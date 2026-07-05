@@ -1,0 +1,75 @@
+---
+title: Performance
+description: The player's performance machinery — priority-based preloading, LRU image caching with a memory budget, asset variant selection, and memory management.
+---
+
+The player is designed to keep reading fluid on slow networks and modest devices. Three mechanisms carry most of the load: the **preload queue**, the **image cache**, and **asset variant selection**. All class and function names below are real symbols from `projects/player/src/lib/`.
+
+## Preloading
+
+`PreloadService` maintains a priority queue of `PreloadItem`s (`{ id, type: 'image' | 'audio' | 'video', url, priority }`) and loads them with bounded concurrency:
+
+- **Priorities**: `high`, `medium`, `low`. The queue is re-sorted on every insert; duplicates (already loaded or already queued) are ignored.
+- **Concurrency**: default `maxConcurrent = 3`, overridable via `setMaxConcurrent()`.
+- **Network awareness** (on by default, `setNetworkAware(false)` to disable): the service reads the Network Information API and adapts —
+
+| Connection | Max concurrent loads |
+|---|---|
+| `4g` | 5 |
+| `3g` | 2 |
+| `2g` / `slow-2g` | 1 |
+| `saveData` enabled | 0 — preloading stops and the queue is cleared |
+
+- **Idle scheduling**: `low`-priority items are deferred with `requestIdleCallback` (2 s timeout, `setTimeout` fallback) so they never compete with rendering.
+- **Prediction**: `preloadNext(currentIndex, panelUrls, count = 3)` queues the next panels with descending priority (next = `high`, +2 = `medium`, +3 = `low`); `predictAndPreload(currentIndex, totalPanels, direction, panelUrls)` supports `forward`, `backward`, and `auto` (forward 3 + backward 1).
+- **Per-type loading**: images go through `ImageCacheService.preload()`; audio waits for `canplaythrough`; video only fetches metadata (`video.preload = 'metadata'`) to keep preloads cheap.
+- **Observability**: `status$` emits `queued`/`loading`/`loaded`/`error` per item; `getQueueStatus()` returns counts.
+
+## Image caching
+
+`ImageCacheService` is an LRU cache for decoded images:
+
+- **Decode path**: `fetch()` → `blob` → `createImageBitmap()` where supported (decode off the main thread), falling back to an `HTMLImageElement` from an object URL.
+- **Memory budget**: 100 MB (`MEMORY_BUDGET`), adjustable at runtime with `setMemoryBudget(bytes)`. Entry size is estimated as `width × height × 4` bytes (RGBA).
+- **LRU mechanics**: the backing `Map`'s insertion order is the recency order — a cache hit re-inserts the entry at the end; eviction pops from the front until the new entry fits. Evicted and removed `ImageBitmap`s are explicitly released with `bitmap.close()`.
+- **Deduplication**: concurrent `load()` calls for the same URL share one in-flight promise.
+- **API**: `load(url)`, `preload(url)`, `preloadBatch(urls)`, `has(url)`, `remove(url)`, `clear()`, `getCachedUrls()`, and `getStats()` (entries, memory usage, budget utilization, in-flight count).
+
+<Callout kind="tip">
+If a single image exceeds the entire budget, the cache logs a warning and clears itself rather than thrashing — keep source images within reasonable dimensions and rely on variants (below) for large artwork.
+</Callout>
+
+## Asset variant selection
+
+Manifests can list multiple encodings/resolutions per asset (see [Assets](/schema/assets)). The selection helpers live in `utils/asset-utils.ts`:
+
+- `selectBestImageVariant(variants, targetWidth, pixelDensity = 1)` — computes the required width as `targetWidth × pixelDensity`, sorts variants by width, and returns the **smallest variant that meets or exceeds** the requirement, or the largest available if none does. A 500 px slot on a 2× display therefore gets the smallest variant ≥ 1000 px.
+- `selectVariantByFormat(variants, preferredFormats)` — walks a MIME preference list (e.g. `['image/avif', 'image/webp', 'image/jpeg']`) and returns the first match, falling back to the first variant.
+- `generateSrcSet(variants)` — builds a `srcset` string (`"hero-400.jpg 400w, hero-800.jpg 800w"`) for native responsive images.
+- `resolveAssetUrl(assetId, assetBase, category)` — resolves relative asset references against the category-specific base URLs (`imageBase`, `audioBase`, `videoBase`, `pluginsBase`, with `mediaBase` as the fallback); absolute URLs pass through untouched.
+- Supporting utilities: `isAbsoluteUrl`, `getAssetFromCatalog`, `getFileExtension`, `guessMimeType`, `isMimeTypeSupported`, `calculateOptimalDimensions`, `estimateImageSize`.
+
+## Rendering performance
+
+- **OnPush everywhere.** Every component uses `ChangeDetectionStrategy.OnPush`; state flows in through inputs and RxJS subscriptions.
+- **Viewport culling.** `ViewportComponent` can skip off-screen panels in page view (`enableViewportCulling` input) and supports lazy image loading (`enableLazyLoading`, default on).
+- **Metrics output.** The viewport emits `performanceMetrics` (`renderTime`, `panelCount`, `visiblePanelCount`, `culledPanelCount`, `transformCalculationTime`) so hosts can watch real render cost.
+- **Visibility-driven media.** `VisibilityService` (an `IntersectionObserver` wrapper with a 50% threshold, `VISIBILITY_THRESHOLD = 0.5`) gates page-view video playback, and `UserGestureService` attaches its global listeners outside the Angular zone to avoid change-detection churn on every pointer event.
+
+## Video and audio costs
+
+- Preloading fetches **video metadata only**; full video data streams on demand.
+- `VideoControllerService` allows any number of *muted* videos but at most **one unmuted video** at a time, preempting the previous one — bounding both audio chaos and decode load.
+- `VideoSequencerService` plays page-view videos sequentially (one panel-slot at a time) instead of all at once, and skips stalled entries after a configurable timeout (`DEFAULT_STALL_TIMEOUT_MS = 10_000`).
+- `AudioEngineService.cleanup()` disconnects source nodes and empties `HTMLAudioElement`s (`src = ''` + `load()`) when tracks stop, and `destroy()` closes the `AudioContext`.
+
+## Memory checklist for contributors
+
+When adding features, keep these invariants:
+
+1. Decoded images are owned by `ImageCacheService` — do not hold long-lived references to `ImageBitmap`s elsewhere, and never bypass the budget.
+2. Anything you `observe()` (visibility) or register (sequencer, controller) must be unobserved/unregistered in `ngOnDestroy`.
+3. Subscriptions in components follow the `takeUntil(destroy$)` pattern.
+4. Respect the user's constraints: `saveData` disables preloading, and `reducedMotion` (input or `prefers-reduced-motion`) degrades video `on-view` autoplay to `on-click`.
+
+Related: [Player Architecture](/player/architecture), [Core Services](/player/services), [Configuration](/player/configuration).

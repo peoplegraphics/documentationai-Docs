@@ -1,0 +1,126 @@
+---
+title: Validating Manifests
+description: Validate a PanelWave manifest with AJV in Node.js or the PanelWave CLI, and learn how to read the most common validation errors.
+---
+
+Every PanelWave manifest should be validated against the official schema before it is published or handed to the player. There are two supported paths: the `@panelwave/cli` command line tool, and AJV directly in your own code.
+
+## Option 1: PanelWave CLI (recommended)
+
+```bash
+npm install -g @panelwave/cli
+
+panelwave validate ./my-comic/panelwave.json
+```
+
+Options:
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `-s, --schema <version>` | `1.0.0` | Schema version to validate against (resolved by **major** version to the bundled `schema/<major>.0/panelwave.schema.json`) |
+| `--strict` | off | Also fail (exit code 1) when there are warnings |
+| `--json` | off | Machine-readable output: `{ valid, errors, warnings }` |
+
+The exit code is `0` when valid, `1` otherwise — suitable for CI. Errors are grouped by JSON path:
+
+```text
+  ✗ my-comic/panelwave.json has 2 error(s)
+
+  /meta
+    → must have required property 'default_locale'
+  /chapters/0/panels/p1/layers/0
+    → must have required property 'kind'
+```
+
+### Warnings
+
+Beyond schema errors, the CLI emits non-blocking structural warnings:
+
+- **No `assets` section** — panels referencing `assetId`s will fail at runtime.
+- **No `characters` in `meta`** — speech bubbles with a `characterId` will be unresolved.
+
+With `--strict`, warnings also fail the run.
+
+## Option 2: AJV programmatically
+
+The schema uses JSON Schema **2020-12**, so import AJV's 2020 build (`ajv/dist/2020`), and add `ajv-formats` for `uri`, `date`, and `date-time` format checks:
+
+```bash
+npm install ajv ajv-formats
+```
+
+```javascript
+const Ajv = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+
+const ajv = new Ajv({
+  allErrors: true,       // report every error, not just the first
+  verbose: true,
+  strict: false,         // the schema uses 2020-12 features AJV strict mode flags
+  validateFormats: true,
+  allowUnionTypes: true
+});
+addFormats(ajv);
+
+const schema = require('./schema/1.0/panelwave.schema.json');
+const manifest = require('./my-comic/panelwave.json');
+
+const validate = ajv.compile(schema);
+
+if (validate(manifest)) {
+  console.log('Manifest is valid');
+} else {
+  console.error(validate.errors);
+}
+```
+
+<Callout kind="alert">
+Using the default `new Ajv()` (draft-07) build will fail to compile the schema. Always import `ajv/dist/2020` and set `strict: false`.
+</Callout>
+
+Each AJV error has an `instancePath` (where in the manifest), a `keyword` (which rule failed), and a `message`. Group errors by `instancePath` for readable output — a single root cause inside a `oneOf` (like a layer) can fan out into many raw errors.
+
+## Common validation errors
+
+<ExpandableGroup>
+  <Expandable title="must NOT have additional properties" default-open="true">
+    The most frequent error. Almost every object in the schema sets `additionalProperties: false` (or `unevaluatedProperties: false`). Causes:
+    - A **typo** in a property name (`asetId` instead of `assetId`).
+    - A property placed at the **wrong level** (e.g. `condition` on a panel instead of an edge).
+    - Custom data without the `x-` prefix. Only the manifest root explicitly allows `x-` extension properties — see [Extensions](/schema/extensions).
+  </Expandable>
+  <Expandable title="must have required property 'kind' / must match exactly one schema in oneOf">
+    Layers are a discriminated union on `kind` (`image`, `audio`, `video`, `text`, `vector`, `plugin`). A missing or misspelled `kind`, or a property that belongs to a different layer kind, makes the layer match none of the `oneOf` branches — AJV then reports errors against **every** branch. Fix the `kind` first, then re-validate. See [Layers](/schema/layers).
+  </Expandable>
+  <Expandable title="must match pattern ...">
+    - **IDs** (`Identifier`): must match `^[a-zA-Z0-9][a-zA-Z0-9._:-]*$` — no spaces, must start alphanumeric, 1–200 chars.
+    - **Variable IDs**: stricter dot-namespaced pattern `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` — see [Variables](/schema/variables).
+    - **Locales** (`LocaleCode`): BCP-47-like, e.g. `en-US`, `de-DE`.
+    - **Colors** (`ColorHex`): `#RRGGBB` or `#RGB`.
+    - **MIME types on variants**: image variants must have an `image/*` MIME, audio `audio/*`, and so on — see [Assets](/schema/assets).
+  </Expandable>
+  <Expandable title="must have required property 'locales' (or other Meta fields)">
+    `meta` requires `id`, `title`, `locales`, and `default_locale`. `title` must be a `LocalizedString` object (`{ "en-US": "..." }`), not a plain string. See [Meta](/schema/meta).
+  </Expandable>
+  <Expandable title="must NOT have fewer than 1 items (graph.edges, chapters, variants)">
+    Several arrays have `minItems: 1`: `chapters`, `graph.edges`, every asset's `variants`, and `layout.placements`. A chapter graph needs at least one edge — a single-panel chapter can't have an empty `edges` array. Each chapter's `panels` map also needs at least one entry.
+  </Expandable>
+  <Expandable title="must be equal to one of the allowed values (enum)">
+    Enumerated fields reject unknown values: `transition.type`, `variable.scope`, `asset.category`, `paywall.scope`, `tracking.eventWhitelist` entries, and others. Check the reference page of the object in question for the exact allowed values.
+  </Expandable>
+</ExpandableGroup>
+
+For a longer troubleshooting walkthrough see [Validation Errors](/help-center/troubleshooting/validation-errors).
+
+## What schema validation does not catch
+
+Schema validation is structural. These checks are up to application code (the CMS runs them as part of its own [validation](/cms/validation)):
+
+- **Referential integrity** — that every `assetId`, `characterId`, edge `from`/`to`, and `graph.entry` points to something that exists.
+- **Graph reachability** — that all panels are reachable from the entry.
+- **Cross-field constraints** — e.g. for `loop-from` video playback, `startAtMs <= loopFromMs < durationMs` is documented in the schema but not structurally enforceable.
+- **Asset availability** — that variant `src` URLs actually resolve.
+
+<Callout kind="tip">
+Validate early and often: on save in your authoring pipeline, in CI, and before publishing. A manifest that passes schema validation plus reference checks will load in the [player](/player/overview) without surprises.
+</Callout>

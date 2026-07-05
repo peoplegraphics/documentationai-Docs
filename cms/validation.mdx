@@ -1,0 +1,80 @@
+---
+title: Validation & Preflight
+description: Check your work before publishing with Preflight Validation — what is checked, how errors and warnings are presented, auto-fixes, and how to resolve issues.
+---
+
+Before a work goes live, **Preflight Validation** checks it for problems — missing translations, broken navigation, oversized files, accessibility gaps. Errors block publishing; warnings and info items are advisory.
+
+You reach it in two ways:
+
+- The **Preflight** button in the editor header (it shows a badge with the current issue count).
+- **Validation** in the Backstage sidebar, which opens the full **Preflight Validation** page.
+
+Publishing runs the same checks: the [publish wizard's](/cms/publishing) first step is **Preflight**.
+
+## Running a validation
+
+Click **Run Validation**. When it finishes you get a summary:
+
+- A verdict card — **Ready to Publish** (green) or **Cannot Publish** (red) with the total issue count. If you've run validation before, a diff shows how many issues are **new** and how many were **resolved** since the last run.
+- Counts per severity: **Errors**, **Warnings**, **Info**.
+
+| Severity | Meaning |
+|---|---|
+| **Error** | Must be fixed — blocks publishing |
+| **Warning** | Should be fixed — quality or accessibility concern |
+| **Info** | Nice to have — suggestions |
+
+## What is checked
+
+Issues are grouped into eight categories:
+
+| Category | Typical checks |
+|---|---|
+| **Accessibility** | Image layers without alt text, audio without captions |
+| **Content** | Empty panels (no layers or content) |
+| **Localization** | Strings missing translations for supported locales |
+| **Flow** | Panels unreachable from the chapter's entry point in the [graph](/cms/editor/graph) |
+| **Performance** | Oversized assets that will slow readers down |
+| **Audio** | Speech bubbles without voice audio |
+| **Integrity** | Broken references (edges or layers pointing at missing panels/assets), duplicate IDs |
+| **Metadata** | Missing work title, description, or cover |
+
+## Working through issues
+
+Issues are listed grouped by category. Each row shows a severity badge, the human-readable message, and the issue code (e.g. `MISSING_ALT_TEXT`). Click a row to open the details:
+
+- **Path** — where in the work the problem sits (with a copy button), plus panel/bubble IDs and locale where relevant.
+- **Suggestion** — the recommended fix.
+- **Open in editor** — jumps straight to the offending panel so you can fix it.
+- **Learn more** — links to documentation for the issue code (see [Validation error reference](/help-center/troubleshooting/validation-errors)).
+
+To narrow a long list use the **Search** box (message, code, or path), the **Category** dropdown, and the **Errors / Warnings / Info** severity toggles. Frequently used filter combinations can be saved as **presets** (**Save current as preset**) and re-applied with one click.
+
+Each category header also has a re-run button so you can re-check just that category after fixing things.
+
+## Auto-fixes
+
+Issues that can be fixed automatically show a **Fix** button — for example removing a dangling reference. You can also:
+
+- Tick multiple fixable issues (or select a whole category) and click **Apply fixes to selected**.
+- **Undo** the most recent applied fixes — removed content is restored from a snapshot.
+
+<Callout kind="alert">
+Auto-fixes are convenient but not always what you want — a "broken link" fix removes the reference rather than restoring the missing target. Review the suggestion before fixing, and prefer **Open in editor** when the real fix is authoring work.
+</Callout>
+
+## Fixing common issues
+
+| Issue | How to fix |
+|---|---|
+| Missing alt text | **Open in editor**, select the layer, add alt text in the **A11y** inspector tab (or via the asset's **Edit Metadata** in the [Assets library](/cms/assets)) |
+| Missing translations | Open the [Localization Workshop](/cms/localization), filter by **Show Only Missing** |
+| Unreachable panel | Open the [Graph Editor](/cms/editor/graph) and connect the panel — or delete it if it's leftover |
+| Oversized asset | Re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
+| Missing title/description/cover | Fill them in under [Work Properties](/cms/works) → Metadata |
+| Empty panel | Add content, or delete the panel in the Tree |
+
+## Exporting a report
+
+**Export JSON** and **Export CSV** download the full issue list — useful for tracking fixes in a spreadsheet or handing a QA report to teammates.

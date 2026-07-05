@@ -1,0 +1,128 @@
+---
+title: Layers
+description: Work with image, video, audio, text, and plugin layers in the PanelWave editor — stacking order, visibility, opacity, transforms, and multi-selection.
+---
+
+Every panel in your graphic novel is built from **layers**: stacked pieces of content that the player composites into the final image. Background art, character art, a video clip, a caption, ambient sound — each is its own layer that you can move, resize, hide, or reorder independently.
+
+<Callout kind="info">
+  Layers are edited in **panel view**. If you are looking at a whole page, the layer list shows a **Read-only** badge — double-click a panel on the canvas to enter panel view and start editing. See [Canvas](/cms/editor/canvas) for the two view modes.
+</Callout>
+
+## Layer types
+
+| Type | What it holds | Typical use |
+|---|---|---|
+| **Image** | An image asset from your [asset library](/cms/assets) | Panel artwork, backgrounds, characters, props |
+| **Video** | A video asset with play/start modes, trim, and loop settings | Animated panels, motion backgrounds — see [Video Panels](/cms/editor/video-panels) |
+| **Audio** | An audio asset with autoplay, loop, and volume | Music, ambience, sound effects — see [Audio](/cms/editor/audio) |
+| **Text** | Free text with font, size, weight, color, and alignment | Captions, titles, sound-effect lettering |
+| **Plugin** | A plugin (Image Zoom, 360° Panorama, Image Gallery) with its configuration | Special interactive content |
+
+Speech bubbles and hotspots are *not* layers — they sit on top of the layer stack and have their own editing workflows. See [Speech Bubbles](/cms/editor/speech-bubbles) and [Hotspots](/cms/editor/hotspots).
+
+## Adding layers
+
+<Steps>
+  <Step title="Open a panel">
+    Double-click a panel on the canvas (or pick it in the structure tree) so you are in panel view.
+  </Step>
+  <Step title="Right-click the canvas">
+    Choose **Add Layer** from the context menu, then pick **Image Layer**, **Video Layer**, **Audio Layer**, **Text Layer**, or **Plugin Layer**. The new layer is created where you clicked.
+  </Step>
+  <Step title="Assign content">
+    With the layer selected, use the Inspector's type-specific section (for example **Image Properties** → **Browse**, or **Video Properties** → the video asset selector) to attach an asset.
+  </Step>
+</Steps>
+
+Two layer types also have dedicated canvas tools in the tool palette: **Image** (shortcut `I`) and **Text** (shortcut `T`) — select the tool and click the canvas to place a layer directly. The full shortcut list is on [Shortcuts](/cms/editor/shortcuts).
+
+## The layer list
+
+The **Layers** section of the Inspector's panel tab lists everything in the current panel, top-most first:
+
+- **Speech bubbles** appear at the top of the list (they always render above layers). Each row shows the bubble's speaker and has **Hide bubble / Show bubble** and **Delete bubble** buttons.
+- **Layers** show their name, type, and z-index (for example `image • z3`), plus four row buttons:
+  - the eye icon — **Hide layer / Show layer**
+  - the up arrow — **Move up (increase z-index)**
+  - the down arrow — **Move down (decrease z-index)**
+  - the trash icon — **Delete layer**
+
+Click a row to select the layer (Ctrl/Cmd-click to add to the selection); double-click to jump to its properties.
+
+## Selecting and moving on the canvas
+
+With the **Select** tool (`V`) active:
+
+- **Click** a layer to select it; **Shift-click** to add more layers to the selection; click empty canvas to clear it.
+- **Drag on empty canvas** to marquee-select everything the rectangle touches.
+- A selected layer shows **8 resize handles** (corners and edges) plus a **rotate handle** above it. Drag the body to move, handles to resize, the top handle to rotate.
+- **Arrow keys** nudge the selection by 1 px; **Shift + arrow** nudges by 10 px.
+- **Ctrl/Cmd + D** duplicates the selection; **Delete** or **Backspace** removes it.
+
+Locked layers ignore moves and nudges until you unlock them.
+
+## Layer properties
+
+Select a single layer and open the Inspector's layer tab. Properties are grouped into collapsible sections:
+
+### Common Properties
+
+| Field | Description |
+|---|---|
+| **Layer ID** | Read-only identifier used by hotspot actions and conditions |
+| **Type** | The layer type (read-only) |
+| **Name** | Display name shown in the layer list |
+| **Z-Index** | Position in the stacking order (higher = in front) |
+| **Parallax Depth** | Depth for the parallax scrolling effect |
+| **Visible If** | Optional condition that shows/hides the layer at read time — use **Build Condition** to compose it visually (see [Variables](/cms/editor/variables)) |
+
+### Transform
+
+**X**, **Y**, **Width**, **Height**, **Scale X**, **Scale Y**, and **Rotation** (0–360°). You can type exact values or drag horizontally on a field label to scrub it. **Reset Transform** puts everything back to neutral.
+
+### Appearance
+
+- **Opacity** — slider from 0% to 100%.
+- **Visible** — the design-time visibility toggle (same as the eye icon in the layer list).
+- **Locked** — protects the layer from canvas edits.
+
+<Callout kind="info">
+  There are no blend modes — layers composite with plain transparency, controlled by **Opacity**.
+</Callout>
+
+### Drag Reveal
+
+Enable **Drag Reveal** to let readers wipe a layer into view by dragging, and set the **Reveal Rect** (X, Y, Width, Height) that responds to the gesture.
+
+### Type-specific sections
+
+Depending on the layer type you will also see **Image Properties** (asset + clip rect), **Video Properties** (asset, view mode, start mode, trim, muted, controls), **Audio Properties** (asset, autoplay, loop, volume), **Text Properties** (content, font, size, weight, color, alignment), or **Plugin Properties** (plugin and its configuration).
+
+## Ordering layers
+
+Layers render bottom-to-top by z-index. Three ways to reorder:
+
+1. The **up/down arrows** on a row in the layer list.
+2. The **Arrange** section of the layer tab: **Bring to Front**, **Bring Forward**, **Send Backward**, **Send to Back**.
+3. Right-click a selected layer on the canvas → **Arrange** (same four commands).
+
+The right-click menu also offers **Align** (left/center/right/top/middle/bottom, needs 2+ selected) and **Distribute** (horizontally/vertically, needs 3+ selected).
+
+## Editing several layers at once
+
+Select multiple layers and the layer tab switches to multi-edit: shared **Transform** and **Appearance** fields apply your input to every selected layer. Where the layers currently disagree, the field shows a **Multiple** badge — typing a value overwrites it everywhere.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Canvas" icon="frame" href="/cms/editor/canvas">
+    View modes, zoom, grid, and device frame.
+  </Card>
+  <Card title="Layers in the format" icon="layers" href="/schema/layers">
+    How layers are represented in the PanelWave manifest.
+  </Card>
+  <Card title="Animations" icon="sparkles" href="/cms/editor/animations">
+    Animate layer properties over time.
+  </Card>
+</Columns>

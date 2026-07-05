@@ -1,0 +1,103 @@
+---
+title: Works
+description: Manage your projects on the My Works page — create works with the wizard, filter and sort, change statuses, use the Trash, and edit work-level defaults.
+---
+
+**My Works** (`/works`) is the CMS home screen. Every interactive graphic novel you author is a **work** — a self-contained project with its own chapters, assets, characters, translations, and settings.
+
+## Creating a work
+
+Click **Create New Work** to open the three-step wizard:
+
+<Steps>
+  <Step title="Basic Info">
+    Enter the **Work Title** and the **URL Slug** (lowercase letters, numbers, and hyphens; auto-generated from the title). The wizard checks slug availability live — you'll see **Available** or **Already taken**.
+
+    Optionally pick a starter template (**Webcomic**, **Branching Novel**, **All-Ages Story**, **Graphic Novel**) to pre-fill languages, age rating, and tags — you can still adjust everything in the next steps.
+  </Step>
+  <Step title="Languages">
+    Choose the **Default Language** and tick any **Additional Languages**. The list is grouped by region and searchable; **Select all** and **Clear** help with large selections. You can add or remove languages later in the [Localization Workshop](/cms/localization).
+  </Step>
+  <Step title="Details">
+    Pick an **Age Rating** — **Everyone** (all ages), **Teen** (13+), **Mature** (17+), or **Adult** (18+) — and add optional **Tags** (press Enter, comma, or **Add**). Tick **Start with a first chapter** to have "Chapter 1" created so the editor isn't empty. Click **Create Work**.
+  </Step>
+</Steps>
+
+<Callout kind="tip">
+If you close the wizard halfway, your input is kept as a draft — next time you'll see a **Resume where you left off?** banner with **Resume** and **Discard**.
+</Callout>
+
+You can also **Import** an existing PanelWave JSON file instead of starting from scratch — see [Import](/cms/import).
+
+## Browsing and filtering
+
+The list supports:
+
+- **Search** by title, slug, or work ID.
+- **Status** filter: All, Draft, Review, Published, Archived.
+- **Sort by** Last Updated (default), Date Created, or Title, with an ascending/descending toggle.
+- **Grid or list view** toggle.
+- Two view tabs: **Works** (active) and **Trash**.
+
+Each work card shows the cover, a color-coded status badge, creators, chapter/panel/character/language counts, an artwork-progress bar (panels with artwork vs. total), last-updated time, and who last edited it. Click a card (or the pencil button) to open the work in the editor; middle-click opens it in a new tab.
+
+## Work statuses
+
+A work is always in one of four statuses, changeable directly from the dropdown on each card:
+
+| Status | Meaning |
+|---|---|
+| **Draft** | Work in progress |
+| **Review** | Ready for internal review |
+| **Published** | Live for readers (see [Publishing](/cms/publishing)) |
+| **Archived** | Kept, but out of the way |
+
+## The card menu
+
+The **⋮ More actions** button on a card opens a menu with quick jumps into the work — **Editor**, **Open in new tab**, **Characters**, **Extras**, **Graph Editor**, **Preview**, **Validation**, **Analytics** — plus **Properties** (see below) and **Move to Trash**.
+
+## Bulk actions
+
+Tick the checkbox on one or more cards (or **Select all**) to reveal the bulk action bar:
+
+- **Move to Trash** — trash all selected works.
+- **Set status** — change the status of all selected works at once.
+- **Export** — queue a bulk export in **PDF**, **PPT**, or **Video** format (see [Export](/cms/export)).
+
+In the Trash view, the bulk bar offers **Restore** and **Delete permanently** instead.
+
+## Trash, restoring, and deleting
+
+**Move to Trash** never deletes anything immediately. Switch to the **Trash** tab to **Restore** works or delete them for good. Permanent deletion opens a confirmation dialog — **Delete Work Permanently?** — because it removes all chapters, panels, assets, and data and **cannot be undone**.
+
+<Callout kind="alert">
+There is currently no duplicate-work action on the works list. To copy a work, [export](/cms/export) it as JSON and [import](/cms/import) it under a new slug.
+</Callout>
+
+## Work Properties — work-level settings and defaults
+
+Open **Properties** from the card menu, or press <kbd>Ctrl</kbd>+<kbd>,</kbd> inside the editor. The **Work Properties** dialog has six tabs:
+
+### Metadata
+Localized **Name** and **Description**, **Series Name** and **Issue / Episode Number**, a **Cover Image** picker (choose from the work's uploaded image assets), **Creators**, and publishing fields: **Publisher**, **Release Date**, **Age Rating**, **Tags / Genres**, **Copyright**, and **License**.
+
+### Typography
+Work-wide visual defaults:
+
+- **Default Font** and **Default Font Size**, plus the **Default Page Background Color**.
+- **Speech Balloon Style (Work Default)** — the balloon configurator with live preview. This is the base style for *every* speech bubble in the work; [characters](/cms/characters) and individual bubbles can override it (styles cascade: work default → character override → per-bubble override).
+- **Panel Border Style** (color, thickness, solid/dashed/none) and the **Gutter Width** between panels.
+
+### Localization
+The **Default Locale**, the set of **Supported Locales**, and the **Reading Direction**. These are the same locales managed in the [Localization Workshop](/cms/localization).
+
+### Audio/Visual
+Default **Ambient**, **SFX**, and **Voice** volume levels, and the default panel **Transition Effect** and **Transition Duration**.
+
+### Output
+The **Default Format** used for previews and exports.
+
+### Video Defaults
+Defaults applied to new video layers (view mode, start mode, **Muted by default**) unless overridden per layer — see [Video Panels](/cms/editor/video-panels).
+
+Click **Save Properties** to apply.

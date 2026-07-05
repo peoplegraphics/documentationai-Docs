@@ -1,0 +1,131 @@
+---
+title: Canvas
+description: How to work on the editor canvas — zooming, panning, selecting, moving and resizing elements, snapping and guides, and page vs panel view.
+---
+
+The canvas is the center zone of the [editor](/cms/editor/layout) where your artwork appears. What you see and manipulate depends on the view: a whole page with all its panels (**page view**) or a single panel with its layers, speech bubbles, and hotspots (**panel view**).
+
+## Canvas toolbar
+
+Across the top of the canvas:
+
+- **Format selector** — the frame you're designing for. Available frames: Tablet Portrait (768×1024), Mobile Portrait (375×667), Square (1024×1024), Desktop Landscape (1920×1080), Bigscreen Landscape (3840×2160), DIN A4 Portrait (794×1123), and DIN A4 Landscape (1123×794). Because panel placement uses percentages of the page, your layout adapts when you switch frames.
+- **Zoom controls** — zoom out, current zoom percentage, zoom in, and **Fit to View**.
+- **Page View / Panel View toggle** — switches views (shown once your work has pages).
+- **View options** — **Grid**, **Rulers**, **Safe Area**, and **Snap** toggles.
+- **Canvas info** — the frame's pixel dimensions and aspect ratio.
+
+## Zoom and pan
+
+Zooming steps through preset levels: 25%, 33%, 50%, 67%, 75%, 90%, 100%, 125%, 150%, 200%, 300%, 400%, 500%.
+
+| Action | How |
+|---|---|
+| Zoom in / out | Toolbar buttons, or `Ctrl/Cmd` + `+` / `-` |
+| Zoom with the mouse | Hold `Ctrl/Cmd` and scroll the mouse wheel (smooth zoom from 10% to 500%) |
+| Fit the whole frame on screen | Fit to View button, or `Ctrl/Cmd+0` |
+| Zoom into a region | Select the **Zoom tool** (`Z`), then drag a rectangle around the area |
+| Pan (move around) | Select the **Hand tool** (`H`) and drag, or drag with the **middle mouse button** at any time |
+
+<Callout kind="tip">
+  A plain mouse wheel scroll won't zoom — you must hold `Ctrl/Cmd`. This keeps accidental zooming from happening while you scroll panels or the inspector.
+</Callout>
+
+## Selecting elements
+
+With the **Select tool** (`V`) active:
+
+- **Click** an element to select it. In panel view that's a layer, speech bubble, or hotspot; in page view it's a panel.
+- **Shift+Click** adds an element to the selection (or removes an already-selected one).
+- **Marquee**: drag on empty canvas to draw a selection rectangle — everything it touches gets selected.
+- **`Ctrl/Cmd+A`** selects all layers in the panel.
+- **`Escape`** clears the selection.
+
+Selected elements show a bounding box with handles; the [inspector](/cms/editor/layout#right-inspector) switches to the matching tab automatically. When several panels are selected in page view, the primary panel (the one that drives resizing and snapping) has a solid outline and the others a dashed outline.
+
+## Moving and resizing
+
+- **Drag** a selected element to move it. With multiple panels selected, they all move together, keeping their relative positions.
+- **Arrow keys** nudge the selection by 1 pixel; **Shift+Arrow** nudges by 10 pixels.
+- **Resize handles** — 8 handles around the selection (corners and edges) resize it; the cursor shows the direction. A **rotation handle** sits above the selection.
+- **`Ctrl/Cmd+D`** duplicates the selection; **`Delete`/`Backspace`** removes it.
+- In page view you can also **copy, cut, and paste panels** with `Ctrl/Cmd+C`, `Ctrl/Cmd+X`, and `Ctrl/Cmd+V`.
+
+<Callout kind="info">
+  **Panel resizing is special.** In page view, dragging a panel's **corner** handles resizes it while keeping its aspect ratio, so artwork never distorts. Dragging its **edge** handles doesn't stretch the panel — it adjusts the panel's *visible area* (a crop). The hidden portion appears washed out and the visible region gets a blue dashed border. This lets one panel show different crops in different page formats.
+</Callout>
+
+## Snapping, grid, and guides
+
+- **Grid** (`G`) — overlays a light grid as a visual alignment aid. It never constrains placement by itself.
+- **Snap** — when enabled, dragged elements snap to the grid.
+- **Smart guides** — while dragging panels, alignment guides appear against the edges and centers of other panels (like in typical design tools), so it's easy to line things up even with the grid off.
+- **Rulers** (`Shift+R`) — pixel rulers along the top and left edges.
+- **Safe Area** — shows an inset border marking the zone that stays visible on all devices (and print bleed).
+
+For precise numeric positioning, use the **Layout & Transform** section of the panel inspector — see [Pages & Panels](/cms/editor/pages-panels#panel-properties-in-the-inspector).
+
+## Aligning and distributing panels
+
+With two or more panels selected in page view you can align them; with three or more you can distribute them evenly. Both are available from the **right-click context menu** (Align and Distribute submenus) and via shortcuts:
+
+| Shortcut | Action |
+|---|---|
+| `Ctrl+Shift+L` / `Ctrl+Shift+E` | Align left / right |
+| `Ctrl+Shift+T` / `Ctrl+Shift+B` | Align top / bottom |
+| `Ctrl+Shift+H` / `Ctrl+Shift+M` | Align horizontal center / vertical middle |
+| `Ctrl+Alt+H` / `Ctrl+Alt+Y` | Distribute horizontally / vertically |
+
+## Page view vs panel view
+
+<Tabs>
+  <Tab title="Page view" icon="file-text">
+    Shows the whole page at once. Panels appear with borders and a numbered blue **reading order badge** in the corner. Use this view to:
+
+    - Arrange panel placement, size, rotation, and stacking (overlap)
+    - Select and move several panels at once
+    - Align and distribute panels
+    - Drop image assets to create new panels, or drop panels dragged from the structure tree
+
+    Speech bubbles render inside each panel; when panels are small, bubble text is scaled up slightly so it stays readable while you work.
+  </Tab>
+  <Tab title="Panel view" icon="image">
+    Shows a single panel filling the frame. Use this view to:
+
+    - Edit the panel's [layers](/cms/editor/layers) — artwork, text, video, audio
+    - Place and style [speech bubbles](/cms/editor/speech-bubbles) (double-click a bubble to edit its text right on the canvas)
+    - Draw and edit [hotspots](/cms/editor/hotspots)
+
+    If the panel defines a *minimal focus rect*, the area outside it is dimmed with a green border around the important region — a preview of what readers focus on.
+  </Tab>
+</Tabs>
+
+**Switching between views:**
+
+- The **Page View / Panel View** button in the canvas toolbar, or the `V` shortcut, toggles views.
+- **Double-click a panel** in page view to open it in panel view.
+- In panel view, **`Tab` / `Shift+Tab`** jump to the next / previous panel following the reading order.
+- Selecting a page or a panel in the structure tree also switches the canvas to the matching view.
+
+## Adding content by drag and drop
+
+- **Asset → canvas**: drag an image from the **Assets** tab onto the canvas. An overlay reads "Drop asset here to add to canvas". In page view, dropping on empty space creates a brand-new panel containing the image, while dropping onto an existing panel adds the image to that panel. In panel view it adds an image layer to the current panel.
+- **Panel → page**: drag a panel from the structure tree onto the canvas while in page view to place it on the page ("Drop panel to place it on this page"). If you're in panel view, the overlay tells you to switch to page view first.
+
+## Right-click menu
+
+Right-clicking the canvas opens a context menu with actions for the current selection — for example adding layers, arranging order, and the Align/Distribute submenus for multi-panel selections. Entries that don't apply to your selection are grayed out.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Pages & Panels" icon="layout-grid" href="/cms/editor/pages-panels">
+    Create and organize the structure you see on the canvas.
+  </Card>
+  <Card title="Layers" icon="layers" href="/cms/editor/layers">
+    Everything about artwork layers inside a panel.
+  </Card>
+  <Card title="Shortcuts" icon="keyboard" href="/cms/editor/shortcuts">
+    All canvas and editor keyboard shortcuts in one place.
+  </Card>
+</Columns>

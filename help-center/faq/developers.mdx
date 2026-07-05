@@ -1,0 +1,69 @@
+---
+title: Developers FAQ
+description: Answers for developers working with the PanelWave format and player — validation, schema versions, embedding, entitlements, and asset resolution.
+---
+
+Questions developers ask most often. For step-by-step fixes see the [troubleshooting pages](/help-center); for the full references see the [Schema](/schema/overview) and [Player](/player/overview) sections.
+
+## Format and validation
+
+<ExpandableGroup>
+  <Expandable title="Why won't AJV compile the PanelWave schema?">
+    The schema uses JSON Schema draft 2020-12. Import AJV's 2020 build (`require('ajv/dist/2020')`), add `ajv-formats`, and construct it with `strict: false` — the default draft-07 AJV build cannot compile it. See [Validation](/schema/validation).
+  </Expandable>
+  <Expandable title="Why does my manifest fail with 'must NOT have additional properties'?">
+    Nearly every object in the schema sets `additionalProperties: false`, so a typo in a property name, a field at the wrong nesting level, or custom data without the `x-` prefix is rejected. Check the property name against the reference page for that object, and note that `x-` extension fields are only allowed at the manifest root. See [Extensions](/schema/extensions) and [Validation Errors](/help-center/troubleshooting/validation-errors).
+  </Expandable>
+  <Expandable title="My manifest says version 1.1.0 but points at the 1.0 schema URL — is that wrong?">
+    No. The schema directory is named after the **major** version; minor releases are additive and ship in place. Format 1.1.0 validates against `https://panelwave.org/schema/1.0/panelwave.schema.json`, and every valid 1.0 manifest stays valid. See [Versioning](/schema/versioning).
+  </Expandable>
+  <Expandable title="Does schema validation check that my assetId and panel references exist?">
+    No — JSON Schema validation is structural only. Dangling `assetId`s, unknown `characterId`s, or graph edges to missing panels pass validation but break at runtime. Run reference and reachability checks in your pipeline: the [CLI](/schema/cli) adds some warnings, and the CMS runs full [preflight checks](/cms/validation).
+  </Expandable>
+  <Expandable title="Where can I put custom data in a manifest without breaking validation?">
+    At the manifest root you can add any property starting with `x-` (e.g. `x-mytool-state`). Deeper in the tree most objects are closed, so nested `x-` keys fail strict validation — use `PluginInstance.props` (any JSON), `pluginPayload` catalog assets, or the intentionally open `ExtraBlock` object instead. See [Extensions &amp; Plugins](/schema/extensions).
+  </Expandable>
+</ExpandableGroup>
+
+## Player integration
+
+<ExpandableGroup>
+  <Expandable title="Which Angular version do I need for @panelwave/player?">
+    Use Angular 20. The library's `package.json` still declares peer dependencies of `@angular/common`/`@angular/core` `^17.3.0`, but it is developed and tested against Angular 20.3 with TypeScript 5.8, RxJS 7.8, `@ngx-translate/core` 17, and `json-logic-js` 2.0.5. See [Installation](/player/installation).
+  </Expandable>
+  <Expandable title="Why does the player show 'Manifest URL loading not yet implemented'?">
+    The `pw-player-shell` `manifestUrl` input is reserved but not functional in the current build. Fetch the manifest JSON yourself (e.g. with `HttpClient`) and bind the parsed object to the `[manifest]` input — exactly what the demo application does. See [Quickstart: Embed](/player/quickstart-embed).
+  </Expandable>
+  <Expandable title="Does the player use Angular signals or NgRx for state?">
+    Neither. Player state is managed with RxJS `BehaviorSubject`-backed services; components are standalone with OnPush change detection. Persistent-scope variables are stored in `localStorage`. See [State &amp; Conditions](/player/state-and-conditions).
+  </Expandable>
+  <Expandable title="How does the player decide which edge to follow when several conditions pass?">
+    `FlowEngineService.getNextPanel()` collects all edges leaving the current panel, evaluates each JSON Logic condition against the flattened variable context (missing condition = always true; evaluation error = fail-closed), sorts survivors by numeric priority with the **highest value winning** (missing priority = 0), and follows the first edge. See [State &amp; Conditions](/player/state-and-conditions).
+  </Expandable>
+  <Expandable title="Does the player remember where a reader stopped?">
+    Not automatically. Persistent-scope variables survive reloads via `localStorage` (key `pw-variables-persistent`), but reading position is the host application's job: record the shell's `panelChange` output and feed the saved position back into `initialChapterId`/`initialPanelId` on the next visit. See [Saving Progress](/player/saving-progress).
+  </Expandable>
+  <Expandable title="Why is my audio not playing until the reader clicks something?">
+    Browsers block audible playback before a user gesture (hover doesn't count). The player's `UserGestureService` reports the first real interaction and `AudioEngineService` exposes `resumeContext()`; on-view videos begin muted until a gesture occurs. See [Audio](/player/audio).
+  </Expandable>
+</ExpandableGroup>
+
+## Rendering, assets, and monetization
+
+<ExpandableGroup>
+  <Expandable title="How does the player decide which asset file to load?">
+    Layers reference catalog items by `assetId`; each item has variants. The player first applies the locale fallback chain, then picks the smallest variant whose width meets the required pixel width (display width × device pixel ratio), preferring modern formats (AVIF before WebP before JPEG). The chosen `src` resolves against the `assets.base` URLs. See [Performance](/player/performance) and [Assets](/concepts/assets).
+  </Expandable>
+  <Expandable title="Why don't speech balloons look like real comic lettering in my embed?">
+    The open-licensed balloon font set ships with the package, but its CSS (`assets/fonts/balloon/balloon-fonts.css`) must be included once in your application's styles. Note that Ames Pro is a commercial font that is not bundled — without a license, balloons fall back to Comic Neue. See [Installation](/player/installation).
+  </Expandable>
+  <Expandable title="Why are there two copies of the ComicBalloon renderer (player and CMS)?">
+    The player copy is canonical and renders SVG; the CMS editor needs Canvas 2D drawing and headless balloon measurement, so it keeps a deliberately synchronized fork. Geometry changes must land in the player first — any divergence is a WYSIWYG bug. See [Balloon Renderer](/player/balloon-renderer).
+  </Expandable>
+  <Expandable title="Why is all gated content locked even though I set up paywall rules?">
+    Without an entitlement adapter the player uses the built-in `NullEntitlementAdapter`, which denies everything. Implement an adapter or use the exported `MockEntitlementAdapter` during development, which grants all access. See [Paywall &amp; Entitlement](/player/paywall-entitlement).
+  </Expandable>
+  <Expandable title="How do paywalls work if the player is open source?">
+    The manifest only declares rules; the player enforces gates but delegates the access decision to an adapter you implement against your own account system. Client-side gating is a UX layer, not a security boundary — truly protected content must also be withheld server-side until the reader is authorized. See [Monetization](/concepts/monetization).
+  </Expandable>
+</ExpandableGroup>

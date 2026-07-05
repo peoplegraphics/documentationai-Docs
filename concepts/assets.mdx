@@ -1,0 +1,84 @@
+---
+title: Assets
+description: The PanelWave asset catalog — catalog items vs variants by resolution, format, and locale, how the player picks variants, and how the CMS manages them.
+---
+
+PanelWave separates **what** an asset is from **which file** delivers it. The manifest registers each logical asset once in a catalog; every catalog item carries one or more **variants** — concrete files differing in resolution, format, or language. Content (layers, covers, extras) references assets only by ID, and the player picks the best variant at load time.
+
+## Catalog items vs variants
+
+The top-level `assets` section has two parts:
+
+```json
+{
+  "assets": {
+    "base": {
+      "imageBase": "https://cdn.example.com/comic/images/",
+      "audioBase": "https://cdn.example.com/comic/audio/"
+    },
+    "catalog": [
+      {
+        "id": "img-alley",
+        "category": "image",
+        "alt": { "en-US": "Dark city alley in the rain" },
+        "variants": [
+          { "src": "alley-2048.avif", "mime": "image/avif", "w": 2048, "h": 1536, "density": 2 },
+          { "src": "alley-2048.webp", "mime": "image/webp", "w": 2048, "h": 1536, "density": 2 },
+          { "src": "alley-1024.jpg",  "mime": "image/jpeg", "w": 1024, "h": 768,  "density": 1 }
+        ]
+      }
+    ]
+  }
+}
+```
+
+- **`base`** — optional base URLs per media kind (`mediaBase`, `imageBase`, `audioBase`, `videoBase`, `sfxBase`, `thumbsBase`, `pluginsBase`). Variant `src` values can be short relative paths; absolute URLs pass through unchanged.
+- **`catalog`** — the list of items. Each has an `id`, a `category`, shared metadata (`alt`, `caption`, `transcript` — all [localized](/concepts/localization) — plus `durationMs`, `sha256`, `tags`), and its `variants`.
+
+Seven categories exist, each with a matching variant shape: `image`, `audio`, `video`, `subtitle`, `vector`, `json`, and `pluginPayload`. Image variants require `src`, `mime`, `w`, `h` (and may declare a `density` from 0.5–4); video variants can additionally mark a playback `direction` and the item can carry a `poster` frame. Full reference: [Assets schema](/schema/assets).
+
+A layer then references the item — never a file:
+
+```json
+{ "kind": "image", "id": "bg", "assetId": "img-alley", "z": 0 }
+```
+
+## Three axes of variation
+
+| Axis | Expressed by | Example |
+|------|-------------|---------|
+| **Resolution** | `w` / `h` / `density` on the variant | 1024 px JPEG for phones, 2048 px for hi-DPI screens |
+| **Format** | `mime` | AVIF where supported, WebP fallback, JPEG last |
+| **Locale** | `locale` on the variant | English vs German voiceover; lettered artwork per language |
+
+One catalog item can combine all three — e.g. localized, multi-resolution page art.
+
+## How the player picks a variant
+
+When a panel needs an asset, the player resolves the `assetId` in the catalog and selects a variant:
+
+1. **Locale** — if variants carry `locale`, apply the [locale fallback chain](/concepts/localization#the-fallback-chain): exact match → base language → default locale → universal/first variant.
+2. **Resolution** — compute the required pixel width (display width × device pixel ratio) and take the **smallest variant that meets or exceeds it**; if none is large enough, the largest available.
+3. **Format** — prefer supported modern formats in order (e.g. AVIF → WebP → JPEG).
+
+Finally the chosen `src` is resolved against the matching base URL. Loaded images go through the player's LRU cache with a memory budget, and the preloader fetches variants for upcoming panels along the [graph](/concepts/graph-navigation). Details: [Player performance](/player/performance).
+
+<Callout kind="tip">
+  Always provide at least one modest-resolution universal variant per item. It is the guaranteed fallback for old devices, unknown locales, and constrained networks.
+</Callout>
+
+## How the CMS manages assets
+
+Creators never write catalogs by hand. In the CMS [asset library](/cms/assets) you upload source files; the platform then:
+
+- transcodes and generates the **resolution and format variants** automatically (images and video are processed by dedicated media workers),
+- records dimensions and metadata into the catalog,
+- ties **localized uploads** to the right variant locale via the [localization workflow](/cms/localization),
+- and writes the finished `assets` section into the exported manifest.
+
+## Related pages
+
+- [Assets schema reference](/schema/assets) — every category and variant property
+- [Variants schema](/schema/variants) — conditional *panel* variants (a different concept: content that changes with variables)
+- [Audio](/schema/audio) and [Video](/schema/video) — media-specific behavior
+- [CMS asset library](/cms/assets)

@@ -1,0 +1,115 @@
+---
+title: Settings
+description: The Settings section — typography defaults, reader UI defaults, preload strategy, and per-output-format presets in a PanelWave manifest.
+---
+
+`settings` is an optional top-level section holding work-wide defaults: typography and balloon styling, reader UI behavior, asset preloading, and per-output-format presets. Everything here is a *default* — many values cascade down and can be overridden at more specific levels (character, panel, layer).
+
+`Settings` has four optional property groups: `typography`, `ui`, `preload`, and `outputPresets`.
+
+## `settings.typography`
+
+Global text and page styling defaults for the work.
+
+| Property | Type | Default | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `default_font` | string | `"Roboto"` | — | Default font family for text |
+| `default_font_size` | integer | `14` | 8–72 | Default font size in points |
+| `default_page_bg_color` | [`ColorHex`](/schema/manifest-structure#uri-colorhex-timestamp) | — | hex color | Default background color for pages |
+| `balloon_config` | `BalloonConfig` | — | — | Default balloon styling for **all** speech bubbles in this work; start of the balloon cascade (work → character → bubble). See [Speech Bubbles](/schema/speech-bubbles) |
+| `panel_border_style` | object | — | — | Default panel border: `color` (`ColorHex`), `thickness` (integer 0–10, default 1, px), `style` (`solid` \| `dashed` \| `dotted` \| `none`, default `solid`) |
+| `gutter_width` | integer | `10` | 0–50 | Space between panels in pixels |
+
+## `settings.ui`
+
+Reader-behavior defaults. The player exposes matching toggles (controlled via [UI settings](/schema/ui)); these values seed them.
+
+| Property | Type | Default | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `mangaMode` | boolean | `false` | — | Right-to-left reading direction |
+| `autoplayDefault` | boolean | `false` | — | Start in autoplay mode |
+| `secondsPerPanel` | number | — | 0.5–120 | Autoplay dwell time per panel; a panel's own `durationMs` overrides this |
+| `speechDefault` | boolean | `true` | — | Speech bubbles visible by default |
+| `audioDefault` | boolean | `true` | — | Music/ambient audio on by default |
+| `sfxDefault` | boolean | `true` | — | Sound effects on by default |
+| `scrollingDefault` | boolean | `true` | — | Scrolling navigation enabled by default |
+| `videoPlayModeDefault` | string | `"once"` | `once` \| `loop` \| `pingpong` \| `loop-from` | Work-level default for `VideoLayer.playMode` (schema 1.1+); cascades to per-layer overrides |
+| `videoStartModeDefault` | string | `"on-view"` | `on-view` \| `on-hover` \| `on-click` | Work-level default for `VideoLayer.startMode` (schema 1.1+) |
+| `videoMutedDefault` | boolean | `true` | — | Work-level default for `VideoLayer.muted` (schema 1.1+) |
+
+The three `video*Default` fields follow the same cascade pattern as balloon config: the work default applies whenever a [video layer](/schema/video) does not specify its own value.
+
+## `settings.preload`
+
+Controls how aggressively the player prefetches upcoming panel assets.
+
+| Property | Type | Default | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `strategy` | string | `"lookahead"` | `none` \| `lookahead` \| `aggressive` | Preload strategy |
+| `panelsAhead` | integer | `2` | ≥ 0 | How many panels ahead to prefetch (for `lookahead`) |
+| `maxConcurrent` | integer | `4` | ≥ 1 | Maximum parallel asset downloads |
+
+Panels can additionally hint specific assets via `preloadHints` — see [Panels](/schema/panels).
+
+## `settings.outputPresets` and `FormatPreset`
+
+`outputPresets` maps an [`OutputFormat`](/schema/manifest-structure#outputformat) name to a `FormatPreset`. The schema lists the eight classic formats as named properties (`flex-landscape`, `mobile-portrait`, `bigscreen-landscape`, `a4-portrait`, `a4-landscape`, `us-portrait`, `us-landscape`, `video-16-9`) and additionally accepts any other key with a `FormatPreset` value (covering `square`, `desktop-landscape`, `tablet-portrait`).
+
+### `FormatPreset`
+
+| Property | Type | Default | Description |
+|----------|------|:--:|-------------|
+| `panelView` | boolean | `true` | Allow panel-by-panel viewing in this format |
+| `pageView` | boolean | `false` | Allow whole-page viewing in this format (requires [page layouts](/schema/chapters-and-pages)) |
+| `defaultTransition` | [`Transition`](/schema/manifest-structure#transition) | — | Default transition between panels in this format; individual [edges](/schema/graph) override it |
+
+Individual panels can further restrict views per format with `formatViews` (`allowPageView` / `allowPanelView` / `minimalFocusRect`) — see [Panels](/schema/panels).
+
+## Example
+
+```json
+{
+  "settings": {
+    "typography": {
+      "default_font": "Roboto",
+      "default_font_size": 14,
+      "default_page_bg_color": "#111111",
+      "gutter_width": 10,
+      "panel_border_style": { "color": "#000000", "thickness": 1, "style": "solid" }
+    },
+    "ui": {
+      "mangaMode": false,
+      "autoplayDefault": false,
+      "secondsPerPanel": 4,
+      "speechDefault": true,
+      "audioDefault": true,
+      "sfxDefault": true,
+      "scrollingDefault": true,
+      "videoPlayModeDefault": "once",
+      "videoStartModeDefault": "on-view",
+      "videoMutedDefault": true
+    },
+    "preload": {
+      "strategy": "lookahead",
+      "panelsAhead": 2,
+      "maxConcurrent": 4
+    },
+    "outputPresets": {
+      "bigscreen-landscape": {
+        "panelView": true,
+        "pageView": true,
+        "defaultTransition": { "type": "slide", "dir": "left", "durationMs": 400 }
+      },
+      "mobile-portrait": {
+        "panelView": true,
+        "pageView": false,
+        "defaultTransition": { "type": "fade", "durationMs": 200 }
+      }
+    }
+  }
+}
+```
+
+<Callout kind="tip">
+How the player applies these defaults at runtime is described in [Player Configuration](/player/configuration).
+</Callout>

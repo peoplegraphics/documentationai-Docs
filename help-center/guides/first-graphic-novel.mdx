@@ -1,0 +1,99 @@
+---
+title: Your First Graphic Novel
+description: A beginner tutorial for the PanelWave CMS — create a work, upload art, build panels, add speech bubbles, connect the story graph, preview, and publish.
+---
+
+This tutorial walks you from an empty account to a published interactive graphic novel. It takes about 30 minutes with a handful of finished artwork files ready to upload.
+
+**What you'll need:** a PanelWave account ([sign up](/cms/account) if you don't have one) and a few page/panel images (PNG, JPEG, or WebP).
+
+<Steps>
+  <Step title="Create a work">
+    Sign in — you'll land on **My Works**. Click **Create New Work** and walk through the wizard:
+
+    1. **Basic Info** — enter a title (e.g. "The Long Way Home"); the URL slug is generated for you and checked for availability. Optionally pick the **Webcomic** starter template.
+    2. **Languages** — pick your default language. You can add more languages any time later, so one is fine for now.
+    3. **Details** — choose an age rating, add a tag or two, and leave **Start with a first chapter** ticked so the editor isn't empty.
+
+    Click **Create Work**. The editor opens. Full reference: [Works](/cms/works).
+  </Step>
+
+  <Step title="Get oriented in the editor">
+    The editor has four zones: the **left sidebar** (with **Tree**, **Assets**, and **Tools** tabs), the **canvas** in the middle, the **inspector** on the right, and the **timeline** at the bottom.
+
+    Two things in the header worth knowing from minute one: the save status (auto-save is on — you'll see "Saved …" after changes) and undo/redo (<kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd>). Details: [Editor Layout](/cms/editor/layout).
+  </Step>
+
+  <Step title="Upload your artwork">
+    Open the **Assets** tab in the left sidebar and either click **Upload** or simply **drag your image files onto the editor**. Each file shows an upload progress bar, then a short **Processing…** phase while optimized variants and thumbnails are generated automatically.
+
+    Details: [Assets](/cms/assets).
+  </Step>
+
+  <Step title="Build your first pages and panels">
+    Switch to the **Tree** tab. Your work already contains "Chapter 1" (from the wizard). Right-click it and choose **New Page**, then right-click the page and choose **New Panel** — repeat for as many panels as your first page needs.
+
+    Select a panel to open it on the canvas, then **drag an image from the Assets tab onto the canvas** — it becomes a layer of that panel. You can stack multiple layers (background, characters, effects) and arrange them; the **Layer** tab in the right inspector holds position, size, and visibility settings.
+
+    Details: [Pages & Panels](/cms/editor/pages-panels), [Layers](/cms/editor/layers).
+  </Step>
+
+  <Step title="Add speech bubbles">
+    Open the **Tools** tab and pick the **Speech Bubble** tool (shortcut <kbd>S</kbd>), then draw a bubble on the panel. With the bubble selected, use the **Speech** tab in the inspector to type the dialogue, pick the balloon type (normal, thought, shout, whisper…), and position the tail.
+
+    Two tips:
+
+    - Define your cast in the [Characters Manager](/cms/characters) and assign each bubble to a character — bubbles then inherit that character's balloon style automatically.
+    - Set your work-wide default balloon look once under **Work Properties → Typography** instead of styling every bubble by hand.
+
+    Details: [Speech Bubbles](/cms/editor/speech-bubbles).
+  </Step>
+
+  <Step title="Connect your panels in the graph">
+    An interactive graphic novel isn't a strip of images — it's a **graph**: readers move from panel to panel along edges, which may branch. Open the **Graph Editor** from the Backstage sidebar (work card menu → **Graph Editor** also works).
+
+    Each panel appears as a node; the chapter's **entry** node is where readers start. Select a node and press <kbd>C</kbd> to start a connection, pick the target with the arrow keys, and confirm with <kbd>Enter</kbd> — the new edge appears. For a simple linear story, chain your panels 1 → 2 → 3.
+
+    Want a branch? Give a node two outgoing edges and add a **Condition** (JSON Logic) to one of them in the edge properties — an empty condition means "always follow". Use **Auto-Layout** to tidy the diagram and **Simulate** to walk the flow from the entry node. Click **Save**.
+
+    Details: [Graph](/cms/editor/graph), [Graph navigation concepts](/concepts/graph-navigation).
+  </Step>
+
+  <Step title="Preview your work">
+    Click the eye icon (**Preview Work**) in the editor header, or open **Preview** in the Backstage sidebar. Your work runs in the real, embedded PanelWave Player — tap through it exactly as a reader would, and check that navigation, bubbles, and artwork all behave.
+
+    Details: [Preview](/cms/preview).
+  </Step>
+
+  <Step title="Validate">
+    Click **Preflight** in the editor header (or open **Validation** in Backstage) and hit **Run Validation**. You'll get a verdict — **Ready to Publish** or **Cannot Publish** — plus a categorized list of errors, warnings, and info items with suggestions and **Open in editor** shortcuts. Fix all errors; warnings (like missing alt text) are worth fixing too.
+
+    Details: [Validation & Preflight](/cms/validation).
+  </Step>
+
+  <Step title="Publish">
+    Once preflight reports no errors, mark your work as **Published** from the status dropdown on **My Works**, and use the works-list **Export** action to produce shareable output.
+
+    <Callout kind="info">
+      The guided publish wizard (**Preflight → Environment → Options → Confirm**) is still being rolled out — the **Publish** button in the editor header is visible but not yet active. See [Publishing](/cms/publishing) for what's available today and what the full flow will look like.
+    </Callout>
+
+    Congratulations — your first interactive graphic novel is finished. 🎉
+  </Step>
+</Steps>
+
+## Where to go next
+
+<Columns cols={3}>
+  <Card title="Hotspots" icon="target" href="/cms/editor/hotspots">
+    Make artwork clickable — jumps, reveals, and effects.
+  </Card>
+  <Card title="Localization" icon="languages" href="/cms/localization">
+    Translate your work and add voice audio per language.
+  </Card>
+  <Card title="Monetization" icon="lock" href="/cms/monetization">
+    Gate chapters or extras behind a paywall.
+  </Card>
+</Columns>
+
+Stuck somewhere? Check the [Creator FAQ](/help-center/faq/creators) or [Troubleshooting](/help-center/troubleshooting/cms-uploads).

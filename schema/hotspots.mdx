@@ -1,0 +1,155 @@
+---
+title: Hotspots
+description: Reference for Hotspot and HotspotAction — interactive shapes on panels, the five action types, mutations, and visibility conditions.
+---
+
+Hotspots are interactive regions on a panel. Readers click or tap them to navigate the story graph, set variables, open bonus content, show a modal, or trigger a plugin event. Hotspots are the primary building block for **choice-driven branching** (see [Graph Navigation](/concepts/graph-navigation)).
+
+## `Hotspot`
+
+Defined as `$defs/Hotspot`. Lives in `chapters[].panels.<panelId>.hotspots[]` (and in [variant overrides](/schema/variants)).
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `id` | `Identifier` | Yes | Unique hotspot ID within the panel. |
+| `shape` | `Shape` | Yes | Clickable region in normalized panel coordinates (0–1). |
+| `label` | `LocalizedString` | Yes | Visible/announced label for the hotspot. |
+| `action` | `HotspotAction` | Yes | What happens on activation — one of five action types. |
+| `ariaLabel` | `LocalizedString` | No | Screen-reader label, if it should differ from `label`. |
+| `visibleIf` | `JsonLogic` | No | Condition controlling hotspot availability, evaluated against [variables](/schema/variables). |
+
+## `Shape`
+
+A discriminated union (`$defs/Shape`) — the `type` property selects one of four geometries. All coordinates are normalized (0–1) relative to the panel.
+
+<Tabs>
+  <Tab title="rect">
+    Required: `type`, `x`, `y`, `w`, `h`.
+    ```json
+    { "type": "rect", "x": 0.05, "y": 0.4, "w": 0.4, "h": 0.4 }
+    ```
+  </Tab>
+  <Tab title="circle">
+    Required: `type`, `cx`, `cy`, `r` (center point and radius).
+    ```json
+    { "type": "circle", "cx": 0.5, "cy": 0.5, "r": 0.15 }
+    ```
+  </Tab>
+  <Tab title="ellipse">
+    Required: `type`, `x`, `y`, `w`, `h` (bounding box of the ellipse).
+    ```json
+    { "type": "ellipse", "x": 0.6, "y": 0.15, "w": 0.3, "h": 0.18 }
+    ```
+  </Tab>
+  <Tab title="polygon">
+    Required: `type`, `points` — an array of at least 3 `[x, y]` points.
+    ```json
+    { "type": "polygon", "points": [[0.1, 0.1], [0.4, 0.1], [0.25, 0.35]] }
+    ```
+  </Tab>
+</Tabs>
+
+## `HotspotAction`
+
+A `oneOf` union (`$defs/HotspotAction`) discriminated by `type`. Exactly these five action types exist:
+
+### `goTo` — navigate to a panel
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `type` | `"goTo"` | Yes | Action discriminator. |
+| `to` | `Identifier` | Yes | Target panel ID. |
+| `mutations` | `Mutation[]` | No | Variable mutations applied when the hotspot fires (e.g. record the choice). |
+| `transition` | `Transition` | No | Visual transition for this navigation — see [Animations & Transitions](/schema/animations). |
+
+### `setVariables` — mutate variables without navigating
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `type` | `"setVariables"` | Yes | Action discriminator. |
+| `mutations` | `Mutation[]` (min 1) | Yes | One or more variable mutations. |
+
+### `openExtras` — open a bonus-content block
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `type` | `"openExtras"` | Yes | Action discriminator. |
+| `extrasId` | `Identifier` | Yes | ID of an [extras](/schema/extras) block to open. |
+
+### `openModal` — show an inline modal
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `type` | `"openModal"` | Yes | Action discriminator. |
+| `title` | `LocalizedString` | Yes | Modal title. |
+| `content` | `LocalizedString` | Yes | Modal body text. |
+
+### `pluginEvent` — dispatch an event to a plugin
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `type` | `"pluginEvent"` | Yes | Action discriminator. |
+| `pluginId` | `Identifier` | Yes | Target plugin — see [Extensions & Plugins](/schema/extensions). |
+| `event` | string | Yes | Event name. |
+| `payload` | `JsonValue` | No | Arbitrary JSON payload. |
+
+### `Mutation`
+
+Variable mutations (`$defs/Mutation`) used by `goTo` and `setVariables` (and on graph [edges](/schema/graph)):
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `op` | `"set"` \| `"increment"` \| `"toggle"` \| `"append"` \| `"remove"` | Yes | Operation. |
+| `var` | string | Yes | Variable ID (e.g. `"path.choice"`). |
+| `value` | `JsonValue` | No | Operand where the operation needs one. |
+
+## Conditions
+
+Two mechanisms make hotspots conditional:
+
+- **`visibleIf` on the hotspot** hides or shows the hotspot itself based on a [JSON Logic](https://jsonlogic.com/) expression over current variable values.
+- **Mutations + conditional edges**: a common branching pattern is a `goTo` hotspot that both navigates and sets a variable, with downstream [graph edges](/schema/graph) or [panel variants](/schema/variants) conditioned on that variable.
+
+## Example
+
+A decision panel with two choices (from the branching sample):
+
+```json
+{
+  "hotspots": [
+    {
+      "id": "hs-forest",
+      "label": { "en-US": "Enter the Forest", "de-DE": "Betrete den Wald" },
+      "shape": { "type": "rect", "x": 0.05, "y": 0.3, "w": 0.4, "h": 0.6 },
+      "action": {
+        "type": "goTo",
+        "to": "panel-forest-path",
+        "mutations": [
+          { "op": "set", "var": "choices.first", "value": "forest" }
+        ],
+        "transition": { "type": "slide", "dir": "left", "durationMs": 350 }
+      }
+    },
+    {
+      "id": "hs-mountain",
+      "label": { "en-US": "Climb the Mountain", "de-DE": "Besteige den Berg" },
+      "shape": { "type": "rect", "x": 0.55, "y": 0.3, "w": 0.4, "h": 0.6 },
+      "action": {
+        "type": "goTo",
+        "to": "panel-mountain-path",
+        "mutations": [
+          { "op": "set", "var": "choices.first", "value": "mountain" }
+        ],
+        "transition": { "type": "slide", "dir": "right", "durationMs": 350 }
+      }
+    }
+  ]
+}
+```
+
+## Related pages
+
+- [Graph](/schema/graph) — edges, conditions, and priorities
+- [Variables](/schema/variables) — variable definitions and scopes
+- [Variants](/schema/variants) — variable-driven content on the same panel
+- [Examples](/schema/examples) — the branching sample walkthrough

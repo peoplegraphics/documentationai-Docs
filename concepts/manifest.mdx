@@ -1,0 +1,149 @@
+---
+title: The Manifest
+description: The panelwave.json manifest at a glance — top-level structure, string IDs and references, and a small annotated example of the PanelWave format.
+---
+
+A PanelWave work is described by a single JSON document — the **manifest**, conventionally named `panelwave.json`. The manifest declares everything: metadata, assets, chapters, panels, the navigation graph, variables, and optional paywall, tracking, and UI configuration. The [player](/player/overview) needs nothing else to render the work.
+
+## Top-level structure
+
+Three sections are required; the rest are optional.
+
+| Section | Required | Purpose |
+|---------|----------|---------|
+| `panelwave` | Yes | Format header: `version` (semver), `schema` (URI of the JSON Schema), optional `generator`. |
+| `meta` | Yes | Work metadata: `id`, `title`, `locales`, `default_locale` (all required), plus creators, series, age rating, characters, content warnings, and more. See [Meta](/schema/meta). |
+| `chapters` | Yes | The content: each chapter has `panels` (a map of panel objects) and a `graph` (entry + edges), optionally `pages` for print/spread layouts. See [Chapters &amp; pages](/schema/chapters-and-pages). |
+| `assets` | No | Asset catalog: base URLs plus catalog items with variants. See [Assets concept](/concepts/assets). |
+| `variables` | No | Typed variable definitions that drive conditions. See [Variables concept](/concepts/variables). |
+| `settings` | No | Work-wide defaults: typography, balloon styling, UI behavior (autoplay, audio defaults), preloading. See [Settings](/schema/settings). |
+| `extras` | No | Bonus content: cover, character sheets, galleries. See [Extras](/schema/extras). |
+| `paywall` | No | Entitlement rules gating content. See [Monetization concept](/concepts/monetization). |
+| `tracking` | No | Analytics configuration and event whitelist. See [Tracking](/schema/tracking). |
+| `ui` | No | Branding and UI customization. See [UI](/schema/ui). |
+
+## IDs and references
+
+PanelWave connects objects by **string IDs, never array indices**. An `Identifier` is a 1–200 character string of letters, digits, dots, hyphens, and colons.
+
+- Layers reference catalog assets by `assetId`.
+- Graph edges reference panels by their key in the chapter's `panels` map (`from` / `to`).
+- Hotspot `goTo` actions reference target panel IDs.
+- Paywall rules reference chapters, panels, or extras by `refId`.
+- `meta.cover` references an asset catalog ID (a URI is also accepted for static bundles).
+
+This makes manifests robust against reordering and diff-friendly — inserting a panel never shifts any reference.
+
+Two other conventions run through the whole format:
+
+- **Localized text** is always an object keyed by locale, never a bare string: `{ "en-US": "Hello", "de-DE": "Hallo" }`. See [Localization](/concepts/localization).
+- **Custom fields** are allowed anywhere when prefixed with `x-` (for editor state, plugin data, and other extensions). See [Extensions](/schema/extensions).
+
+## A small annotated example
+
+A complete, valid manifest with two panels and one branch choice:
+
+```json
+{
+  "panelwave": {
+    "version": "1.0.0",
+    "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json"
+  },
+  "meta": {
+    "id": "night-shift",
+    "title": { "en-US": "Night Shift", "de-DE": "Nachtschicht" },
+    "locales": ["en-US", "de-DE"],
+    "default_locale": "en-US"
+  },
+  "assets": {
+    "base": { "imageBase": "https://cdn.example.com/night-shift/images/" },
+    "catalog": [
+      {
+        "id": "img-alley",
+        "category": "image",
+        "alt": { "en-US": "Dark city alley in the rain" },
+        "variants": [
+          { "src": "alley-2048.avif", "mime": "image/avif", "w": 2048, "h": 1536, "density": 2 },
+          { "src": "alley-1024.jpg", "mime": "image/jpeg", "w": 1024, "h": 768, "density": 1 }
+        ]
+      },
+      {
+        "id": "img-doors",
+        "category": "image",
+        "alt": { "en-US": "Two doors at the end of the alley" },
+        "variants": [
+          { "src": "doors-1024.jpg", "mime": "image/jpeg", "w": 1024, "h": 768 }
+        ]
+      }
+    ]
+  },
+  "variables": {
+    "definitions": [
+      { "id": "story.choice", "type": "enum", "enum": ["left", "right", "none"],
+        "scope": "chapter", "default": "none" }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "ch-01",
+      "title": { "en-US": "Chapter One" },
+      "panels": {
+        "panel-01": {
+          "layers": [
+            { "kind": "image", "id": "bg", "assetId": "img-alley", "z": 0 }
+          ],
+          "speechBubbles": [
+            {
+              "id": "sb-1",
+              "text": { "en-US": "Something's not right here.",
+                        "de-DE": "Hier stimmt etwas nicht." },
+              "shape": { "x": 0.6, "y": 0.2, "w": 0.25, "h": 0.15 }
+            }
+          ]
+        },
+        "panel-02": {
+          "layers": [
+            { "kind": "image", "id": "bg", "assetId": "img-doors", "z": 0 }
+          ],
+          "hotspots": [
+            {
+              "id": "door-left",
+              "shape": { "type": "rect", "x": 0.1, "y": 0.4, "w": 0.15, "h": 0.3 },
+              "label": { "en-US": "Left door" },
+              "action": {
+                "type": "setVariables",
+                "mutations": [{ "op": "set", "var": "story.choice", "value": "left" }]
+              }
+            }
+          ]
+        }
+      },
+      "graph": {
+        "entry": "panel-01",
+        "edges": [
+          { "from": "panel-01", "to": "panel-02",
+            "transition": { "type": "slide", "dir": "left", "durationMs": 500 } }
+        ]
+      }
+    }
+  ]
+}
+```
+
+Reading it top to bottom:
+
+- **`panelwave`** pins the format version and schema URI — validators and players use this to pick the right rules.
+- **`meta`** declares two locales; `default_locale` anchors the [fallback chain](/concepts/localization).
+- **`assets.catalog`** registers each image once, with multiple **variants** (formats/resolutions); layers refer to it by `assetId`, and the player [picks the best variant](/concepts/assets) at runtime.
+- **`variables`** defines `story.choice`, which the hotspot mutates and which edges or [panel variants](/schema/variants) can test with conditions.
+- **`chapters[0].graph`** names the entry panel and connects the panels with an edge carrying a slide transition — see [Graph navigation](/concepts/graph-navigation).
+
+## Validating
+
+Always validate manifests against the schema:
+
+```bash
+panelwave validate ./panelwave.json
+```
+
+See [Validation](/schema/validation) and the [CLI reference](/schema/cli). For the property-by-property reference, start at [Manifest structure](/schema/manifest-structure).

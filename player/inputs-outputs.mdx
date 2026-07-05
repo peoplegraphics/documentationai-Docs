@@ -1,0 +1,158 @@
+---
+title: Inputs & Outputs
+description: Complete API reference for pw-player-shell — every @Input and @Output with types and semantics, plus public methods and other exported components.
+---
+
+`PlayerShellComponent` (selector **`pw-player-shell`**) is the main integration surface. This page lists its complete input/output API as implemented, plus the public methods you can call on a component reference and the other components exported from the package.
+
+```typescript
+import { PlayerShellComponent, EntitlementAdapter } from '@panelwave/player';
+import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/player';
+```
+
+## Inputs
+
+<ResponseField name="manifest" field-type="PanelWaveManifest">
+  The manifest object to render. Validated on load (required header, meta, and chapter structure); a validation failure emits `error` and shows the error screen.
+</ResponseField>
+
+<ResponseField name="manifestUrl" field-type="string">
+  URL of a manifest to load as an alternative to `manifest`. **Not implemented in the current shell** — it throws "Manifest URL loading not yet implemented". Fetch the JSON yourself and bind `manifest`.
+</ResponseField>
+
+<ResponseField name="entitlementAdapter" field-type="EntitlementAdapter">
+  Adapter for paywall integration. The shell calls `getContext()` once at startup (merging the returned key/values into global-scope variables) and `hasAccess(panelId)` before each panel navigation. See [Paywall & Entitlement](/player/paywall-entitlement) for the interface definition.
+</ResponseField>
+
+<ResponseField name="locale" field-type="LocaleCode">
+  Initial content locale, BCP-47 (default `'en-US'`). Also selects the player-UI language (base language, e.g. `en`).
+</ResponseField>
+
+<ResponseField name="initialChapterId" field-type="string">
+  Chapter to open first. Without it, the player starts at the first chapter's graph entry.
+</ResponseField>
+
+<ResponseField name="initialPanelId" field-type="string">
+  Panel to open first (used together with `initialChapterId`).
+</ResponseField>
+
+<ResponseField name="autoplay" field-type="boolean">
+  Autoplay flag (default `false`). Reserved: the current build starts autoplay only via the toolbar toggle.
+</ResponseField>
+
+<ResponseField name="secondsPerPanel" field-type="number">
+  Autoplay seconds per panel (default `5`) when a panel defines no `durationMs`. Readers can adjust it from 0.5 to 120 s in the toolbar.
+</ResponseField>
+
+<ResponseField name="reducedMotion" field-type="boolean">
+  Force reduced-motion rendering (default `false`). On-view videos degrade to click-to-play; transitions are disabled.
+</ResponseField>
+
+<ResponseField name="showToolbar" field-type="boolean">
+  Whether the toolbar is visible initially (default `false`).
+</ResponseField>
+
+## Outputs
+
+<ResponseField name="ready" field-type="EventEmitter<void>">
+  Fires once the manifest is loaded, validated, tracking is configured, and the initial panel is set.
+</ResponseField>
+
+<ResponseField name="panelChange" field-type="EventEmitter<{ panel: Panel; chapter: Chapter }>">
+  Fires on every panel navigation with the new panel and its chapter. Use it for progress tracking, deep links, or analytics forwarding.
+</ResponseField>
+
+<ResponseField name="chapterChange" field-type="EventEmitter<Chapter>">
+  Fires when the current chapter changes.
+</ResponseField>
+
+<ResponseField name="error" field-type="EventEmitter<Error>">
+  Fires on load, validation, or navigation errors (the shell also renders its own error screen with a retry button).
+</ResponseField>
+
+<ResponseField name="localeChange" field-type="EventEmitter<LocaleCode>">
+  Fires when the content locale changes (e.g. the reader picked a language in the language modal).
+</ResponseField>
+
+<ResponseField name="variableChange" field-type="EventEmitter<{ key: string; value: unknown }>">
+  Fires when a variable is set through the shell's `setVariable` method.
+</ResponseField>
+
+<ResponseField name="navigationAttempt" field-type="EventEmitter<{ direction: 'next' | 'previous' | 'panel'; target?: string }>">
+  Fires when a navigation is attempted (before it resolves) — useful for interstitials or analytics.
+</ResponseField>
+
+### Example: wiring all outputs
+
+```html
+<pw-player-shell
+  #player
+  [manifest]="manifest"
+  (ready)="onReady()"
+  (panelChange)="onPanel($event)"
+  (chapterChange)="onChapter($event)"
+  (localeChange)="onLocale($event)"
+  (variableChange)="onVariable($event)"
+  (navigationAttempt)="onNavAttempt($event)"
+  (error)="onError($event)">
+</pw-player-shell>
+```
+
+## Public methods
+
+With a template reference (`#player`) or `@ViewChild(PlayerShellComponent)` you can drive the player programmatically:
+
+| Method | Signature | Semantics |
+|---|---|---|
+| `navigateToChapter` | `(chapterId: string) => Promise<void>` | Jump to a chapter's graph entry panel |
+| `navigateToPanel` | `(chapterId: string, panelId: string) => Promise<void>` | Jump to a specific panel (entitlement-checked if an adapter is set) |
+| `navigateNext` | `() => Promise<void>` | Follow the graph forward (condition + priority resolution) |
+| `navigatePrevious` | `() => Promise<void>` | Follow an incoming edge back |
+| `navigateToNextPage` / `navigateToPreviousPage` | `() => void` | Page-view navigation |
+| `changeLocale` | `(locale: LocaleCode) => void` | Switch the content locale |
+| `setVariable` | `(key, value, scope?) => void` | Set a variable (`scope` defaults to `'session'`); emits `variableChange` |
+| `getVariable` | `(key, scope?, scopeId?) => unknown` | Read a variable |
+| `toggleToolbar` | `() => void` | Show/hide the toolbar |
+| `getCurrentPanelId` | `() => string \| undefined` | ID of the currently shown panel |
+
+```typescript
+import { Component, ViewChild } from '@angular/core';
+import { PlayerShellComponent } from '@panelwave/player';
+
+@Component({ /* … */ })
+export class ReaderComponent {
+  @ViewChild(PlayerShellComponent) player!: PlayerShellComponent;
+
+  skipToFinale(): void {
+    void this.player.navigateToPanel('ch-3', 'p-finale');
+  }
+
+  markHeroMet(): void {
+    this.player.setVariable('metHero', true, 'persistent');
+  }
+}
+```
+
+## Other exported components
+
+These standalone components are part of the public API and can be used on their own (the shell composes most of them internally):
+
+| Component | Selector | Key inputs → outputs |
+|---|---|---|
+| `PwIconComponent` | `pw-icon` | `name` (Lucide id, e.g. `lucideSettings`) |
+| `SpeechBubblesComponent` | `pw-speech-bubbles` | `bubbles`, `locale`, `containerWidth/Height`, `workBalloonConfig`, `characters` → `bubbleClick`, `bubbleAudioPlay` |
+| `PaywallOverlayComponent` | `pw-paywall-overlay` | `visible`, `gate`, `purchaseOptions`, `locale`, `title`, `message`, `allowPreview`, `showLogin` → `action: PaywallAction`, `purchase: string`, `close` |
+| `AgeGateComponent` | `pw-age-gate` | `visible`, `minimumAge` (default 18), `locale`, `warningMessage`, `allowDismiss` → `verify: AgeVerificationResult`, `close` |
+| `VideoLayerComponent` | `pw-video-layer` | `src`, `poster`, `playMode`, `startMode`, `muted`, `startAtMs`, `loopFromMs`, … → `videoPlay`, `videoPause`, `videoEnd`, `videoLoop`, `passComplete`, `videoError` |
+| `PluginSandboxComponent` | `pw-plugin-sandbox` | `manifest: PluginManifest` → `loaded`, `failed` |
+| `VariantSelectorComponent` | `pw-variant-selector` | `visible`, `variantGroup` → `variantSelected`, `close` |
+
+Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `LayerViewMode` (`'panel' | 'page'`).
+
+<Callout kind="alert">
+`PlayerComponent` (selector `pw-player`) is also exported but is a **legacy placeholder** that renders static text. Do not embed it.
+</Callout>
+
+## Services
+
+All core services (`PlayerStateService`, `ManifestService`, `VariableStoreService`, `FlowEngineService`, `AudioEngineService`, `TrackingService`, `EntitlementService`, `PluginHostService`, and more) are `providedIn: 'root'` and exported — you can inject them next to the shell to observe or extend behavior. See [Services](/player/services) for the contributor-level reference.

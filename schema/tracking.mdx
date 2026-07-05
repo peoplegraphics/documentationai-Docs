@@ -1,0 +1,91 @@
+---
+title: Tracking
+description: Reference for the Tracking section — enabling analytics, consent requirements, the event whitelist enum, and the ingest endpoint.
+---
+
+The optional top-level `tracking` section configures **what analytics events a player may emit for this work, and where to send them**. It is deliberately allowlist-based: only events named in `eventWhitelist` should be reported.
+
+## `Tracking`
+
+Defined as `$defs/Tracking`. All properties are optional.
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `enabled` | boolean | `true` | Master switch for tracking. |
+| `consent` | object | — | Consent requirements (see below). |
+| `eventWhitelist` | string[] (unique, enum) | — | The events the player is allowed to emit. |
+| `endpoint` | `Uri` | — | Absolute URI of the analytics ingest endpoint. |
+
+### `consent`
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `required` | boolean | `false` | Whether explicit reader consent is required before any event is sent. |
+| `defaultOptIn` | boolean | `false` | Whether readers are opted in by default (when consent is not strictly required). |
+
+### `eventWhitelist` values
+
+The enum contains exactly these event names:
+
+| Event | Fires when… |
+|---|---|
+| `session_start` | A reading session begins. |
+| `session_end` | A reading session ends. |
+| `panel_view` | A panel becomes current. |
+| `dwell_time` | Dwell time on a panel is reported. |
+| `transition` | The reader navigates along an edge. |
+| `hotspot_click` | A hotspot is activated. |
+| `decision` | A branching decision is made. |
+| `autoplay_start` | Autoplay starts. |
+| `autoplay_stop` | Autoplay stops. |
+| `lang_change` | The reader switches language. |
+| `audio_toggle` | The audio toggle changes. |
+| `sfx_toggle` | The SFX toggle changes. |
+| `speech_toggle` | The speech toggle changes. |
+| `paywall_view` | A paywall prompt is shown. |
+| `like` | The reader likes the work. |
+| `bookmark` | The reader bookmarks a position. |
+| `share` | The reader shares content. |
+| `comment_posted` | A comment is posted. |
+| `export_triggered` | An export is triggered. |
+| `videoPlay` | A video layer starts playing (format 1.1+). |
+| `videoPause` | A video layer is paused (format 1.1+). |
+| `videoEnded` | A video layer finishes (format 1.1+). |
+| `videoLoop` | A video layer loops (format 1.1+). |
+
+<Callout kind="info">
+Naming note: the four video events added in format 1.1 are camelCase (matching the events the player emits), while the older entries are snake_case. This inconsistency is inherited from 1.0 and kept for compatibility.
+</Callout>
+
+## Example
+
+```json
+{
+  "tracking": {
+    "enabled": true,
+    "consent": {
+      "required": true,
+      "defaultOptIn": false
+    },
+    "eventWhitelist": [
+      "session_start",
+      "panel_view",
+      "transition",
+      "hotspot_click",
+      "decision",
+      "paywall_view",
+      "videoPlay",
+      "videoEnded"
+    ],
+    "endpoint": "https://analytics.panelwave.cloud/ingest"
+  }
+}
+```
+
+With this configuration a compliant player asks for consent first, then reports only the eight whitelisted events to the given endpoint.
+
+## Related pages
+
+- [Player: Tracking](/player/tracking) — how the player emits these events
+- [CMS Analytics](/cms/analytics) — dashboards built on the collected events
+- [Paywall](/schema/paywall) — source of the `paywall_view` event

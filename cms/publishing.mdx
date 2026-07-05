@@ -1,0 +1,109 @@
+---
+title: Publishing
+description: Move a work from draft to published — work statuses, the guided publish flow, release history, rollback, and what published readers receive.
+---
+
+Publishing is how your work leaves the workshop and reaches readers. PanelWave separates two ideas:
+
+1. **Work status** — a label (*Draft*, *Review*, *Published*, *Archived*) that organizes your library and signals where each work is in its lifecycle.
+2. **The publish pipeline** — a guided flow that validates the work, packages it into a [manifest](/concepts/manifest), and deploys it (with assets and audio) so the PanelWave Player can serve it to readers.
+
+<Callout kind="alert">
+  In the current release, work statuses are fully available, but the guided **Publish** flow described further below is still being rolled out — the **Publish** button in the editor header and the "Publish Work" command are present but not yet active. This page documents both so you know what's here today and what the full flow looks like.
+</Callout>
+
+## Work statuses
+
+Every work has one of four statuses, shown as a badge on its card in **My Works**:
+
+| Status | Meaning |
+|---|---|
+| **Draft** | Work in progress — the default for new works |
+| **Review** | Ready for a second pair of eyes |
+| **Published** | Finished and released |
+| **Archived** | Retired; kept for reference |
+
+To change a status:
+
+- **One work** — use the status dropdown at the bottom of the work's card in the works list. A confirmation toast ("Status set to published") appears, and the badge updates immediately.
+- **Several works** — select them with the checkboxes, then use the bulk action bar's status dropdown and **Set status**.
+
+You can also filter the works list by status (**Status: All / Draft / Review / Published / Archived**) to keep an overview of what is live and what isn't.
+
+Setting a work back to **Draft** or **Archived** is how you mark it as no longer published in your library.
+
+## The guided publish flow
+
+When you publish, the CMS walks you through a four-step wizard titled **Publish Work**: **Preflight → Environment → Options → Confirm**.
+
+<Steps>
+  <Step title="Preflight Check">
+    Validation runs automatically. The wizard summarizes errors, warnings, and info notes. **Errors block publishing** — each is listed with a suggestion for fixing it (see [Validation](/cms/validation)). Warnings don't block you: the wizard shows "Warnings (you can proceed)". Use **Re-validate** after fixing issues. When everything passes you'll see **"Ready to Publish"**.
+  </Step>
+  <Step title="Select Environment">
+    Choose where the work goes:
+    - **Production** — "Live for all users"
+    - **Staging** — "Testing environment"
+    - **Preview** — "Share with team"
+
+    Each environment has its own content delivery network, so you can rehearse a release on staging before going live.
+  </Step>
+  <Step title="Publishing Options">
+    - **Version Tag (optional)** — a label such as `v1.0.0`, `beta`, or `final` to identify this release later.
+    - **Create Backup** — save a snapshot before publishing (recommended, on by default). Backups are what make [rollback](#release-history-and-rollback) possible.
+    - **Invalidate CDN Cache** — clear cached copies so readers see the update immediately (on by default).
+    - **Send Notifications** — notify your team members about the publish (on by default).
+  </Step>
+  <Step title="Confirm & Publish">
+    Review the summary (work, environment, tag, options) and click **Publish Now**. A progress screen tracks the stages — validating content, building the manifest, uploading assets and audio files, invalidating the cache, finalizing.
+  </Step>
+</Steps>
+
+On success you'll see **"Published Successfully! Your work is now live and accessible"** together with the **Manifest URL** (with copy and open buttons), the environment, files uploaded, total size, duration, and the backup ID.
+
+<Callout kind="tip">
+  Publishing keeps running on the server even if you close the wizard mid-way. Reopening the wizard for the same work within a few minutes reattaches to the running publish and continues showing its progress.
+</Callout>
+
+If publishing fails, the wizard shows the error with a **Try Again** button and a **Copy error details** button for support requests.
+
+## What readers get
+
+A publish produces a complete, self-contained package on the CDN:
+
+- the work's **manifest** (`panelwave.json`) — the [open-format](/schema/overview) description of your chapters, panels, graph, and settings,
+- all referenced **assets** (artwork, video) and **audio files**.
+
+Any site embedding the [PanelWave Player](/player/overview) can then render the work from its manifest URL. Content you keep in draft inside the CMS — for example extras marked **Draft (hidden from readers)** — is excluded from the published manifest (see [Extras](/cms/extras)).
+
+## Release history and rollback
+
+The **Publish Releases** view keeps a complete history of every publish:
+
+- A **Current Published Version** card shows the live release (marked **LIVE**) with its environment, publish time, and manifest URL.
+- Counters for **Total Releases**, **Successful**, and **Failed** publishes.
+- Filters by **Environment** (Production/Staging/Preview) and **Status** (Success/Failed), sorting by date, size, or status, and an **Export CSV** button for the full list.
+- Each release card shows its environment, status, version tag, files uploaded, total size, and duration; you can attach your own **note** to a release, **Download Manifest** as a JSON file, or copy/open its manifest URL.
+- A **Compare** mode lets you pick two releases and see their differences side by side.
+
+### Rolling back
+
+If a release goes wrong, choose **Rollback to this version** on any earlier successful release. A **Rollback preview** dialog first shows exactly what will change — how many releases and days you are going back, the file-count and size difference, and an estimated duration — before you confirm with **Rollback now**. Rolling back restores content, assets, and configuration from that release's backup; newer releases stay in the history, so you can roll forward again later.
+
+<Callout kind="info">
+  Rolling back to a very old release (more than 30 days or 10 releases behind) requires an extra acknowledgment, because readers will lose everything published since that point.
+</Callout>
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Validation" icon="shield-check" href="/cms/validation">
+    Fix preflight errors before you publish.
+  </Card>
+  <Card title="Preview" icon="play" href="/cms/preview">
+    Rehearse the reader experience first.
+  </Card>
+  <Card title="Export" icon="download" href="/cms/export">
+    Produce PDF, PowerPoint, or video versions.
+  </Card>
+</Columns>

@@ -1,0 +1,96 @@
+---
+title: Assets
+description: Upload, organize, and manage images, audio, video, and fonts in the PanelWave CMS asset library, with automatic processing into optimized variants.
+---
+
+Every image, audio clip, video, and font in your work lives in the **Assets** library. Open it in the editor's left sidebar — the **Assets** tab, next to **Tree** and **Tools**.
+
+## Supported file types
+
+| Type | Formats |
+|---|---|
+| Images | PNG, JPEG, WebP, AVIF |
+| Audio | MP3, AAC, Opus, WAV |
+| Video | MP4, WebM, MOV |
+| Fonts | TTF, OTF, WOFF, WOFF2 |
+
+## Uploading
+
+There are two ways to get files in:
+
+- Click **Upload** in the Assets toolbar and pick one or more files.
+- **Drag & drop** files anywhere onto the editor — a "Drop files here to upload" zone appears.
+
+While uploading, each file shows an **Uploading…** card with a live progress bar, status, and any error message. Newly uploaded assets appear with a **Processing…** indicator until automatic processing finishes.
+
+### Large files and resumable uploads
+
+Small files upload directly. Large files (10 MB and up — think video or long audio) automatically switch to **resumable, chunked uploads**:
+
+- Progress survives network interruptions — when the connection returns, the upload resumes where it stopped.
+- You can even close the browser mid-upload and resume later.
+
+You don't need to do anything to enable this; the CMS picks the right upload method per file.
+
+## Automatic processing
+
+After upload, a background pipeline optimizes every asset. You keep working while it runs; the asset card shows **Processing…** until it's done.
+
+- **Images** — AVIF and WebP variants are generated for fast delivery, plus a 400px thumbnail; EXIF metadata is stripped. Dimensions are read and stored.
+- **Audio** — AAC and Opus variants with broadcast loudness normalization (EBU R128), waveform data for the editor's audio views, and the duration in milliseconds.
+- **Video** — a web-friendly H.264 rendition (up to 1920px wide), a poster frame, and scrubbing thumbnails, plus dimensions and duration.
+
+Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage.
+
+<Callout kind="info">
+Readers automatically get the best variant their device supports — you never have to export "web versions" yourself. See [Assets in the format](/concepts/assets) for how variants appear in the manifest.
+</Callout>
+
+## Finding and organizing assets
+
+The Assets toolbar offers:
+
+- **Search assets…** by name.
+- A **type filter** (All Types, Images, Audio, Video, Fonts, Other).
+- A **locale filter** for language-specific assets (e.g. a title card that differs per language).
+- **Sort** by file name, uploaded date, last updated, or file size.
+- A **grid/list view** toggle.
+
+Each asset card shows a thumbnail (or a type icon for audio/video/fonts), the filename, type, locale, file size, image dimensions, and how many processed variants exist.
+
+To place an asset in your comic, **drag it from the Assets tab onto the canvas** — it becomes a layer on the current panel (see [Layers](/cms/editor/layers)).
+
+## Asset actions
+
+Right-click an asset (or use the **⋮** button) for the context menu:
+
+| Action | What it does |
+|---|---|
+| **Copy ID** / **Copy URL** | Copy the asset's ID or delivery URL to the clipboard |
+| **Replace File** | Upload a new file in place — every panel using the asset updates automatically |
+| **Edit Metadata** | Edit the title, alt text, description, and tags |
+| **Download** | Download the original file |
+| **View Details** | Open the details panel |
+| **Generate Variants** | Re-run variant generation (images) |
+| **Delete** | Remove the asset from the library |
+
+<Callout kind="tip">
+**Replace File** is the safe way to swap artwork after revisions: the asset keeps its ID, so layers, covers, and extras that reference it don't break.
+</Callout>
+
+## The details panel
+
+**View Details** opens a side panel with everything about the asset: filename, ID, type, locale, size, dimensions, duration (for audio/video), your metadata (title, alt text, description, tags), the list of generated variants (each with preview and **Copy URL**), and upload/edit timestamps.
+
+For images, a zoom button opens a **lightbox** with zoom controls (`+`, `-`, `0` to reset), arrow-key navigation between images, and an optional slideshow (Space to start/pause).
+
+## Alt text and accessibility
+
+Give important artwork **alt text** via **Edit Metadata**. [Preflight validation](/cms/validation) warns about image layers without alt text, and the player exposes it to screen readers.
+
+## Where else assets appear
+
+- The work's **cover** is picked from image assets in [Work Properties](/cms/works).
+- **Character portraits** and reference images upload into the same library — see [Characters](/cms/characters).
+- **Per-locale voice audio** is managed in the Audio Localization tool — see [Localization](/cms/localization).
+- Having upload trouble? See [Troubleshooting CMS uploads](/help-center/troubleshooting/cms-uploads).

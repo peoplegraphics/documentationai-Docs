@@ -1,0 +1,27 @@
+---
+title: General FAQ
+description: Common questions about PanelWave — what it is, what it costs, how the open format, player, and CMS relate, and who owns the content you create.
+---
+
+Questions about the PanelWave ecosystem as a whole. Creator-specific questions live in the [Creators FAQ](/help-center/faq/creators), technical ones in the [Developers FAQ](/help-center/faq/developers).
+
+<ExpandableGroup>
+  <Expandable title="Is PanelWave free to use?" default-open="true">
+    The format is open: the JSON Schema is licensed CC BY 4.0, and the player library plus `@panelwave/types` and `@panelwave/cli` are MIT-licensed — anyone can build, embed, and publish works with them at no cost. The PanelWave CMS is a proprietary SaaS product. Content you create in the PanelWave format remains yours; the format imposes no license on works.
+  </Expandable>
+  <Expandable title="What is the difference between the Schema, the Player, and the CMS?">
+    The [Schema](/schema/overview) defines the open `panelwave.json` manifest format — the contract everything else follows. The [Player](/player/overview) is an open-source Angular library that renders manifests for readers. The [CMS](/cms/overview) is the commercial authoring tool that produces manifests visually and embeds the player for preview. The [Architecture concept page](/concepts/architecture) explains how they fit together.
+  </Expandable>
+  <Expandable title="How is locked (paid) content expressed in a manifest?">
+    The `paywall` section lists rules; each rule gates a scope (whole work, a chapter, a panel, or an extras block) and names a `requireEntitlement` key such as `premium`. The manifest never verifies purchases itself — the player asks its host platform whether the reader holds that entitlement, and can show a number of preview panels for free or add an age gate on top. See [Monetization](/concepts/monetization).
+  </Expandable>
+  <Expandable title="Does the CMS preview match what readers see?">
+    Yes — the CMS embeds the open-source PanelWave Player for preview, so the [Preview screen](/cms/preview) renders your work with exactly the same engine readers use.
+  </Expandable>
+  <Expandable title="Are reader comments and likes available?">
+    Not yet. The community toolkit (threaded comments with reactions, likes, watchlists with update notifications, and social sharing) is implemented in the platform but is not yet visible in the CMS or the reading experience, and there is no moderation dashboard yet. See [Community](/cms/community) for the current state.
+  </Expandable>
+  <Expandable title="What happens when a translation is missing?">
+    Nothing breaks. Every localized string resolves through a fallback chain: the reader's exact locale, then the same base language, then the work's default locale and its base language, and finally the first available entry. A partially translated work simply shows the default language for missing pieces; localized assets (audio, lettered art, subtitles) fall back the same way. See [Localization](/concepts/localization).
+  </Expandable>
+</ExpandableGroup>

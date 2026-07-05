@@ -1,0 +1,121 @@
+---
+title: Paywall
+description: Reference for Paywall and PaywallRule — scopes, entitlement requirements, preview panels, age gates, and rule constraints.
+---
+
+The optional top-level `paywall` section declares **which parts of a work are locked and what unlocks them**. The manifest expresses the rules; verifying whether a reader actually holds an entitlement is the job of the embedding platform (see [Player: Paywall & Entitlement](/player/paywall-entitlement) and [Concepts: Monetization](/concepts/monetization)).
+
+## `Paywall`
+
+Defined as `$defs/Paywall`:
+
+| Property | Type | Description |
+|---|---|---|
+| `rules` | `PaywallRule[]` (unique) | The list of paywall rules. |
+
+## `PaywallRule`
+
+Defined as `$defs/PaywallRule`. Required: `scope` and `requireEntitlement`.
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | `Identifier` | No | — | Rule ID. |
+| `scope` | enum | Yes | — | What the rule gates: `work`, `chapter`, `panel`, `extras`. |
+| `refId` | `Identifier` | Conditional | — | The gated chapter/panel/extras-block ID. Required for `chapter`/`panel`/`extras`; **must be omitted** for `work`. |
+| `requireEntitlement` | string | Yes | — | Entitlement key the reader must hold (e.g. `"premium"`). |
+| `previewPanels` | integer ≥ 0 | No | `0` | Number of panels shown as a free preview before the gate applies. |
+| `ageGate` | integer ≥ 0 | No | — | Minimum age required to view the gated content. |
+| `name` | string | No | — | CMS: human-friendly rule name. |
+| `description` | string | No | — | CMS: rule description. |
+| `entitlementType` | string | No | — | CMS entitlement kind (e.g. `purchase`, `subscription`). |
+| `subscriptionTiers` | string[] | No | — | CMS: subscription tiers that satisfy the rule. |
+| `price` | object | No | — | CMS embedded price: `{ "amount": number, "currency": string }`. |
+| `minimumAge` | integer ≥ 0 | No | — | CMS variant of the age restriction. |
+| `previewPanelCount` | integer ≥ 0 | No | — | CMS variant of the preview count. |
+| `targetPanelIds` | `Identifier[]` | No | — | CMS: explicit list of gated panel IDs. |
+
+<Callout kind="info">
+Properties marked "CMS" are authoring metadata written by the PanelWave CMS so its paywall editor can round-trip rules. Player behavior is defined by `scope`, `refId`, `requireEntitlement`, `previewPanels`, and `ageGate`.
+</Callout>
+
+### Scope constraints
+
+The schema enforces two conditional rules:
+
+- `scope: "work"` → `refId` must **not** be present (the rule gates the whole work).
+- `scope: "chapter" | "panel" | "extras"` → `refId` is **required** and names the gated chapter, panel, or extras block.
+
+### Entitlement semantics
+
+`requireEntitlement` is an opaque string key. The manifest does not define what the key means or how it is granted — the player asks its host (or an entitlement provider) "does the current reader hold entitlement X?" and gates rendering accordingly:
+
+- Without the entitlement, gated content is not rendered; the player can show a paywall prompt instead (and emit the `paywall_view` [tracking event](/schema/tracking)).
+- `previewPanels` allows the first *n* panels within the gated scope to render for everyone.
+- `ageGate` adds an age requirement on top of (not instead of) the entitlement.
+
+For gated bonus content, extras blocks additionally carry their own `gated`/`requiredTier` flags — see [Extras](/schema/extras).
+
+## Examples
+
+### Gate everything after a free first chapter
+
+```json
+{
+  "paywall": {
+    "rules": [
+      {
+        "id": "pw-ch2",
+        "scope": "chapter",
+        "refId": "ch-2",
+        "requireEntitlement": "premium",
+        "previewPanels": 3
+      }
+    ]
+  }
+}
+```
+
+Readers without the `premium` entitlement see the first three panels of chapter `ch-2`, then the paywall.
+
+### Panel-level gating with an age gate
+
+```json
+{
+  "paywall": {
+    "rules": [
+      {
+        "id": "pw-p2-3",
+        "scope": "panel",
+        "refId": "p2-3",
+        "requireEntitlement": "premium",
+        "previewPanels": 0,
+        "ageGate": 16
+      }
+    ]
+  }
+}
+```
+
+### Whole-work purchase
+
+```json
+{
+  "paywall": {
+    "rules": [
+      {
+        "id": "pw-work",
+        "scope": "work",
+        "requireEntitlement": "purchase:work-city-noir",
+        "previewPanels": 10
+      }
+    ]
+  }
+}
+```
+
+## Related pages
+
+- [Extras](/schema/extras) — `gated` and `requiredTier` on bonus content
+- [Player: Paywall & Entitlement](/player/paywall-entitlement) — runtime enforcement
+- [CMS Monetization](/cms/monetization) — authoring rules, products, and prices
+- [Concepts: Monetization](/concepts/monetization) — the overall model

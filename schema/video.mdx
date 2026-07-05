@@ -1,0 +1,161 @@
+---
+title: Video Panels
+description: Reference for VideoLayer, VideoVariant, and VideoPoster — playback modes, start triggers, reverse variants, and format 1.1 legacy mapping.
+---
+
+Video panels put motion video inside a panel. Format **1.1** substantially extended video support with playback modes (`playMode`), start triggers (`startMode`), reverse-encoded variants for smooth ping-pong, posters, native controls, and work-level defaults. Format 1.0 manifests using the legacy `autoplay`/`loop` booleans remain valid — see [the legacy mapping](#legacy-fields-schema-10) below and [Versioning](/schema/versioning).
+
+A video panel consists of:
+
+- A **video asset** in the [asset catalog](/schema/assets) (`category: "video"`) with one or more `VideoVariant`s and an optional `VideoPoster`.
+- A **`VideoLayer`** in the panel that references the asset and configures playback. Video layers may appear in `panels.<id>.layers[]` (as a layer with `kind: "video"`) or in the dedicated `panels.<id>.video[]` array.
+
+## `VideoLayer`
+
+Defined as `$defs/VideoLayer`. Extends the shared layer base (`LayerCommon` — `id`, `z`, `opacity`, `visibleIf`, transform, etc.; see [Layers](/schema/layers)) with:
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `kind` | `"video"` | Yes | — | Layer discriminator. |
+| `assetId` | `Identifier` | Yes | — | Video asset from the catalog. |
+| `playMode` | enum | No | `"once"` | Playback mode (1.1+): `once`, `loop`, `pingpong`, `loop-from`. |
+| `startMode` | enum | No | `"on-view"` | Start trigger (1.1+): `on-view`, `on-hover`, `on-click`. |
+| `loopFromMs` | integer ≥ 0 | No | — | Loop re-entry point in ms; only used with `playMode: "loop-from"`. |
+| `muted` | boolean | No | `false` | Mute the video's audio. |
+| `startAtMs` | integer ≥ 0 | No | — | Offset into the video where playback begins. |
+| `controls` | boolean | No | `false` | Show native video controls (1.1+). |
+| `autoplay` | boolean | No | `false` | Legacy (1.0). Superseded by `startMode`. |
+| `loop` | boolean | No | `false` | Legacy (1.0). Superseded by `playMode`. |
+
+### `playMode` values
+
+| Value | Behavior |
+|---|---|
+| `once` | Play through and freeze on the last frame. |
+| `loop` | Play from `startAtMs` to the end, seek back, repeat. |
+| `pingpong` | Play forward, then backward, then forward, repeating. Prefers a `direction: "reverse"` `VideoVariant` for the backward pass; otherwise the player frame-steps backward. |
+| `loop-from` | Play once from `startAtMs` to the end, then loop endlessly from `loopFromMs` to the end. |
+
+<Callout kind="alert">
+For `loop-from`, the semantic constraint `startAtMs <= loopFromMs < asset.durationMs` applies. `loopFromMs` is absolute media time on the video's own timeline (independent of `startAtMs`). JSON Schema cannot express this cross-field constraint — validate it in application code.
+</Callout>
+
+### `startMode` values
+
+| Value | Behavior |
+|---|---|
+| `on-view` | Starts when the panel becomes current (panel view) or when the placement enters the viewport (page view). |
+| `on-hover` | Starts on mouseover. Page view only — falls back to `on-click` in panel view and on touch devices. |
+| `on-click` | Starts on click/tap and toggles play/pause thereafter. |
+
+### Legacy fields (schema 1.0)
+
+`autoplay` and `loop` remain valid and are not deprecated. Consumers apply this mapping at read time; the new fields always win when present:
+
+- `loop: true` → `playMode: "loop"` — **only when `playMode` is absent**.
+- `autoplay: true` → `startMode: "on-view"`; explicit `autoplay: false` → `startMode: "on-click"` — **only when `startMode` is absent**.
+
+### Work-level defaults
+
+`settings.ui` provides cascading defaults (work default → per-layer override), used when a layer omits the field (see [Settings](/schema/settings)):
+
+| Setting | Default | Applies to |
+|---|---|---|
+| `videoPlayModeDefault` | `"once"` | `VideoLayer.playMode` |
+| `videoStartModeDefault` | `"on-view"` | `VideoLayer.startMode` |
+| `videoMutedDefault` | `true` | `VideoLayer.muted` |
+
+## `VideoVariant`
+
+Defined as `$defs/VideoVariant` — one encode of a video asset inside `assets.catalog[].variants[]`.
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `src` | string | Yes | — | Source path/URL (may be relative to `assets.base.videoBase`). |
+| `mime` | string | Yes | — | Must match `video/*` or `application/vnd.apple.mpegurl` (HLS). |
+| `w` | integer ≥ 16 | Yes | — | Width in pixels. |
+| `h` | integer ≥ 16 | Yes | — | Height in pixels. |
+| `fps` | number ≥ 1 | No | — | Frame rate. |
+| `codec` | string | No | — | Codec label (e.g. `"h264"`). |
+| `streaming` | boolean | No | `false` | Marks a streaming (e.g. HLS) variant. |
+| `locale` | `LocaleCode` | No | — | Locale for localized video variants. |
+| `direction` | `"forward"` \| `"reverse"` | No | `"forward"` | 1.1+. `reverse` marks a pre-rendered, time-reversed encode (video only, typically without audio) used for smooth `pingpong` playback. |
+
+## `VideoPoster`
+
+Defined as `$defs/VideoPoster` (1.1+) — an optional `poster` on the video catalog item, shown before playback starts (click-to-play, reduced-motion presentations).
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `src` | string | Yes | Poster image source. |
+| `mime` | string | No | Must match `image/*`. |
+| `w` | integer ≥ 1 | No | Width in pixels. |
+| `h` | integer ≥ 1 | No | Height in pixels. |
+
+## Tracking events
+
+Format 1.1 added four video events to the [tracking](/schema/tracking) `eventWhitelist`: `videoPlay`, `videoPause`, `videoEnded`, `videoLoop`.
+
+## Example
+
+A ping-pong panel with a reverse variant, from the video sample (`07_video`):
+
+```json
+{
+  "assets": {
+    "catalog": [
+      {
+        "id": "vid-pingpong",
+        "category": "video",
+        "alt": { "en-US": "Pendulum swing, forward/backward" },
+        "durationMs": 3000,
+        "variants": [
+          {
+            "src": "https://cdn.example.com/video/vid-pingpong-1280x720.mp4",
+            "mime": "video/mp4", "w": 1280, "h": 720,
+            "fps": 30, "codec": "h264", "direction": "forward"
+          },
+          {
+            "src": "https://cdn.example.com/video/vid-pingpong-1280x720-reverse.mp4",
+            "mime": "video/mp4", "w": 1280, "h": 720,
+            "fps": 30, "codec": "h264", "direction": "reverse"
+          }
+        ],
+        "poster": {
+          "src": "https://cdn.example.com/video/vid-pingpong-poster.jpg",
+          "mime": "image/jpeg", "w": 1280, "h": 720
+        }
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "ch-1",
+      "panels": {
+        "p-play-pingpong": {
+          "durationMs": 6000,
+          "layers": [
+            {
+              "kind": "video",
+              "id": "ly-play-pingpong",
+              "assetId": "vid-pingpong",
+              "z": 0,
+              "muted": true,
+              "startAtMs": 0,
+              "playMode": "pingpong",
+              "startMode": "on-view"
+            }
+          ]
+        }
+      },
+      "graph": { "entry": "p-play-pingpong", "edges": [{ "from": "p-play-pingpong", "to": "p-play-pingpong" }] }
+    }
+  ]
+}
+```
+
+## Related pages
+
+- [Assets](/schema/assets) — the video catalog item (`AssetCatalogItemVideo`)
+- [Versioning](/schema/versioning) — what changed in 1.1 and the compatibility guarantees
+- [Examples](/schema/examples) — the `07_video` sample covers all play/start modes

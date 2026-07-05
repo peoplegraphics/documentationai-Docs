@@ -1,0 +1,66 @@
+---
+title: Import
+description: Bring existing PanelWave graphic novels into the CMS from JSON manifest files — validation, preview, and what gets imported.
+---
+
+The CMS can import a complete graphic novel from a **PanelWave JSON manifest** — for example a work you previously [exported](/cms/export), a backup, or a manifest produced by other tooling against the [open format](/schema/overview).
+
+## Importing a work
+
+<Steps>
+  <Step title="Open the import dialog">
+    On the [My Works](/cms/works) page, click **Import** (next to **Create New Work**). The **Import Graphic Novel** dialog opens.
+  </Step>
+  <Step title="Select the file">
+    Click the drop zone to browse, or **drag and drop** a `.json` file onto it. The file must be a PanelWave manifest of **at most 10 MB**.
+  </Step>
+  <Step title="Review the preview">
+    The dialog parses the file and shows a preview before anything is imported: the work's **Title**, the number of **Chapters**, and the format **Version**. If something is wrong you'll see an error instead — use **Try Another File** to pick a different one.
+  </Step>
+  <Step title="Import">
+    Click **Import**. Progress is shown while the data is validated and uploaded ("Validating graphic novel data…", "Uploading to server…", "Import complete!"). The new work then appears in your works list.
+  </Step>
+</Steps>
+
+## What the file must contain
+
+The import validates the file before accepting it:
+
+- It must be valid JSON with the required top-level sections `panelwave`, `meta`, and `chapters` (see [Manifest structure](/schema/manifest-structure)).
+- The declared format version (`panelwave.version`) must be **1.0.0** — other versions are rejected with an "Unsupported version" message. Use the [PanelWave CLI](/schema/cli) to upgrade older or newer manifests if needed.
+- Maximum file size: **10 MB**. The manifest references assets by URL; large media files are not embedded in the JSON.
+
+## What gets imported
+
+Imports preserve the full content of the manifest:
+
+- Work metadata — title, description, creators, publisher, series, tags, age rating, locales
+- The assets catalog (images, audio, video entries with their variants)
+- Chapters, including their navigation **graphs**
+- Pages and their layouts
+- Panels with all layers, speech bubbles, hotspots, and interactive elements
+- [Extras](/cms/extras), [variables](/cms/editor/variables), and settings
+
+The import is atomic: if anything fails partway, nothing is created — you never end up with a half-imported work.
+
+<Callout kind="info">
+Asset entries are imported as catalog references (URLs). If the manifest points at externally hosted files, they keep working as external URLs; to manage the files inside the CMS, upload them to the [Assets library](/cms/assets) and relink.
+</Callout>
+
+## Common errors
+
+| Message | Cause / fix |
+|---|---|
+| *Invalid file type. Please select a JSON file.* | The file doesn't end in `.json` |
+| *File too large. Maximum size is 10MB.* | Strip embedded data or split the work |
+| *Invalid JSON file. Please check the file format.* | The file isn't parseable JSON — validate it with the [CLI](/schema/cli) |
+| *Invalid PanelWave graphic novel file. Missing required fields.* | `panelwave`, `meta`, or `chapters` is missing |
+| *Unsupported version: …* | The manifest declares a version other than 1.0.0 |
+
+## Other imports in the CMS
+
+The work import is not the only way to bring data in:
+
+- **Characters** — import/export a character set as JSON in the [Characters Manager](/cms/characters).
+- **Translations** — import JSON, CSV, or XLIFF files from translators in the [Localization Workshop](/cms/localization).
+- **Team invites** — bulk-invite members from a CSV on the [Team page](/cms/account).

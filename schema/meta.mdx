@@ -1,0 +1,119 @@
+---
+title: Meta
+description: The Meta section of a PanelWave manifest — work identity, creators, locales, cover, character roster, content warnings, and rights info.
+---
+
+`meta` is one of the three required top-level sections. It identifies the work, declares its languages, and carries everything a library, storefront, or reader UI needs to present the work: title, description, creators, cover, characters, and content warnings.
+
+## Properties (`Meta`)
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | Yes | Stable unique ID of the work |
+| `title` | [`LocalizedString`](/schema/manifest-structure#localizedstring) | Yes | Work title per locale |
+| `locales` | `LocaleCode[]` (min 1, unique) | Yes | All locales the work provides content for |
+| `default_locale` | `LocaleCode` | Yes | Fallback locale when the reader's locale is unavailable |
+| `description` | `LocalizedString` | — | Work description / blurb |
+| `creators` | `Creator[]` | — | Credited people; see below |
+| `publisher` | string | — | Publisher name |
+| `series` | string | — | Series the work belongs to |
+| `issue` | string | — | Issue label within the series (free-form, e.g. `"#7"`, `"Sample One-Shot"`) |
+| `release_date` | string (`format: date`) | — | Release date, e.g. `"2025-09-01"` |
+| `age_rating` | string | — | Free-form age rating label, e.g. `"13+"`, `"16+"`, `"all"` |
+| `tags` | `string[]` | — | Free-form tags for discovery |
+| `cover` | `Identifier` \| `Uri` | — | Cover image. **Preferred:** an [asset catalog](/schema/assets) ID; an absolute URI is also accepted for static bundles |
+| `characters` | `Character[]` (unique) | — | Character roster; see below |
+| `content_warnings` | `ContentWarning[]` | — | Declared content warnings; see below |
+| `copyright` | string | — | Copyright notice for the work |
+| `license` | string | — | License information for the work |
+
+### Creator
+
+Each entry in `creators`:
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `role` | string | Yes | Free-form role, e.g. `"writer"`, `"artist"` |
+| `name` | string | Yes | Display name |
+| `url` | `Uri` | — | Link to the creator's site or profile |
+
+### ContentWarning
+
+Content warnings are declared once here and referenced from panels via `Panel.contentWarnings` (by `id`):
+
+| Property | Type | Required | Default | Description |
+|----------|------|:--:|:--:|-------------|
+| `id` | `Identifier` | Yes | — | Warning ID referenced by panels |
+| `label` | `LocalizedString` | Yes | — | Reader-facing label |
+| `defaultBlur` | boolean | — | `false` | Whether affected panels are blurred until the reader opts in |
+
+## The `Character` roster
+
+Characters are defined once in `meta.characters` and referenced by [speech bubbles](/schema/speech-bubbles) (`characterId`) and [character sheet extras](/schema/extras).
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | `Identifier` | Yes | Character ID |
+| `name` | `LocalizedString` | Yes | Character name per locale |
+| `description` | `LocalizedString` | — | Character description |
+| `images` | object (string → string) | — | Named image URLs, e.g. `{ "portrait": "https://…" }` |
+| `voice` | object | — | TTS voice binding: `provider` (`"elevenlabs"` \| `"custom"`) and `voiceId` (string) |
+| `balloonConfig` | `BalloonConfigOverride` | — | Per-character balloon style overrides, merged onto the work-level defaults from [`settings.typography.balloon_config`](/schema/settings). See [Speech Bubbles](/schema/speech-bubbles) |
+
+<Callout kind="info">
+Balloon styling cascades: work defaults → character `balloonConfig` → per-bubble `balloonConfig`. Only the fields you specify at each level override the parent.
+</Callout>
+
+## Example
+
+Adapted from the bundled samples:
+
+```json
+{
+  "meta": {
+    "id": "work-sample-3pages",
+    "title": {
+      "en-US": "City Noir: Sample",
+      "de-DE": "Stadt Noir: Beispiel"
+    },
+    "description": {
+      "en-US": "A sample PanelWave graphic novel with 3 pages and multiple panels per page."
+    },
+    "creators": [
+      { "role": "writer", "name": "Dana Kim" },
+      { "role": "artist", "name": "Leo Park" }
+    ],
+    "publisher": "PanelWave Press",
+    "series": "City Noir",
+    "issue": "Sample One-Shot",
+    "release_date": "2025-09-01",
+    "age_rating": "16+",
+    "tags": ["noir", "branching"],
+    "locales": ["en-US", "de-DE"],
+    "default_locale": "en-US",
+    "cover": "img-cover",
+    "characters": [
+      {
+        "id": "char-mira",
+        "name": { "en-US": "Mira" },
+        "description": { "en-US": "Night watch captain navigating dangerous choices." },
+        "images": { "portrait": "https://cdn.example.com/chars/mira.png" },
+        "voice": { "provider": "elevenlabs", "voiceId": "EL-12345" }
+      }
+    ],
+    "content_warnings": [
+      {
+        "id": "cw-violence",
+        "label": { "en-US": "Stylized violence", "de-DE": "Stilisierte Gewalt" },
+        "defaultBlur": false
+      }
+    ],
+    "copyright": "© 2025 PanelWave Press",
+    "license": "All rights reserved"
+  }
+}
+```
+
+## Locales and fallback
+
+`locales` declares every locale the work supports; `default_locale` must be the one guaranteed to have complete content. When resolving a [`LocalizedString`](/schema/manifest-structure#localizedstring) or a localized asset, consumers try the reader's locale first, then walk the fallback chain down to `default_locale`. The full resolution algorithm is described in [Localization](/concepts/localization); localized assets are covered in [Assets](/schema/assets#localized-asset-resolution).

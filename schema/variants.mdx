@@ -1,0 +1,114 @@
+---
+title: Panel Variants
+description: Reference for PanelVariant and PanelPartial — conditional panel content selected at read time by JSON Logic over variables.
+---
+
+Panel variants let one panel show **different content depending on state** — a reader's earlier choice, their age, an entitlement, or any other [variable](/schema/variables). Unlike graph branching (different panels), a variant keeps the story flow fixed and swaps the panel's *content*.
+
+## `PanelVariant`
+
+Defined as `$defs/PanelVariant`, used in `chapters[].panels.<panelId>.variants[]`.
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `id` | `Identifier` | Yes | Unique variant ID within the panel. |
+| `when` | `JsonLogic` | Yes | Condition evaluated against current variable values. The variant applies when it is truthy. |
+| `overrides` | `PanelPartial` | Yes | The panel properties to replace when the variant applies. |
+
+Conditions use [JSON Logic](https://jsonlogic.com/) with `{ "var": "..." }` references to variable IDs, e.g.:
+
+```json
+{ "==": [{ "var": "path.choice" }, "left"] }
+```
+
+## `PanelPartial`
+
+Defined as `$defs/PanelPartial` — a subset of the [Panel](/schema/panels) object. Every property is optional; a property that is present **replaces** the base panel's value wholesale (e.g. an overriding `layers` array replaces the entire base layer list, so repeat any base layers you want to keep).
+
+| Property | Type | Description |
+|---|---|---|
+| `title` | `LocalizedString` | Override panel title. |
+| `description` | `LocalizedString` | Override panel description. |
+| `durationMs` | number ≥ 100 | Override autoplay duration for this panel. |
+| `formatViews` | map of `PanelFormatView` | Override per-format view settings. |
+| `layers` | `Layer[]` | Replace the panel's layer stack — see [Layers](/schema/layers). |
+| `animations` | `PanelAnimations` | Replace the viewport animation — see [Animations](/schema/animations). |
+| `speechBubbles` | `SpeechBubble[]` | Replace the [speech bubbles](/schema/speech-bubbles). |
+| `hotspots` | `Hotspot[]` | Replace the [hotspots](/schema/hotspots). |
+| `audio` | `AudioTrack[]` | Replace the panel [audio](/schema/audio). |
+| `video` | `VideoLayer[]` | Replace the panel [video layers](/schema/video). |
+| `plugins` | `PluginInstance[]` | Replace panel plugins — see [Extensions](/schema/extensions). |
+| `shareable` | boolean | Override sharing permission. |
+| `age_rating_override` | string | Override the panel-level age rating. |
+| `preloadHints` | `Identifier[]` | Override asset preload hints. |
+| `memoryBudgetHint` | number ≥ 0 | Override the memory budget hint. |
+| `contentWarnings` | `Identifier[]` | Override the content-warning references. |
+
+Compared to a full `Panel`, a `PanelPartial` cannot carry `id`, `placement`, `accessibility`, or nested `variants` (variants do not recurse).
+
+## Typical patterns
+
+- **Choice reflection** — a hotspot sets `path.choice`, and a later panel's variants render a left- or right-path version of the same beat.
+- **Age-appropriate content** — a variant with `{"<": [{"var": "user.age"}, 16]}` adds a blur overlay layer and a "content adjusted" text layer.
+- **Entitlement-aware teasers** — swap layers depending on an entitlement variable (the hard gate itself belongs in the [paywall](/schema/paywall)).
+
+## Example
+
+From the complex sample (`02_complex`): panel `p1-4` reacts to the `path.choice` variable set by hotspots on the previous panel.
+
+```json
+{
+  "panels": {
+    "p1-4": {
+      "title": { "en-US": "The Door" },
+      "layers": [
+        { "kind": "image", "id": "ly-p1-4-bg", "assetId": "img-p1-4", "z": 0 }
+      ],
+      "variants": [
+        {
+          "id": "var-left",
+          "when": { "==": [{ "var": "path.choice" }, "left"] },
+          "overrides": {
+            "layers": [
+              { "kind": "image", "id": "ly-p1-4-bg", "assetId": "img-p1-4", "z": 0 },
+              { "kind": "image", "id": "ly-p1-4-ovl", "assetId": "img-overlay-left", "z": 1, "opacity": 0.4 },
+              {
+                "kind": "text", "id": "ly-p1-4-tx", "z": 2, "opacity": 0.95,
+                "text": { "en-US": "Left path chosen.", "de-DE": "Linker Pfad gewählt." },
+                "style": { "font": "Helvetica", "sizePt": 16, "color": "#ffffff",
+                           "strokeColor": "#000000", "strokeWidth": 2 }
+              }
+            ]
+          }
+        },
+        {
+          "id": "var-right",
+          "when": { "==": [{ "var": "path.choice" }, "right"] },
+          "overrides": {
+            "layers": [
+              { "kind": "image", "id": "ly-p1-4-bg", "assetId": "img-p1-4", "z": 0 },
+              { "kind": "image", "id": "ly-p1-4-ovr", "assetId": "img-overlay-right", "z": 1, "opacity": 0.4 }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}
+```
+
+Note how each variant repeats the background layer — `overrides.layers` replaces the whole stack.
+
+## Variants vs. other conditional mechanisms
+
+| Mechanism | Granularity | Use when |
+|---|---|---|
+| `variants` (`PanelVariant`) | Whole property groups of one panel | The panel's content differs meaningfully by state. |
+| `visibleIf` on a layer/bubble/hotspot/track | Single element | One element toggles; the rest of the panel is unchanged. |
+| Conditional [graph edges](/schema/graph) | Story flow | The *path* differs — readers see different panels entirely. |
+
+## Related pages
+
+- [Variables](/schema/variables) — definitions, scopes, and mutation
+- [Graph](/schema/graph) — branching with conditional edges
+- [Concepts: Variables](/concepts/variables) — how state drives content across the ecosystem

@@ -1,0 +1,148 @@
+---
+title: Pages & Panels
+description: Create and organize chapters, pages, and panels with the structure tree, set up page layouts, and edit panel properties in the inspector.
+---
+
+A PanelWave work is organized in four levels: **Work → Chapters → Pages → Panels**. Chapters group your story into parts, pages lay panels out for page-capable formats, and panels are the individual story beats readers move through. You manage all of this from the **Tree** tab in the editor's left sidebar.
+
+<Callout kind="info">
+  How panels connect — the reading flow, branches, and conditions — is defined separately in the [Graph editor](/cms/editor/graph). Reordering panels here changes their reading order within a page, not the story graph.
+</Callout>
+
+## The structure tree
+
+The Tree tab shows your whole work as an expandable outline. Each row has an expand/collapse arrow, an icon, its title, and (for panels) small badges:
+
+| Badge | Meaning |
+|---|---|
+| **H** | Has hotspots |
+| **V** | Has variants |
+| **W** | Content warning |
+| **P** | Paywalled |
+| **!** | Has issues |
+
+**Selecting** a row opens it in the canvas — a page opens in page view, a panel in panel view — and the breadcrumb in the header updates.
+
+### Search and filters
+
+At the top of the tree, the search box ("Search chapters, pages, panels...") filters the outline as you type, matching titles and IDs and auto-expanding branches that contain matches. Next to it, three filter buttons narrow the tree to panels that are **invalid**, have **hotspots**, or have **variants**; a clear button appears when any filter is active.
+
+You can also move through the tree with the keyboard: `↑`/`↓` walk visible rows, `→` expands (or enters) a node, `←` collapses (or goes to the parent), and `Enter` selects.
+
+## Creating chapters, pages, and panels
+
+<Steps>
+  <Step title="Create a chapter">
+    Click the **New Chapter** button at the top of the tree, or right-click the work node and choose **New Chapter**.
+  </Step>
+  <Step title="Add a page">
+    Right-click the chapter and choose **New Page**.
+  </Step>
+  <Step title="Add panels">
+    Right-click the page and choose **New Panel** — or simply drag an image from the **Assets** tab onto the canvas in page view, which creates a panel with that artwork already placed. See [Canvas](/cms/editor/canvas#adding-content-by-drag-and-drop).
+  </Step>
+</Steps>
+
+### Context menus
+
+Every row has a right-click context menu (also available via the **⋮** button that appears on the row):
+
+| Node | Menu items |
+|---|---|
+| **Work** | New Chapter · Properties · Settings |
+| **Chapter** | New Page · Duplicate · Rename · Move Up · Move Down · Delete |
+| **Page** | New Panel · Page Properties · Duplicate · Rename · Move Up · Move Down · Delete |
+| **Panel** | Edit Panel · Duplicate · Move to... · Set Paywall · Content Warning · Copy as JSON · Delete Panel |
+
+Destructive actions ask for confirmation, and every structural change supports [undo/redo](/cms/editor/layout#header-bar) (`Ctrl+Z` / `Ctrl+Shift+Z`).
+
+### Reordering by drag and drop
+
+Each draggable row shows a grip handle (⋮⋮). Drag it to reorder:
+
+- **Chapters** within the work
+- **Pages** within a chapter
+- **Panels** within a page
+
+A "Drop here" placeholder shows where the item will land. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders.
+
+You can also drag a panel from the tree **onto the canvas** (in page view) to place it on the current page.
+
+## Page layouts
+
+Pages position their panels with **percentages of the page**, not fixed pixels — a panel at "x 25%, width 50%" sits in the same relative spot on a phone, a 4K screen, or a printed A4 page. Panels may overlap (stacking order is controlled per panel) and can be rotated for dynamic layouts.
+
+To edit page-level settings, right-click a page and choose **Page Properties**. The dialog is organized into four sections and **saves automatically** as you edit:
+
+- **Layout & Structure** — the chapter the page belongs to and a **Layout Template** starting point: Blank, 2 Panels Horizontal, 3 Panels Vertical, Splash (Full Page), 4 Panels Grid, or Custom.
+- **Visual Properties** — background settings and **Page Margins** (top/right/bottom/left, in pixels).
+- **Transitions & Audio** — **Transition In** and **Transition Out** effects for entering/leaving the page (fade, slide-left, slide-right, cut, zoom).
+- **Production** — a workflow **Status** (Draft, Review, Final, Published) and **Production Notes** for your team. Notes are internal and never appear in the published work.
+
+Arranging the panels themselves — moving, resizing, aligning, distributing — happens visually on the canvas in page view; see [Canvas](/cms/editor/canvas#page-view-vs-panel-view).
+
+## Panel properties in the inspector
+
+Select a panel and open the **Panel** tab in the right inspector. Changes apply to the canvas immediately and are picked up by [auto-save](/cms/editor/layout#saving-your-work).
+
+### Basic Properties
+
+- **Panel ID** — the internal identifier (read-only).
+- **Friendly ID** — an optional human-readable identifier (e.g. `intro-panel-001`), useful when referencing panels in conditions or exports.
+- **Reading Order** — the panel's position in the page's reading sequence; this is the number shown in the blue badge in page view.
+- **Title** and **Description** — edited in the locale currently selected in the header. The description is read by screen readers, so a short sentence describing what happens in the panel makes your work accessible to blind and low-vision readers.
+
+### Layout & Transform
+
+The numeric twin of dragging on the canvas:
+
+- **Position (X, Y)** and **Size (W, H)** — in percent of the page (0–100%).
+- **Rotation** — from −180° to 180°.
+- **Z-Index** — stacking order for overlapping panels, plus **Bring to Front / Bring Forward / Send Backward / Send to Back** buttons.
+- **Lock Position** — prevents accidental dragging; **Lock Aspect Ratio** keeps the panel's proportions when resizing.
+
+### Content Settings
+
+- **Shareable** — allow readers to share this panel.
+- **Content Warnings** — tags (e.g. "violence, language") that alert readers to sensitive content; they also produce the **W** badge in the tree.
+
+### Format Views
+
+Controls how the panel behaves across reading formats:
+
+- **Allow Page View** / **Allow Panel View** — whether the panel may appear in each view mode.
+- **Minimal Focus Rect** — the important region of the panel (X, Y, width, height). Panel-by-panel readers zoom to this region, and the editor previews it as the bright area in panel view.
+- **Display Duration (ms)** — how long the panel is shown during autoplay. Leave it empty to use the work's default seconds-per-panel setting. Panels with a video layer lock the duration to the video length automatically; a toggle switches between **Locked to video** and manual duration, with a **Reset to video length** button. See [Video Panels](/cms/editor/video-panels).
+
+### Layers
+
+A list of the panel's layers and speech bubbles, with visibility toggles and stacking controls. Deeper layer editing happens in the **Layer** tab — see [Layers](/cms/editor/layers).
+
+### More sections
+
+The rest of the Panel tab manages content that has its own documentation:
+
+| Section | What it holds | Learn more |
+|---|---|---|
+| **Animations** | Camera moves and timed effects for the panel | [Animations](/cms/editor/animations) |
+| **Video Tracks** / **Audio Tracks** / **Sequence Audio Tracks** | Media that plays with the panel or across a sequence | [Audio](/cms/editor/audio), [Video Panels](/cms/editor/video-panels) |
+| **Variants** | Conditional versions of the panel based on reader choices | [Variables](/cms/editor/variables) |
+| **Performance Hints** | Preload priority and memory hints for large works | — |
+
+<Callout kind="tip">
+  The inspector also has an **A11y** tab for the selected element, covering screen reader settings, captions for audio/video, and interactive element accessibility — worth a pass before [publishing](/cms/publishing).
+</Callout>
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Editor Layout" icon="layout-panel-left" href="/cms/editor/layout">
+    Where the tree, canvas, and inspector live on screen.
+  </Card>
+  <Card title="Canvas" icon="mouse-pointer-2" href="/cms/editor/canvas">
+    Move, resize, align, and distribute panels visually.
+  </Card>
+  <Card title="Graph" icon="git-fork" href="/cms/editor/graph">
+    Connect panels into a branching reading flow.
+  </Card>
+</Columns>

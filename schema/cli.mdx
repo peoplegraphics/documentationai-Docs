@@ -1,0 +1,209 @@
+---
+title: CLI (@panelwave/cli)
+description: Install and use the panelwave command line — validate, bundle, diff, and upgrade manifests, with all options, exit codes, and example runs.
+---
+
+`@panelwave/cli` is the official command-line tool for working with PanelWave manifests. It installs a single binary, `panelwave`, with four commands: `validate`, `bundle`, `diff`, and `upgrade`. The CLI is MIT-licensed and validates against the official schema using AJV (JSON Schema 2020-12, all-errors mode, formats enabled).
+
+## Installation
+
+<Callout kind="info">
+  `@panelwave/cli` is not published to the npm registry yet. Until it is, build it from the `panelwave-packages` repository and link it locally.
+</Callout>
+
+```bash
+# In your checkout of panelwave-packages
+npm install
+npm run build:cli
+
+# Make the `panelwave` binary available globally
+cd packages/cli
+npm link
+```
+
+Once the package is published, this becomes `npm install -g @panelwave/cli` (or ad hoc via `npx @panelwave/cli`).
+
+```bash
+panelwave --version   # prints the CLI version (1.0.0)
+panelwave --help      # command overview
+```
+
+## `panelwave validate <file>`
+
+Validates a manifest against the PanelWave JSON Schema.
+
+| Option | Default | Description |
+|---|---|---|
+| `-s, --schema <version>` | `1.0.0` | Schema version to validate against. Resolved by **major** version — any `1.x.y` value resolves `schema/1.0/panelwave.schema.json`. |
+| `--strict` | off | Fail (exit 1) when warnings are present, even if the manifest is schema-valid. |
+| `--json` | off | Print the machine-readable result instead of human output. |
+
+Schema resolution order: the schema bundled inside the CLI package, then `./schema/<major>.0/panelwave.schema.json` relative to the current directory, then the same path walking up to five parent directories (handy in a monorepo checkout).
+
+Besides schema errors, `validate` emits **structural warnings** (non-blocking unless `--strict`):
+
+- `No "assets" section — panels referencing assetIds will fail at runtime.`
+- `No "characters" defined in meta — speech bubbles with characterId will be unresolved.`
+
+### Example runs
+
+```bash
+$ panelwave validate my-comic/panelwave.json
+
+  ✓ my-comic/panelwave.json is valid (schema 1.0.0)
+```
+
+```bash
+$ panelwave validate broken.json
+
+  ✗ broken.json has 2 error(s)
+
+  /chapters/0/graph
+    → must have required property 'entry'
+  /meta/default_locale
+    → must match pattern "^[A-Za-z]{2,8}(-[A-Za-z0-9]{2,8})*$"
+```
+
+With `--json`, output is a `ValidationResult`:
+
+```json
+{
+  "valid": false,
+  "errors": [
+    { "path": "/chapters/0/graph", "message": "must have required property 'entry'", "keyword": "required" }
+  ],
+  "warnings": ["No \"assets\" section — panels referencing assetIds will fail at runtime."]
+}
+```
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Valid (and no warnings when `--strict`). |
+| `1` | Validation errors, file not found, invalid JSON, schema not resolvable, or warnings with `--strict`. |
+
+## `panelwave bundle <directory>`
+
+Assembles a manifest that was **split across files** back into a single JSON document.
+
+| Option | Default | Description |
+|---|---|---|
+| `-o, --output <file>` | stdout | Write the bundle to a file (directories are created as needed). |
+| `--minify` | off | Emit compact JSON (no indentation). |
+
+Supported directory layout:
+
+```
+manifest/
+  panelwave.json      # root (used as-is if it already contains everything)
+  meta.json           # merged as "meta" if the root lacks it
+  assets.json         # …same for assets, variables, settings,
+  variables.json      #  extras, paywall, tracking, ui
+  chapters/
+    ch-01.json        # each file = one chapter object,
+    ch-02.json        # sorted by filename into the "chapters" array
+```
+
+Merge rules: a section file is only merged when the root does not already define that key; the `chapters/` directory is only used when the root has no `chapters`.
+
+```bash
+$ panelwave bundle ./manifest -o dist/panelwave.json
+
+  ✓ Bundled manifest written to dist/panelwave.json
+```
+
+<Callout kind="tip">
+`bundle` does not validate the result — pipe it through `validate` afterwards:
+`panelwave bundle ./manifest -o dist/panelwave.json && panelwave validate dist/panelwave.json`
+</Callout>
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Bundle written (or printed to stdout). |
+| `1` | Directory not found, or invalid JSON in any input file. |
+
+## `panelwave diff <fileA> <fileB>`
+
+Shows structural differences between two manifests as a recursive deep diff with JSON-path-style locations (e.g. `chapters[0].panels.p1.layers[0].opacity`).
+
+| Option | Default | Description |
+|---|---|---|
+| `--json` | off | Output the diff entries as JSON. |
+| `--ignore-order` | off | Sort arrays before comparing, ignoring ordering differences. |
+
+Each difference is one of `added` (in B only), `removed` (in A only), or `changed`.
+
+```bash
+$ panelwave diff v1/panelwave.json v2/panelwave.json
+
+  Comparing v1/panelwave.json ↔ v2/panelwave.json
+
+  3 difference(s) found:
+
+  ~ meta.title.en-US
+    - "Night Shift"
+    + "Night Shift — Director's Cut"
+  + chapters[0].panels.p1-6
+    {"title":{"en-US":"New scene"},"layers":[...]}
+  - paywall.rules[2]
+    {"id":"pw-p3-1","scope":"panel","refId":"p3-1",...}
+```
+
+With `--json`, output is an array of `{ "path", "type", "valueA", "valueB" }` entries.
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Manifests are identical. |
+| `1` | Differences found, file not found, or invalid JSON. |
+
+The diff-means-nonzero convention makes `diff` usable as a CI guard ("did the published manifest change?").
+
+## `panelwave upgrade <file>`
+
+Normalizes a manifest to the CLI's target schema version, applying mechanical migrations.
+
+| Option | Default | Description |
+|---|---|---|
+| `-o, --output <file>` | overwrite in place | Write the upgraded manifest elsewhere. |
+| `--dry-run` | off | Print the planned changes without writing anything. |
+
+Migration steps applied (each reported individually):
+
+1. Add a missing `panelwave` header (version + schema URI).
+2. Normalize `panelwave.version` and `panelwave.schema` to the CLI's target version.
+3. Derive a missing `meta.locales` array from `meta.default_locale`.
+4. Rename legacy layer `type` fields to `kind` (older drafts used `type`).
+5. Add a missing `graph.edges` array to each chapter.
+
+```bash
+$ panelwave upgrade old-manifest.json --dry-run
+
+  old-manifest.json — 2 upgrade(s):
+
+  ~ panelwave.version — Updated version from "0.9.0" to "1.0.0"
+  + chapters[0].graph.edges — Added missing graph.edges array
+
+  --dry-run: no files were modified
+```
+
+<Callout kind="alert">
+The current CLI release (1.0.0) targets manifest version **1.0.0** as "latest" — it predates format 1.1. Running `upgrade` on a manifest that declares `panelwave.version: "1.1.0"` will rewrite the version back to `1.0.0`. Until a CLI release aligned with format 1.1 ships, only use `upgrade` on pre-1.0 drafts, and prefer `--dry-run` first. Validation is unaffected: `validate` uses the current schema file, which accepts both 1.0 and 1.1 manifests (see [Versioning](/schema/versioning)).
+</Callout>
+
+### Exit codes
+
+| Code | Meaning |
+|---|---|
+| `0` | Already up to date, upgrade written, or `--dry-run` completed. |
+| `1` | File not found or invalid JSON. |
+
+## Related pages
+
+- [Validation](/schema/validation) — validating with AJV directly, error anatomy
+- [Versioning](/schema/versioning) — format 1.0 vs. 1.1 and compatibility rules
+- [Examples](/schema/examples) — sample manifests to try the commands on

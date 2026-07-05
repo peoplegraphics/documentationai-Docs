@@ -1,0 +1,63 @@
+---
+title: Validation Errors
+description: Decode and fix the most common PanelWave manifest validation errors — from AJV setup problems to schema violations and CMS preflight failures.
+---
+
+This page covers errors from all three validation surfaces: AJV directly, the [`panelwave` CLI](/schema/cli), and the CMS [Preflight Validation](/cms/validation).
+
+## AJV won't even compile the schema
+
+**Symptom:** errors like `no schema with key or ref "https://json-schema.org/draft/2020-12/schema"`.
+
+The schema uses JSON Schema draft 2020-12, which the default AJV build doesn't support. Use the 2020 build:
+
+```javascript
+const Ajv2020 = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
+
+const ajv = new Ajv2020({ allErrors: true, strict: false });
+addFormats(ajv);
+```
+
+Full setup: [Validating Manifests](/schema/validation).
+
+## "must NOT have additional properties"
+
+The most common error. Nearly every object in the schema is closed (`additionalProperties: false`), so this means one of:
+
+- **A typo** in a property name (`chapers` instead of `chapters`).
+- **A property at the wrong nesting level** (e.g. `transition` directly on an edge's `condition`).
+- **Custom data without the `x-` prefix** — and note `x-` fields are only accepted at the **manifest root**, not on nested objects. See [Extensions](/schema/extensions).
+
+The error's `instancePath` tells you exactly which object carries the offending property.
+
+<Callout kind="tip">
+  A classic instance: giving a speech bubble's `shape` a `type` property. `SpeechBubble.shape` is a plain bounding box (`x`, `y`, `w`, `h` — nothing else); only **hotspot** shapes have a `type` discriminator (`rect`/`circle`/`ellipse`/`polygon`). See [Speech Bubbles](/schema/speech-bubbles) vs. [Hotspots](/schema/hotspots).
+</Callout>
+
+## "must NOT have fewer than 1 items" on `graph.edges`
+
+Every chapter graph requires at least one edge — a single-panel chapter with `"edges": []` is invalid. Add a second panel and an edge, or restructure the chapter. See [Graph](/schema/graph).
+
+## Missing required properties
+
+A manifest requires `panelwave`, `meta`, and `chapters` at the top level. Within `meta`, the required fields include `id`, `title`, `locales`, and `default_locale`. The error message names the missing property; the [Manifest Structure](/schema/manifest-structure) page shows a minimal valid manifest to compare against.
+
+## "must match pattern" on variable IDs
+
+Variable IDs are stricter than other identifiers: they must match `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` (dot-namespaced, e.g. `story.hasKey`), and plugin state variables must start with `plugin.`. See [Variables](/schema/variables).
+
+## CLI warnings (exit 0, but flagged)
+
+`panelwave validate` emits structural warnings that don't block validation unless you pass `--strict`:
+
+- `No "assets" section` — panels referencing `assetId`s will fail at runtime.
+- `No "characters" defined in meta` — speech bubbles with `characterId` will be unresolved.
+
+## CMS preflight says "Cannot Publish"
+
+The CMS runs deeper checks than the schema: broken references, duplicate IDs, unreachable graph nodes, missing captions/alt text, oversized assets, and more, grouped into eight categories with three severities. Only **errors** block publishing. Each issue includes a suggestion, an *Open in editor* shortcut, and often an auto-fix. See [Validation &amp; Preflight](/cms/validation).
+
+## Import into the CMS fails
+
+The work import currently accepts only manifests declaring `panelwave.version` **`1.0.0`** and at most **10 MB** of JSON. If your manifest declares `1.1.0`, adjust the version declaration (1.1 is additive over 1.0, so a manifest without 1.1-only features is valid either way). See [Import](/cms/import).

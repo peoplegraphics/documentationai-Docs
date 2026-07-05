@@ -1,0 +1,97 @@
+---
+title: Video Panels
+description: Put video inside panels — add a video layer, choose play and start modes, loop from any point, play forward–backward, and track transcoding status.
+---
+
+Video panels let a panel play motion footage instead of (or on top of) still artwork — a looping rain shot behind a scene, a short animated beat that plays when the reader arrives, an establishing shot that only starts on click. In PanelWave, video is just another **layer type** inside a panel, configured from the Inspector like any other layer.
+
+## What happens when you upload a video
+
+Upload video files in the [Assets](/cms/assets) tab, exactly like images and audio. Each video is then **processed in the background**: the CMS prepares a web-friendly playback version, a **poster image** (a representative frame), and a filmstrip of preview thumbnails.
+
+While that runs you'll see:
+
+- a **Processing…** indicator on the asset card in the Assets tab,
+- the note "Processing… duration and poster will appear once transcoding finishes." in the Inspector if the layer already uses the asset,
+- a "processing…" badge on the video layer on the canvas.
+
+You can keep working during processing — settings that need the video's duration or poster simply fill in once it completes.
+
+## Adding video to a panel
+
+<Tabs>
+  <Tab title="Drag from Assets" icon="mouse-pointer">
+    Drag a video asset from the **Assets** tab onto the canvas. Dropped inside an existing panel it becomes a video layer of that panel; dropped on an empty spot in page view it creates a new panel with the video as its layer.
+  </Tab>
+  <Tab title="Context menu" icon="list">
+    Right-click the canvas and choose **Add → Video Layer**. This creates an empty video layer; then select it and pick the footage with the **Video Asset** selector in the Inspector.
+  </Tab>
+</Tabs>
+
+On the canvas, the layer shows the video's **poster frame** with a small badge in the corner indicating the play mode and effective duration (a placeholder appears until the poster is ready). The editor canvas doesn't play the video — use [Preview](/cms/preview) to watch it in the real player.
+
+## Playback settings
+
+Select the video layer and open **Video Properties** in the Inspector:
+
+| Setting | Options / values | What it does |
+|---|---|---|
+| Video Asset | asset picker | The video file this layer plays |
+| View Mode | Play once · Loop · Forward–backward · Loop from second… | How the video plays once started |
+| Loop From | scrubber (only for "Loop from second…") | The point the video returns to on each loop |
+| Start Mode | On view · On mouseover (page view) · On click | What triggers playback |
+| Trim Start (seconds) | number | Skips the first part of the footage |
+| Muted | checkbox (on by default) | Plays the video without its sound |
+| Controls | checkbox (on by default) | Shows the reader player controls on the video |
+
+### View Mode in detail
+
+- **Play once** — plays through a single time and holds on the last frame.
+- **Loop** — repeats from the beginning indefinitely.
+- **Forward–backward** — plays to the end, then plays **in reverse** back to the start, and repeats. Great for seamless ambient motion without a visible cut. When you pick this mode, a reversed copy of the footage is prepared automatically in the background.
+- **Loop from second…** — plays from the start once, then keeps looping from a point you choose. A filmstrip **Loop From** scrubber appears so you can pick the loop point visually on the video's thumbnails (the point must lie after your Trim Start and before the end).
+
+<Callout kind="alert">
+  **Forward–backward** is not available for streaming-only (HLS) videos — the option is disabled with the hint "Forward–backward playback is not supported for streaming (HLS) video". Upload a regular video file if you need this mode.
+</Callout>
+
+### Start Mode in detail
+
+- **On view** — starts as soon as the panel becomes visible to the reader.
+- **On mouseover (page view)** — starts when the pointer hovers the panel. This only applies in page view; elsewhere it falls back to click.
+- **On click** — waits for the reader to click/tap the video.
+
+<Callout kind="tip">
+  Keep **Muted** enabled for autoplaying video: browsers block unmuted autoplay, so an "On view" video with sound may not start for many readers. If the sound matters, use **On click**, or pair a muted video with an [audio track](/cms/editor/audio).
+</Callout>
+
+## Poster images
+
+Every transcoded video gets a poster frame automatically. It is what readers see before playback starts (and what the editor canvas shows), so panels never appear blank while a video loads. The poster is generated during processing — you don't upload it separately.
+
+## Panel duration and video length
+
+For autoplay timing, a panel with a video layer can derive its **Display Duration** from the video itself. In the Inspector's Format Views section, the **Display Duration (ms)** field shows a badge:
+
+- **Auto (from video)** — the duration is locked to the video's length (a Forward–backward video counts twice, out and back). The field is read-only and a **Locked to video** button indicates the state.
+- **Manual** — click the lock button (**Unlocked (manual)**) to type your own duration. A **Reset to video length** button recomputes it from the footage and switches back to automatic.
+
+See [Animations & Timeline](/cms/editor/animations) for how display durations drive the autoplay sequence.
+
+## Video tracks
+
+Besides video layers, the panel Inspector also has a **Video Tracks** section (**+ Add Video Track**) that uses the same Track Editor as audio tracks — with start time, duration override, looping, volume, and fades. Use tracks when you want video timed against the panel's timeline the way audio is; use a video **layer** when the video is part of the panel's artwork with its own placement, play mode, and start trigger.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Video in the format" icon="file-json" href="/schema/video">
+    How video layers and their settings are stored in the manifest.
+  </Card>
+  <Card title="Assets" icon="folder-open" href="/cms/assets">
+    Uploading footage and monitoring processing status.
+  </Card>
+  <Card title="Preview" icon="play" href="/cms/preview">
+    Watch video panels exactly as readers will see them.
+  </Card>
+</Columns>

@@ -1,0 +1,99 @@
+---
+title: Versioning
+description: How PanelWave manifests declare their format version, what the version numbers mean, and how to upgrade older manifests with the CLI.
+---
+
+Every manifest declares which format version it was written for in the required top-level `panelwave` header. Consumers use it to decide how to interpret the document and whether an upgrade is needed.
+
+## The `panelwave` header (`PanelwaveHeader`)
+
+| Property | Type | Required | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `version` | string | Yes | Pattern `^[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z-.]+)?$` | Semantic format version the manifest targets, e.g. `"1.1.0"`. Pre-release suffixes (`1.2.0-beta.1`) are allowed |
+| `schema` | string (`Uri`) | Yes | Absolute URI | URL of the schema the manifest validates against |
+| `generator` | string | — | — | Free-form tool identifier that produced the manifest, e.g. `"panelwave-cms/2.3"` |
+
+```json
+{
+  "panelwave": {
+    "version": "1.1.0",
+    "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json",
+    "generator": "panelwave-sample-gen/1.0"
+  }
+}
+```
+
+## Version semantics
+
+The format follows semantic versioning:
+
+| Segment | Example | Meaning |
+|---------|---------|---------|
+| **Patch** (`1.0.x`) | `1.0.1` | Clarifications and non-functional changes — no structural impact |
+| **Minor** (`1.x.0`) | `1.1.0` | Backward-compatible additions — new optional fields and enum values |
+| **Major** (`x.0.0`) | `2.0.0` | Breaking changes — requires migration |
+
+### One schema file per major version
+
+The schema file lives in a directory named after the **major** version. Minor versions are additive and ship **in place** within that directory:
+
+- Current format version: **1.1.0**
+- Schema location: `schema/1.0/panelwave.schema.json`
+- Schema `$id`: `https://panelwave.org/schema/1.0/panelwave.schema.json` (unchanged by minor releases)
+
+This is why a `1.1.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
+
+## Compatibility rules as encoded in the schema
+
+**Backward compatibility (old manifests, new schema).** Minor releases only add *optional* properties and *new enum values*. A manifest written for 1.0.0 validates unchanged against the current schema. Example: schema 1.1 added `playMode`/`startMode` to `VideoLayer`, but the legacy 1.0 fields `autoplay` and `loop` remain valid and are **not** deprecated — consumers map them at read time (`loop: true` → `playMode: "loop"` and `autoplay` → `startMode` *only when the new field is absent*; a present new field always wins). See [Video](/schema/video) for the full mapping.
+
+**Forward compatibility (new manifests, old consumers).** The schema is strict about unknown properties (`additionalProperties: false` / `unevaluatedProperties: false` on most objects), so a 1.0-era validator will reject fields introduced later. Custom data that must survive round-trips belongs in `x-` prefixed [extension fields](/schema/extensions) instead.
+
+**Deprecation policy.** Deprecated fields are marked with `"deprecated": true` in the schema and remain supported for at least one major version.
+
+### What changed in 1.1.0
+
+All additive; existing manifests remain valid unchanged:
+
+- `VideoLayer`: `playMode` (`once` | `loop` | `pingpong` | `loop-from`), `loopFromMs`, `startMode` (`on-view` | `on-hover` | `on-click`), `controls`
+- `VideoVariant`: `direction` (`forward` | `reverse`) for pre-rendered reverse encodes (smooth ping-pong)
+- `AssetCatalogItemVideo`: optional `poster` (`VideoPoster`)
+- `settings.ui`: work-level defaults `videoPlayModeDefault`, `videoStartModeDefault`, `videoMutedDefault`
+- `tracking.eventWhitelist`: new events `videoPlay`, `videoPause`, `videoEnded`, `videoLoop`
+
+Details: [Video](/schema/video), [Assets](/schema/assets), [Settings](/schema/settings), [Tracking](/schema/tracking).
+
+## Upgrading manifests with the CLI
+
+`@panelwave/cli` ships an `upgrade` command that normalizes a manifest to the latest supported format:
+
+```bash
+# Preview the changes without writing anything
+panelwave upgrade ./my-comic/panelwave.json --dry-run
+
+# Upgrade in place
+panelwave upgrade ./my-comic/panelwave.json
+
+# Write to a different file
+panelwave upgrade ./my-comic/panelwave.json --output ./my-comic/panelwave.upgraded.json
+```
+
+The upgrade currently performs these normalizations:
+
+- Adds a missing `panelwave` header
+- Updates `panelwave.version` and `panelwave.schema` to the CLI's target version
+- Derives a missing `meta.locales` array from `meta.default_locale`
+- Renames the pre-1.0 draft layer field `type` to `kind`
+- Adds a missing `graph.edges` array
+
+<Callout kind="alert">
+The CLI's upgrade target is currently `1.0.0` — it has not yet been synchronized with the 1.1.0 format release. Since 1.1 is purely additive, 1.0 manifests need no migration to be read by 1.1-aware consumers; run `--dry-run` first and review the reported steps before overwriting files.
+</Callout>
+
+After upgrading, always re-validate:
+
+```bash
+panelwave validate ./my-comic/panelwave.json
+```
+
+See [Validation](/schema/validation) for validation options and [CLI](/schema/cli) for the full command reference.

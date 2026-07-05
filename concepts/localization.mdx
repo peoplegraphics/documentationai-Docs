@@ -1,0 +1,86 @@
+---
+title: Localization
+description: PanelWave's localization model — LocalizedString objects, BCP-47 locales, fallback chains, and per-locale asset variants shared by schema, player, and CMS.
+---
+
+PanelWave treats multilingual publishing as a first-class concern. One model is shared across the whole ecosystem: the **schema** defines it, the **player** resolves it at runtime, and the **CMS** provides the [translation workflow](/cms/localization) that fills it.
+
+## LocalizedString
+
+Every user-facing string in a manifest — titles, speech bubble text, hotspot labels, alt text, captions — is a `LocalizedString`: an object mapping locale codes to text, never a bare string.
+
+```json
+{
+  "title": {
+    "en-US": "Night Shift",
+    "de-DE": "Nachtschicht",
+    "fr-FR": "Équipe de nuit"
+  }
+}
+```
+
+At least one entry is required. Keys must match the locale pattern; any other key is invalid.
+
+## Locales are BCP-47
+
+Locale codes follow the BCP-47 style: a base language plus optional subtags — `en-US`, `de-DE`, `ja-JP`, `zh-Hans-CN`, or just `en`. Two fields in [`meta`](/schema/meta) anchor the model:
+
+```json
+{
+  "meta": {
+    "locales": ["en-US", "de-DE"],
+    "default_locale": "en-US"
+  }
+}
+```
+
+- `locales` — the languages the work supports (what a language switcher offers).
+- `default_locale` — the ultimate fallback when a translation is missing.
+
+## The fallback chain
+
+Translations are rarely 100% complete at all times, so the player never hard-fails on a missing entry. When resolving a `LocalizedString` for a requested locale, it tries, in order:
+
+1. **Exact match** — `de-DE` requested, `de-DE` present.
+2. **Base-language match** — `de-DE` requested; any `de*` entry (e.g. `de` or `de-AT`) matches.
+3. **The work's `default_locale`.**
+4. **Base language of the default locale.**
+5. **First available entry**, as a last resort.
+
+So a reader on `en-GB` still gets the `en-US` text, and a partially translated work degrades gracefully to its default language instead of showing blanks. The player applies this chain everywhere — including runtime language switching, which re-resolves all text without a reload. See [Player localization](/player/localization).
+
+## Localized assets
+
+Text is not the only thing that varies by language — lettered artwork, voiceover audio, video, and subtitles do too. Instead of localizing the asset *reference*, PanelWave localizes the asset *variant*: a catalog item's variants may carry an optional `locale`, and variants without one are universal.
+
+```json
+{
+  "id": "vo-intro",
+  "category": "audio",
+  "variants": [
+    { "src": "intro-en.mp3", "mime": "audio/mpeg", "locale": "en-US" },
+    { "src": "intro-de.mp3", "mime": "audio/mpeg", "locale": "de-DE" },
+    { "src": "intro.mp3",    "mime": "audio/mpeg" }
+  ]
+}
+```
+
+The player picks a variant with the same fallback logic as text: exact locale → base language → default locale → its base language → any variant. Layers and panels never change — only which file gets loaded. Subtitle assets (`category: "subtitle"`) follow the same pattern. See [Assets](/concepts/assets) and the [asset schema reference](/schema/assets).
+
+## Accessibility text is localized too
+
+`alt`, `caption`, and `transcript` on catalog assets are all `LocalizedString`s, so screen-reader output and captions follow the reader's language like everything else.
+
+## Where each layer fits
+
+| Layer | Role |
+|-------|------|
+| **Schema** | Defines `LocalizedString`, `LocaleCode`, `meta.locales` / `default_locale`, and per-variant `locale`. |
+| **Player** | Resolves fallback chains at runtime, switches language live, picks localized asset variants, supports RTL scripts. |
+| **CMS** | Manages source text and translations, tracks stale entries after edits, and writes completed translations back into the manifest. See [CMS localization](/cms/localization). |
+
+## Related pages
+
+- [Player localization behavior](/player/localization)
+- [Localization workflow in the CMS](/cms/localization)
+- [Meta reference](/schema/meta) — `locales`, `default_locale`, content warnings

@@ -1,0 +1,130 @@
+---
+title: Monetization
+description: Configure paywall rules, products, price points, and coupons in the PanelWave CMS — and test what free and paying readers will see.
+---
+
+PanelWave lets you decide **what is free and what is paid** in a work. Monetization in the CMS has three parts:
+
+- **Paywall rules** — define *which content is gated* and *what unlocks it* (a subscription, a one-time purchase, or age verification).
+- **Products and coupons** — define *what readers can buy*: subscription tiers and one-time purchases, with multi-currency price points and discount codes.
+- **Entitlement simulation** — test the whole setup from a reader's point of view before anything goes live.
+
+For the underlying concepts see [Monetization concepts](/concepts/monetization) and the [paywall section of the format](/schema/paywall).
+
+<Callout kind="alert">
+  **Current limitations, honestly:** reader checkout and real payment processing are not live yet — payment-provider connections exist in the product editor but stay disabled until they are configured, and reader access is currently *simulated* for testing rather than driven by real purchases. You can fully configure rules, products, and coupons today; charging readers comes with a later release.
+</Callout>
+
+## Paywall rules
+
+Open a work's backstage and choose **Paywall** in the navigation. The **Paywall Configuration** screen shows how many panels are currently locked and lists your rules.
+
+### The content map
+
+At the top, the **Content map** summarizes your gating at a glance:
+
+- Every panel appears as a chip marked **Free**, **Preview** (free preview before the paywall), or **Gated**, grouped by chapter.
+- A plain-language rollup explains the reader's experience, for example: *"Readers can view 12 of 40 panels free (5-panel preview). The remaining 28 panels require a premium subscription or a one-time purchase."*
+- Health warnings flag common mistakes — for example if **every** panel is gated ("readers get no free preview") or if a rule targets panels that no longer exist.
+
+### Creating a rule
+
+Click **New Paywall Rule** and fill in the dialog:
+
+| Field | Description |
+|---|---|
+| **Rule Name** | A label such as "Premium Subscription" |
+| **Scope** | **Global (All Works)**, **Work Level**, or **Panel Level** |
+| **Entitlement Type** | **Subscription Required**, **One-Time Purchase**, **Age Verification**, or **Free Access** |
+| **Required Subscription Tiers** | For subscription rules: any of **basic**, **premium**, **pro** |
+| **Price / Currency** | For purchase rules: the price in USD, EUR, GBP, or JPY |
+| **Minimum Age** | For age-verification rules (e.g. 18) |
+| **Preview Panel Count** | How many panels readers can view before the paywall |
+| **Description** | Optional note about the rule |
+| **Active** | Whether the rule is enforced |
+
+Rules can be filtered by scope and status, and each rule card offers **Activate/Deactivate**, **Edit**, **Duplicate**, and **Delete**. Rule cards also show their details — tiers, price, minimum age, preview count — and which panels they apply to.
+
+<Callout kind="info">
+  A **Bulk Apply to Panels** action exists on each rule for assigning many panels at once, but panel assignments made this way are not yet saved permanently in the current release.
+</Callout>
+
+<Callout kind="tip">
+  Always leave a free preview. The **Preview Panel Count** is what hooks readers before they hit the paywall — the content map warns you if nothing at all is free.
+</Callout>
+
+## Products, price points, and coupons
+
+The **Products Management** screen is where you define what readers can buy.
+
+<Callout kind="alert">
+  In the current release this screen is not yet linked from a work's backstage navigation (it is available in the app's test area). Its configuration is fully functional and saved.
+</Callout>
+
+### Products
+
+Click **New Product** to create either a **Subscription** (with a **Monthly**, **Yearly**, or **Lifetime** billing interval) or a **One-Time Purchase**. Each product has:
+
+- **Product Name**, **Description**, and a **Features** list (the selling points shown to readers — at least one is required),
+- a default **Price** and **Currency** (USD, EUR, GBP, JPY, CAD, AUD),
+- **Active** and **Featured** toggles, and a sort order (**Move Up / Move Down**).
+
+Product cards show payment-provider details (Stripe product/price IDs, PayPal SKU/plan) and a sync status chip such as *"Stripe: not synced"*. The **Sync** action stays disabled until a payment provider is actually configured for your team.
+
+### Regional price points
+
+Under **Regional prices** you can add **price points** — additional currency- or region-specific prices that override the default: each row is a **currency**, an **amount**, and optionally a **region** (or "All regions (currency-wide)"). A region-specific price wins over a currency-wide one, which wins over the default. A **Prices by region** panel lets you check what a reader in, say, Germany or Japan would be charged, and a **Wero-ready** chip marks products that have a EUR price.
+
+The page also includes a **revenue estimate** — a deliberately rough model where you enter expected monthly readers and a conversion rate to see indicative recurring and one-time revenue per product.
+
+### Coupons
+
+The **Coupons** section manages discount codes readers will be able to redeem at checkout:
+
+| Field | Description |
+|---|---|
+| **Code** | The redemption code (letters, numbers, hyphens, underscores — e.g. `SAVE25`) |
+| **Type** | **Percentage** or **Fixed amount** (fixed amounts have a currency) |
+| **Expires** | Optional expiry date (empty = never expires) |
+| **Max redemptions** | Optional usage cap (empty = unlimited) |
+| **Applies to** | Specific products, or every product if none are selected |
+| **Active** | Whether the coupon is redeemable |
+
+Each coupon shows its status (**Active**, **Inactive**, **Expired**, or **Used up**) and usage count, and a **Preview** action calculates the coupon's exact effect on each active product's price — including why it *doesn't* apply (wrong currency, product not covered, expired, and so on).
+
+## Simulating reader access
+
+The **Entitlement** backstage screen is a sandbox for answering "what would *this* reader see?" — no real reader accounts are involved.
+
+Click **Start Simulation**, then either pick a **Quick Scenario** — **Free User**, **Basic Subscriber**, **Premium Subscriber**, **Pro Subscriber**, **One-Time Buyer**, **Underage User** — or dial in the details yourself:
+
+- **Subscription** — has one or not, and its tier (Basic/Premium/Pro),
+- **One-Time Purchases** — which products the reader owns,
+- **Age Verification** — the reader's age (verified from 18 up).
+
+The screen then shows which content is **Unlocked** and which is **Locked**, and the **Paywall Test Results** explain each decision with a reason ("Preview panel (free)", "Requires premium or pro subscription", "Age verification required (18+)", …) and the rule that applied.
+
+Two buttons make the test tangible:
+
+- **Preview Paywall Overlay** shows the reader-facing lock screen: a **"Content Locked"** overlay listing the benefits of upgrading with a **Subscribe Now** / **Upgrade to Premium** call to action (in the simulator these buttons are visual only).
+- **Preview as this user** opens the [Preview](/cms/preview) screen with this reader's entitlements applied — the preview header shows a *"Previewing as …"* badge — so you can read the work exactly as that reader would.
+
+You can **Reset**, **Copy State**, and **Import/Export** simulation states as JSON to share test setups with your team.
+
+## How the paywall reaches readers
+
+Paywall rules travel with your work: publishing writes them into the [manifest](/concepts/manifest), and the [PanelWave Player](/player/paywall-entitlement) enforces them when readers hit gated content — showing the lock overlay and checking the reader's entitlements. Purchasing itself will happen on the reading site through hosted payment pages, not inside the CMS.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Preview" icon="play" href="/cms/preview">
+    Test paywalls with different entitlement tiers.
+  </Card>
+  <Card title="Publishing" icon="rocket" href="/cms/publishing">
+    Ship the work — rules included — to readers.
+  </Card>
+  <Card title="Player paywall" icon="lock" href="/player/paywall-entitlement">
+    How the player enforces entitlements.
+  </Card>
+</Columns>

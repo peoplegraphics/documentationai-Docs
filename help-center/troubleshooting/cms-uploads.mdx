@@ -1,0 +1,37 @@
+---
+title: CMS Upload & Media Issues
+description: Fix asset upload and media processing problems in the PanelWave CMS — stuck processing states, missing posters, disabled video options, and import limits.
+---
+
+How the pipeline works is described on [Assets](/cms/assets); this page is for when something looks wrong.
+
+## An asset card shows "Processing..." for a long time
+
+Every upload is processed in the background — images into AVIF/WebP variants and thumbnails, audio into normalized AAC/Opus plus waveform data, video into an H.264 web rendition with a poster frame. Video takes the longest. While a video is processing, the layer inspector shows *"Processing… duration and poster will appear once transcoding finishes."* and the canvas badge reads *processing…*.
+
+If a card stays in that state far beyond the expected time, re-open the asset library to refresh, and if it persists, re-upload the file — a failed job leaves the card stuck.
+
+## My video has no poster or duration
+
+Both come from transcoding. Until the job finishes they are simply not there yet (see above). Audio durations, by contrast, are extracted immediately in your browser at upload time.
+
+## "Forward–backward" playback is disabled for my video
+
+Forward–backward (ping-pong) playback needs a downloadable video rendition so a reversed copy can be prepared. Streaming-only (HLS) assets don't have one, so the option is disabled for them — upload a regular video file (e.g. MP4) instead. See [Video Panels](/cms/editor/video-panels).
+
+## Large uploads fail midway
+
+Large files upload in resumable chunks — an interrupted upload continues where it stopped when you retry with the same file. If uploads consistently fail, check for aggressive proxy/VPN timeouts on long-running requests.
+
+## Import is rejected
+
+The **Import** dialog on My Works accepts PanelWave JSON manifests only, with two hard limits in the current release:
+
+- `panelwave.version` must be exactly **`1.0.0`** (1.1 manifests are rejected even though the format is additive — adjust the version declaration if your manifest uses no 1.1-only features),
+- the file must be at most **10 MB**.
+
+The importer validates before importing and shows a preview of what will be created. See [Import](/cms/import).
+
+## A replaced asset still shows the old image
+
+Variants are cached aggressively. After replacing an asset, give processing a moment to regenerate variants, then hard-reload the editor (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>). If a published work still serves the old file, re-publish so the CDN cache is invalidated — see [Publishing](/cms/publishing).

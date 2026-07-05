@@ -1,0 +1,69 @@
+---
+title: Characters
+description: Manage your cast in the Characters Manager — portraits, roles, localized bios, per-character speech balloon styles, and voice assignment.
+---
+
+Characters give your dialogue an identity. Once a speech bubble is assigned to a character, it automatically inherits that character's balloon style, and readers can meet the cast through [character sheets](/cms/extras).
+
+Open the **Characters Manager** from the Backstage sidebar of a work (or via the work card menu → **Characters**).
+
+## The Characters Manager at a glance
+
+The page header shows the character count and the toolbar: **Roster Preview**, **Import**, **Export**, **Team library** (when your work belongs to a team), **From template**, and **Add Character**.
+
+Below, stat cards summarize **Total Characters**, **Active**, **With Portrait**, and **With Voice**, plus counts per role (**Protagonist**, **Antagonist**, **Supporting**, **Minor**).
+
+Each character card shows the portrait (or initials), a role badge, the bio, age and gender, whether a voice is assigned, and — importantly — how often the character is used: **Used in N** (speech bubbles referencing it) or **Unused**. On the right, a live **balloon sample** renders the character's effective speech balloon style.
+
+You can **search by name or bio**, filter by role, and sort by manual order, name, role, or recently edited. Drag cards to change the manual order.
+
+## Creating and editing a character
+
+Click **Add Character** (or the pencil on a card). The editor dialog contains:
+
+### Basic Information
+- **Name** (required) plus optional **Localized Names** for English, German, French, and Spanish — each falls back to the main name when empty.
+- **Role** — Protagonist, Antagonist, Supporting, or Minor.
+- **Age** and **Gender**.
+- **Portrait / reference image** — **Upload image** or paste an image URL; a live preview shows the result.
+- **Reference images** — extra expressions, poses, or costume references with labels (e.g. "angry", "side profile"). These are CMS-side working material; the exported manifest carries only the portrait.
+
+### Biography
+A **Default Bio** plus **Localized Biographies** per language.
+
+### Speech Balloon Style (Character Override)
+The same balloon configurator you know from [Work Properties](/cms/works), scoped to this character. Set the balloon type — Normal, Rectangle, Panel Top, Panel Top-Right, Panel Top-Left, Thought, Shout, Whisper, or Connector — colors, tail, and typography, with a live preview (type your own **Preview text** to test a line of dialogue).
+
+<Callout kind="info">
+**How balloon styles cascade:** work default → character override → per-bubble override. A character override only changes balloons *assigned to that character*, and an individual bubble can still override everything. See [Speech Bubbles](/cms/editor/speech-bubbles).
+</Callout>
+
+Click **Create Character** / **Update Character** to save.
+
+## Linking characters to speech bubbles
+
+Characters connect to dialogue in the editor: select a speech bubble on the canvas and choose the character in the **Speech** inspector tab. From then on the bubble renders with the character's balloon style, and the character card's **Used in** count reflects it. See [Speech Bubbles](/cms/editor/speech-bubbles).
+
+## Card actions
+
+Each card offers: **Edit**, **Duplicate**, **Share to team library** (team works), **Assign Voice**, **Deactivate/Activate** (inactive characters are dimmed and excluded from the roster), and **Delete**.
+
+### Assigning a voice
+
+**Assign Voice** opens a list of available text-to-speech voices (with provider, locale, gender, and age). The assigned voice becomes the default when generating spoken audio for this character's bubbles in the [Audio Localization](/cms/localization) tool.
+
+## Templates, import & export
+
+- **From template** creates a pre-filled character (archetype starters) that you then customize.
+- **Export** downloads all characters as a JSON file; **Import** loads a character set from JSON — handy for reusing a cast across works.
+
+## Team character library
+
+Team works get a shared **Team library**:
+
+- **Share to team library** (the share button on a card) publishes a copy of the character for teammates. Re-sharing a character with the same name updates the team's copy.
+- **Team library** opens the shared list; **Import** copies a character into the current work.
+
+## Roster Preview
+
+**Roster Preview** shows the active cast as readers might see it — portraits, names, and roles in a grid. To publish full character sheets as bonus content, create **Character Sheets** in [Extras](/cms/extras) and link each sheet to a character.

@@ -1,0 +1,100 @@
+---
+title: Animations & Transitions
+description: Reference for PanelAnimations viewport moves and the Transition object — the seven transition types, directions, timing, and easing.
+---
+
+The format describes motion in two places: **within a panel** (`PanelAnimations` — a camera move across the artwork) and **between panels or pages** (`Transition` — the visual effect while navigating). Both are declarative; the [player](/player/overview) interpolates them.
+
+## `PanelAnimations`
+
+Defined as `$defs/PanelAnimations`, set per panel at `chapters[].panels.<panelId>.animations` (also overridable via [variants](/schema/variants)). It describes a viewport interpolation — a Ken-Burns-style pan/zoom from a start rectangle to an end rectangle over the panel artwork.
+
+| Property | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `startViewportRect` | `NormalizedRect` | No | `x`,`y`,`w`,`h` each 0–1 | Viewport at animation start, normalized to the panel. |
+| `endViewportRect` | `NormalizedRect` | No | `x`,`y`,`w`,`h` each 0–1 | Viewport at animation end. |
+| `durationMs` | integer | No | 0–120000 | Animation duration in milliseconds. |
+| `easing` | enum | No | `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` | Easing function. |
+
+A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1.
+
+```json
+{
+  "animations": {
+    "startViewportRect": { "x": 0, "y": 0, "w": 1, "h": 1 },
+    "endViewportRect": { "x": 0.3, "y": 0.2, "w": 0.4, "h": 0.4 },
+    "durationMs": 4000,
+    "easing": "ease-in-out"
+  }
+}
+```
+
+This starts on the full panel and slowly zooms into the region at (0.3, 0.2) sized 40% × 40% — a classic dramatic push-in.
+
+<Callout kind="tip">
+Layers can add depth to these moves with `parallaxDepth` — see [Layers](/schema/layers).
+</Callout>
+
+## `Transition`
+
+Defined as `$defs/Transition`. Transitions describe how the view changes while navigating, and appear in several places:
+
+- **Graph edges** — `chapters[].graph.edges[].transition` (the transition used when following that edge)
+- **Hotspot `goTo` actions** — `action.transition` (see [Hotspots](/schema/hotspots))
+- **Page transitions** — `pages[].transitions.in` / `pages[].transitions.out` (entering/leaving a page)
+- **Format presets** — `settings.outputPresets.<format>.defaultTransition` (per-output-format default, see [Settings](/schema/settings))
+
+All properties are optional:
+
+| Property | Type | Constraints | Description |
+|---|---|---|---|
+| `type` | enum | `none`, `cut`, `fade`, `slide`, `zoom`, `push`, `cover` | The transition effect (7 types). |
+| `dir` | enum | `left`, `right`, `up`, `down` | Direction for directional types (`slide`, `push`, `cover`). |
+| `durationMs` | integer | 0–60000 | Duration in milliseconds. |
+| `easing` | enum | `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` | Easing function. |
+
+### Transitions on edges
+
+The most common placement is on a graph edge, so different paths through the story can feel different:
+
+```json
+{
+  "graph": {
+    "entry": "p1",
+    "edges": [
+      {
+        "from": "p1",
+        "to": "p2",
+        "transition": { "type": "slide", "dir": "left", "durationMs": 300 }
+      },
+      {
+        "from": "p2",
+        "to": "p3-dream",
+        "condition": { "==": [{ "var": "state.dreaming" }, true] },
+        "transition": { "type": "fade", "durationMs": 800, "easing": "ease-in-out" }
+      }
+    ]
+  }
+}
+```
+
+### Which transition applies
+
+- Navigation triggered by a **hotspot** `goTo` action uses the `transition` declared on that action.
+- Navigation along a **graph edge** uses the edge's `transition`.
+- When the chosen navigation declares no transition, the active output format's `defaultTransition` from `settings.outputPresets` serves as the fallback.
+
+## What can animate — summary
+
+| Mechanism | Where | What it does |
+|---|---|---|
+| `PanelAnimations` | `panels.<id>.animations` | Viewport pan/zoom across the panel artwork. |
+| `Transition` | edges, hotspot actions, pages, output presets | Effect between panels/pages during navigation. |
+| `parallaxDepth` | layer property | Per-layer depth offset during viewport motion — see [Layers](/schema/layers). |
+| Video layers | `panels.<id>.layers[]` / `panels.<id>.video[]` | Real motion content — see [Video](/schema/video). |
+
+## Related pages
+
+- [Graph](/schema/graph) — edges and conditions
+- [Chapters & Pages](/schema/chapters-and-pages) — page `transitions.in`/`out`
+- [Settings](/schema/settings) — `outputPresets` and default transitions

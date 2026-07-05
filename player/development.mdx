@@ -1,0 +1,123 @@
+---
+title: Development & Contributing
+description: Contributing to the PanelWave Player — repository layout, building the library, running the demo app, tests and lint, commit conventions, and publishing.
+---
+
+The player is MIT-licensed and open to contributions. This page covers the developer workflow inside the `panelwave-player` repository. For the internal design, start with [Player Architecture](/player/architecture).
+
+## Repository layout
+
+```
+panelwave-player/
+├── angular.json              # Angular CLI workspace (projects: player, demo)
+├── package.json              # Workspace scripts and dev dependencies
+├── projects/
+│   ├── player/               # The library (published as @panelwave/player)
+│   │   ├── ng-package.json   # ng-packagr config → dist/player/
+│   │   ├── package.json      # Library package manifest
+│   │   └── src/
+│   │       ├── public-api.ts # THE public API surface
+│   │       ├── assets/       # Fonts (balloon fonts), GUI i18n JSON
+│   │       └── lib/          # types/ utils/ services/ components/
+│   └── demo/                 # Demo app for local development
+│       └── src/app/          # Hosts pw-player-shell with sample manifests
+└── docs/                     # Per-feature implementation docs (*_COMPLETE.md)
+```
+
+The `docs/` folder contains one deep-dive markdown file per feature (e.g. `PRELOAD_SERVICE_COMPLETE.md`, `VIEWPORT_COMPONENT_COMPLETE.md`, `BALLOON_RENDERER_SYNC.md`) — useful background, but **the source code is authoritative** when they disagree.
+
+## Prerequisites and setup
+
+The player targets Angular 20 with TypeScript ~5.8 and RxJS 7.8. Runtime dependencies are deliberately small: `@ngx-translate/core` (GUI strings) and `json-logic-js` (conditions).
+
+<Steps>
+  <Step title="Clone and install">
+    ```bash
+    git clone <repository-url>
+    cd panelwave-player
+    npm install
+    ```
+  </Step>
+  <Step title="Run the demo app">
+    ```bash
+    npm start
+    ```
+    Serves the demo application at `http://localhost:4200`. It embeds `pw-player-shell` with sample manifests — the fastest feedback loop while developing.
+  </Step>
+  <Step title="Build the library">
+    ```bash
+    ng build player
+    ```
+    Builds via ng-packagr into `dist/player/`. Use `ng build player --watch` for incremental rebuilds while a host app consumes the built output.
+  </Step>
+</Steps>
+
+## Testing
+
+Unit tests use **Jasmine + Karma**, with `.spec.ts` files colocated next to their sources:
+
+```bash
+# Interactive (watch mode, Chrome)
+ng test player
+
+# CI / single run, headless
+ng test player --watch=false --browsers=ChromeHeadless
+
+# With coverage (report at coverage/player/index.html)
+ng test player --code-coverage
+```
+
+Services with pure logic (`FlowEngineService`, `VariableStoreService`, `VariantService`, the utils) are the most test-dense areas — extend the existing specs when you change behavior there.
+
+## Linting and code style
+
+```bash
+ng lint
+```
+
+The workspace uses `angular-eslint` with strict `typescript-eslint` rules plus Prettier (`eslint-plugin-prettier`/`eslint-config-prettier`). Follow the Angular style guide; components are standalone, `OnPush`, and use the `pw-` selector prefix.
+
+## Commit and branch conventions
+
+- **Conventional commits**: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, …
+- **Branches**: `feature/*`, `bugfix/*`, `hotfix/*` off the development branch.
+- Standard flow: fork → feature branch → change + tests → `ng test player` and `ng lint` green → PR.
+
+## Working on the public API
+
+Everything a host can import comes from `projects/player/src/public-api.ts`. When you add a service, component, or utility that hosts should reach:
+
+1. Export the symbol (and its supporting types) from `public-api.ts`.
+2. Keep type definitions in `src/lib/types/` aligned with `@panelwave/types` and the [schema](/schema/overview) — format changes must land in schema, types, player, and CMS together.
+3. If you touch balloon rendering, follow the [player↔CMS sync policy](/player/balloon-renderer#why-the-renderer-is-shared-with-the-cms).
+
+## Building for production and publishing
+
+```bash
+# Production library build
+ng build player --configuration production
+
+# Output in dist/player/: ESM bundles, .d.ts declarations, package.json, README
+cd dist/player
+npm publish --access public
+```
+
+Notes from `projects/player/ng-package.json`:
+
+- The entry file is `src/public-api.ts`; output goes to `dist/player/`.
+- `src/assets/` (balloon fonts, GUI translation JSON) is copied into the package, **except** files matching `amespro-*` — the commercial Ames Pro font files are excluded from the distributed package. The default balloon config references `'Ames Italic'` with a `sans-serif` fallback, so the renderer degrades gracefully when the font is absent.
+- The library `package.json` sets `sideEffects: false` for tree-shaking.
+
+## Demo app tips
+
+The demo project (`projects/demo/`) is a plain Angular application wired to the library source (not the built package), so changes hot-reload instantly. Use it to:
+
+- exercise sample manifests (see [Examples](/schema/examples) and the spec samples),
+- test inputs/outputs interactively before writing specs,
+- reproduce bugs with a minimal manifest before filing or fixing.
+
+## Related pages
+
+- [Installation](/player/installation) — consuming the published package
+- [Inputs & Outputs](/player/inputs-outputs) — the shell's public contract
+- [Core Services](/player/services) and [Components](/player/components) — where to make your change

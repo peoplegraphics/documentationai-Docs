@@ -1,0 +1,101 @@
+---
+title: Variables
+description: The Variables section — typed variable definitions with five scopes, defaults, visibility, and persistence for branching PanelWave stories.
+---
+
+The optional `variables` section declares the state that drives everything conditional in a PanelWave story: branching [edges](/schema/graph), conditional layers and speech bubbles (`visibleIf`), [panel variants](/schema/variants) (`when`), and hotspot side effects. Variables are read in [JSON Logic](https://jsonlogic.com/) expressions via `{ "var": "path.choice" }` and written through [mutations](/schema/graph#mutation).
+
+`Variables` has a single optional property: `definitions`, an array of unique `VariableDefinition` objects.
+
+## `VariableDefinition`
+
+| Property | Type | Required | Default | Description |
+|----------|------|:--:|:--:|-------------|
+| `id` | string | Yes | — | Variable name; pattern `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` — dot-namespaced segments, e.g. `prefs.speech`, `path.choice`, `user.age` |
+| `type` | string | Yes | — | `boolean` \| `number` \| `integer` \| `string` \| `enum` \| `date` \| `time` \| `datetime` |
+| `scope` | string | Yes | — | `global` \| `chapter` \| `page` \| `session` \| `persistent` — see below |
+| `enum` | `string[]` (min 1, unique) | When `type` is `"enum"` | — | Allowed values |
+| `default` | [`JsonValue`](/schema/manifest-structure#jsonvalue-and-jsonlogic) | — | — | Initial value. Conditionally typed: must be an integer when `type` is `"integer"`, a number for `"number"`, a boolean for `"boolean"` |
+| `description` | string | — | — | Authoring note |
+| `visibility` | string | — | `"public"` | `public` \| `private`. Private variables are for internal/engine use (e.g. a read-only `user.age` supplied by the host) and are not surfaced to reader-facing UI |
+| `readOnly` | boolean | — | `false` | Story content cannot mutate this variable; its value comes from the environment |
+
+<Callout kind="info">
+Note the stricter ID pattern: unlike a general [`Identifier`](/schema/manifest-structure#identifier), variable IDs are dot-separated segments (`prefs.speech` is valid, `prefs..speech` or a leading dot is not). Plugin state variables use the reserved `plugin.` prefix — see [Panels](/schema/panels#plugins).
+</Callout>
+
+## The five scopes
+
+`scope` controls the lifetime and reset behavior of a variable's value:
+
+| Scope | Lifetime |
+|-------|----------|
+| `global` | The whole work, for the duration of the reading context |
+| `chapter` | Reset when the reader enters a different chapter |
+| `page` | Reset when the reader moves to a different page |
+| `session` | Kept for the current reading session only |
+| `persistent` | Stored across sessions (e.g. reader preferences, unlocked routes) |
+
+How the player stores and restores `persistent` values is an implementation concern of the runtime — see [Saving Progress](/player/saving-progress) and the cross-cutting [Variables concept page](/concepts/variables).
+
+## Example
+
+```json
+{
+  "variables": {
+    "definitions": [
+      {
+        "id": "prefs.speech",
+        "type": "boolean",
+        "default": true,
+        "scope": "persistent",
+        "visibility": "public",
+        "description": "Reader wants speech bubbles shown"
+      },
+      {
+        "id": "path.choice",
+        "type": "enum",
+        "enum": ["none", "left", "right"],
+        "default": "none",
+        "scope": "session"
+      },
+      {
+        "id": "user.age",
+        "type": "integer",
+        "default": 18,
+        "scope": "global",
+        "visibility": "private",
+        "readOnly": true
+      }
+    ]
+  }
+}
+```
+
+## Using variables
+
+**Read** them in any `JsonLogic` field:
+
+```json
+{ "visibleIf": { "var": "prefs.speech" } }
+```
+
+```json
+{ "condition": { "==": [ { "var": "path.choice" }, "left" ] } }
+```
+
+**Write** them with mutations on [edges](/schema/graph) (`action`) or [hotspot actions](/schema/hotspots) (`goTo.mutations`, `setVariables.mutations`):
+
+```json
+{
+  "op": "set",
+  "var": "path.choice",
+  "value": "left"
+}
+```
+
+Mutation operations are `set`, `increment`, `toggle`, `append`, and `remove` — documented in [Graph](/schema/graph#mutation).
+
+<Callout kind="tip">
+Declare every variable you reference. The schema cannot verify that `{ "var": "path.choice" }` matches a definition — an undeclared variable simply evaluates to `null` at runtime, which can silently disable branches.
+</Callout>

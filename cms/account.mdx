@@ -1,0 +1,101 @@
+---
+title: Account & Team
+description: Sign up and sign in to the PanelWave CMS, manage your profile, security, and sessions, and collaborate with team members and roles.
+---
+
+## Creating an account
+
+On the **Create your account** page (`/register`) enter your **Full Name**, **Email Address**, and a **Password** (at least 8 characters — a strength meter gives live feedback), confirm the password, and accept the **Terms of Service** and **Privacy Policy**. Click **Create Account**.
+
+Already registered? Use the **Sign in** link at the bottom of the card.
+
+## Signing in
+
+The **Sign in to your account** page (`/login`) asks for your email and password.
+
+- **Keep me signed in** keeps your session alive across browser restarts.
+- **Forgot password?** starts a reset flow: you receive an email with a link to set a new password.
+- A caps-lock warning appears while typing your password if Caps Lock is on.
+
+If two-factor authentication is enabled on your account, a second step asks for the **Authentication code** — the 6-digit code from your authenticator app, or one of your recovery codes (`XXXX-XXXX` format). The challenge expires after 5 minutes; use **Back to password** to start over.
+
+## Profile settings
+
+Open the user menu (top right) and choose **Profile** to reach **Profile Settings**.
+
+### Profile information
+
+Click **Edit Profile** to change your **Full Name**, **Location**, **Website**, and **Bio**, then **Save Changes**.
+
+- **Avatar** — **Change avatar** uploads a PNG, JPEG, or WebP image; it is cropped to a square and resized automatically. **Remove** deletes it (your initials are shown instead).
+- **Email Address** — changing your email is a verified flow. Click **Change…**, enter the **New email address** and your **Current password**, then **Send confirmation link**. Your current address stays active until you confirm the link sent to the new address; a **Pending verification** banner shows the pending address and lets you **Cancel** the change.
+
+### Password
+
+Click **Change Password**, enter your **Current Password**, a **New Password** (at least 8 characters), and the confirmation. Tick **Sign out all other sessions** to revoke every other device at the same time.
+
+### Two-factor authentication
+
+The **Two-factor authentication** card lets you require a 6-digit authenticator code (TOTP) in addition to your password:
+
+<Steps>
+  <Step title="Start setup">
+    Click **Set up two-factor authentication** and confirm your password.
+  </Step>
+  <Step title="Add the key to your authenticator app">
+    The CMS shows a **Secret key** and an `otpauth` link for your authenticator app. Enter the 6-digit code from the app and click **Verify & enable**.
+  </Step>
+  <Step title="Save your recovery codes">
+    Recovery codes are shown **only once**. Each code signs you in one time if you lose the authenticator. Use **Copy all**, store them safely, then confirm with **I saved them — done**.
+  </Step>
+</Steps>
+
+To turn it off, click **Disable…** and confirm your password — this also invalidates your recovery codes.
+
+### Active sessions
+
+The **Active sessions** card lists devices signed in to your account with browser, last-active time, IP address, and sign-in time. The current device is marked **This device**. Click **Sign out** on any other session to revoke it, or **Sign out all other sessions** to revoke everything except the current one.
+
+### Preferences
+
+Preferences are saved to your account and follow you across devices:
+
+- **Theme** — System, Light, or Dark.
+- **Default editing language** — preselected as the target language when you open the [Localization Workshop](/cms/localization).
+- **Email notifications** — comments & mentions on your works, and product news & updates.
+
+### Account information and danger zone
+
+**Account Information** shows your user ID, creation date, role, and team count. The **Danger Zone** offers:
+
+- **Export my data** — downloads your profile, preferences, team memberships, and your teams' works as JSON.
+- **Deactivate account** — signs you out and blocks future sign-ins. Type the confirmation keyword to enable the button. Your content is retained; contact support to reactivate or fully delete it.
+
+## Teams and roles
+
+Works belong to teams. Open the user menu and choose **Team** to manage them. The page lists your teams in a sidebar; select one to see its members.
+
+### Roles
+
+| Role | Permissions |
+|---|---|
+| **Owner** | Full control, including granting the Admin role |
+| **Admin** | Can manage team and settings |
+| **Editor** | Can edit content |
+| **Viewer** | Can view content only |
+
+Owners and admins can change a member's role with the role dropdown in the members table, or remove members. The owner role itself cannot be reassigned from this table.
+
+### Inviting members
+
+Click **Invite Member**, enter an **Email Address**, and pick a **Role**. Tick **Invite several people at once** for bulk mode — paste addresses (one per line, or comma/semicolon separated) or **Upload CSV**; everyone gets the role you select.
+
+Outstanding invitations appear under **Pending Invitations**, where you can **Copy link**, **Resend** (generates a fresh link and expiry), or **Revoke**. Invitees open the link and accept while signed in.
+
+### Payouts & payments
+
+Teams that sell content connect a Stripe merchant account from the **Payouts & payments** card (**Set up payouts with Stripe** opens Stripe's hosted onboarding). This is required before products can be sold — see [Monetization](/cms/monetization).
+
+## The user menu
+
+The avatar button in the top-right corner of every screen opens a menu with **Profile**, **Settings**, **Team**, a **Dark/Light Mode** toggle, a **Condensed/Regular Font** toggle, **Keyboard Shortcuts**, **Help & Support**, and **Logout**.

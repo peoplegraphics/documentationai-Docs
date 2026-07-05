@@ -1,0 +1,41 @@
+---
+title: Player Embedding Issues
+description: Fix the most common problems when integrating the PanelWave Player into an Angular app — blank screens, load errors, fonts, audio, and paywalls.
+---
+
+Work through the symptom that matches what you see. The full integration guide is [Quickstart: Embed](/player/quickstart-embed).
+
+## The player renders nothing (or just placeholder text)
+
+- **You embedded `pw-player`.** That selector belongs to a legacy stub component that renders static text. The real embed target is **`pw-player-shell`** (`PlayerShellComponent`). See [Inputs &amp; Outputs](/player/inputs-outputs).
+- **You passed only `manifestUrl`.** URL loading is not implemented in the shell yet and produces an error. Fetch the manifest JSON yourself and bind the parsed object to `[manifest]`.
+- **The manifest fails the shell's load-time checks.** The shell validates `panelwave.version`, `meta.id/title/locales/default_locale`, and each chapter's `panels` + `graph.entry`/`edges` before rendering. Subscribe to the `error` output to see what was rejected, and run the manifest through the [CLI](/schema/cli) first.
+
+## Build or injection errors on startup
+
+- **Missing `HttpClient`:** the player needs `provideHttpClient()` in your application config.
+- **Missing translations setup:** provide `TranslateModule.forRoot` with a loader serving `assets/i18n/<lang>.json` — the player's UI strings come from `@ngx-translate`. See [Installation](/player/installation).
+- **npm can't find `@panelwave/player`:** the package is not published to the npm registry yet. Build it from the player repository (`ng build player --configuration production`) and consume `dist/player`. See [Installation](/player/installation).
+- **Peer dependency warnings about Angular ^17.3:** the library's declared peer range is stale; it is developed and tested against Angular 20.3. Angular 20 is the supported target.
+
+## Speech balloons use the wrong font
+
+Include the bundled balloon font CSS once in your application styles (`assets/fonts/balloon/balloon-fonts.css`). Ames Pro is a commercial font and is **not** bundled — without a license, balloons fall back to Comic Neue. See [Balloon Renderer](/player/balloon-renderer).
+
+## Audio or video won't start
+
+Browsers block audible playback before a user gesture (hover doesn't count):
+
+- On-view videos start **muted** with an unmute affordance until the reader interacts.
+- Start audible audio from the first real interaction — `UserGestureService` signals it, and `AudioEngineService.resumeContext()` resumes the WebAudio context.
+- Only one unmuted video plays at a time; starting another preempts the first.
+
+See [Audio](/player/audio).
+
+## All gated content is locked (or nothing is)
+
+Without an adapter the player uses `NullEntitlementAdapter`, which **denies everything**. For development, use the exported `MockEntitlementAdapter` (grants everything); for production, implement an adapter against your account system and pass it via the `[entitlementAdapter]` input. See [Paywall &amp; Entitlement](/player/paywall-entitlement).
+
+## Reader progress isn't saved
+
+That's by design: only persistent-scope variables are auto-persisted (localStorage key `pw-variables-persistent`). Reading position is the host's job — record `panelChange` events and restore via `initialChapterId`/`initialPanelId`. A complete resume example is on [Saving Progress](/player/saving-progress).

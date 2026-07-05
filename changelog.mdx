@@ -1,22 +1,50 @@
 ---
-title: Sample Changelog
-description: Sample release notes you can replace with your real updates.
+title: Changelog
+description: Release notes for the PanelWave format and this documentation site — format versions, notable additions, and documentation updates.
 ---
 
-## Sample updates
+Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
-<Callout kind="alert">
-This changelog is example content. Replace every entry with your real releases.
-</Callout>
+<Update label="2026-07-05" description="Documentation" tags={["feature"]}>
+  ## Documentation site — initial release
 
-<Update label="2026-01-26" description="Sample Update" tags={["sample"]}>
-## What changed
-- Cleaned up placeholder copy across the starter kit.
-- Added clearer "sample" messaging to avoid confusion.
+  First public release of the PanelWave documentation, covering:
+
+  - **Documentation** — introduction, quickstart, and core concepts
+  - **Schema** — full format reference for every manifest section, plus validation and the CLI
+  - **Player** — embedding, configuration, and architecture of `@panelwave/player`
+  - **CMS** — creator guides for the editor, assets, localization, publishing, and monetization
+  - **Help Center** — FAQs, troubleshooting, and guides
 </Update>
 
-<Update label="2025-12-10" description="Sample Update" tags={["sample"]}>
-## What changed
-- Simplified the Quickstart steps.
-- Trimmed Help Center examples.
+<Update label="2026-07-02" description="Format 1.1" tags={["feature"]}>
+  ## Format 1.1 — video panels
+
+  Additive, backward-compatible release: every valid 1.0 manifest remains valid unchanged.
+
+  - **Video playback control** on video layers: `playMode` (`once`, `loop`, `pingpong`, `loop-from`), `startMode` (`on-view`, `on-hover`, `on-click`), `loopFromMs`, and native `controls`.
+  - **Work-level video defaults** in `settings.ui` (`videoPlayModeDefault`, `videoStartModeDefault`, `videoMutedDefault`), cascading to per-layer overrides.
+  - **Video variants** can mark a playback `direction` (`forward`/`reverse`) for pre-rendered reverse encodes used by smooth ping-pong playback.
+  - **Poster frames** on video catalog items for click-to-play and reduced-motion presentation.
+  - **Tracking** event whitelist extended with video playback events.
+  - The 1.0 fields `autoplay`/`loop` on video layers remain valid; the new fields take precedence when both are present.
+
+  Details: [Video schema reference](/schema/video) and [Versioning](/schema/versioning).
+</Update>
+
+<Update label="Format 1.0" description="Initial specification" tags={["feature"]}>
+  ## Format 1.0 — initial public specification
+
+  First public release of the PanelWave manifest format (JSON Schema 2020-12, CC BY 4.0):
+
+  - Chapters, pages, and panels with layered content (image, video, text, audio, plugin layers)
+  - Graph-based flow: entry panels, edges, transitions, and JSON Logic conditions
+  - Asset catalog with image/audio/video/subtitle variants
+  - Typed variable system with five scopes
+  - Localization via `LocalizedString`, BCP-47 locales, and per-locale asset variants
+  - Output format presets for web, print, and video
+  - Paywall and entitlement rules, tracking configuration, plugin support, accessibility hints
+  - `x-` extension fields throughout
+
+  Details: [Schema overview](/schema/overview).
 </Update>

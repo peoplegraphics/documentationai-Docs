@@ -1,0 +1,172 @@
+---
+title: "Quickstart: Embed the Player"
+description: Load a PanelWave manifest and render it with pw-player-shell — a minimal, working Angular embed based on the demo application.
+---
+
+This page shows the smallest useful integration: fetch a manifest JSON file, hand it to `pw-player-shell`, and react to player events. It mirrors the demo application that ships with the player repository (`projects/demo`).
+
+## Prerequisites
+
+- [Installation](/player/installation) completed (`provideHttpClient()` + `TranslateModule.forRoot(...)` configured).
+- A valid manifest file, e.g. `src/assets/my-story/panelwave.json`. You can export one from the [CMS](/cms/export), use a sample from the schema repository, or start from the minimal example below.
+
+<Callout kind="alert">
+Pass the manifest as an **object** via `[manifest]`. The shell also has a `manifestUrl` input, but URL loading is **not implemented yet** in the shell — providing only `manifestUrl` currently produces an error. Fetch the JSON yourself (as below) and bind the object.
+</Callout>
+
+## Component
+
+```typescript
+// reader.component.ts
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { PlayerShellComponent } from '@panelwave/player';
+import type { PanelWaveManifest, Panel, Chapter } from '@panelwave/player';
+
+@Component({
+  selector: 'app-reader',
+  standalone: true,
+  imports: [PlayerShellComponent],
+  templateUrl: './reader.component.html',
+})
+export class ReaderComponent implements OnInit {
+  manifest: PanelWaveManifest | null = null;
+  loading = true;
+  error: string | null = null;
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.http.get<PanelWaveManifest>('assets/my-story/panelwave.json').subscribe({
+      next: (manifest) => {
+        this.manifest = manifest;
+        this.loading = false;
+      },
+      error: (err) => {
+        this.error = `Failed to load manifest: ${err.message}`;
+        this.loading = false;
+      },
+    });
+  }
+
+  onPlayerReady(): void {
+    console.log('Player is ready');
+  }
+
+  onPanelChange(event: { panel: Panel; chapter: Chapter }): void {
+    console.log('Now showing panel in chapter', event.chapter.id);
+  }
+
+  onError(error: Error): void {
+    this.error = error.message;
+  }
+}
+```
+
+## Template
+
+```html
+<!-- reader.component.html -->
+@if (loading) {
+  <p>Loading…</p>
+}
+@if (error) {
+  <p class="error">{{ error }}</p>
+}
+@if (manifest && !loading) {
+  <pw-player-shell
+    [manifest]="manifest"
+    [locale]="'en-US'"
+    [showToolbar]="true"
+    (ready)="onPlayerReady()"
+    (panelChange)="onPanelChange($event)"
+    (error)="onError($event)">
+  </pw-player-shell>
+}
+```
+
+That's the entire integration. The shell validates the manifest, navigates to the first chapter's graph entry panel, and renders the viewport plus toolbar.
+
+## A minimal valid manifest
+
+The shell's `ManifestService` validates structure on load. At minimum it requires the `panelwave` header with a `version`, `meta` with `id`, `title`, `locales`, and `default_locale`, and at least one chapter with non-empty `panels` and a `graph` containing `entry` and `edges`:
+
+```json
+{
+  "panelwave": {
+    "version": "1.1.0",
+    "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json"
+  },
+  "meta": {
+    "id": "work-hello-panelwave",
+    "title": { "en-US": "Hello PanelWave" },
+    "locales": ["en-US"],
+    "default_locale": "en-US"
+  },
+  "assets": {
+    "base": { "mediaBase": "assets/my-story/" },
+    "catalog": [
+      {
+        "id": "img-1",
+        "category": "image",
+        "alt": { "en-US": "A quiet street at dawn." },
+        "variants": [{ "src": "panel-1.webp", "mime": "image/webp", "w": 1280, "h": 720 }]
+      },
+      {
+        "id": "img-2",
+        "category": "image",
+        "alt": { "en-US": "A door opens." },
+        "variants": [{ "src": "panel-2.webp", "mime": "image/webp", "w": 1280, "h": 720 }]
+      }
+    ]
+  },
+  "chapters": [
+    {
+      "id": "ch-1",
+      "title": { "en-US": "Chapter One" },
+      "panels": {
+        "p-1": { "layers": [{ "kind": "image", "id": "ly-1", "assetId": "img-1", "z": 0 }] },
+        "p-2": { "layers": [{ "kind": "image", "id": "ly-2", "assetId": "img-2", "z": 0 }] }
+      },
+      "graph": {
+        "entry": "p-1",
+        "edges": [{ "from": "p-1", "to": "p-2" }]
+      }
+    }
+  ]
+}
+```
+
+For the full format, see the [manifest structure reference](/schema/manifest-structure) and [examples](/schema/examples). Validate manifests before shipping with the [CLI](/schema/cli).
+
+## Starting at a specific position
+
+Use the initial-position inputs to deep-link into a work (e.g. to implement resume — see [Saving Progress](/player/saving-progress)):
+
+```html
+<pw-player-shell
+  [manifest]="manifest"
+  [initialChapterId]="'ch-1'"
+  [initialPanelId]="'p-2'">
+</pw-player-shell>
+```
+
+## Switching works
+
+The shell loads its manifest in `ngOnInit`. To switch to a different work at runtime, destroy and re-create the component — the demo app does this by clearing `manifest` (which removes the element via `@if`) before assigning the new one.
+
+## Next steps
+
+<Columns cols={3}>
+  <Card title="Configuration" icon="settings" href="/player/configuration">
+    Every input the shell accepts, plus manifest-driven settings.
+  </Card>
+  <Card title="Reader Interface" icon="book-open" href="/player/reader-interface">
+    What your readers can do once the player renders.
+  </Card>
+  <Card title="Paywall & Entitlement" icon="lock" href="/player/paywall-entitlement">
+    Wire up gated content with an entitlement adapter.
+  </Card>
+</Columns>
+
+Having trouble? See [Troubleshooting: Player Embedding](/help-center/troubleshooting/player-embedding).

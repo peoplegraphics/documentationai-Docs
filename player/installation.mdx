@@ -1,0 +1,146 @@
+---
+title: Installation
+description: Install @panelwave/player in an Angular application — peer dependencies, required providers, translations, and balloon fonts.
+---
+
+The player is an Angular library built with ng-packagr. This page covers getting it into your application and the one-time app setup it needs.
+
+## Requirements
+
+- **Node.js 20.x**, npm 10.x
+- **Angular 20** application (the library is developed and tested against Angular 20.3, TypeScript 5.8)
+- `@angular/common/http` available (the player loads manifests and translation files over HTTP)
+
+### Peer dependencies
+
+The library's `package.json` declares:
+
+```json
+{
+  "peerDependencies": {
+    "@angular/common": "^17.3.0",
+    "@angular/core": "^17.3.0"
+  },
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}
+```
+
+<Callout kind="info">
+The declared peer range starts at Angular 17.3, but the workspace itself builds and tests against **Angular 20.3.14 / TypeScript 5.8.3** with RxJS 7.8, `@ngx-translate/core` 17 and `json-logic-js` 2.0.5. Use Angular 20 to match the tested configuration.
+</Callout>
+
+## Install
+
+<Callout kind="alert">
+`@panelwave/player` is **not yet published** to the public npm registry. Until it is, build the library from source and install the build output (or use an npm workspace / local file reference).
+</Callout>
+
+<Steps>
+  <Step title="Build the library from source">
+    ```bash
+    git clone <panelwave-player-repository>
+    cd panelwave-player
+    npm install
+    ng build player --configuration production
+    ```
+    The publishable package is emitted to `dist/player/` (ESM modules, TypeScript declarations, `package.json`).
+  </Step>
+  <Step title="Install it into your app">
+    ```bash
+    # from your application's directory
+    npm install <path-to>/panelwave-player/dist/player
+    ```
+    Once the package is on npm, this becomes `npm install @panelwave/player`.
+  </Step>
+</Steps>
+
+## Application setup
+
+The player ships as **standalone components** — there is no NgModule to import. You import `PlayerShellComponent` directly into the `imports` array of your own standalone component (or into an NgModule's `imports` if you still use modules).
+
+Two application-level providers are required:
+
+1. **`provideHttpClient()`** — used by `ManifestService` and the translation loader.
+2. **`TranslateModule.forRoot(...)`** — the player's UI chrome (toolbar labels, modals, loading/error text) is translated with `@ngx-translate/core`. The host application configures the loader.
+
+```typescript
+// app.config.ts
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { provideHttpClient, HttpClient } from '@angular/common/http';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { Observable } from 'rxjs';
+
+/** Loads the player UI translations from your app's assets. */
+export class AppTranslateLoader implements TranslateLoader {
+  constructor(private http: HttpClient) {}
+  getTranslation(lang: string): Observable<Record<string, unknown>> {
+    return this.http.get<Record<string, unknown>>(`./assets/i18n/${lang}.json`);
+  }
+}
+
+export function createTranslateLoader(http: HttpClient): TranslateLoader {
+  return new AppTranslateLoader(http);
+}
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideHttpClient(),
+    importProvidersFrom(
+      TranslateModule.forRoot({
+        loader: {
+          provide: TranslateLoader,
+          useFactory: createTranslateLoader,
+          deps: [HttpClient],
+        },
+      })
+    ),
+  ],
+};
+```
+
+### UI translation files
+
+The loader above expects JSON files at `assets/i18n/<lang>.json` (base language codes: `en.json`, `de.json`, …). The demo application in the player repository ships English and German files you can copy as a starting point (`projects/demo/src/assets/i18n/`). The player maps content locales like `en-US` to the base language `en` when picking the UI language — see [Localization](/player/localization).
+
+## Balloon fonts
+
+Speech balloons render with real comic-lettering fonts. The open-licensed set (SIL OFL 1.1 — Bangers, Comic Neue, Caveat, Anton, and more) ships with the package under `assets/fonts/balloon/`. Include the `@font-face` declarations once in your application:
+
+```json
+// angular.json → projects.<app>.architect.build.options
+"styles": [
+  "node_modules/@panelwave/player/src/assets/fonts/balloon/balloon-fonts.css",
+  "src/styles.css"
+]
+```
+
+Alternatively, `@import` the file from your global stylesheet — the font URLs are relative to the CSS file, so both approaches work.
+
+<Callout kind="alert">
+**Ames Pro** (Blambot) is a commercial font and is **not** included in this MIT package. The default balloon font stack is `'Ames Italic', 'Comic Neue', sans-serif` — without a license for Ames, balloons fall back to Comic Neue. If your works use Ames, license it from blambot.com and add your own `@font-face` declarations for `'Ames Italic'`, `'Ames Bold Italic'`, and `'Ames Regular'`.
+</Callout>
+
+The speech-bubble overlay re-renders once `document.fonts.ready` resolves, so balloons are measured with the real fonts even when they load late.
+
+## Verify the setup
+
+Import the component and render it — if the providers are missing you will see injection errors for `HttpClient` or `TranslateService` at startup:
+
+```typescript
+import { Component } from '@angular/core';
+import { PlayerShellComponent } from '@panelwave/player';
+
+@Component({
+  selector: 'app-reader',
+  standalone: true,
+  imports: [PlayerShellComponent],
+  template: `<pw-player-shell [manifest]="manifest"></pw-player-shell>`,
+})
+export class ReaderComponent {
+  manifest = /* a loaded PanelWaveManifest object */;
+}
+```
+
+Next: [Quickstart: Embed the Player](/player/quickstart-embed) walks through loading a manifest and handling player events.

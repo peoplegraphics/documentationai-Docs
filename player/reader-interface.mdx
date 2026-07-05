@@ -1,0 +1,109 @@
+---
+title: Reader Interface
+description: What readers see and can do in the PanelWave Player — viewport, toolbar controls, navigation, autoplay, modals, keyboard and touch input.
+---
+
+This page describes the player from the reader's point of view: every visible control and input method, as implemented in the shell, viewport, and toolbar components.
+
+## Layout
+
+The player fills its host container with three UI layers:
+
+1. **Viewport** (`pw-viewport`) — renders the current panel (panel view) or the current page with all its placed panels (page view), including image/video/text layers and speech bubbles.
+2. **Toolbar** (`pw-toolbar`) — a bottom bar with all reader controls. Hidden by default unless the integrator sets `[showToolbar]="true"`.
+3. **Modals and overlays** — table of contents, settings, language picker, character roster, extras viewer, share modal, comments drawer, and a thumbnail strip.
+
+While the toolbar is hidden, a **floating menu button** (hamburger icon, bottom of the viewport) lets readers bring it back. Clicking anywhere on the viewport also shows the toolbar temporarily — it auto-hides again after 5 seconds.
+
+<Callout kind="info">
+The player has no built-in fullscreen button. It fills whatever container the embedding application gives it; fullscreen (e.g. via the Fullscreen API) is the host application's responsibility.
+</Callout>
+
+## Navigation
+
+### Panel view
+
+Panel view shows one panel at a time and follows the chapter's [graph](/concepts/graph-navigation):
+
+- **Next** follows the outgoing edge of the current panel. When several edges match, their [JSON Logic](/concepts/variables) conditions are evaluated against the current variables and the highest-priority valid edge wins — this is how branching narratives resolve.
+- **Previous** follows an incoming edge back.
+- Hovering the left/right edge of the viewport reveals **navigation arrow zones** (chevron icons); panels larger than the viewport additionally show **overflow arrows** for panning.
+
+### Page view
+
+If the manifest defines page layouts, the **View** toolbar button toggles between panel view and page view. Page view renders all panels of a page in their placed positions; next/previous then move page by page, and the current panel follows the page's reading order. Video panels on a page play one after another in reading order (see [video sequencing behavior](/schema/video)).
+
+### Input methods
+
+| Input | Action |
+|---|---|
+| `→` (Arrow Right) | Next panel (or next page in page view) |
+| `←` (Arrow Left) | Previous panel (or previous page in page view) |
+| `T` | Toggle toolbar |
+| `Esc` | Hide toolbar / close the settings modal |
+| Click / tap viewport | Show toolbar temporarily (5 s) |
+| Swipe left | Navigate forward |
+| Swipe right | Navigate backward |
+
+Keyboard shortcuts are ignored while typing in an input field. `Enter`/`Space` activate the focused viewport element for keyboard users.
+
+## Toolbar controls
+
+From left to right (labels are translatable UI strings; icons are Lucide glyphs):
+
+| Control | Behavior |
+|---|---|
+| **View** | Toggle page/panel view. Disabled when the manifest defines no pages. |
+| **Language** (globe) | Opens the language modal. Only shown when the work has more than one locale. |
+| **Speech** | Toggle speech bubbles on/off. |
+| **Audio** | Mute/unmute audio. |
+| **SFX** | Enable/disable sound effects. |
+| **Autoplay** | Start/stop automatic advancing. While active, the button shows a progress bar and **−/+** controls to adjust the seconds-per-panel (0.5–120 s in 1-s steps). |
+| **Thumbs** | Toggle the thumbnail strip (jump to any panel by its thumbnail). |
+| **ToC** | Open the table of contents (chapters and panels; selecting one navigates there). |
+| **Settings** | Open the settings modal. |
+| **Characters** | Open the character roster built from `meta.characters` in the manifest. |
+| **Alt** | Cycle alternative panels — only shown when alternatives exist. |
+| **Choices** | Preview upcoming branch choices — only shown when branches lie ahead. |
+| **Extras** | Open the extras viewer (covers, character sheets, bonus art — see [Extras](/schema/extras)). |
+| **Like / Bookmark / Share / Comments** | Social cluster; Share opens the share modal, Comments opens the comments drawer. |
+| **✕** | Close the toolbar. |
+
+<Callout kind="alert">
+**Work in progress:** in the current build, several toolbar actions are visual placeholders that log to the console instead of acting — the Speech/Audio/SFX toggles, Like, Bookmark, Alt (cycle alternatives), and Choices. Also, the shell currently always reports "no alternatives / no branches" to the toolbar, so the Alt and Choices buttons do not appear yet. View toggle, language, autoplay, thumbnails, ToC, settings, characters, extras, share, and comments are functional.
+</Callout>
+
+## Autoplay
+
+Autoplay advances automatically using, in order of precedence:
+
+1. the current panel's own `durationMs` from the manifest,
+2. otherwise the reader-adjustable *seconds per panel* (default 5 s).
+
+Autoplay is **video-aware**: when the current panel contains videos that start on view, the player waits for each video to complete one full pass (media-event driven) instead of running a wall-clock timer — buffering can never cut a video short. A stall watchdog force-advances if a video source never finishes (and emits a `videoEnded` tracking event with reason `stall-skip`). In page view with on-view videos, the page advances when the whole video sequence completes.
+
+## Settings modal
+
+The settings modal (`pw-settings-modal`) has two tabs:
+
+- **Preferences** — speech bubbles, audio, SFX, autoplay and seconds-per-panel, manga mode (right-to-left reading), reduced motion, high contrast. Includes a reset-to-defaults action.
+- **Variables** — shows the work's variables whose definition has `visibility: "public"`, with type-appropriate editors (checkbox for booleans, number input with min/max, select for enums, text otherwise) and per-variable reset. This lets readers change story-affecting switches the creator exposed.
+
+Changes apply on **Save**; **Cancel** (or clicking the backdrop, or `Esc`) restores the previous values.
+
+## Modals and overlays
+
+- **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation.
+- **Language modal** (`pw-language-modal`) — pick from the work's `meta.locales`; switching updates content and player UI immediately ([Localization](/player/localization)).
+- **Character roster** (`pw-character-roster`) — characters with portrait and description from the manifest.
+- **Extras viewer** (`pw-extras-viewer`) — bonus content.
+- **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation.
+- **Share modal** and **comments drawer** — social features (surface only; persistence is up to the host application).
+- **Paywall overlay** and **age gate** — shown for gated or age-restricted content when the integrator wires an entitlement adapter; see [Paywall & Entitlement](/player/paywall-entitlement).
+- **Loading & error states** — the shell shows a spinner while the manifest loads and an error screen with a retry button if loading or validation fails.
+
+## Accessibility
+
+- Every toolbar button carries a translated `aria-label`; toggles expose `aria-pressed`.
+- The viewport is a labelled `region` with keyboard activation (`Enter`/`Space`); page-view panels are focusable buttons with visible focus indicators.
+- The reduced-motion preference (input `[reducedMotion]` or the OS-level `prefers-reduced-motion`) disables transition animations and degrades on-view video autostart to click-to-play.

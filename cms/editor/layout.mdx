@@ -1,0 +1,133 @@
+---
+title: Editor Layout
+description: Tour of the PanelWave editor screen — header bar, structure tree, canvas, inspector, and timeline — plus view switching and how saving works.
+---
+
+The editor is where you build your graphic novel. It opens when you select a work from your [works list](/cms/works) and is arranged in four zones around a central canvas.
+
+```
+┌────────────────────────────────────────────────────────────┐
+│  Header — breadcrumb · save status · undo/redo · publish   │
+├───────────┬────────────────────────────────┬───────────────┤
+│  Left     │                                │  Right        │
+│  sidebar  │            Canvas              │  inspector    │
+│  (Tree /  │   your page or panel, with     │  (Panel /     │
+│  Assets / │   zoom, grid, and rulers       │  Layer / ...) │
+│  Tools)   │                                │               │
+├───────────┴────────────────────────────────┴───────────────┤
+│  Timeline — animations and audio for the current panel     │
+└────────────────────────────────────────────────────────────┘
+```
+
+Both sidebars and the timeline are **resizable** — drag the thin handle between a sidebar and the canvas to change its width (roughly 280–380 px on the left, 320–420 px on the right), or drag the top edge of the timeline to change its height. Each zone can also be **collapsed** with its chevron button to give the canvas more room; collapsed sidebars shrink to a narrow rail with an expand button.
+
+## Header bar
+
+The header stays visible at all times and is split into three areas.
+
+### Left: where you are, and whether you're saved
+
+- **PanelWave CMS logo** — click to leave the editor and return to your works.
+- **Breadcrumb** — shows your current position (work › chapter › page › panel) and updates as you navigate.
+- **Branch badge** — the branch you are working on (normally `main`).
+- **Save status badge** — see [Saving](#saving-your-work) below.
+
+### Center: editing controls
+
+- **Undo** (`Ctrl+Z`) and **Redo** (`Ctrl+Shift+Z`) — step backward and forward through your edits.
+- **View Undo History** — opens a panel listing your recent actions so you can see what each undo step will revert.
+- **Locale selector** — a dropdown (English, Deutsch, Français, Español) that controls which language you are editing. Localized fields such as panel titles and speech bubble text are edited per locale; see [Localization](/cms/localization).
+
+### Right: actions
+
+| Button | What it does |
+|---|---|
+| **Search** (`Cmd/Ctrl+K`) | Opens the command palette — type to find and run editor commands. |
+| **Fullscreen** | Toggles browser fullscreen for distraction-free editing. |
+| **Work Properties** (`Ctrl+,`) | Opens the settings dialog for the whole work — basic information, creators, language settings, default output format, and work-wide defaults for typography, speech balloons, panel borders, transitions, and video/volume playback. |
+| **Preview Work** | Opens your work in the embedded reader. See [Preview](/cms/preview). |
+| **Preflight** | Runs validation checks and shows an issue count badge if problems are found. See [Validation](/cms/validation). |
+| **Publish** | Only enabled when everything is saved and preflight reports no issues. The guided publish flow behind it is still being rolled out — see [Publishing](/cms/publishing) for what's available today. |
+| **Close Editor** | Leaves the editor (you'll be asked to save if you have unsaved changes). |
+| **User menu** | Profile, settings, light/dark theme toggle, keyboard shortcuts reference, and logout. |
+
+<Callout kind="tip">
+  Press `?` anywhere in the editor to open the keyboard shortcuts overlay. The full list is on the [Shortcuts](/cms/editor/shortcuts) page.
+</Callout>
+
+## Left sidebar
+
+The left sidebar has three tabs:
+
+- **Tree** — the structure tree: your work broken down into chapters, pages, and panels. Select anything here to open it on the canvas. Creating, reordering, and organizing content happens in this tab — see [Pages & Panels](/cms/editor/pages-panels).
+- **Assets** — your uploaded artwork, audio, and video. Drag an image from here straight onto the canvas to use it. See [Assets](/cms/assets).
+- **Tools** — the tool palette, grouped into **Navigation** (Select `V`, Hand `H`, Zoom `Z`), **Drawing** (Rectangle `R`, Circle `C`, Pen `P`), and **Content** (Speech Bubble `S`, Text `T`, Image `I`). The active tool decides what clicking and dragging on the canvas does.
+
+## Canvas
+
+The center zone renders the page or panel you are editing, with its own toolbar for the output format, zoom, grid, rulers, and snapping. Canvas interactions have their own page: [Canvas](/cms/editor/canvas).
+
+## Right inspector
+
+The inspector shows editable properties for whatever is selected, organized into tabs:
+
+| Tab | Shows |
+|---|---|
+| **Panel** | Properties of the current panel — ID, reading order, title, layout, content warnings, animations, tracks, variants. |
+| **Layer** | Properties of the selected artwork layer — transform, appearance, type-specific settings. See [Layers](/cms/editor/layers). |
+| **Hotspot** | Shape, actions, and conditions of the selected hotspot. See [Hotspots](/cms/editor/hotspots). |
+| **Speech** | Text, balloon style, and audio of the selected speech bubble. See [Speech Bubbles](/cms/editor/speech-bubbles). |
+| **A11y** | Accessibility settings for the selected element — screen reader labels, captions, state properties. |
+
+The **Layer**, **Hotspot**, and **Speech** tabs are grayed out until you select a matching element on the canvas, and the inspector switches to the right tab automatically when you click one. Edits in the inspector appear on the canvas immediately — there is no separate "apply" step.
+
+## Timeline
+
+The bottom zone is the **Timeline** for the current panel. It's where panel animations and audio tracks are arranged over time. Collapse it with the chevron when you don't need it. See [Animations](/cms/editor/animations) and [Audio](/cms/editor/audio).
+
+## Views in the editor
+
+- **Panel view** — the canvas shows a single panel filling the frame. This is where you edit layers, speech bubbles, and hotspots.
+- **Page view** — the canvas shows a whole page with all its panels laid out, numbered in reading order. This is where you arrange panel placement. The **Page View / Panel View** toggle appears in the canvas toolbar once your work has pages. Double-clicking a panel in page view opens it in panel view.
+
+The differences between the two views are covered in detail on the [Canvas](/cms/editor/canvas) page.
+
+<Callout kind="info">
+  The **Graph editor** — where you connect panels with branching, conditional edges — is not a tab inside this screen. It's a separate view of your work, described on the [Graph](/cms/editor/graph) page. Chapter- and work-level features such as characters, extras, and localization also live in their own screens outside the editor.
+</Callout>
+
+## Saving your work
+
+The editor saves for you. You normally never need to think about it:
+
+<Steps>
+  <Step title="You make a change">
+    Any edit — moving a layer, typing bubble text, changing a property — marks the work as unsaved.
+  </Step>
+  <Step title="Auto-save kicks in">
+    Two seconds after your last change, the editor saves automatically. If you keep editing, the timer restarts, so saves happen during natural pauses.
+  </Step>
+  <Step title="The badge confirms it">
+    The save status badge in the header cycles from **Unsaved changes** to **Saving...** to **Saved just now** (later "Saved 5m ago").
+  </Step>
+</Steps>
+
+You can also save **manually at any time with `Ctrl+S`** — useful right before previewing or publishing. When the editor is idle with nothing to save, the badge reads **Auto-save enabled**.
+
+<Callout kind="info">
+  If you try to close the editor or navigate away with unsaved changes, a dialog asks whether you want to save before leaving — so a mistimed click won't lose work.
+</Callout>
+
+## Next steps
+
+<Columns cols={3}>
+  <Card title="Canvas" icon="mouse-pointer-2" href="/cms/editor/canvas">
+    Zoom, pan, select, move, and resize elements on the canvas.
+  </Card>
+  <Card title="Pages & Panels" icon="layout-grid" href="/cms/editor/pages-panels">
+    Build your story structure: chapters, pages, and panels.
+  </Card>
+  <Card title="Shortcuts" icon="keyboard" href="/cms/editor/shortcuts">
+    The full keyboard shortcut reference.
+  </Card>
+</Columns>

@@ -1,0 +1,118 @@
+---
+title: Audio
+description: Add music, ambience, voiceover, and sound effects to panels or across whole chapters, control volume, fades, and looping, and preview the mix in the timeline.
+---
+
+Sound turns a graphic novel into an experience: ambient rain behind a scene, a musical theme that carries across a chapter, a door slam exactly when a panel appears. PanelWave gives you two kinds of audio:
+
+- **Panel audio tracks** — sounds that belong to a single panel and start relative to it (a sound effect, a line of dialogue).
+- **Sequence audio tracks** — sounds that span **multiple panels** of a chapter (background music, ambience) and are positioned on the chapter's overall timeline.
+
+Both are built from audio **assets** you upload once and reuse anywhere.
+
+## Getting audio into your work
+
+Upload audio files in the [Assets](/cms/assets) tab (drag and drop or the upload button). The editor accepts common audio formats — MP3, WAV, OGG, AAC, and FLAC all play in the editor preview.
+
+When you upload, the file's **duration is detected automatically** and stored with the asset, so tracks can default to the natural length of the sound. While a file is still being prepared you'll see a **Processing…** indicator on its asset card; it becomes usable as soon as processing finishes in the background.
+
+<Callout kind="tip">
+  Use the **Audio** filter in the Assets tab to see only your sound files. Asset cards show the duration and file size, which helps when picking between takes.
+</Callout>
+
+## Panel audio tracks
+
+Panel audio tracks live in the Inspector when a panel is selected.
+
+<Steps>
+  <Step title="Select a panel">
+    Click the panel on the canvas or in the structure tree.
+  </Step>
+  <Step title="Add a track">
+    In the Inspector's **Audio Tracks** section, click **+ Add Audio Track**. The Track Editor dialog opens.
+  </Step>
+  <Step title="Pick the sound">
+    Give the track a **Name**, then click **Select Audio Asset** to open the asset browser and choose a file. (If the list is empty, upload audio in the Assets tab first.)
+  </Step>
+  <Step title="Set timing and playback">
+    Adjust the timing and playback options described below, then click **Create Track**.
+  </Step>
+</Steps>
+
+### Track Editor options
+
+| Field | What it does |
+|---|---|
+| Start Time (ms) | When the track begins, relative to the panel |
+| Duration Override (ms) | Optional custom length — leave empty to use the asset's own duration |
+| Loop Track | Repeats the track when it reaches the end |
+| Volume | 0–100% playback volume |
+| Fade In (ms) / Fade Out (ms) | Smooth ramps at the start and end (0 = no fade) |
+| Playback Rate | Speed from 0.5× to 2.0× |
+| Muted | Disables the track's audio output without deleting it |
+
+A **Track Summary** at the bottom of the dialog recaps type, asset, start time, and volume before you save. Existing tracks are listed in the Inspector with their start time; use the pencil to edit or the trash button to remove one.
+
+<Callout kind="info">
+  The same Track Editor also handles **video tracks** (the Audio/Video toggle at the top). Video overlays are covered in [Video Panels](/cms/editor/video-panels).
+</Callout>
+
+## Sequence audio tracks
+
+Sequence audio tracks belong to a **chapter**, not a single panel. They sit on the timeline's absolute time axis and keep playing while the reader (or the autoplay playhead) moves through panels — ideal for background music and ambience.
+
+Each track has a **role** that classifies it and color-codes it in the timeline:
+
+| Role | Typical use |
+|---|---|
+| Ambient | Environmental atmosphere — rain, wind, room tone |
+| Music | Background music and themes |
+| Voiceover | Narration and dialogue |
+| SFX | Sound effects |
+
+### Creating and editing sequence tracks
+
+- In the **Timeline panel** header, click **+ Audio Track**. The Track Editor opens in sequence mode: name the track, pick the asset, and set its start time, duration, volume, fades, and looping — the same options as panel tracks.
+- Sequence tracks appear as colored clips in the timeline, spanning however many panels their duration covers. **Click a clip** to reopen it in the editor.
+- Each track's label row has a **mute** button and a **delete** button; clips show extra indicators when the volume differs from 100%, when looping is on, and shaded ramps for fade-in and fade-out.
+
+### Seeing them per panel
+
+Select any panel and check the Inspector's **Sequence Audio Tracks** section: it lists exactly the tracks that overlap that panel's time range, with their start time and duration, plus quick mute, edit, and delete buttons. This answers "what will the reader hear on this panel?" without hunting through the timeline.
+
+<Callout kind="tip">
+  Timing is millisecond-precise and derives from panel display durations. If you change panel durations later (see [Animations & Timeline](/cms/editor/animations)), re-check where your sequence tracks fall.
+</Callout>
+
+## Previewing audio in the editor
+
+Press **Play** in the [Timeline panel](/cms/editor/animations) to hear your mix:
+
+- All tracks that overlap the playhead play **simultaneously and in sync** — volumes, fades, playback rate, and looping are applied exactly as configured.
+- Muted tracks stay silent.
+- **Seeking** (clicking the ruler or dragging the playhead) restarts audio at the correct offset, so you can audition any moment directly.
+- The canvas follows the playhead from panel to panel, so picture and sound stay together.
+
+<Callout kind="info">
+  Browsers only allow sound after you interact with the page — that's why playback always starts from the Play button. If you hear nothing on the very first attempt, click Play again.
+</Callout>
+
+For the full reader-side behavior of audio (mixing rules, autoplay policies in the published player), see [Player audio](/player/audio).
+
+## Localized audio
+
+Like text, audio assets can vary per language — a German voiceover for `de-DE` readers, English for `en-US`. Manage per-locale recordings in the [Localization](/cms/localization) workshop; the format details are in [Audio in the schema](/schema/audio) and [Localization concepts](/concepts/localization).
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Assets" icon="folder-open" href="/cms/assets">
+    Upload and organize the audio files your tracks use.
+  </Card>
+  <Card title="Audio in the format" icon="file-json" href="/schema/audio">
+    How audio tracks are stored in the PanelWave manifest.
+  </Card>
+  <Card title="Animations & Timeline" icon="play-circle" href="/cms/editor/animations">
+    The timeline where you preview audio alongside motion.
+  </Card>
+</Columns>

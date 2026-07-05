@@ -1,0 +1,139 @@
+---
+title: Layers
+description: The Layer union — image, vector, video, audio, text, and plugin layers, shared LayerCommon properties, positioning, z-order, and opacity.
+---
+
+A panel's artwork is a stack of **layers**. `Layer` is a union of six kinds, discriminated by the required `kind` property: `image`, `vector`, `video`, `audio`, `text`, and `plugin`. All kinds share the `LayerCommon` base for identity, stacking, opacity, transforms, and conditional visibility.
+
+```json
+{ "kind": "image", "id": "ly-bg", "assetId": "img-alley", "z": 0 }
+```
+
+<Callout kind="alert">
+A layer without a valid `kind` fails validation against **every** branch of the union, producing a wall of `oneOf` errors. Check `kind` first. See [Validation](/schema/validation).
+</Callout>
+
+## Shared properties (`LayerCommon`)
+
+| Property | Type | Default | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | — | Layer ID (used by variants to override matching layers) |
+| `z` | number | — | Stacking order within the panel — higher renders on top |
+| `opacity` | number 0–1 | `1` | Layer opacity |
+| `parallaxDepth` | number | `0` | Parallax factor; 0 = static, higher values move more with viewport motion |
+| `dragReveal` | boolean \| [`NormalizedRect`](/schema/manifest-structure#normalizednumber-normalizedpoint-normalizedrect) | — | Layer is revealed by dragging; a rect constrains the reveal area |
+| `transform` | object | — | `x` (number), `y` (number), `scale` (number ≥ 0.01, default 1), `rotation` (number, default 0) |
+| `visibleIf` | [`JsonLogic`](/schema/manifest-structure#jsonvalue-and-jsonlogic) | — | Layer only renders when this evaluates truthy against [variables](/schema/variables) |
+| `name` | string | — | Human-friendly layer name (authoring aid) |
+
+<Callout kind="info">
+There is no blend-mode property in the current schema — compositing is plain alpha stacking via `z` and `opacity`.
+</Callout>
+
+### Editor fields
+
+`LayerCommon` also admits fields written by the CMS editor: `x`, `y`, `width`, `height`, `scaleX`, `scaleY`, `rotation` (editor transform), `locked`, `visible` (editor state), and `content`, `fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `verticalAlign` (editor text styling). They are valid on any layer kind but are authoring metadata; runtime rendering is driven by `transform`, `z`, `opacity`, and the kind-specific fields.
+
+## Layer kinds
+
+### `ImageLayer` (`kind: "image"`)
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `assetId` | `Identifier` | Yes | Image [catalog asset](/schema/assets) |
+| `clipRect` | `NormalizedRect` | — | Crop the source image to this region |
+| `visibleRect` | `NormalizedRect` | — | Visible area of the layer; if omitted the full layer is visible. Hidden areas render at reduced opacity in the editor |
+
+### `VectorLayer` (`kind: "vector"`)
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `assetId` | `Identifier` | Yes | Vector catalog asset (SVG/PDF) |
+
+### `VideoLayer` (`kind: "video"`)
+
+| Property | Type | Required | Default | Description |
+|----------|------|:--:|:--:|-------------|
+| `assetId` | `Identifier` | Yes | — | Video catalog asset |
+| `muted` | boolean | — | `false` | Mute playback (work default: `settings.ui.videoMutedDefault`) |
+| `startAtMs` | integer ≥ 0 | — | — | Start offset on the media timeline |
+| `playMode` | string | — | `"once"` | `once` \| `loop` \| `pingpong` \| `loop-from` (schema 1.1+) |
+| `loopFromMs` | integer ≥ 0 | — | — | Loop re-entry point for `loop-from` (semantic rule: `startAtMs <= loopFromMs < durationMs`) |
+| `startMode` | string | — | `"on-view"` | `on-view` \| `on-hover` \| `on-click` (schema 1.1+) |
+| `controls` | boolean | — | `false` | Show native video controls (schema 1.1+) |
+| `autoplay` | boolean | — | `false` | **Legacy (1.0)** — superseded by `startMode`; only interpreted when `startMode` is absent |
+| `loop` | boolean | — | `false` | **Legacy (1.0)** — superseded by `playMode`; only interpreted when `playMode` is absent |
+
+Full playback semantics, the legacy-field mapping, and reverse variants are covered in [Video](/schema/video).
+
+### `AudioLayer` (`kind: "audio"`)
+
+| Property | Type | Required | Default | Description |
+|----------|------|:--:|:--:|-------------|
+| `assetId` | `Identifier` | Yes | — | Audio catalog asset |
+| `loop` | boolean | — | `false` | Loop playback |
+| `gain` | number 0–2 | — | `1` | Volume multiplier |
+| `startAtMs` | integer ≥ 0 | — | — | Start offset |
+
+Panels more commonly use the `Panel.audio` array of `AudioTrack`s (which adds `role` and `visibleIf`) — see [Audio](/schema/audio).
+
+### `TextLayer` (`kind: "text"`)
+
+Only `kind` is required.
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `text` | `LocalizedString` | Localized text content |
+| `content` | string | Plain-string alternative to `text` (written by the CMS) |
+| `style` | object | `font` (string), `sizePt` (number 4–200), `color` (`ColorHex`), `strokeColor` (`ColorHex`), `strokeWidth` (number 0–20) |
+
+### `PluginLayer` (`kind: "plugin"`)
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `plugin` | [`PluginInstance`](/schema/panels#plugininstance) | Yes | The plugin instance to render in this layer |
+
+## Positioning and z-order
+
+- **Stacking:** layers render in ascending `z`. Speech bubbles and hotspots render above the layer stack.
+- **Coordinates:** geometry fields that are `NormalizedRect`/`NormalizedNumber` (`clipRect`, `visibleRect`, `dragReveal`) are fractions of the panel box — resolution-independent. `transform.x`/`y` offset the layer; `transform.scale`/`rotation` apply around the layer.
+- **Parallax:** `parallaxDepth` shifts layers at different rates during viewport motion for a depth effect (e.g. background `0`, midground `0.3`, foreground `0.6`).
+
+## `AssetRef`
+
+The schema defines a general-purpose asset reference form:
+
+```json
+{ "assetId": "img-alley", "variant": "alley-2048.avif", "locale": "de-DE" }
+```
+
+An `AssetRef` is one of: a plain `Identifier` (catalog ID), an absolute `Uri`, or an object with required `assetId` plus optional `variant` and `locale` to pin a specific variant or localization. Layer `assetId` fields themselves are plain `Identifier`s; automatic variant/locale selection is described in [Assets](/schema/assets#localized-asset-resolution).
+
+## Example
+
+A layered panel with parallax, a conditional overlay, and a caption:
+
+```json
+{
+  "layers": [
+    { "kind": "image", "id": "ly-bg", "assetId": "img-alley", "z": 0, "parallaxDepth": 0 },
+    { "kind": "image", "id": "ly-mid", "assetId": "img-detective", "z": 10, "parallaxDepth": 0.3 },
+    {
+      "kind": "image",
+      "id": "ly-overlay",
+      "assetId": "img-overlay-left",
+      "z": 20,
+      "opacity": 0.4,
+      "visibleIf": { "==": [ { "var": "path.choice" }, "left" ] }
+    },
+    {
+      "kind": "text",
+      "id": "ly-caption",
+      "z": 30,
+      "opacity": 0.95,
+      "text": { "en-US": "Left path chosen.", "de-DE": "Linker Pfad gewählt." },
+      "style": { "font": "Helvetica", "sizePt": 16, "color": "#ffffff", "strokeColor": "#000000", "strokeWidth": 2 }
+    }
+  ]
+}
+```

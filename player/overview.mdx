@@ -1,0 +1,91 @@
+---
+title: Player Overview
+description: What the PanelWave Player is — an MIT-licensed Angular 20 library that renders interactive graphic novels from PanelWave manifests.
+---
+
+`@panelwave/player` is the **open-source player** of the PanelWave ecosystem: an MIT-licensed **Angular 20 library** that renders interactive graphic novels from a [PanelWave manifest](/concepts/manifest) (`panelwave.json`). You embed it in your own Angular application; it takes care of rendering, navigation, localization, and reader controls.
+
+<Callout kind="info">
+The player renders whatever a valid manifest describes — it contains no authoring features. Works are created with the [PanelWave CMS](/cms/overview) or any tool that produces a manifest conforming to the [PanelWave Schema](/schema/overview).
+</Callout>
+
+## What it renders
+
+A PanelWave work is a set of chapters whose **panels are nodes in a directed graph**. The player walks that graph, evaluating [JSON Logic](/concepts/graph-navigation) conditions on edges, and renders each panel from its layers:
+
+- **Image layers** — the artwork itself, with lazy loading and caching.
+- **Video layers** — video panels with play modes (`once`, loop, pingpong), start triggers (`on-view`, on click, …), and page-view sequencing.
+- **Text and plugin layers** — text content and sandboxed iframe extensions.
+- **Speech bubbles** — rendered by the `ComicBalloon` SVG engine with configurable balloon types, tails, and a styling cascade (work defaults → character override → per-bubble override).
+
+Panels can be read one at a time (**panel view**) or composed into comic pages (**page view**) when the manifest defines page layouts.
+
+## Feature summary
+
+All of the following is implemented in the library source (`projects/player/src/lib`):
+
+| Area | What you get |
+|---|---|
+| Navigation | Graph traversal with conditional edges and edge priorities (`FlowEngineService`), panel and page view, keyboard and swipe input, autoplay with per-panel durations and video-aware advance |
+| Localization | `LocalizedString` resolution with fallback chains, per-locale asset variants, runtime language switching, translated player UI via `@ngx-translate` |
+| Variables | Five scopes (`global`, `chapter`, `page`, `session`, `persistent`), typed definitions, mutations, JSON Logic context building; `persistent` scope survives reloads via `localStorage` |
+| Media | WebAudio mixer with four buses (`ambient`, `music`, `voiceover`, `sfx`), video controller with a single-active-video policy and stall watchdogs, LRU image cache, lookahead preloading |
+| Monetization | `EntitlementAdapter` interface for plugging in your own subscription/purchase backend, paywall overlay, age gate, preview modes |
+| Analytics | Consent-aware `TrackingService` with event whitelisting, batching, and a configurable endpoint — driven by the manifest's `tracking` section |
+| Extensibility | Plugin system: sandboxed iframe plugins with a capability model and a postMessage protocol, plus `plugin` layers inside panels |
+| Accessibility | Keyboard navigation, ARIA labels and roles throughout the UI, `prefers-reduced-motion` support (degrades video autostart), focus management in modals |
+| UI chrome | Toolbar, table of contents, settings modal, language modal, character roster, extras viewer, thumbnail strip, share modal, comments drawer — all icons are inlined Lucide SVGs (`pw-icon`), so the player adds **no icon-library dependency** |
+
+## The main component
+
+The component you embed is **`PlayerShellComponent`** (selector `pw-player-shell`). It orchestrates all services and child components:
+
+```html
+<pw-player-shell
+  [manifest]="manifest"
+  [locale]="'en-US'"
+  (ready)="onReady()"
+  (panelChange)="onPanelChange($event)">
+</pw-player-shell>
+```
+
+See [Quickstart: Embed the Player](/player/quickstart-embed) for a complete working example and [Inputs & Outputs](/player/inputs-outputs) for the full API.
+
+<Callout kind="alert">
+The public API also exports a `PlayerComponent` with selector `pw-player` — it is a legacy stub and renders nothing useful. Always use `pw-player-shell`.
+</Callout>
+
+## Where it's used
+
+- **Standalone reader sites** — any Angular 20 application that loads a published manifest and embeds `pw-player-shell`.
+- **The demo application** — ships in the same repository (`projects/demo`) and is the reference integration; run it with `npm start`.
+- **PanelWave CMS preview** — the CMS uses the player for its [preview environment](/cms/preview) so that what creators see is exactly what readers get. Rendering behavior lives in the player, not in a CMS fork.
+
+## Project status
+
+The library has completed its core feature phases (foundation, services, rendering, UI, media, advanced features) and is currently in **testing/QA**. A few toolbar actions (speech/audio/SFX toggles, like, bookmark, alternatives cycling) are present in the UI but not yet wired to behavior — pages in this section call these out explicitly where relevant. The package is not yet published to the public npm registry; see [Installation](/player/installation).
+
+## Explore this section
+
+<Columns cols={2}>
+  <Card title="Installation" icon="package" href="/player/installation">
+    Peer dependencies, required providers, and app setup.
+  </Card>
+  <Card title="Quickstart: Embed" icon="zap" href="/player/quickstart-embed">
+    A minimal working embed with a real manifest.
+  </Card>
+  <Card title="Reader Interface" icon="book-open" href="/player/reader-interface">
+    What readers see: viewport, toolbar, modals, input.
+  </Card>
+  <Card title="Inputs & Outputs" icon="code" href="/player/inputs-outputs">
+    The complete `pw-player-shell` API reference.
+  </Card>
+  <Card title="Paywall & Entitlement" icon="lock" href="/player/paywall-entitlement">
+    Implement the entitlement adapter for gated content.
+  </Card>
+  <Card title="Plugins" icon="puzzle" href="/player/plugins">
+    Extend the player with sandboxed iframe plugins.
+  </Card>
+</Columns>
+
+For contributor-oriented material (services, components, data flow), start at [Player Architecture](/player/architecture).

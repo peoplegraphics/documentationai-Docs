@@ -1,0 +1,184 @@
+---
+title: Paywall & Entitlement
+description: How the PanelWave Player gates content — the entitlement adapter interfaces you implement, the EntitlementService, and the paywall UI components.
+---
+
+The player never processes payments itself. Instead, it delegates every access decision to an **entitlement adapter** that you implement against your own backend (subscriptions, purchases, tokens). The manifest declares *what* is gated ([`paywall.rules`](/schema/paywall)); your adapter decides *who* gets in.
+
+<Callout kind="info">
+There are **two adapter interfaces** in the current codebase, used at different integration points. Both are described below — pick the one matching where you plug in.
+</Callout>
+
+## 1. The shell-level adapter (`[entitlementAdapter]` input)
+
+`PlayerShellComponent` accepts a lightweight adapter via its `entitlementAdapter` input. This interface is declared in `player-shell.component.ts`:
+
+```typescript
+export interface EntitlementAdapter {
+  /** Check if the user has access to a specific panel. */
+  hasAccess(panelId: string): Promise<boolean>;
+
+  /** Get entitlement context (merged into global-scope variables at startup). */
+  getContext(): Promise<Record<string, unknown>>;
+
+  /** Handle a purchase flow (optional). */
+  purchase?(productId: string): Promise<boolean>;
+}
+```
+
+How the shell uses it:
+
+- **At startup**, `getContext()` is called once and every returned key/value is written into the **global variable scope** — so manifest conditions (edges, variants) can reference entitlement flags like `{"var": "premium"}`.
+- **Before every panel navigation**, `hasAccess(panelId)` is awaited; a `false` result blocks the navigation and surfaces an error.
+
+```typescript
+import { Component } from '@angular/core';
+import { PlayerShellComponent } from '@panelwave/player';
+import type { EntitlementAdapter } from './my-entitlements';
+
+class ApiEntitlementAdapter implements EntitlementAdapter {
+  constructor(private token: string) {}
+
+  async hasAccess(panelId: string): Promise<boolean> {
+    const res = await fetch(`/api/entitlements/panel/${panelId}`, {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    return res.ok && (await res.json()).ok === true;
+  }
+
+  async getContext(): Promise<Record<string, unknown>> {
+    const res = await fetch('/api/entitlements/context', {
+      headers: { Authorization: `Bearer ${this.token}` },
+    });
+    return res.ok ? await res.json() : {};
+  }
+}
+
+@Component({
+  selector: 'app-reader',
+  standalone: true,
+  imports: [PlayerShellComponent],
+  template: `
+    <pw-player-shell [manifest]="manifest" [entitlementAdapter]="adapter">
+    </pw-player-shell>
+  `,
+})
+export class ReaderComponent {
+  adapter = new ApiEntitlementAdapter(sessionToken);
+  manifest = /* … */;
+}
+```
+
+<Callout kind="alert">
+This shell-level interface is defined in the shell's source file but is **not re-exported** through the package's public API surface — declare a structurally identical interface in your app (as above) or import the type from the component file path. Only the richer interface below is exported from `@panelwave/player`.
+</Callout>
+
+## 2. The full adapter (`EntitlementAdapter` from `entitlement.types`)
+
+The exported, richer interface powers the **`EntitlementService`** and supports signed URLs, paywall UI, age checks, and user info:
+
+```typescript
+import type {
+  EntitlementAdapter,
+  EntitlementContext,
+  EntitlementStatus,
+  PaywallGate,
+  UserInfo,
+} from '@panelwave/player';
+
+export interface EntitlementAdapter {
+  /** Required: resolve entitlements for a work/chapter/panel context. */
+  resolveEntitlement(context: EntitlementContext): Promise<EntitlementStatus>;
+
+  /** Optional: return a signed URL for a gated asset. */
+  getSignedUrl?(assetId: string, purpose: 'stream' | 'download'): Promise<string>;
+
+  /** Optional: show your paywall UI; resolve when completed/dismissed. */
+  showPaywallUI?(gate: PaywallGate): Promise<void>;
+
+  /** Optional: verify age for age-restricted content. */
+  verifyAge?(minimumAge: number): Promise<boolean>;
+
+  /** Optional: authentication status. */
+  isAuthenticated?(): boolean;
+
+  /** Optional: current user information. */
+  getCurrentUser?(): Promise<UserInfo | null>;
+}
+```
+
+### Supporting types
+
+<ResponseField name="EntitlementContext" field-type="object">
+  `workId` (required), optional `chapterId`, `panelId`, `userToken`, `metadata`.
+</ResponseField>
+
+<ResponseField name="EntitlementStatus" field-type="object">
+  `ok: boolean` (access granted), `entitlements: Record<string, boolean>` (flag dictionary, e.g. `{ premium: true }`), optional `user: UserInfo`, `reason` (denial explanation), `expiresAt` (epoch ms — controls cache lifetime).
+</ResponseField>
+
+<ResponseField name="UserInfo" field-type="object">
+  `id` (hashed/pseudonymous), optional `displayName`, `email`, `age`, `tier`, `purchased: string[]`, `tokens: number`, plus custom properties.
+</ResponseField>
+
+<ResponseField name="PaywallGate" field-type="object">
+  `scope: 'work' | 'chapter' | 'panel'`, optional `refId`, `requireEntitlement`, required `reason`, optional `preview` (`previewPanels`, `mode: 'blur' | 'low-res' | 'watermark' | 'time-limited'`, `durationSeconds`).
+</ResponseField>
+
+### Registering the adapter
+
+```typescript
+import { inject } from '@angular/core';
+import { EntitlementService } from '@panelwave/player';
+
+const entitlements = inject(EntitlementService);
+entitlements.setAdapter(new MyFullAdapter());
+
+// Convenience checks (all resolve through your adapter):
+await entitlements.hasAccessToWork('work-1');
+await entitlements.hasAccessToChapter('work-1', 'ch-2');
+await entitlements.hasAccessToPanel('work-1', 'ch-2', 'p-9');
+```
+
+`EntitlementService` behavior worth knowing:
+
+- **Caching:** results are cached per `workId:chapterId:panelId` key. The cache entry lives until the status's `expiresAt`, otherwise 5 minutes. `clearCache()` resets; showing the paywall (`showPaywall(gate)`) clears the cache afterwards so a completed purchase is re-checked.
+- **Defaults:** with no adapter registered, a built-in `NullEntitlementAdapter` **denies everything** (`ok: false`, reason "No entitlement adapter configured").
+- **Development:** a `MockEntitlementAdapter` is exported that grants all access with a fake premium user — handy for local testing.
+- **Observables:** `getEntitlementStatus$()` and `getCurrentUser$()` for reactive UI.
+- **Age gates:** `verifyAge(minimumAge)` delegates to the adapter or falls back to `user.age`; without either it denies.
+
+## Manifest paywall rules
+
+The manifest's `paywall.rules` array declares the gates the adapter should enforce:
+
+```json
+{
+  "paywall": {
+    "rules": [
+      {
+        "scope": "chapter",
+        "refId": "ch-3",
+        "requireEntitlement": "premium",
+        "previewPanels": 3
+      }
+    ]
+  }
+}
+```
+
+`scope` is `work`, `chapter`, or `panel`; `requireEntitlement` is one of `premium`, `token`, `purchaseId`; `previewPanels` allows a teaser before the gate. See [Paywall (schema)](/schema/paywall) and [Monetization concepts](/concepts/monetization).
+
+## Paywall UI components
+
+Two exported overlay components render the reader-facing side:
+
+- **`pw-paywall-overlay`** (`PaywallOverlayComponent`) — inputs `gate: PaywallGate`, `purchaseOptions: PurchaseInfo[]`, `locale`, `title`/`message` (LocalizedString), `allowPreview`, `showLogin`; outputs `action: PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `purchase: string` (product id), `close`.
+- **`pw-age-gate`** (`AgeGateComponent`) — inputs `minimumAge` (default 18), `warningMessage`, `allowDismiss`; outputs `verify: AgeVerificationResult`, `close`.
+
+`PurchaseInfo` describes an offer: `productId`, `name`, `price: { amount, currency }`, `type: 'one-time' | 'subscription' | 'token'`, optional `description`.
+
+## Which integration should I use?
+
+- Embedding `pw-player-shell` and you just need go/no-go per panel plus entitlement flags for conditions → **shell-level adapter** via the `[entitlementAdapter]` input.
+- Building custom flows (signed asset URLs, your own paywall modal, age verification, purchase re-checks) → implement the **full adapter** and register it with `EntitlementService.setAdapter()`; combine with the paywall/age-gate components as needed. You can do both in the same app.

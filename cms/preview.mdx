@@ -1,0 +1,108 @@
+---
+title: Preview
+description: Test your interactive graphic novel in the embedded PanelWave Player — device frames, locales, entitlements, variable overrides, and saved scenarios.
+---
+
+The **Preview** screen lets you experience your work the way a reader will — inside the same PanelWave Player that powers published works — without leaving the CMS. You can switch device frames, languages, and simulated entitlements, and override variables to walk every branch of your story.
+
+## Opening the preview
+
+Preview is one of the **Backstage Tools**. You can reach it two ways:
+
+- From the works list, open a work's **More actions** menu (the ⋮ button on the card) and choose **Preview**.
+- From any backstage screen, click **Preview** in the left-hand Backstage Tools navigation.
+
+The screen is titled **Player Preview** and shows the work ID it is previewing. If the work's manifest has not been built yet, you'll see **"No Manifest Available — Build the work manifest to enable preview"** instead of the player.
+
+<Callout kind="info">
+  Preview always renders the **current editing state** of your work — including content you have not published yet. It is a private testing surface; readers never see it.
+</Callout>
+
+## The preview controls
+
+A control bar above the player frame lets you shape the reading conditions you want to test.
+
+### Device frames
+
+Pick a device under **Device:** to preview your layout at realistic screen sizes:
+
+| Device | Viewport |
+|---|---|
+| **iPhone 14 Pro** | 393 × 852 (portrait phone) |
+| **iPad Pro** | 1024 × 1366 (portrait tablet) |
+| **Desktop** | 1920 × 1080 (landscape) |
+
+The current device name and dimensions are shown below the frame. Use the number keys **1**, **2**, **3** to switch devices quickly.
+
+### Locale
+
+The **Locale:** dropdown switches the player's language so you can check translations, text fit, and speech-bubble layout per language. Available preview locales: English, Deutsch, Français, Español, Italiano, 日本語, 中文, and 한국어. Press **L** to jump to the locale selector. See [Localization](/cms/localization) for managing translations.
+
+### Network
+
+The **Network:** dropdown offers connection presets: **Fast (WiFi)**, **4G**, **3G**, **Slow 2G**, and **Offline**.
+
+<Callout kind="alert">
+  Network presets are currently informational — the selection is recorded in the preview configuration but does not yet throttle the actual connection.
+</Callout>
+
+### Entitlements
+
+Under **Entitlements:** you can toggle the access tiers the simulated reader holds: **free**, **basic**, **premium**, and **pro** (only *free* is active by default). This is how you test [paywalls](/cms/monetization): preview with only *free* checked to confirm the paywall appears where you expect, then add *premium* and confirm gated chapters unlock.
+
+<Callout kind="tip">
+  The [Entitlement](/cms/monetization#simulating-reader-access) backstage screen can open Preview pre-configured for a specific reader persona — the preview header then shows a **"Previewing as …"** badge listing that persona's entitlements.
+</Callout>
+
+### Playback options
+
+Two checkboxes under **Options:**
+
+- **Autoplay** — start playback automatically (on by default).
+- **Muted** — silence all audio.
+
+### Variable overrides
+
+The **Variables:** panel lists every variable your work defines (see [Variables](/cms/editor/variables)) and lets you override its value for the preview session — this is the key tool for **testing branches**:
+
+- Each variable gets an input matched to its type: a checkbox for booleans, a dropdown for enums, number/date/time pickers, or a text field.
+- An **overridden** badge marks values you have changed; the reset arrow next to a row restores its default, and **Clear all overrides** resets everything at once.
+- Each row shows the variable's default value, so you always know what readers start with.
+
+Set a decision variable to each of its possible values and re-run the chapter to verify every path through your [graph](/cms/editor/graph) behaves as intended. If the work defines no variables, the panel says **"This work defines no variables."**
+
+### Scenarios
+
+The **Scenario:** row saves complete control setups so you can re-test recurring situations in one click:
+
+- Built-in presets: **Mobile 3G**, **Free tier**, and **Premium reader**.
+- Save your own: configure the controls, type a name into **"Save current as…"**, and click the save button. Saved scenarios appear as chips next to the presets and can be deleted with their **×** button.
+
+Scenarios are stored in your browser, per device.
+
+## Fullscreen and sharing
+
+In the preview header:
+
+- **Fullscreen** (or the **F** key) removes the device frame and fills your screen — the most accurate way to judge the final reading experience. Press **Esc** to exit.
+- **Copy URL** copies a direct player URL for the current work to your clipboard.
+- **Open in new window** launches the preview in a separate browser window.
+- **Reset** returns every control to its default (Desktop, English, Fast network, free entitlement, no overrides).
+
+## Previewing extras
+
+Bonus content (covers, concept art, wallpapers, …) has its own reader-style preview: the [Extras](/cms/extras) manager shows your published extras grouped exactly as readers will see them, and excludes anything still marked **Draft (hidden from readers)**.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Validation" icon="shield-check" href="/cms/validation">
+    Run preflight checks before you publish.
+  </Card>
+  <Card title="Publishing" icon="rocket" href="/cms/publishing">
+    Take your work from draft to published.
+  </Card>
+  <Card title="Monetization" icon="lock" href="/cms/monetization">
+    Configure what is free and what is paid.
+  </Card>
+</Columns>

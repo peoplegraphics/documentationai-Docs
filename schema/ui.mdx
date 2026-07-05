@@ -1,0 +1,66 @@
+---
+title: UI Settings
+description: Reference for the UISettings section — per-work branding colors and logo, plus toggles for the player's reader controls.
+---
+
+The optional top-level `ui` section lets a manifest customize the **player chrome** for this work: branding colors and a logo, and which reader controls are shown. It configures appearance and control *visibility* — reader behavior defaults (autoplay, audio on/off, manga mode, video defaults) live in `settings.ui` instead (see [Settings](/schema/settings)).
+
+## `UISettings`
+
+Defined as `$defs/UISettings`. Both groups are optional.
+
+### `branding`
+
+| Property | Type | Description |
+|---|---|---|
+| `primaryColor` | hex color (`#RRGGBB` or `#RGB`) | Primary brand color for the player UI. |
+| `accentColor` | hex color | Accent color. |
+| `logo` | string | Logo image URL/path. |
+
+### `controls`
+
+All toggles are booleans and default to `true` (shown):
+
+| Property | Default | Controls |
+|---|---|---|
+| `showLanguageToggle` | `true` | The language switcher (relevant for multi-locale works — see [Localization](/concepts/localization)). |
+| `showAutoplayToggle` | `true` | The autoplay on/off control. |
+| `showSfxToggle` | `true` | The sound-effects toggle. |
+| `showSpeechToggle` | `true` | The speech/voice-over toggle. |
+| `showToc` | `true` | The table of contents. |
+| `showThumbnails` | `true` | The thumbnail strip/navigation. |
+
+## Example
+
+```json
+{
+  "ui": {
+    "branding": {
+      "primaryColor": "#0055ff",
+      "accentColor": "#ffd400",
+      "logo": "https://cdn.example.com/works/city-noir/logo.svg"
+    },
+    "controls": {
+      "showLanguageToggle": true,
+      "showAutoplayToggle": true,
+      "showSfxToggle": true,
+      "showSpeechToggle": true,
+      "showToc": true,
+      "showThumbnails": false
+    }
+  }
+}
+```
+
+## `ui` vs. `settings.ui`
+
+| Concern | Section |
+|---|---|
+| Brand colors, logo, which controls are visible | top-level `ui` (`UISettings`, this page) |
+| Reader behavior defaults: `mangaMode`, `autoplayDefault`, `secondsPerPanel`, `speechDefault`, `audioDefault`, `sfxDefault`, `scrollingDefault`, `videoPlayModeDefault`, `videoStartModeDefault`, `videoMutedDefault` | `settings.ui` — see [Settings](/schema/settings) |
+
+## Related pages
+
+- [Settings](/schema/settings) — behavior defaults, typography, preload, output presets
+- [Player: Reader Interface](/player/reader-interface) — what these controls look like at runtime
+- [Player: Configuration](/player/configuration) — host-side configuration that can further constrain the UI

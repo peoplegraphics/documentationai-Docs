@@ -1,0 +1,153 @@
+---
+title: Example Manifests
+description: Guided tour of the seven sample manifests (01_simple to 07_video) — what each demonstrates, with key excerpts you can copy.
+---
+
+The format repository ships seven sample manifests under `_spec/samples/`, from a minimal smoke-test file to a full branching story and a schema 1.1 video showcase. They are the fastest way to see the schema in practice — validate any of them with the [CLI](/schema/cli) (`panelwave validate <file>`) or the repository's `node validate-samples.js` script.
+
+| Sample | File | Demonstrates |
+|---|---|---|
+| `01_simple` | `panelwave_graphic_novel_sample_01.json` | 3 pages × 5 panels, linear graph, two locales, format views |
+| `02_complex` | `panelwave_graphic_novel_sample_02.json` | Variants, hotspot decisions, content warning, paywall, tracking, UI branding |
+| `03_scifi` | `panelwave_graphic_novel_sample_03_scifi.json` | Themed bilingual linear story, string variables, extras |
+| `04_fantasy` | `panelwave_graphic_novel_sample_04_fantasy.json` | Themed bilingual linear story with a larger character cast |
+| `05_minimal` | `panelwave_graphic_novel_sample_05_minimal.json` | The smallest realistic manifest |
+| `06_branching` | `panelwave_branching_sample.json` | True graph branching: 2 choice points, 4 endings |
+| `07_video` | `panelwave_graphic_novel_sample_07_video.json` | Schema 1.1 video panels: all play/start modes, reverse variant, defaults |
+
+<Callout kind="success">
+All seven samples validate cleanly against the current schema (`node validate-samples.js` in the repository runs the check).
+</Callout>
+
+## 01_simple — the linear baseline
+
+A 3-page noir short with 5 panels per page (15 panels), `bigscreen-landscape` page layouts, localized titles/descriptions in `en-US` and `de-DE`, and a simple linear graph across all panels. It also shows **per-format view hints** (`formatViews`) — a minimal focus rectangle so mobile-portrait rendering knows what part of the panel matters:
+
+```json
+"formatViews": {
+  "mobile-portrait": {
+    "minimalFocusRect": { "x": 0.1, "y": 0.1, "w": 0.8, "h": 0.8 },
+    "allowPageView": false,
+    "allowPanelView": true
+  }
+}
+```
+
+Start here to understand [chapters, pages, and placements](/schema/chapters-and-pages).
+
+## 02_complex — the kitchen sink
+
+The same noir setting, but exercising most optional sections at once:
+
+- **Variables** with three scopes: a persistent reader preference, a session-scoped choice, and a read-only global (see [Variables](/schema/variables)):
+
+```json
+"variables": {
+  "definitions": [
+    { "id": "prefs.speech", "type": "boolean", "default": true, "scope": "persistent", "visibility": "public" },
+    { "id": "path.choice", "type": "enum", "enum": ["none", "left", "right"], "default": "none", "scope": "session", "visibility": "public" },
+    { "id": "user.age", "type": "integer", "default": 18, "scope": "global", "visibility": "private", "readOnly": true }
+  ]
+}
+```
+
+- **Hotspot-based decision navigation** — panel `p1-3` has two `goTo` hotspots that both lead to `p1-4` but set `path.choice` to `left` or `right` (see [Hotspots](/schema/hotspots)).
+- **Panel variants** — `p1-4` renders a left- or right-path overlay depending on `path.choice`, and `p2-3` swaps in a blur overlay plus a "Content adjusted" text layer when `user.age < 16` (see [Variants](/schema/variants)).
+- **A content warning** on a single panel: `"contentWarnings": ["cw-violence"]` referencing `meta.content_warnings`.
+- **An active paywall from page 2** — ten panel-scope rules (`p2-1` … `p3-5`), each `{"scope": "panel", "refId": "...", "requireEntitlement": "premium"}` (see [Paywall](/schema/paywall)).
+- **Tracking** with required consent and a six-event whitelist, plus **UI branding** and an extras cover (see [Tracking](/schema/tracking), [UI Settings](/schema/ui)).
+- **Settings** with `outputPresets` per format, including default transitions (see [Settings](/schema/settings)).
+
+## 03_scifi — Starbound: Echoes
+
+A bilingual (en-US/de-DE) linear sci-fi story with three credited creators and two characters. Notable extra: plain **string variables** used as global constants:
+
+```json
+"variables": {
+  "definitions": [
+    { "id": "ui.themeColor", "type": "string", "scope": "global", "default": "#4A90E2", "description": "Theme color for the UI" },
+    { "id": "ship.name", "type": "string", "scope": "global", "default": "Prometheus", "description": "Name of the exploration vessel" }
+  ]
+}
+```
+
+## 04_fantasy — The Crystal Quest
+
+Structurally similar to `03_scifi` — a bilingual linear fantasy adventure — useful as a second data point for the same patterns (multi-creator credits, character roster, extras cover, image asset catalog with picsum placeholder art).
+
+## 05_minimal — the smallest realistic manifest
+
+One chapter, one page, three panels, two slide-transition edges, one cover extra. Good template for a "hello world" manifest — pair it with the [Quickstart](/quickstart). Key shape:
+
+```json
+"graph": {
+  "entry": "p1",
+  "edges": [
+    { "from": "p1", "to": "p2", "transition": { "type": "slide", "dir": "left", "durationMs": 300 } },
+    { "from": "p2", "to": "p3", "transition": { "type": "slide", "dir": "left", "durationMs": 300 } }
+  ]
+}
+```
+
+## 06_branching — The Crossroads of Fate
+
+**True branching navigation** (as opposed to variant-based content swapping): 9 panels, 2 decision points, 4 distinct endings.
+
+```text
+                [Start]
+                   |
+           [First Crossroads]
+             /          \
+        Forest          Mountain
+           |               |
+    [Forest Choice]  [Mountain Choice]
+      /       \        /        \
+ Clearing    Cave    Peak     Stream
+     |         |       |         |
+ [Ending1] [Ending2] [Ending3] [Ending4]
+```
+
+Each choice panel has two `goTo` hotspots pointing at **different panels**, recording the decision via mutations:
+
+```json
+{
+  "id": "hs-forest",
+  "label": { "en-US": "Enter the Forest", "de-DE": "Betrete den Wald" },
+  "shape": { "type": "rect", "x": 0.05, "y": 0.3, "w": 0.4, "h": 0.6 },
+  "action": {
+    "type": "goTo",
+    "to": "panel-forest-path",
+    "mutations": [{ "op": "set", "var": "choices.first", "value": "forest" }],
+    "transition": { "type": "slide", "dir": "left", "durationMs": 350 }
+  }
+}
+```
+
+The chapter graph declares all nine edges up front (with per-edge transitions — `fade` into the first crossroads, directional `slide`s along the branches), so the story structure is fully visible to tools like the CMS [graph editor](/cms/editor/graph) without executing anything.
+
+## 07_video — schema 1.1 video showcase
+
+A single-chapter manifest (`panelwave.version: "1.1.0"`) that systematically exercises the [video panel](/schema/video) fields:
+
+- **All four `playMode` values** — `once`, `loop`, `pingpong` (with a `direction: "reverse"` `VideoVariant` on `vid-pingpong` for smooth backward playback), and `loop-from` with `loopFromMs: 3000`.
+- **All three `startMode` values** — `on-view`, `on-hover`, `on-click`.
+- **A `poster`** on the `vid-once` asset (`VideoPoster`).
+- **Legacy backward compatibility** — panel `p-legacy-fields` uses only the schema 1.0 `autoplay`/`loop` booleans and relies on the documented mapping (`loop: true` → `playMode: "loop"`, `autoplay: true` → `startMode: "on-view"`).
+- **Work-level video defaults** in `settings.ui`:
+
+```json
+"settings": {
+  "ui": {
+    "autoplayDefault": false,
+    "videoPlayModeDefault": "once",
+    "videoStartModeDefault": "on-view",
+    "videoMutedDefault": true
+  }
+}
+```
+
+## Related pages
+
+- [Manifest Structure](/schema/manifest-structure) — the top-level layout all samples share
+- [Validation](/schema/validation) — validating manifests with AJV or the CLI
+- [CLI](/schema/cli) — `panelwave validate`, `diff`, and friends

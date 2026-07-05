@@ -1,0 +1,200 @@
+---
+title: Variables & Conditions
+description: Define and test story variables in the PanelWave CMS — variable types and scopes, setting values from hotspots, building conditions, and preview overrides.
+---
+
+**Variables** are your story's memory. They remember what the reader did — which door they opened, how much a character trusts them, whether they have found the key — and **conditions** read that memory to decide what happens next: which panel comes after this one, which layers are visible, which speech bubble appears.
+
+This page covers how variables work in the CMS editor. For the concept itself see [Variables](/concepts/variables); for the exact format see [Variables in the schema](/schema/variables).
+
+## Anatomy of a variable
+
+Every variable is defined once per work, with:
+
+| Property | What it is |
+|---|---|
+| **Id** | The name you use in conditions, e.g. `trustLevel` or `inventory.hasKey`. Letters and digits, optionally in dot-separated segments. |
+| **Type** | What kind of value it holds (see below). |
+| **Default** | The value every reader starts with. |
+| **Scope** | How long the value lives (see below). |
+| **Read-only** | If set, the story can read but not change the value. |
+| **Visibility** | `public` (default) or `private`. |
+| **Description** | A note to yourself about what the variable is for. |
+
+### Types
+
+| Type | Holds | Example |
+|---|---|---|
+| `boolean` | true / false | `hasKey: true` |
+| `number` | Any number | `trustLevel: 62.5` |
+| `integer` | Whole numbers | `score: 100` |
+| `string` | Text | `playerName: "Aki"` |
+| `enum` | One value from a fixed list | `difficulty: "easy" \| "normal" \| "hard"` |
+| `date` / `time` / `datetime` | Calendar and clock values | `firstReadAt` |
+
+### The five scopes
+
+Scope controls when a variable's value resets:
+
+| Scope | Lifetime |
+|---|---|
+| `global` | Lives for the whole work, across all chapters. |
+| `chapter` | Resets when the reader enters a new chapter. |
+| `page` | Resets when the reader moves to a new page. |
+| `session` | Lives for one reading session; gone when the reader closes the story. |
+| `persistent` | Survives across sessions — the reader can come back tomorrow and the value is still there. |
+
+<Callout kind="tip">
+Rule of thumb: story decisions the whole work should remember → `global` or `persistent`; short-lived puzzle state → `chapter` or `page`; things like "has seen the tutorial hint this visit" → `session`.
+</Callout>
+
+## Where variables are defined
+
+Variable definitions are part of your work's manifest. Today they enter a work in two ways:
+
+- **Importing a manifest** — a `panelwave.json` that contains a `variables` section keeps all its definitions when you [import it](/cms/import).
+- **Hand-authoring the manifest** — for works maintained outside the CMS, define them under `variables.definitions` as described in [the schema reference](/schema/variables).
+
+A definition looks like this in the manifest:
+
+```json
+{
+  "variables": {
+    "definitions": [
+      {
+        "id": "trustLevel",
+        "type": "integer",
+        "default": 50,
+        "scope": "global",
+        "description": "How much Mira trusts the reader"
+      },
+      {
+        "id": "difficulty",
+        "type": "enum",
+        "enum": ["easy", "normal", "hard"],
+        "default": "normal",
+        "scope": "session"
+      }
+    ]
+  }
+}
+```
+
+<Callout kind="info">
+A visual **Variables Designer** (a table of all variables with create/edit/duplicate/delete, search, filters, and JSON import/export) exists in the CMS codebase but is **not yet enabled** in the released editor UI. Until it ships, define variables via import or the manifest, and manage their *values* with the tools below.
+</Callout>
+
+## Changing values from the story
+
+Readers change variables through **hotspot actions**. In the [Hotspots](/cms/editor/hotspots) inspector, click **+ Add Action** and choose the action type **Set Variables**. Each row of the action has three parts:
+
+| Field | Options | Example |
+|---|---|---|
+| Variable name | Any variable id | `trustLevel` |
+| Operation | **Set**, **Increment**, **Toggle** | Increment |
+| Value | The value to set / add | `10` |
+
+So *"clicking this door increases `trustLevel` by 10"* is: variable `trustLevel`, operation **Increment**, value `10`. Use **Toggle** for booleans (`hasKey` flips between true and false) and **Set** to assign a value outright. One action can change several variables at once — click **+ Add Variable** for more rows.
+
+## Using variables in conditions
+
+Conditions appear in three places in the editor, with two styles of input.
+
+### 1. Edge conditions in the Graph Editor (JSON Logic)
+
+Branching is decided on graph edges. When you select an edge in the [Graph Editor](/cms/editor/graph), the Edge panel offers a **Condition (JSON Logic; empty = always follow)** field where you type the rule as JSON.
+
+JSON Logic looks intimidating for about five minutes, then the pattern clicks. A rule is always:
+
+```json
+{"OPERATOR": [LEFT SIDE, RIGHT SIDE]}
+```
+
+- To *read a variable*, write `{"var": "name"}`.
+- Everything else is a plain value: `100`, `"easy"`, `true`.
+
+<Tabs>
+  <Tab title="Equals">
+    ```json
+    {"==": [{"var": "difficulty"}, "easy"]}
+    ```
+    True when `difficulty` is `"easy"`.
+  </Tab>
+  <Tab title="Greater than">
+    ```json
+    {">": [{"var": "score"}, 100]}
+    ```
+    True when `score` is above 100.
+  </Tab>
+  <Tab title="Both must be true">
+    ```json
+    {"and": [
+      {"==": [{"var": "hasKey"}, true]},
+      {">=": [{"var": "trustLevel"}, 75]}
+    ]}
+    ```
+    True when the reader has the key **and** trust is at least 75.
+  </Tab>
+  <Tab title="Either is enough">
+    ```json
+    {"or": [
+      {"==": [{"var": "chosenPath"}, "heroic"]},
+      {">": [{"var": "score"}, 500]}
+    ]}
+    ```
+    True when the reader chose the heroic path **or** scored over 500.
+  </Tab>
+</Tabs>
+
+The comparison operators are `==`, `!=`, `<`, `>`, `<=`, `>=`, combined with `and`, `or`, and `not`. That small set covers nearly every story rule. The same JSON Logic format powers conditions everywhere in the [PanelWave format](/schema/graph), so what you learn here transfers.
+
+### 2. Visibility conditions with the Condition Builder
+
+Hotspots and speech bubbles have a **Visibility Condition** section in the inspector: an element with a condition only appears when the condition is true. You can type the expression directly, or click **Build Condition** to open the **Condition Builder** dialog — no code required:
+
+<Steps>
+  <Step title="Add a condition">
+    Click **+ Add Condition**. Each condition card has four inputs: **Variable** (the name), **Type** (String / Number / Boolean), **Operator**, and **Value**.
+  </Step>
+  <Step title="Pick the operator">
+    All types offer *equals* and *not equals*. Numbers add *greater than*, *less than*, *greater or equal*, *less or equal*; strings add *contains*, *starts with*, *ends with*; booleans use a simple true/false dropdown.
+  </Step>
+  <Step title="Combine multiple conditions">
+    With two or more cards, choose **AND (all must be true)** or **OR (any can be true)** at the top.
+  </Step>
+  <Step title="Check the preview and apply">
+    The **Expression Preview** shows the result as readable text, e.g. `score > 100 && hasKey === true`. Click **Apply Condition** to save it to the element.
+  </Step>
+</Steps>
+
+### 3. Mutation triggers
+
+[Hotspot](/cms/editor/hotspots) **mutations** change an element's look (Visible, Opacity, Scale, Rotation, Position, Color) in response to a trigger — **On Hover**, **On Click**, or **When Variable Changes**. The variable trigger takes a **Condition Expression** in the same style as the Condition Builder output, e.g. `hasKey === true` or `score > 100`, so artwork can react the moment your story state changes.
+
+## Testing values in Preview
+
+The [Preview](/cms/preview) page has a **Variables:** section that lists every variable defined in your work, each with an editor that matches its type — a checkbox for booleans, a dropdown for enums, number/date/time inputs where appropriate. For each variable you see:
+
+- its id, type badge, and the **default** value,
+- a **read-only** badge where applicable,
+- an **overridden** badge once you change the value, and a **reset** button to return to the default.
+
+Override a few values, then read the chapter in the embedded player to check that your branches, visibility conditions, and mutations fire the way you intended. Overrides are part of preview **scenarios**, so you can save "Premium reader with the key" or "Fresh first-time reader" as one-click test setups.
+
+<Callout kind="tip">
+Test both sides of every branch: once with values that satisfy the condition and once with values that don't. The most common branching bug is a condition that can never be true because the variable is never set — search your hotspots for the matching **Set Variables** action.
+</Callout>
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Graph Editor" icon="workflow" href="/cms/editor/graph">
+    Put conditions on edges to branch the story.
+  </Card>
+  <Card title="Hotspots" icon="mouse-pointer-click" href="/cms/editor/hotspots">
+    Set variables and react to them with actions and mutations.
+  </Card>
+  <Card title="Variables (concept)" icon="book-open" href="/concepts/variables">
+    Scopes, evaluation, and how the player stores state.
+  </Card>
+</Columns>

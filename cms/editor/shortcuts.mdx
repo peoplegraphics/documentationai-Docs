@@ -1,0 +1,177 @@
+---
+title: Keyboard Shortcuts
+description: Complete keyboard shortcut reference for the PanelWave CMS editor — canvas, structure tree, timeline, and Graph Editor shortcuts, plus undo and redo.
+---
+
+The editor is built for a keyboard-first workflow. This page is the complete, verified reference, grouped by the area of the editor a shortcut works in.
+
+Two quick notes before the tables:
+
+- **Ctrl means Cmd on macOS.** Every `Ctrl` shortcut also responds to `⌘`.
+- **Shortcuts pause while you type.** When the cursor is in a text field, shortcuts don't fire — so pressing Backspace in a title never deletes a layer.
+
+You can open a shortcut reference inside the editor at any time: press <kbd>Shift</kbd>+<kbd>?</kbd> for the quick help overlay, or choose **Keyboard shortcuts** from the user menu / command palette.
+
+## General
+
+Work everywhere in the editor:
+
+| Keys | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>K</kbd> | Open the command palette |
+| <kbd>Ctrl</kbd>+<kbd>S</kbd> | Save the current work |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Undo |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> | Redo |
+| <kbd>Shift</kbd>+<kbd>?</kbd> | Show / hide the shortcuts help |
+| <kbd>Esc</kbd> | Deselect all / cancel the current operation |
+
+### Command palette (while open)
+
+| Keys | Action |
+|---|---|
+| Type | Filter commands (save, undo, preflight, publish, assets, …) |
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Highlight the previous / next command |
+| <kbd>Enter</kbd> | Run the highlighted command |
+| <kbd>Esc</kbd> | Close the palette |
+
+## Canvas — selection & editing
+
+For the canvas itself, see [Canvas](/cms/editor/canvas); layers are covered in [Layers](/cms/editor/layers).
+
+| Keys | Action |
+|---|---|
+| Click | Select a panel / element |
+| <kbd>Shift</kbd> or <kbd>Ctrl</kbd>+Click | Add / remove from the selection |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select all panels (page view) or all layers (panel view) |
+| <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Delete the selection — speech bubbles first, then hotspots, then panels, then layers |
+| <kbd>Ctrl</kbd>+<kbd>D</kbd> | Duplicate the selected layers |
+| <kbd>Tab</kbd> / <kbd>Shift</kbd>+<kbd>Tab</kbd> | Focus the next / previous item: panels in panel view, speech bubbles while the speech tool is active, otherwise hotspots |
+| <kbd>Alt</kbd>+<kbd>L</kbd> / <kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> | Layer Navigator: select the next / previous unlocked layer (announced for screen readers) |
+| <kbd>Esc</kbd> | Clear the selection |
+
+### Moving elements
+
+| Keys | Action |
+|---|---|
+| <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> | Nudge the selection by 1 px |
+| <kbd>Shift</kbd>+Arrow | Nudge the selection by 10 px |
+
+### Clipboard (page view)
+
+| Keys | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>C</kbd> | Copy the selected panels |
+| <kbd>Ctrl</kbd>+<kbd>X</kbd> | Cut the selected panels |
+| <kbd>Ctrl</kbd>+<kbd>V</kbd> | Paste panels |
+
+### Arranging panels (page view, 2+ panels selected)
+
+| Keys | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> / <kbd>E</kbd> | Align left / right |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>T</kbd> / <kbd>B</kbd> | Align top / bottom |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>H</kbd> / <kbd>M</kbd> | Align centers horizontally / vertically |
+| <kbd>Ctrl</kbd>+<kbd>Alt</kbd>+<kbd>H</kbd> / <kbd>Y</kbd> | Distribute horizontally / vertically (3+ panels) |
+
+## Canvas — view
+
+Zoom shortcuts require the mouse pointer to be over the canvas:
+
+| Keys | Action |
+|---|---|
+| <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>−</kbd> | Zoom in / out |
+| <kbd>Ctrl</kbd>+<kbd>0</kbd> | Fit to view |
+| <kbd>G</kbd> | Toggle grid |
+| <kbd>Ctrl</kbd>+<kbd>G</kbd> | Toggle grid visibility |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> | Toggle snap to grid |
+| <kbd>Shift</kbd>+<kbd>R</kbd> | Toggle rulers |
+
+## Polygon editing (hotspots)
+
+While editing a polygon [hotspot's](/cms/editor/hotspots) points:
+
+| Keys | Action |
+|---|---|
+| <kbd>Delete</kbd> | Delete the selected point |
+| <kbd>I</kbd> | Insert a point after the selected one |
+| <kbd>Enter</kbd> | Finish polygon editing |
+| <kbd>Esc</kbd> | Stop polygon editing |
+
+## Structure tree
+
+These work while the structure sidebar has focus (see [Pages & Panels](/cms/editor/pages-panels)):
+
+| Keys | Action |
+|---|---|
+| <kbd>↑</kbd> / <kbd>↓</kbd> | Move to the previous / next visible item |
+| <kbd>←</kbd> | Collapse the item, or jump to its parent |
+| <kbd>→</kbd> | Expand the item, or jump to its first child |
+| <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Delete the selected chapter, page, or panel (with confirmation) |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Open properties for the selected work or page |
+| <kbd>Ctrl</kbd>+<kbd>Z</kbd> | Undo |
+| <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> or <kbd>Ctrl</kbd>+<kbd>Y</kbd> | Redo |
+| <kbd>Esc</kbd> (in the search box) | Clear the search and return focus to the tree |
+
+## Timeline
+
+These work while the [timeline](/cms/editor/animations) area or its playhead has focus:
+
+| Keys | Action |
+|---|---|
+| <kbd>Space</kbd> | Play / pause |
+| <kbd>←</kbd> / <kbd>→</kbd> | Step one frame back / forward |
+| <kbd>Shift</kbd>+<kbd>←</kbd> / <kbd>→</kbd> | Jump one second back / forward |
+| <kbd>Home</kbd> / <kbd>End</kbd> | Jump to the start / end |
+
+The timecode display is editable: click it, type `HH:MM:SS:FF`, `MM:SS`, or plain seconds, and press <kbd>Enter</kbd> to seek.
+
+## Graph Editor
+
+These work inside the [Graph Editor](/cms/editor/graph):
+
+| Keys | Action |
+|---|---|
+| <kbd>←</kbd> <kbd>↑</kbd> <kbd>→</kbd> <kbd>↓</kbd> | Move the node selection in that direction |
+| <kbd>C</kbd> | Connect: start creating an edge from the selected node |
+| <kbd>Enter</kbd> | Create the pending edge |
+| <kbd>Ctrl</kbd>+<kbd>A</kbd> | Select all nodes |
+| <kbd>Delete</kbd> / <kbd>Backspace</kbd> | Delete the selected nodes / edges |
+| <kbd>L</kbd> | Auto-layout the graph |
+| <kbd>V</kbd> | Run validation |
+| <kbd>Esc</kbd> | Cancel connect mode / stop the simulation / clear selection |
+| Mouse wheel | Zoom |
+| Drag empty canvas | Pan |
+
+## Undo & redo
+
+Undo in the editor is **action-based**: each recorded action knows how to reverse itself, and <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>Z</kbd> walk that history. The header shows **Undo** and **Redo** buttons (grayed out when there is nothing to undo or redo) plus a **View Undo History** button.
+
+**What is recorded today:**
+
+- **Structure operations** — reordering chapters, pages, and panels, and adding/removing a panel on a page (via drag & drop in the structure tree). These live in the main history, which keeps the **50 most recent actions**.
+- **Hotspot editing** — shape and property edits in the hotspot inspector keep their own history of up to **100 steps** (there, <kbd>Ctrl</kbd>+<kbd>Y</kbd> also works for redo).
+
+<Callout kind="alert">
+Not every edit is in the undo history yet — canvas layer edits and most inspector property changes are applied directly. When in doubt, check the History panel before assuming an action can be reversed, and save deliberate checkpoints with <kbd>Ctrl</kbd>+<kbd>S</kbd>.
+</Callout>
+
+**The History panel** (header → **View Undo History**) shows two lists:
+
+- **Undo Stack** — everything you can undo, newest first, with the current position marked *← Current*. Entries are plain descriptions like *Reorder chapter "Chapter 1"* with relative timestamps.
+- **Redo Stack** — actions you have undone and can redo.
+
+A **Clear History** button empties both lists. As in most editors, performing any *new* action clears the redo stack — you can't redo into a timeline that no longer exists.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Editor Layout" icon="layout-panel-left" href="/cms/editor/layout">
+    Where the header, sidebars, canvas, and timeline live.
+  </Card>
+  <Card title="Canvas" icon="frame" href="/cms/editor/canvas">
+    Page view vs. panel view, grid, rulers, and zoom.
+  </Card>
+  <Card title="Graph Editor" icon="workflow" href="/cms/editor/graph">
+    The branching-flow editor and its own shortcut set.
+  </Card>
+</Columns>

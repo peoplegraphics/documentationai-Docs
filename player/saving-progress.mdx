@@ -1,0 +1,132 @@
+---
+title: Saving Progress
+description: How the PanelWave Player persists state — variable scopes and lifetimes, localStorage keys, and how integrators implement resume.
+---
+
+Two kinds of state matter across a reading session: **story variables** (what happened in the narrative) and **reading position** (where the reader is). The player persists the first automatically; the second is a small integrator task built on the shell's inputs and outputs.
+
+## Variable scopes and lifetimes
+
+Variables live in the `VariableStoreService` in five scopes (see [Variables](/concepts/variables) for the concept):
+
+| Scope | Lifetime | Storage |
+|---|---|---|
+| `global` | Until the store is reset | In memory |
+| `chapter` | Per chapter id | In memory |
+| `page` | Per page id | In memory |
+| `session` | Current visit | In memory |
+| `persistent` | **Across visits** | `localStorage` |
+
+Only the `persistent` scope survives a reload. Every write to it is immediately serialized to `localStorage` under the key:
+
+```
+pw-variables-persistent
+```
+
+and loaded back when the store is created (i.e. on the next visit). If `localStorage` is unavailable (SSR, privacy mode), the store degrades gracefully to in-memory behavior.
+
+```typescript
+// Remember a story decision across visits
+player.setVariable('endingUnlocked', true, 'persistent');
+
+// Read it back on any later visit
+const unlocked = player.getVariable('endingUnlocked', 'persistent');
+```
+
+Variable definitions from the manifest (`variables` section) initialize defaults, enforce types/ranges on writes, and mark variables `readOnly` or `visibility: "public"` (public ones are editable by readers in the settings modal).
+
+<Callout kind="info">
+Resetting: `VariableStoreService.resetScope('persistent')` clears the stored values and removes the `localStorage` entry; `resetAll()` wipes every scope and re-applies manifest defaults.
+</Callout>
+
+## Reading position and resume
+
+The current build does **not** automatically save or restore the reading position — the shell exposes the building blocks and the host application (or the platform embedding the player, such as the CMS) owns the policy:
+
+- **Track position** with the `panelChange` output (fires on every navigation with `{ panel, chapter }`).
+- **Restore position** with the `initialChapterId` / `initialPanelId` inputs.
+
+A complete localStorage-based resume implementation:
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { PlayerShellComponent } from '@panelwave/player';
+import type { PanelWaveManifest, Panel, Chapter } from '@panelwave/player';
+
+interface SavedPosition {
+  chapterId: string;
+  panelId: string;
+  updatedAt: number;
+}
+
+@Component({
+  selector: 'app-reader',
+  standalone: true,
+  imports: [PlayerShellComponent],
+  template: `
+    @if (manifest) {
+      <pw-player-shell
+        [manifest]="manifest"
+        [initialChapterId]="resume?.chapterId"
+        [initialPanelId]="resume?.panelId"
+        (panelChange)="savePosition($event)">
+      </pw-player-shell>
+    }
+  `,
+})
+export class ReaderComponent implements OnInit {
+  private readonly workId = 'work-hello-panelwave';
+  manifest: PanelWaveManifest | null = null;
+  resume: SavedPosition | null = null;
+
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    const raw = localStorage.getItem(`progress:${this.workId}`);
+    this.resume = raw ? (JSON.parse(raw) as SavedPosition) : null;
+
+    this.http
+      .get<PanelWaveManifest>('assets/my-story/panelwave.json')
+      .subscribe((m) => (this.manifest = m));
+  }
+
+  savePosition(event: { panel: Panel; chapter: Chapter }): void {
+    // Panel ids are the keys of chapter.panels — resolve the id of the emitted panel.
+    const panelId = Object.entries(event.chapter.panels).find(
+      ([, p]) => p === event.panel
+    )?.[0];
+    if (!panelId) return;
+
+    const position: SavedPosition = {
+      chapterId: event.chapter.id,
+      panelId,
+      updatedAt: Date.now(),
+    };
+    localStorage.setItem(`progress:${this.workId}`, JSON.stringify(position));
+  }
+}
+```
+
+<Callout kind="tip">
+If a saved panel sits behind a paywall or was removed in a newer manifest version, `navigateToPanel` fails and the shell emits `error`. Validate the saved id against the loaded manifest (or catch the error and fall back to the chapter start) before resuming.
+</Callout>
+
+## Helper types for richer progress models
+
+The public API exports two types you can use as the shape of your own progress store — they are data contracts, not built-in persistence:
+
+- **`ReadingProgress`** — `workId`, `lastChapterId`, `lastPanelId`, `panelsViewed: string[]`, `percentComplete`, `lastUpdated`.
+- **`Bookmark`** — `workId`, `chapterId`, `panelId`, `timestamp`, optional `note`.
+
+Server-side progress (sync across devices, accounts) follows the same pattern: post the `panelChange` payload to your backend and feed the stored position back into the initial-position inputs.
+
+## What else touches localStorage
+
+The complete list of `localStorage` keys in the current library build:
+
+| Key | Written by | Content |
+|---|---|---|
+| `pw-variables-persistent` | `VariableStoreService` | JSON of all persistent-scope variables |
+
+Reader preferences (speech/audio/autoplay etc.) and tracking consent are currently held in memory per session; a richer state service with `pw-preferences` / `pw-tracking-consent` persistence exists in the codebase but is not yet active in the shell.

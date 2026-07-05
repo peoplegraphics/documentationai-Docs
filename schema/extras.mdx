@@ -1,0 +1,121 @@
+---
+title: Extras
+description: Reference for Extras, ExtraBlock, and ExtraCharacterSheet — covers, character sheets, bonus art, interviews, and gated bonus content.
+---
+
+The optional top-level `extras` section holds **bonus content** around the story itself: covers, character sheets, author information and interviews, bonus/fan art, and behind-the-scenes material. Extras can be opened from [hotspots](/schema/hotspots) via the `openExtras` action, listed in the player UI, and gated behind a [paywall](/schema/paywall).
+
+## `Extras`
+
+Defined as `$defs/Extras`. All properties are optional; single blocks vs. arrays as noted:
+
+| Property | Type | Description |
+|---|---|---|
+| `cover` | `ExtraBlock` | The work's cover presentation. |
+| `alt_cover` | `ExtraBlock` | An alternate cover. |
+| `character_sheets` | `ExtraCharacterSheet[]` | Character sheets, each linked to a character. |
+| `author_info` | `ExtraBlock` | About the author(s). |
+| `author_interviews` | `ExtraBlock[]` | Interview blocks. |
+| `bonus_art` | `ExtraBlock[]` | Bonus artwork. |
+| `fan_art` | `ExtraBlock[]` | Fan artwork. |
+| `behind_the_scenes` | `ExtraBlock[]` | Making-of material. |
+
+## `ExtraBlock`
+
+Defined as `$defs/ExtraBlock` — the generic bonus-content unit. All properties are optional.
+
+| Property | Type | Default | Description |
+|---|---|---|---|
+| `id` | `Identifier` | — | Block ID (referenced by `openExtras` hotspot actions). |
+| `title` | `LocalizedString` | — | Block title. |
+| `text` | `LocalizedString` | — | Body text. |
+| `images` | array | — | Image entries: `{ "assetId": Identifier, "caption": LocalizedString }`. |
+| `audio` | `AudioTrack[]` | — | Attached audio — see [Audio](/schema/audio). |
+| `video` | `VideoLayer[]` | — | Attached video — see [Video](/schema/video). |
+| `shareable` | boolean | `true` | Whether the block may be shared. |
+| `gated` | boolean | `false` | Whether the block sits behind a paywall/entitlement. |
+| `contentType` | enum | — | Primary media type: `image`, `video`, `audio`, `pdf`, `text`. |
+| `url` | string | — | Direct URL for the content (alternative to catalog assets). |
+| `thumbnail` | string | — | Thumbnail URL. |
+| `width` | integer ≥ 0 | — | Media width in pixels. |
+| `height` | integer ≥ 0 | — | Media height in pixels. |
+| `durationMs` | number ≥ 0 | — | Media duration in milliseconds. |
+| `mimeType` | string | — | MIME type of the content. |
+| `downloadable` | boolean | `false` | Whether readers may download the content. |
+| `requiredTier` | string | — | Subscription tier required to view (used with `gated`). |
+
+<Callout kind="info">
+`ExtraBlock` is intentionally an **open object** — the schema does not set `additionalProperties: false` here, so tools may attach additional fields. `ExtraCharacterSheet`, by contrast, is closed (`unevaluatedProperties: false`).
+</Callout>
+
+### Gating semantics
+
+Two fields cooperate with monetization:
+
+- `gated: true` marks the block as locked content; pair it with a `PaywallRule` of scope `extras` whose `refId` is the block's `id` (see [Paywall](/schema/paywall)).
+- `requiredTier` names the subscription tier that unlocks it.
+
+## `ExtraCharacterSheet`
+
+Defined as `$defs/ExtraCharacterSheet` — an `ExtraBlock` plus a required character link:
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| *(all `ExtraBlock` properties)* | — | — | Inherited via `allOf`. |
+| `characterId` | `Identifier` | Yes | The character from `meta.characters` this sheet belongs to. |
+
+Unlike the base block, no properties beyond `ExtraBlock` + `characterId` are allowed.
+
+## Example
+
+```json
+{
+  "extras": {
+    "cover": {
+      "id": "ex-cover",
+      "title": { "en-US": "Cover", "de-DE": "Umschlag" },
+      "images": [
+        {
+          "assetId": "img-cover",
+          "caption": { "en-US": "City Noir cover", "de-DE": "Stadt Noir Umschlag" }
+        }
+      ],
+      "shareable": true,
+      "gated": false
+    },
+    "character_sheets": [
+      {
+        "id": "ex-sheet-mira",
+        "characterId": "char-mira",
+        "title": { "en-US": "Mira — Character Sheet" },
+        "text": { "en-US": "Early concept notes and turnarounds for Mira." },
+        "images": [
+          { "assetId": "img-mira-turnaround", "caption": { "en-US": "Turnaround" } }
+        ],
+        "gated": true,
+        "requiredTier": "premium"
+      }
+    ],
+    "behind_the_scenes": [
+      {
+        "id": "ex-bts-inks",
+        "title": { "en-US": "Inking process" },
+        "contentType": "video",
+        "url": "https://cdn.example.com/extras/inking-timelapse.mp4",
+        "thumbnail": "https://cdn.example.com/extras/inking-thumb.jpg",
+        "mimeType": "video/mp4",
+        "durationMs": 120000,
+        "downloadable": false,
+        "gated": true
+      }
+    ]
+  }
+}
+```
+
+## Related pages
+
+- [Paywall](/schema/paywall) — gating extras with `scope: "extras"` rules
+- [Hotspots](/schema/hotspots) — the `openExtras` action
+- [Meta](/schema/meta) — characters referenced by `characterId`
+- [CMS Extras](/cms/extras) — authoring extras in the CMS

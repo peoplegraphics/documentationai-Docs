@@ -1,0 +1,143 @@
+---
+title: Panels
+description: The Panel object — layers, speech bubbles, hotspots, audio, video, format views, accessibility hints, variants, and performance hints.
+---
+
+A **Panel** is the atomic unit of a PanelWave story: one frame of the comic, composed of stacked [layers](/schema/layers), optionally decorated with [speech bubbles](/schema/speech-bubbles), [hotspots](/schema/hotspots), [audio](/schema/audio), [video](/schema/video), and [plugins](/player/plugins). Panels live in a chapter's `panels` map (panel ID → `Panel`) and are wired together by the chapter [graph](/schema/graph).
+
+All `Panel` properties are optional at the schema level — the panel's identity is its key in the `panels` map.
+
+## Properties (`Panel`)
+
+| Property | Type | Default | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | — | Optional explicit ID (the map key is the canonical ID) |
+| `title` | `LocalizedString` | — | Panel title (authoring/navigation aid) |
+| `description` | `LocalizedString` | — | Panel description |
+| `durationMs` | number ≥ 100 | — | Autoplay dwell time in ms; overrides the global `settings.ui.secondsPerPanel` for this panel |
+| `formatViews` | object (format → `PanelFormatView`) | — | Per-output-format view behavior — see below |
+| `layers` | [`Layer[]`](/schema/layers) | — | Visual/audio content stack |
+| `animations` | `PanelAnimations` | — | Viewport (Ken Burns-style) animation — see [Animations](/schema/animations) |
+| `speechBubbles` | `SpeechBubble[]` (unique) | — | Dialogue balloons — see [Speech Bubbles](/schema/speech-bubbles) |
+| `hotspots` | `Hotspot[]` (unique) | — | Interactive regions — see [Hotspots](/schema/hotspots) |
+| `audio` | `AudioTrack[]` | — | Panel-scoped audio — see [Audio](/schema/audio) |
+| `video` | `VideoLayer[]` | — | Panel-scoped video layers — see [Video](/schema/video) |
+| `plugins` | `PluginInstance[]` | — | Embedded plugin instances — see below |
+| `accessibility` | `AccessibilityHints` | — | Alt text and labels — see below |
+| `shareable` | boolean | `true` | Whether the panel may be shared (social/embed) |
+| `age_rating_override` | string | — | Overrides `meta.age_rating` for this panel |
+| `variants` | `PanelVariant[]` (unique) | — | Conditional overrides of panel content — see [Variants](/schema/variants) |
+| `preloadHints` | `Identifier[]` (unique) | — | Asset catalog IDs to prefetch when this panel becomes likely |
+| `memoryBudgetHint` | number ≥ 0 | — | Advisory memory budget for the panel's assets |
+| `contentWarnings` | `Identifier[]` (unique) | — | References into [`meta.content_warnings`](/schema/meta#contentwarning) |
+| `placement` | object | — | Free-form editor placement data (normalized x/y/w/h, rotation, grid rows/columns) written by the CMS; player positioning comes from [page layouts](/schema/chapters-and-pages) |
+
+## `PanelFormatView`
+
+`formatViews` maps an [`OutputFormat`](/schema/manifest-structure#outputformat) name to view constraints for that format:
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `minimalFocusRect` | [`NormalizedRect`](/schema/manifest-structure#normalizednumber-normalizedpoint-normalizedrect) | The region that must stay visible when the format crops the panel (e.g. mobile portrait showing a landscape panel) |
+| `allowPageView` | boolean | Whether this panel may appear in page view for this format |
+| `allowPanelView` | boolean | Whether this panel may appear in panel view for this format |
+
+Format-wide defaults come from [`settings.outputPresets`](/schema/settings#settingsoutputpresets-and-formatpreset); `formatViews` refines them per panel.
+
+## `AccessibilityHints`
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `alt` | `LocalizedString` | Alternative description of the whole panel for screen readers |
+| `labels` | object (key → `LocalizedString`) | Named labels for parts of the panel (e.g. ARIA labels for regions) |
+
+Asset-level accessibility (`alt`, `caption`, `transcript`) lives on [catalog items](/schema/assets); hotspots have their own `ariaLabel`.
+
+## `PluginInstance`
+
+Embeds custom interactive content (also used by `PluginLayer` — see [Layers](/schema/layers)):
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `pluginId` | `Identifier` | Yes | Which plugin to instantiate |
+| `instanceId` | `Identifier` | Yes | Unique instance ID within the work |
+| `payloadId` | `Identifier` | — | Reference to a `pluginPayload` [catalog asset](/schema/assets) |
+| `props` | `JsonValue` | — | Arbitrary configuration passed to the plugin |
+| `sandbox` | string | — | `iframe` \| `worker` — isolation mode |
+| `stateVariables` | `string[]` (unique) | — | Variables the plugin may access; each must match `^plugin\.` |
+
+## Example
+
+A choice panel combining most features (adapted from the bundled branching sample):
+
+```json
+{
+  "p1-3": {
+    "title": { "en-US": "Fork in the Alley", "de-DE": "Gabelung in der Gasse" },
+    "durationMs": 6000,
+    "formatViews": {
+      "mobile-portrait": {
+        "minimalFocusRect": { "x": 0.1, "y": 0.1, "w": 0.8, "h": 0.8 },
+        "allowPageView": false,
+        "allowPanelView": true
+      }
+    },
+    "layers": [
+      { "kind": "image", "id": "ly-p1-3-bg", "assetId": "img-p1-3", "z": 0 }
+    ],
+    "speechBubbles": [
+      {
+        "id": "sb-p1-3-1",
+        "characterId": "char-mira",
+        "text": { "en-US": "We must choose a path." },
+        "shape": { "x": 0.6, "y": 0.15, "w": 0.3, "h": 0.18 },
+        "visibleIf": { "var": "prefs.speech" }
+      }
+    ],
+    "hotspots": [
+      {
+        "id": "hs-left",
+        "shape": { "type": "rect", "x": 0.05, "y": 0.4, "w": 0.4, "h": 0.4 },
+        "label": { "en-US": "Go left" },
+        "action": {
+          "type": "goTo",
+          "to": "p1-4",
+          "mutations": [ { "op": "set", "var": "path.choice", "value": "left" } ]
+        }
+      }
+    ],
+    "audio": [
+      { "assetId": "sfx-rain", "role": "ambient", "loop": true, "gain": 0.3 }
+    ],
+    "accessibility": {
+      "alt": { "en-US": "A rain-soaked alley splits left and right." }
+    },
+    "preloadHints": ["img-p1-4", "img-overlay-left", "img-overlay-right"],
+    "contentWarnings": [],
+    "shareable": true
+  }
+}
+```
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Layers" icon="layers" href="/schema/layers">
+    The six layer kinds and their positioning model.
+  </Card>
+  <Card title="Speech Bubbles" icon="message-circle" href="/schema/speech-bubbles">
+    Balloon types, tails, and the styling cascade.
+  </Card>
+  <Card title="Hotspots" icon="mouse-pointer-click" href="/schema/hotspots">
+    Shapes and the five action types.
+  </Card>
+  <Card title="Animations" icon="play-circle" href="/schema/animations">
+    Viewport animations (`PanelAnimations`).
+  </Card>
+  <Card title="Variants" icon="git-fork" href="/schema/variants">
+    Conditional panel overrides (`PanelVariant`).
+  </Card>
+  <Card title="Audio & Video" icon="volume-2" href="/schema/audio">
+    Panel audio tracks and video layers.
+  </Card>
+</Columns>

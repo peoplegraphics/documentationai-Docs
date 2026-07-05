@@ -1,0 +1,125 @@
+---
+title: Audio
+description: Reference for AudioTrack, SequenceAudioTrack, and AudioLayer — background music, ambience, SFX, voice-over, mixing gains, and chapter-spanning tracks.
+---
+
+The format models audio at three levels:
+
+1. **`AudioTrack`** — per-panel audio (`panels.<id>.audio[]`): music, ambience, SFX, or voice-over that plays while the panel is current.
+2. **`SequenceAudioTrack`** — chapter-level audio (`chapters[].sequenceAudioTracks[]`): tracks that span multiple panels on a timeline, with fades and playback rate.
+3. **`AudioLayer`** — audio as a panel *layer* (`kind: "audio"` inside `panels.<id>.layers[]`), which additionally supports the layer-level `visibleIf` and other [layer common properties](/schema/layers).
+
+All three reference audio assets from the [asset catalog](/schema/assets) by `assetId`. Audio assets (`category: "audio"`) carry one or more `AudioVariant`s (`src`, `mime` matching `audio/*`, optional `bitrateKbps`, `channels`, `sampleRateHz`, `loop`, `locale`).
+
+## `AudioTrack`
+
+Defined as `$defs/AudioTrack`, used in `panels.<panelId>.audio[]` and in [extras blocks](/schema/extras).
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `assetId` | `Identifier` | Yes | — | Audio asset from the catalog. |
+| `role` | enum | No | `"none"` | `ambient`, `music`, `voiceover`, `sfx`, `ui`, `none`. Lets the player group tracks under the reader's audio/SFX/speech toggles. |
+| `loop` | boolean | No | `false` | Repeat while the panel is active. |
+| `gain` | number (0–2) | No | `1` | Mixing gain (0 = silent, 1 = normal, 2 = double). |
+| `startAtMs` | integer ≥ 0 | No | — | Offset into the audio file at which playback starts. |
+| `visibleIf` | `JsonLogic` | No | — | Condition; the track only plays when the expression is truthy (see [Variables](/schema/variables)). |
+
+```json
+{
+  "panels": {
+    "p1": {
+      "audio": [
+        { "assetId": "sfx-rain", "role": "ambient", "loop": true, "gain": 0.3 },
+        { "assetId": "vo-p1-line", "role": "voiceover", "startAtMs": 0,
+          "visibleIf": { "var": "prefs.speech" } }
+      ]
+    }
+  }
+}
+```
+
+## `SequenceAudioTrack`
+
+Defined as `$defs/SequenceAudioTrack`: "Audio track that spans multiple panels within a chapter". Placed in `chapters[].sequenceAudioTracks[]`, these describe a timeline relative to the chapter/sequence start — the natural home of background music that should not restart on every panel.
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `id` | `Identifier` | Yes | — | Unique track ID. |
+| `friendlyId` | `Identifier` | Yes | — | Human-readable identifier. |
+| `name` | string (≤ 500) | No | — | Display name for the track. |
+| `assetId` | `Identifier` | Yes | — | Audio asset from the catalog. |
+| `role` | enum | Yes | — | `ambient`, `music`, `voiceover`, `sfx` (note: no `ui`/`none` here). |
+| `format` | enum | No | — | Optional output-format filter: `tablet-portrait`, `mobile-portrait`, `bigscreen-landscape`. Omit to apply to all formats. |
+| `startTime` | integer ≥ 0 | Yes | — | Start time in milliseconds relative to chapter/sequence start. |
+| `duration` | integer ≥ 0 | Yes | — | Duration in milliseconds. |
+| `volume` | number (0–2) | No | `1` | Volume/gain level (0.0 = silent, 1.0 = normal, 2.0 = double). |
+| `loop` | boolean | No | `false` | Whether the track loops. |
+| `fadeIn` | integer ≥ 0 | No | `0` | Fade-in duration in milliseconds. |
+| `fadeOut` | integer ≥ 0 | No | `0` | Fade-out duration in milliseconds. |
+| `playbackRate` | number (0.25–4) | No | `1` | Playback speed multiplier. |
+| `muted` | boolean | No | `false` | Whether the track is muted. |
+| `startPanelId` | `Identifier` | No | — | Optional explicit panel range start. |
+| `endPanelId` | `Identifier` | No | — | Optional explicit panel range end. |
+
+```json
+{
+  "chapters": [
+    {
+      "id": "ch-1",
+      "sequenceAudioTracks": [
+        {
+          "id": "seq-music-main",
+          "friendlyId": "main-theme",
+          "name": "Main Theme",
+          "assetId": "music-theme",
+          "role": "music",
+          "startTime": 0,
+          "duration": 90000,
+          "volume": 0.8,
+          "loop": true,
+          "fadeIn": 2000,
+          "fadeOut": 3000,
+          "startPanelId": "p1",
+          "endPanelId": "p12"
+        }
+      ],
+      "panels": { "p1": { "layers": [] } },
+      "graph": { "entry": "p1", "edges": [{ "from": "p1", "to": "p1" }] }
+    }
+  ]
+}
+```
+
+## `AudioLayer`
+
+An audio track expressed as a panel layer (`$defs/AudioLayer`). It extends the shared layer base (`LayerCommon` — `id`, `z`, `opacity`, `visibleIf`, etc.; see [Layers](/schema/layers)) with:
+
+| Property | Type | Required | Default | Description |
+|---|---|---|---|---|
+| `kind` | `"audio"` | Yes | — | Layer discriminator. |
+| `assetId` | `Identifier` | Yes | — | Audio asset from the catalog. |
+| `loop` | boolean | No | `false` | Repeat playback. |
+| `gain` | number (0–2) | No | `1` | Mixing gain. |
+| `startAtMs` | integer ≥ 0 | No | — | Playback start offset. |
+
+### AudioTrack vs. AudioLayer
+
+Both attach panel-scoped audio; the practical differences:
+
+- `AudioTrack` (in `panels.<id>.audio[]`) has a `role`, which ties it to the reader's audio/SFX/speech toggles and the `settings.ui` defaults (`audioDefault`, `sfxDefault`, `speechDefault` — see [Settings](/schema/settings)).
+- `AudioLayer` participates in the layer list (ordering alongside visual layers, `visibleIf`, layer editor state) but has no `role`.
+
+For most authoring, prefer `AudioTrack` for panel sound and `SequenceAudioTrack` for chapter-spanning music.
+
+## Mixing model
+
+- **Gain/volume** is a linear multiplier from 0 to 2 on every audio object (`gain` on tracks/layers, `volume` on sequence tracks); 1 is the asset's natural level.
+- **Roles** partition the mix into reader-controllable groups: `music`/`ambient` fall under the audio toggle, `sfx` under the SFX toggle, `voiceover` under the speech toggle, `ui` for interface sounds.
+- **Fades** (`fadeIn`/`fadeOut`) and `playbackRate` exist only on `SequenceAudioTrack`.
+- **Per-bubble voice-over**: a [speech bubble](/schema/speech-bubbles) can reference audio directly via `audioAssetId`.
+
+## Related pages
+
+- [Assets](/schema/assets) — audio catalog items and variants
+- [Settings](/schema/settings) — `audioDefault`, `sfxDefault`, `speechDefault`
+- [Player audio behavior](/player/audio) — how the player schedules and mixes these tracks

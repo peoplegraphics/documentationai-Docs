@@ -1,0 +1,161 @@
+---
+title: Tracking
+description: Analytics in the PanelWave Player — consent-aware TrackingService, event whitelisting, batching, the endpoint payload, and player events.
+---
+
+The player's **`TrackingService`** is a privacy-conscious analytics pipeline: nothing is recorded without consent (when required), events can be whitelisted by the work's manifest, and delivery is batched to a configurable endpoint. Integrators can also bypass it entirely and forward the shell's Angular outputs to their own analytics.
+
+## How the manifest configures tracking
+
+When a manifest with a `tracking` section loads, the shell configures the service automatically:
+
+```json
+{
+  "tracking": {
+    "enabled": true,
+    "consent": { "required": true, "defaultOptIn": false },
+    "eventWhitelist": ["panelChange", "decision", "videoPlay", "videoEnded"],
+    "endpoint": "https://analytics.example.com/pw/events"
+  }
+}
+```
+
+Mapping (verified in the shell's `configureTracking`):
+
+| Manifest field | Effect |
+|---|---|
+| `consent.required` | Sets `consentRequired` (defaults to `true` when absent) |
+| `consent.defaultOptIn` | If `true`, consent is granted immediately (until an explicit consent UI overrides it) |
+| `eventWhitelist` | Only listed event types are recorded; all others are dropped |
+| `endpoint` | Where batches are POSTed; without it, events stay in the local queue/observable only |
+
+See [Tracking (schema)](/schema/tracking) for the format definition.
+
+## Consent
+
+```typescript
+import { inject } from '@angular/core';
+import { TrackingService } from '@panelwave/player';
+
+const tracking = inject(TrackingService);
+
+// Wire this to your cookie/consent banner:
+tracking.setConsent(true);
+tracking.getConsent(); // → boolean
+```
+
+While `consentRequired` is `true` and consent has not been given, `track()` is a no-op. Revoking consent (`setConsent(false)`) also clears any queued, unsent events.
+
+## Recording events
+
+```typescript
+tracking.track('decision', {
+  panelId: 'p-12',
+  choiceId: 'hs-door-left',
+});
+```
+
+`track(type, data?)` applies, in order: consent check → whitelist check → debouncing for high-frequency types (`scroll`, `mousemove`, `resize`, `progress`; 300 ms default) → queue.
+
+Each recorded event has this shape (`TrackingEvent`):
+
+```typescript
+interface TrackingEvent {
+  type: string;
+  timestamp: number;              // Date.now()
+  data?: Record<string, any>;
+  sessionId?: string;             // anonymized, random per session
+}
+```
+
+The session id is a `crypto.randomUUID()` generated when the service is created — it identifies a session, not a user.
+
+## Batching and delivery
+
+Events are sent when the queue reaches **10 events** (`batchSize`) or every **5 seconds** (`batchInterval`), whichever comes first. Delivery is a JSON POST:
+
+```json
+{
+  "sessionId": "6f0d…",
+  "events": [
+    { "type": "panelChange", "timestamp": 1751712000000, "data": { "panelId": "p-2" }, "sessionId": "6f0d…" }
+  ],
+  "timestamp": 1751712001234
+}
+```
+
+A non-2xx response is logged; failed batches are **not re-queued** (deliberately, to avoid memory buildup). Useful controls:
+
+| Method | Purpose |
+|---|---|
+| `configure(partialConfig)` | Override `endpoint`, `consentRequired`, `eventWhitelist`, `batchSize`, `batchInterval`, `debounceMs` |
+| `flush()` | Send the current queue immediately (e.g. on `beforeunload`) |
+| `clear()` | Drop queued events and pending debounce timers |
+| `getSessionId()` / `getQueueSize()` | Introspection |
+
+## Events the player emits
+
+The `PlayerEvent` enum defines the event vocabulary used by the player internals:
+
+| Event | Value | Meaning |
+|---|---|---|
+| `READY` | `ready` | Player initialized |
+| `PANEL_CHANGE` | `panelChange` | Navigation to a panel |
+| `DECISION` | `decision` | A branch choice was made |
+| `PAYWALL_SHOWN` | `paywallShown` | A gate was displayed |
+| `ERROR` | `error` | An error occurred |
+| `STATE_CHANGE` / `PREFERENCE_CHANGE` / `LOCALE_CHANGE` | `stateChange` / `preferenceChange` / `localeChange` | State, preference, locale updates |
+| `VIDEO_PLAY` | `videoPlay` | A video layer started |
+| `VIDEO_PAUSE` | `videoPause` | A video layer paused |
+| `VIDEO_ENDED` | `videoEnded` | A video finished — or was force-skipped after stalling |
+| `VIDEO_LOOP` | `videoLoop` | A loop/pingpong cycle completed |
+
+Video events carry a `VideoTrackingPayload`:
+
+```typescript
+interface VideoTrackingPayload {
+  panelId?: string;
+  assetId?: string;
+  trigger: 'view' | 'hover' | 'click' | 'sequencer';
+  reason?: 'ended' | 'stall-skip';   // qualifies VIDEO_ENDED
+}
+```
+
+`reason: 'stall-skip'` marks videos the autoplay watchdog or the page-view sequencer skipped because the source never finished — valuable for spotting broken encodes in the wild.
+
+<Callout kind="info">
+In the current build the **video events** are what the shell feeds through the tracking pipeline automatically (they respect consent and the whitelist). Navigation/decision events are available to you via the shell's outputs — forward them yourself as shown below.
+</Callout>
+
+## Forwarding player activity yourself
+
+If you already have an analytics stack, subscribe to the shell's outputs and forward what you need — no `TrackingService` required:
+
+```typescript
+import { Component } from '@angular/core';
+import { PlayerShellComponent } from '@panelwave/player';
+import type { Panel, Chapter } from '@panelwave/player';
+
+@Component({
+  selector: 'app-reader',
+  standalone: true,
+  imports: [PlayerShellComponent],
+  template: `
+    <pw-player-shell
+      [manifest]="manifest"
+      (ready)="analytics.event('pw_ready')"
+      (panelChange)="onPanel($event)"
+      (navigationAttempt)="analytics.event('pw_nav', $event)"
+      (localeChange)="analytics.event('pw_locale', { locale: $event })"
+      (error)="analytics.event('pw_error', { message: $event.message })">
+    </pw-player-shell>
+  `,
+})
+export class ReaderComponent {
+  onPanel(e: { panel: Panel; chapter: Chapter }): void {
+    this.analytics.event('pw_panel_view', { chapterId: e.chapter.id });
+  }
+}
+```
+
+Creators publishing through the PanelWave platform get aggregated dashboards in the CMS — see [Analytics (CMS)](/cms/analytics).

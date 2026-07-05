@@ -1,0 +1,123 @@
+---
+title: Chapters & Pages
+description: Chapter, Page, and PageLayout — how PanelWave organizes panels into chapters, optional print-style page layouts, and panel placements.
+---
+
+`chapters` is a required top-level array (min 1). Each **Chapter** owns a set of panels, the [flow graph](/schema/graph) that connects them, and — optionally — **Pages** that arrange those panels spatially for page-view formats (print, big-screen spreads).
+
+Panels always live in the chapter's `panels` map; pages only *place* them. A chapter without `pages` is still fully readable panel-by-panel via the graph.
+
+## `Chapter`
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | Yes | Chapter ID (referenced by [paywall rules](/schema/paywall) with `scope: "chapter"`) |
+| `panels` | object (ID → [`Panel`](/schema/panels)), min 1 entry | Yes | All panels of the chapter, keyed by panel ID (keys are validated as `Identifier`s) |
+| `graph` | [`Graph`](/schema/graph) | Yes | Entry panel and directed edges defining reading flow |
+| `title` | `LocalizedString` | — | Chapter title |
+| `pages` | `Page[]` (unique) | — | Page layouts for page-view formats |
+| `sequenceAudioTracks` | `SequenceAudioTrack[]` (unique) | — | Audio tracks spanning multiple panels within the chapter — see [Audio](/schema/audio) |
+
+## `Page`
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | `Identifier` | Yes | Page ID |
+| `layout` | `PageLayout` | Yes | Format and panel placements — see below |
+| `title` | `LocalizedString` | — | Page title |
+| `readingOrder` | `Identifier[]` (unique) | — | Panel IDs in reading order on this page |
+| `visual` | object | — | Page appearance — see below |
+| `transitions` | object | — | `in` / `out`, each a [`Transition`](/schema/manifest-structure#transition) applied when entering/leaving the page |
+
+### `Page.visual`
+
+| Property | Type | Constraints | Description |
+|----------|------|-------------|-------------|
+| `background_color` | `ColorHex` | hex color | Page background color |
+| `background_image` | `Identifier` \| `Uri` | — | Background image (asset catalog ID or URI) |
+| `background_texture` | `Identifier` \| `Uri` | — | Background texture (asset catalog ID or URI) |
+| `margins` | object | `top`/`right`/`bottom`/`left`: integer 0–100, default 0 | Page margins in pixels |
+
+## `PageLayout`
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `format` | [`OutputFormat`](/schema/manifest-structure#outputformat) | Yes | Which output format this layout targets (e.g. `bigscreen-landscape`, `a4-portrait`) |
+| `placements` | `Placement[]` (min 1) | Yes | Where each panel sits on the page — see below |
+| `canvasSize` | object | — | `width`/`height` (integers ≥ 100). Reference canvas for the **CMS editor UI only** — not used for player rendering |
+| `gridHelper` | object | — | CMS editor grid: `cols` (1–100, default 12), `rows` (1–100, default 8), `visible` (default `true`), `snapEnabled` (default `true`), `snapDistance` (0.001–0.1, default 0.01, normalized units) |
+
+### Placements
+
+Each entry in `placements` positions one panel using normalized page coordinates:
+
+| Property | Type | Required | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `panelId` | `Identifier` | Yes | — | Key into the chapter's `panels` map |
+| `x` | number | Yes | 0–1 | Left edge (0 = page left, 1 = page right) |
+| `y` | number | Yes | 0–1 | Top edge (0 = page top, 1 = page bottom) |
+| `w` | number | Yes | 0.001–2.0 | Width as a fraction of page width (> 1 allows bleed/overflow) |
+| `h` | number | Yes | 0.001–2.0 | Height as a fraction of page height (> 1 allows overflow) |
+| `z` | integer | — | 0–9999, default 0 | Stacking order for overlapping panels (higher = on top) |
+| `r` | number | — | −180–180, default 0 | Rotation in degrees, clockwise |
+| `origin` | object | — | `x`/`y`: 0–1, default 0.5 | Transform origin for rotation (0.5/0.5 = center) |
+| `vx`, `vy` | number | — | 0–1 | Visible-area position **relative to the panel** — crop window origin. If omitted, the full panel is visible |
+| `vw`, `vh` | number | — | 0.001–1 | Visible-area size relative to the panel |
+
+The `vx`/`vy`/`vw`/`vh` quartet lets a page show only a crop of a panel (e.g. a page spread showing the top half, while panel view shows everything).
+
+## Example
+
+Adapted from the bundled minimal sample — one page with three side-by-side panels:
+
+```json
+{
+  "chapters": [
+    {
+      "id": "ch-1",
+      "title": { "en-US": "Chapter One" },
+      "pages": [
+        {
+          "id": "pg-1",
+          "title": { "en-US": "Page 1" },
+          "layout": {
+            "format": "bigscreen-landscape",
+            "canvasSize": { "width": 3840, "height": 2160 },
+            "gridHelper": { "cols": 12, "rows": 8, "visible": true, "snapEnabled": true, "snapDistance": 0.01 },
+            "placements": [
+              { "panelId": "p1", "x": 0.0,    "y": 0.0, "w": 0.3333, "h": 1.0, "z": 0, "r": 0 },
+              { "panelId": "p2", "x": 0.3333, "y": 0.0, "w": 0.3333, "h": 1.0, "z": 0, "r": 0 },
+              { "panelId": "p3", "x": 0.6667, "y": 0.0, "w": 0.3333, "h": 1.0, "z": 0, "r": 0 }
+            ]
+          },
+          "readingOrder": ["p1", "p2", "p3"],
+          "visual": { "background_color": "#111111" },
+          "transitions": {
+            "in": { "type": "fade", "durationMs": 300 }
+          }
+        }
+      ],
+      "panels": {
+        "p1": { "layers": [ { "kind": "image", "id": "ly-p1", "assetId": "img-p1", "z": 0 } ] },
+        "p2": { "layers": [ { "kind": "image", "id": "ly-p2", "assetId": "img-p2", "z": 0 } ] },
+        "p3": { "layers": [ { "kind": "image", "id": "ly-p3", "assetId": "img-p3", "z": 0 } ] }
+      },
+      "graph": {
+        "entry": "p1",
+        "edges": [
+          { "from": "p1", "to": "p2" },
+          { "from": "p2", "to": "p3" }
+        ]
+      }
+    }
+  ]
+}
+```
+
+## Page view vs. panel view
+
+Whether readers see whole pages or single panels depends on the output format's [`FormatPreset`](/schema/settings#settingsoutputpresets-and-formatpreset) (`pageView` / `panelView`) and per-panel `formatViews` overrides ([Panels](/schema/panels)). A typical setup enables page view for `bigscreen-landscape` and print formats while mobile stays panel-by-panel using each panel's `minimalFocusRect`.
+
+<Callout kind="alert">
+Schema validation does not verify that `placements[].panelId` and `readingOrder[]` reference existing panel keys, or that `graph.entry` exists — check references in your pipeline. See [Validation](/schema/validation).
+</Callout>

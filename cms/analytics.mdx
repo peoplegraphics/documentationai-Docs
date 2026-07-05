@@ -1,0 +1,76 @@
+---
+title: Analytics
+description: Read the PanelWave analytics dashboard — reads, completion, reading time, device and locale breakdowns, comparisons, and CSV export.
+---
+
+The **Analytics Dashboard** shows how readers engage with a published work: how often it is read, how far readers get, and how long they stay. Open a work's backstage and choose **Analytics** in the navigation (it is also available from the work card's **More actions** menu in the works list).
+
+<Callout kind="info">
+  Metrics are aggregated **nightly** from player reading events. A work only starts collecting data once a **published** version is being read — a brand-new or unpublished work shows *"No reader data yet"*.
+</Callout>
+
+## Choosing what you look at
+
+The header reads **"Reader metrics for this work — last 30 days"** (or whichever range is active). Controls at the top let you slice the data:
+
+- **Time range** — preset buttons for **7 days**, **30 days** (default), or **90 days**, plus **Custom** with start/end date pickers.
+- **Compare with previous period** — a checkbox that fetches the preceding window of equal length and adds change badges (e.g. **+25%** / **−12%**) to every metric; metrics that had no data before show a **new** badge.
+- **Device** — filter to a single device type, or **All devices**.
+- **Locale** — filter to a single reading language, or **All locales**.
+
+Two buttons complete the header: **Refresh** and **Export CSV**.
+
+## The four key metrics
+
+Each metric is a tile with the headline number, a small trend sparkline for the selected range, and a supporting figure:
+
+| Tile | What it means |
+|---|---|
+| **Total reads** | Number of reading sessions in the range; the sub-line shows how many were from **signed-in readers** |
+| **Avg completion** | Average share of the work a session got through (e.g. 83%); the sub-line shows average **panels per session** |
+| **Total reading time** | Combined time readers spent in the work (e.g. "2h 5m") across the active days in the range |
+| **Avg session** | Average length of a single reading session |
+
+### Per-day detail
+
+Click any tile to open the **"Per-day detail"** table for the current range and filters, with columns **Date**, **Reads**, **Signed-in**, **Completion**, **Reading time**, **Avg session**, and **Panels/session** — the column for the metric you clicked is highlighted. Click **Close** to collapse it. If the selected slice has no data the table says *"No sessions in this range."*
+
+## Audience breakdowns
+
+Below the tiles, two panels show where your sessions come from:
+
+- **Devices** — sessions per device type, as horizontal bars with counts.
+- **Locales** — sessions per reading language.
+
+Geographic (country-level) data is not collected — device and locale are the two audience dimensions available.
+
+## Exporting the data
+
+**Export CSV** downloads the per-day detail for the current range and filters as a CSV file (one row per day, plus a totals row) — handy for your own spreadsheets or sharing with collaborators.
+
+## Interpreting the numbers
+
+- **A read = a session.** One reader returning three times counts as three reads; **signed-in readers** is the closest thing to unique people.
+- **Completion** tells you whether readers finish. A high read count with low completion usually means readers drop off — check pacing, chapter length, or where your [paywall preview boundary](/cms/monetization) sits.
+- **Panels per session** vs. your total panel count gives a rough sense of how deep a typical session goes.
+- **Compare with previous period** is the quickest way to judge whether a new chapter, a promotion, or a price change moved the needle — look for the green/red change badges.
+- Filtering by **device** can reveal layout problems: if phone sessions complete far less than desktop sessions, [preview](/cms/preview) the work in the phone frame and check panel legibility.
+- Filtering by **locale** shows whether a [translation](/cms/localization) is pulling its weight.
+
+<Callout kind="tip">
+  Because aggregation runs nightly, don't expect today's reads to appear immediately — check back the next day when judging a release or announcement.
+</Callout>
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Publishing" icon="rocket" href="/cms/publishing">
+    Analytics starts once a version is published.
+  </Card>
+  <Card title="Monetization" icon="lock" href="/cms/monetization">
+    Use drop-off data to place your paywall well.
+  </Card>
+  <Card title="Localization" icon="languages" href="/cms/localization">
+    Add languages your audience actually reads.
+  </Card>
+</Columns>

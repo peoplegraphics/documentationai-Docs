@@ -1,58 +1,193 @@
 ---
 title: Quickstart
-description: Minimal steps to customize this sample starter kit.
+description: Three fast paths into PanelWave — validate a manifest with the CLI, embed the player in an Angular app, or create your first work in the CMS.
 ---
-## Overview
 
-<Callout kind="alert" collapsed="false">
-  This site ships with placeholder content. Use this quickstart to replace it with your real product docs.
-</Callout>
+Pick the path that matches what you want to do. Each one takes a few minutes and links into the deeper documentation for that layer.
 
-## 1. Update a page
+<Tabs>
+  <Tab title="Validate a manifest" icon="badge-check">
 
-<Steps>
-  <Step title="Edit introduction" icon="edit" title-type="p">
-    Replace the sample introduction with a concise overview of your product and the key actions you want new users to take first.
-  </Step>
+    Use `@panelwave/cli` to check a manifest against the official schema. This is the fastest way to get hands-on with the format.
 
-  <Step title="Preview your change" icon="monitor" title-type="p">
-    Use your dashboard board editor to confirm the updated introduction looks and reads as expected.
-  </Step>
-</Steps>
+    <Steps>
+      <Step title="Install the CLI">
+        The CLI is not on npm yet — build and link it from the `panelwave-packages` repository:
 
-## 2. Add a new page
+        ```bash
+        npm install
+        npm run build:cli
+        cd packages/cli
+        npm link
+        ```
+        Details: [CLI reference](/schema/cli).
+      </Step>
+      <Step title="Create a minimal manifest">
+        Save this as `panelwave.json`. It is the smallest useful work: two panels connected by one edge.
 
-<Steps>
-  <Step title="Add a page" icon="file-text" title-type="p">
-    Create a new `page` by clicking on the + button from the left navigation bar of dashboard. If you are using git, create the .mdx file and add to navigation bar using documentation.json
-  </Step>
-</Steps>
+        ```json
+        {
+          "panelwave": {
+            "version": "1.0.0",
+            "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json"
+          },
+          "meta": {
+            "id": "my-first-work",
+            "title": { "en-US": "My First Work" },
+            "locales": ["en-US"],
+            "default_locale": "en-US"
+          },
+          "assets": {
+            "catalog": [
+              {
+                "id": "img-p1",
+                "category": "image",
+                "variants": [
+                  { "src": "https://picsum.photos/id/101/1280/720", "w": 1280, "h": 720, "mime": "image/jpeg" }
+                ]
+              },
+              {
+                "id": "img-p2",
+                "category": "image",
+                "variants": [
+                  { "src": "https://picsum.photos/id/102/1280/720", "w": 1280, "h": 720, "mime": "image/jpeg" }
+                ]
+              }
+            ]
+          },
+          "chapters": [
+            {
+              "id": "ch-1",
+              "panels": {
+                "p1": { "layers": [{ "kind": "image", "id": "ly-1", "assetId": "img-p1", "z": 0 }] },
+                "p2": { "layers": [{ "kind": "image", "id": "ly-2", "assetId": "img-p2", "z": 0 }] }
+              },
+              "graph": {
+                "entry": "p1",
+                "edges": [{ "from": "p1", "to": "p2", "transition": { "type": "fade", "durationMs": 300 } }]
+              }
+            }
+          ]
+        }
+        ```
+      </Step>
+      <Step title="Validate it">
+        ```bash
+        panelwave validate ./panelwave.json
+        ```
+        Add `--strict` to fail on warnings, or `--json` for machine-readable output. See [CLI reference](/schema/cli).
+      </Step>
+      <Step title="Break it on purpose">
+        Delete the `meta.default_locale` line and validate again to see how errors are reported. The [validation page](/schema/validation) explains error output and common mistakes.
+      </Step>
+      <Step title="Explore the format">
+        Read the [manifest structure reference](/schema/manifest-structure), then drill into [chapters and pages](/schema/chapters-and-pages), the [graph](/schema/graph), and [panels](/schema/panels).
+      </Step>
+    </Steps>
 
-## Example onboarding flow (replace with yours)
+  </Tab>
+  <Tab title="Embed the player" icon="play-circle">
 
-1. Sign up for an account and verify your email.
+    Render a manifest in your own Angular application with `@panelwave/player`.
 
-2. Create your first workspace, project, or environment.
+    <Steps>
+      <Step title="Install the library">
+        The player targets Angular 20+. It is not published to npm yet — build it from the player repository and consume the built package (see [Installation](/player/installation) for the exact steps and required providers).
 
-3. Add one integration or data source to connect your existing tools.
+        ```bash
+        ng build player --configuration production
+        ```
+      </Step>
+      <Step title="Add a manifest to your app">
+        Place a `panelwave.json` (for example the one from the CLI tab, or a sample) under `src/assets/my-story/`.
+      </Step>
+      <Step title="Drop in the player component">
+        The embeddable component is `PlayerShellComponent` (selector `pw-player-shell`). It takes the manifest as an **object** — fetch the JSON yourself and bind it:
 
-4. Complete a guided action (for example, run your first job or publish your first resource).
+        ```typescript
+        import { Component, inject } from '@angular/core';
+        import { HttpClient } from '@angular/common/http';
+        import { PlayerShellComponent, PanelWaveManifest } from '@panelwave/player';
 
-5. Invite a teammate and assign a basic role or permission.
+        @Component({
+          selector: 'app-root',
+          standalone: true,
+          imports: [PlayerShellComponent],
+          template: `
+            @if (manifest) {
+              <pw-player-shell [manifest]="manifest"></pw-player-shell>
+            }
+          `
+        })
+        export class AppComponent {
+          manifest?: PanelWaveManifest;
 
-## 3. Connect API Reference (optional)
+          constructor() {
+            inject(HttpClient)
+              .get<PanelWaveManifest>('assets/my-story/panelwave.json')
+              .subscribe((m) => (this.manifest = m));
+          }
+        }
+        ```
 
-If you have an API, replace `openapi.yaml` with your real OpenAPI file. If you do not need an API reference, remove that tab either from dashboard or  `documentation.json`.
+        <Callout kind="info">
+          A `manifestUrl` input exists on the shell but URL loading is not implemented yet — always bind the parsed object via `[manifest]`.
+        </Callout>
+      </Step>
+      <Step title="Configure the player">
+        Behavior is controlled through individual inputs on `pw-player-shell`:
+
+        ```html
+        <pw-player-shell
+          [manifest]="manifest"
+          locale="en-US"
+          [autoplay]="false"
+          [showToolbar]="true">
+        </pw-player-shell>
+        ```
+        All inputs and defaults: [Configuration](/player/configuration).
+      </Step>
+      <Step title="Go deeper">
+        Wire up events and inputs on [Inputs &amp; outputs](/player/inputs-outputs), save reader progress with [Saving progress](/player/saving-progress), and follow the full [embedding guide](/player/quickstart-embed).
+      </Step>
+    </Steps>
+
+  </Tab>
+  <Tab title="Create a work in the CMS" icon="pen-tool">
+
+    Author your first interactive graphic novel visually — no JSON editing required.
+
+    <Steps>
+      <Step title="Sign in and create a work">
+        From the dashboard, choose **New Work**. The **Create New Work** wizard walks you through three steps: **Basic Info** (title and URL), **Languages** (supported languages), and **Details** (age rating and tags). See [Works](/cms/works).
+      </Step>
+      <Step title="Upload your artwork">
+        Add your panel art in the [asset library](/cms/assets). The CMS generates the resolution and format variants the player needs.
+      </Step>
+      <Step title="Build pages and panels">
+        In the editor, lay out pages and panels on the canvas and stack layers per panel. Start with [the editor layout](/cms/editor/layout), then [pages &amp; panels](/cms/editor/pages-panels) and [layers](/cms/editor/layers).
+      </Step>
+      <Step title="Add dialogue and interactivity">
+        Place [speech bubbles](/cms/editor/speech-bubbles) and [hotspots](/cms/editor/hotspots), and shape the reading flow — including branches — in the [graph view](/cms/editor/graph).
+      </Step>
+      <Step title="Preview and publish">
+        Use [Preview](/cms/preview) to read your work exactly as readers will (the CMS embeds the real player), then follow [Publishing](/cms/publishing) to go live.
+      </Step>
+    </Steps>
+
+  </Tab>
+</Tabs>
 
 ## Next steps
 
-<Columns cols="2">
-  <Card title="Core Concepts" href="/concepts" icon="layers" horizontal="false">
-    Keep the mental model simple and easy to scan.
+<Columns cols={3}>
+  <Card title="Core concepts" icon="lightbulb" href="/concepts/architecture">
+    How the schema, player, and CMS fit together.
   </Card>
-
-  <Card title="Authentication" href="/authentication" icon="lock" horizontal="false">
-    Add your real auth flows and security notes.
+  <Card title="Graph navigation" icon="git-branch" href="/concepts/graph-navigation">
+    Entries, edges, conditions, and branching.
+  </Card>
+  <Card title="Sample manifests" icon="file-json" href="/schema/examples">
+    Complete example works, from minimal to branching and video.
   </Card>
 </Columns>
-

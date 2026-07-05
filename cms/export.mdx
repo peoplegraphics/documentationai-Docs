@@ -1,0 +1,121 @@
+---
+title: Export
+description: Turn a PanelWave work into a PDF, PowerPoint deck, or video — export options, presets, batch export, job progress, and downloads.
+---
+
+Exports produce **offline versions** of your work for print, pitching, and social media. They are separate from [publishing](/cms/publishing): publishing puts the interactive work online for readers, while an export renders it into a conventional file you can download and share anywhere.
+
+## Export formats
+
+<Columns cols={3}>
+  <Card title="PDF Export" icon="file-text" href="#pdf-options">
+    High-quality PDF document — for print, review copies, and email.
+  </Card>
+  <Card title="PowerPoint" icon="presentation" href="#powerpoint-options">
+    Editable presentation slides — for pitches and readings.
+  </Card>
+  <Card title="Video Export" icon="clapperboard" href="#video-options">
+    Animated video presentation — for trailers and social clips.
+  </Card>
+</Columns>
+
+Exports run as **background jobs**: you queue them, keep working, and download the file when the job completes.
+
+## Queueing exports from the works list
+
+The quickest way to export today is from **My Works**:
+
+<Steps>
+  <Step title="Select works">
+    Tick the checkbox on one or more work cards (or use **Select all**).
+  </Step>
+  <Step title="Pick a format">
+    In the bulk action bar, choose **PDF**, **PPT**, or **Video** from the format dropdown.
+  </Step>
+  <Step title="Click Export">
+    Each selected work is queued as its own export job — you'll see a confirmation like "Queued 3 exports (pdf)".
+  </Step>
+</Steps>
+
+## The Exports screen
+
+The full **Exports** screen ("Export your works to PDF, PowerPoint, or Video") adds per-format options, presets, and job management.
+
+<Callout kind="alert">
+  The Exports screen is built but not yet linked from the main navigation in the current release — the works-list bulk export above is the reachable path today. The options below describe the full screen.
+</Callout>
+
+### Creating an export
+
+Under **Create New Export**, pick a work from the **Select Work** dropdown (or enable **"Batch export (queue one job per selected work)"** and tick several works), then choose a format. A dialog opens with format-specific options:
+
+#### PDF options
+
+| Option | Choices | Notes |
+|---|---|---|
+| **Quality** | Low (Smaller file) / Medium (Balanced) / High (Best quality) | A visual comparison shows the sharpness/size trade-off; High is best for print |
+| **Include metadata** | on/off | Embed work information in the PDF |
+| **Enable hyperlinks** | on/off | Keep links clickable in the document |
+
+#### PowerPoint options
+
+| Option | Choices | Notes |
+|---|---|---|
+| **Slide Layout** | Standard (4:3) / Widescreen (16:9) | |
+| **Include speaker notes** | on/off | |
+| **Enable slide animations** | on/off | Animations increase the file size |
+
+#### Video options
+
+| Option | Choices | Notes |
+|---|---|---|
+| **Video Resolution** | 720p HD / 1080p Full HD / 4K Ultra HD | 1080p is roughly twice the size of 720p; 4K is much larger and slowest to render |
+| **Frame Rate** | 24 fps (Cinematic) / 30 fps (Standard) / 60 fps (Smooth, ~2× size) | |
+| **Include audio narration** | on/off | |
+
+Before you start, the dialog shows an **estimated size** ("~ a few MB" up to "~ several hundred MB+") and warns when a combination — such as 4K at 60 fps — will be very large and slow. Click **Start Export** to queue the job.
+
+### Presets
+
+Recurring setups can be saved as one-click **presets**. Three are built in:
+
+- **Email-friendly PDF** — low quality, no metadata, links enabled
+- **16:9 deck + notes** — widescreen PowerPoint with speaker notes
+- **1080p social clip** — 1080p / 30 fps video with audio
+
+Type a name into **"Save these options as…"** inside any export dialog to add your own; custom presets can be deleted with their **×** button.
+
+## Tracking jobs and downloading
+
+The **Export Jobs** list shows every job with filters for **status** (Queued, Processing, Completed, Failed) and **type** (PDF, PowerPoint, Video). While one or more jobs are running, a floating **Active Exports** panel stays in the corner of the screen and updates progress live.
+
+Each job card shows the work title, format, when it was created, a status badge, and — while processing — a progress bar with the current step. Depending on status you can:
+
+- **Download** — completed jobs show the file size and a green **Download** button.
+- **Retry** — failed jobs show the error message; **Retry** re-queues after a short cancellable countdown, and **"Retry with options…"** reopens the export dialog prefilled with that job's settings so you can adjust before retrying.
+- **Cancel** — stop a queued or processing job.
+- **Details** — expand the card for the job ID, timestamps, and processing time.
+
+<Callout kind="info">
+  Download links are temporary: completed jobs show an **"Expires …"** date. Download your file before it expires, or simply run the export again.
+</Callout>
+
+## What gets exported
+
+Exports render the work's pages, panels, layers, and speech bubbles at the time the job runs. Content that is hidden from readers stays hidden in exports too — for example, [extras](/cms/extras) marked **Draft (hidden from readers)** are excluded, exactly as they are from the published manifest.
+
+The interactive **manifest** itself (the `panelwave.json` file that drives the [PanelWave Player](/player/overview)) is not produced here — it is built and deployed by the [publish flow](/cms/publishing), where each release's manifest can also be downloaded as JSON from the release history.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Publishing" icon="rocket" href="/cms/publishing">
+    Put the interactive version online for readers.
+  </Card>
+  <Card title="Import" icon="upload" href="/cms/import">
+    Bring an existing manifest into the CMS.
+  </Card>
+  <Card title="Validation" icon="shield-check" href="/cms/validation">
+    Catch content issues before exporting.
+  </Card>
+</Columns>

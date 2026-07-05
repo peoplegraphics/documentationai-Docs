@@ -1,0 +1,123 @@
+---
+title: Audio
+description: How audio works in the PanelWave Player — the WebAudio engine, its four channels, browser autoplay policy handling, volumes, and sequence tracks.
+---
+
+The player ships a WebAudio-based **`AudioEngineService`** for music, ambience, voice-over, and sound effects, plus a **`UserGestureService`** that deals with browser autoplay restrictions. Video sound is handled separately by the video layer (muted by default).
+
+<Callout kind="alert">
+**Current integration status:** the audio engine is a fully functional, exported service, but the player shell does **not yet drive it automatically** from the manifest — the toolbar's Audio/SFX toggles are placeholders in this build. If your work uses audio today, inject `AudioEngineService` in your host application and drive it from the shell's `panelChange` output, as shown below.
+</Callout>
+
+## Channels (buses)
+
+The engine mixes every track through a per-role gain node into a master gain:
+
+```
+track → role gain (ambient | music | voiceover | sfx) → master gain → output
+```
+
+The four roles match the manifest's audio roles (see [Audio in the schema](/schema/audio)):
+
+| Role | Typical use |
+|---|---|
+| `ambient` | Background atmosphere (rain, crowd noise) |
+| `music` | Score / theme music |
+| `voiceover` | Narration, character voice |
+| `sfx` | Short effects (door slam, whoosh) |
+
+## Playing a track
+
+```typescript
+import { Component, inject } from '@angular/core';
+import { AudioEngineService } from '@panelwave/player';
+import type { AudioTrack } from '@panelwave/player';
+
+@Component({ /* … */ })
+export class ReaderComponent {
+  private audio = inject(AudioEngineService);
+
+  async playTheme(): Promise<void> {
+    const track: AudioTrack = {
+      id: 'main-theme',
+      url: 'assets/my-story/audio/theme.mp3',
+      role: 'music',
+      loop: true,
+      volume: 0.8,       // 0–1
+      fadeIn: 1500,      // ms
+      fadeOut: 1000,     // ms
+    };
+    await this.audio.play(track);
+  }
+
+  stopTheme(): void {
+    void this.audio.stop('main-theme', 1000); // fade out over 1 s
+  }
+}
+```
+
+`play()` initializes the `AudioContext` on first use, resumes it if suspended, replaces any active track with the same `id`, and applies the fade-in. Other playback controls: `pause(id)`, `resume(id)`, `stopAll(fadeOutMs?)`, `getActiveTracks()`, `getPlaybackState(id)`.
+
+## Autoplay policy
+
+Browsers block audible playback before the user interacts with the page. The player handles this in two pieces:
+
+- **`AudioEngineService`** tests the policy when it initializes (`isAutoplayAllowed()` tells you the result) and exposes `resumeContext()` to resume a suspended `AudioContext` — call it from a user interaction (click, key press).
+- **`UserGestureService`** listens globally for the first real gesture (`pointerdown`, `mousedown`, `touchstart`, `keydown`, `click` — hovering deliberately does *not* count) and exposes `hasInteracted()` / `userHasInteracted$`. Video layers use it: programmatic (`on-view`) video playback starts **muted** until a gesture has occurred.
+
+A robust pattern for starting music as early as the browser allows:
+
+```typescript
+import { AudioEngineService, UserGestureService } from '@panelwave/player';
+
+constructor(
+  private audio: AudioEngineService,
+  private gesture: UserGestureService,
+) {
+  this.gesture.userHasInteracted$.subscribe(async (interacted) => {
+    if (interacted) {
+      await this.audio.resumeContext();
+      await this.playTheme();
+    }
+  });
+}
+```
+
+## Volume and muting
+
+| Method | Effect |
+|---|---|
+| `setMasterVolume(v)` / `getMasterVolume()` | Master gain, clamped to 0–1 |
+| `setRoleVolume(role, v)` / `getRoleVolume(role)` | Per-channel gain, clamped to 0–1 |
+
+Muting a channel is `setRoleVolume('sfx', 0)`; muting everything is `setMasterVolume(0)`. This is also the intended backing for the toolbar's Audio (master/music) and SFX toggles once they are wired.
+
+## Sequence tracks
+
+Chapters can define **sequence audio tracks** (`chapter.sequenceAudioTracks`) — tracks positioned on a timeline that spans multiple panels, each with `assetId`, `role`, `startTime`, `duration`, and optional `volume` (0–2), `loop`, `fadeIn`/`fadeOut`, `muted`, and a panel range (`startPanelId`/`endPanelId`). The engine can start every track that should be audible at a given timeline position, seeking each to the correct offset:
+
+```typescript
+// Start all chapter tracks that overlap the 12.5 s mark
+await this.audio.playSequenceTracks(
+  chapter.sequenceAudioTracks ?? [],
+  12_500,                       // current playback time in ms
+  'https://cdn.example.com/'    // base URL prepended to each track's assetId
+);
+
+// Later
+await this.audio.stopSequenceTracks(); // or pass specific track ids
+```
+
+Muted tracks are skipped, per-track volume is clamped to 0–2, and fade-ins are shortened when starting mid-fade.
+
+## Video sound
+
+Video layers manage their own audio element state via `VideoControllerService` (single active video with sound at a time) and default to `muted: true`; a work can change this with `settings.ui.videoMutedDefault` or per layer. Reduced motion degrades on-view autostart to click-to-play, which also satisfies gesture requirements. See [Video](/schema/video) for the format side.
+
+## Speech-bubble audio
+
+`pw-speech-bubbles` emits `bubbleAudioPlay` with `{ bubble, audioAssetId }` when a bubble with attached audio is activated — the host decides how to play it (typically through the `voiceover` channel of the audio engine).
+
+## Cleanup
+
+Call `destroy()` on the engine if you tear down audio entirely: it stops all tracks, closes the `AudioContext`, and releases every audio element and source node.

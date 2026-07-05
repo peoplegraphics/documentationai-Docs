@@ -1,0 +1,103 @@
+---
+title: Creators FAQ
+description: Answers for graphic novel creators working in the PanelWave CMS — editing, speech bubbles, branching, media, publishing, and monetization questions.
+---
+
+Questions creators ask most often, grouped by topic. Every answer links to the page with the full explanation.
+
+## Working in the editor
+
+<ExpandableGroup>
+  <Expandable title="Do I need to save my work manually?">
+    No. The editor auto-saves two seconds after your last change, and the badge in the header shows the current state (*Unsaved changes* → *Saving...* → *Saved just now*). You can force a save with <kbd>Ctrl</kbd>+<kbd>S</kbd>, and if you close the editor with unsaved changes you'll be asked whether to save first. See [Editor Layout](/cms/editor/layout).
+  </Expandable>
+  <Expandable title="What's the difference between Page View and Panel View?">
+    Page View shows the whole page with all panels and their reading-order badges — use it to arrange, align, and resize panels. Panel View shows one panel filling the frame — layers, speech bubbles, and hotspots are edited there. Double-click a panel in Page View to open it in Panel View. If the layer list says *Read-only*, you're in Page View. See [Canvas](/cms/editor/canvas).
+  </Expandable>
+  <Expandable title="Why doesn't my mouse wheel zoom the canvas?">
+    Zooming with the wheel requires holding <kbd>Ctrl</kbd> (or <kbd>Cmd</kbd> on Mac) so normal scrolling doesn't change your zoom accidentally. You can also use the +/− buttons in the canvas toolbar, <kbd>Ctrl</kbd>+<kbd>0</kbd> to fit the frame, or the Zoom tool (<kbd>Z</kbd>). See [Canvas](/cms/editor/canvas).
+  </Expandable>
+  <Expandable title="Why do panels resize differently from corners and edges?">
+    Corner handles resize a panel while keeping its aspect ratio so artwork never distorts. Edge handles adjust the panel's visible area — a crop — so different page formats can show different parts of the same panel. See [Pages &amp; Panels](/cms/editor/pages-panels).
+  </Expandable>
+  <Expandable title="Can I undo everything in the editor?">
+    No — undo is action-based. Structure operations (reordering chapters, pages, panels; last 50 actions, visible in the History panel) and hotspot editing (its own 100-step history) can be undone. Most canvas and inspector property changes are applied directly, so save deliberate checkpoints with <kbd>Ctrl</kbd>+<kbd>S</kbd>. See [Keyboard Shortcuts](/cms/editor/shortcuts).
+  </Expandable>
+</ExpandableGroup>
+
+## Speech bubbles and languages
+
+<ExpandableGroup>
+  <Expandable title="How do I change the speech balloon style for my whole comic at once?">
+    Open **Work Properties** and edit the work-default balloon style. Every bubble that hasn't overridden a given field inherits it instantly — the cascade is work default → character override → per-bubble override. A bubble with its own overrides shows a *Reset to inherited style* button. See [Speech Bubbles](/cms/editor/speech-bubbles).
+  </Expandable>
+  <Expandable title="How do I write dialogue in more than one language?">
+    Bubble text (and hotspot labels) are stored per locale. Use the locale switcher in the editor header to pick the language you're writing — the Inspector shows which locale you're editing, e.g. *Text (en-US)*. For bulk translation use the [Localization Workshop](/cms/localization); balloons auto-resize per language.
+  </Expandable>
+  <Expandable title="How does translation staleness work?">
+    When the source text of an already-translated string changes, its translations are flagged **Stale** in the Localization Workshop. Use the *Needs review* filter to find and re-confirm or amend them; machine-translated strings carry an *MT* badge until confirmed. See [Localization](/cms/localization).
+  </Expandable>
+</ExpandableGroup>
+
+## Branching and interactivity
+
+<ExpandableGroup>
+  <Expandable title="How do I make my story branch?">
+    Open **Backstage → Graph Editor**, select the panel the branch starts from, press <kbd>C</kbd>, pick the target with the arrow keys, and press <kbd>Enter</kbd> to create a second outgoing edge. Give each edge a condition, and leave one edge unconditional as the fallback so readers can never get stuck. See [Graph Editor](/cms/editor/graph).
+  </Expandable>
+  <Expandable title="How do I make a hidden hotspot appear only after the reader finds an item?">
+    Give the "find item" hotspot a **Set Variables** action (e.g. set `hasKey` to true), then on the second hotspot open **Visibility Condition → Build Condition** and create *hasKey equals true*. No coding needed — the Condition Builder writes the expression for you. See [Hotspots](/cms/editor/hotspots) and [Variables](/cms/editor/variables).
+  </Expandable>
+  <Expandable title="Do I have to learn programming to use conditions?">
+    No. For hotspot and speech-bubble visibility, the Condition Builder gives you dropdowns (variable, operator, value, AND/OR) with a live preview. Only graph edge conditions are typed as JSON Logic, and they follow one simple pattern: `{"OPERATOR": [{"var": "name"}, value]}` — [Variables &amp; Conditions](/cms/editor/variables) has copy-paste examples.
+  </Expandable>
+  <Expandable title="How can I test a branch without publishing?">
+    Two ways: the Graph Editor's **Simulate** button walks the flow structurally, showing every "Where to next?" option; and the [Preview](/cms/preview) page lets you override any variable's value and read the chapter in the embedded player. Save common setups as preview scenarios and test both sides of every condition.
+  </Expandable>
+  <Expandable title="What does the 'nodes are unreachable from the entry node' warning mean?">
+    Some panels have no path leading to them from the chapter's entry panel, so readers will never see them. Click the warning to highlight the affected panels, then connect them into the flow. Cycles and dead ends are reported too — those are informational, since loops and endings can be intentional. See [Graph Editor](/cms/editor/graph).
+  </Expandable>
+</ExpandableGroup>
+
+## Audio and video
+
+<ExpandableGroup>
+  <Expandable title="Why doesn't my video panel play sound for readers?">
+    Video layers are muted by default because browsers block unmuted autoplay. If sound matters, set the video's Start Mode to *On click* and untick *Muted*, or keep the video muted and add the sound as a separate audio track on the panel. See [Video Panels](/cms/editor/video-panels).
+  </Expandable>
+  <Expandable title="What's the difference between a panel audio track and a sequence audio track?">
+    A panel audio track belongs to one panel and starts relative to it — good for sound effects and dialogue. A sequence audio track belongs to the whole chapter and keeps playing across panel boundaries — good for background music and ambience. See [Audio](/cms/editor/audio).
+  </Expandable>
+  <Expandable title="Why can't I edit the Display Duration of a panel with video?">
+    Panels with a video layer default to *Auto (from video)*: the display duration is locked to the video's length. Click *Locked to video* to switch to manual, or *Reset to video length* to switch back. See [Video Panels](/cms/editor/video-panels).
+  </Expandable>
+</ExpandableGroup>
+
+## Publishing, export, and money
+
+<ExpandableGroup>
+  <Expandable title="Why can't I publish my work?">
+    Publishing is blocked while Preflight Validation reports errors — broken references, duplicate IDs, missing captions, oversized assets. Open **Validation** in the Backstage sidebar, run validation, and use the per-issue suggestions, *Open in editor* shortcuts, and auto-fixes to clear the errors; warnings don't block publishing. See [Validation &amp; Preflight](/cms/validation).
+  </Expandable>
+  <Expandable title="Does marking a work as 'Published' in My Works put it online?">
+    The status dropdown (Draft/Review/Published/Archived) is a library label that organizes your works — it doesn't deploy anything by itself. Deployment happens through the publish pipeline, which validates the work, builds the manifest, and uploads it with all assets. See [Publishing](/cms/publishing).
+  </Expandable>
+  <Expandable title="What formats can I export my work to?">
+    Three formats, each rendered as a background job: **PDF** (quality levels, optional metadata and hyperlinks), **PowerPoint** (4:3 or 16:9, optional speaker notes), and **Video** (720p/1080p/4K at 24/30/60 fps). Download links expire, so fetch your file promptly. See [Export](/cms/export).
+  </Expandable>
+  <Expandable title="Can I move my work out of the PanelWave CMS?">
+    Yes. Works export as open PanelWave JSON manifests (plus PDF/PPT/video renditions), and the same JSON can be re-imported via **Import** on My Works. The format is open (CC BY 4.0), so there is no lock-in. See [Export](/cms/export) and [Import](/cms/import).
+  </Expandable>
+  <Expandable title="Can readers buy subscriptions or one-time purchases yet?">
+    Not yet. You can fully configure paywall rules, products, multi-currency price points, and coupons today, and test reader access with the entitlement simulator — but real checkout and payment processing are not live in the current release. See [Monetization](/cms/monetization).
+  </Expandable>
+  <Expandable title="How do I test what a paying (or underage) reader sees?">
+    Use the **Entitlement** screen in the work's Backstage: start a simulation, pick a Quick Scenario such as *Premium Subscriber* or *Underage User*, and review the paywall test results — or toggle entitlements directly in Preview's controls. See [Preview](/cms/preview) and [Monetization](/cms/monetization).
+  </Expandable>
+  <Expandable title="Why is my Analytics dashboard empty?">
+    Analytics are aggregated from reader events of published versions only. If you just published or the work is still in draft, the dashboard shows *No reader data yet* — check back after readers start reading a published version. See [Analytics](/cms/analytics).
+  </Expandable>
+  <Expandable title="What happens to my uploads after I add them?">
+    Every upload is processed automatically in the background: images get AVIF/WebP variants and thumbnails, audio gets loudness-normalized AAC/Opus variants plus waveform data, and video gets a web-friendly H.264 rendition with a poster frame. Readers are served the best variant their device supports. See [Assets](/cms/assets).
+  </Expandable>
+</ExpandableGroup>

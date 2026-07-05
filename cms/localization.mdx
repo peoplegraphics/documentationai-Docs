@@ -1,0 +1,85 @@
+---
+title: Localization
+description: Translate your work in the Localization Workshop — extract strings, edit translations, catch stale text, and add per-language voice audio and TTS.
+---
+
+PanelWave works are multilingual by design: every piece of reader-facing text is stored per locale (like `en-US` or `de-DE`), and readers fall back to your default language where a translation is missing. See [Localization concepts](/concepts/localization) for how this works in the format.
+
+The CMS gives you two Backstage tools for it: the **Localization Workshop** (text) and **Audio Localization** (spoken audio and TTS).
+
+## Locales and fallbacks
+
+Your work's languages are set when you [create the work](/cms/works) and managed afterwards via the **Locales** button in the workshop:
+
+- **Add a locale** by code (e.g. `fr-FR`) — a searchable catalogue helps you pick.
+- **Set default** marks the source language; every other locale falls back to it.
+- **Remove locale** hides it but keeps its translations — re-add it later to restore them.
+
+The locale chips under the workshop header show each language's completion percentage; click one to switch the translation target. Your [profile preference](/cms/account) "Default editing language" preselects the target when you open the workshop.
+
+## Extracting translatable text
+
+Click **Extract Strings** to scan the work and pull every translatable string into the table — speech bubble text, titles, descriptions, and other reader-facing content. Each entry gets a stable **key**, its **default text** (the source language), a category, and a "Used in" badge telling you where it appears.
+
+Run extraction again whenever you've added content; existing translations are kept and new strings are appended. You can also add free-form strings manually with **Add Entry** (key, default text, category).
+
+## The translation editor
+
+The table has four columns: **Key**, **Default Text**, **Translation** (for the selected locale), and **Actions**. Click a translation cell to edit it inline; press Escape to stop editing. Untranslated rows are tinted red, and the stat cards at the top track **Total Strings**, **Translated**, **Missing**, and **Completion**.
+
+Handy details:
+
+- Missing translations show what the reader actually gets: *"No translation — falls back to `en-US` '…'"*.
+- **Autosave** (toggle in the toolbar) saves edits automatically; otherwise use **Save**.
+- Filters: search by key or text, filter by category, **Show Only Missing**, **Needs review**, and **Glossary issues**.
+- Per-row actions: **Translation Memory**, **Copy from default**, **Machine-translate this string**, **Edit**, **Delete**.
+
+### Stale translation detection
+
+When you change the source text of a string that was already translated, its translations are flagged **Stale** ("The source text changed after this was translated — review the translation"). Use the **Needs review** filter to work through them.
+
+### Machine translation
+
+- **Translate untranslated** machine-translates every string missing a value for the selected locale.
+- Machine-translated strings carry an **MT** badge until you confirm them with the green check (or edit them, which marks them **Modified**).
+
+### Translation memory
+
+The brain icon fetches **Translation Memory Suggestions**: exact and fuzzy matches from previously saved translations, with match scores, quality/verified indicators, and a **Use This Translation** button. Everything you translate feeds the memory automatically.
+
+### Glossary
+
+**Glossary** manages preferred translations for key terms (e.g. *Hero → Held*), optionally case-sensitive, with notes for translators. Rows whose translation ignores a glossary term get a warning badge, and the **Glossary issues** filter collects them.
+
+## Working with external translators
+
+Use the **Export** menu to hand strings to translators and **Import** to bring them back:
+
+| Format | Use |
+|---|---|
+| **CSV (spreadsheet)** | key, source, target, note — for spreadsheet workflows |
+| **XLIFF 1.2 (CAT tools)** | the standard translator exchange format |
+| **JSON** | a simple key → value map |
+
+**Import** accepts JSON, CSV, and XLIFF files.
+
+## Localized assets
+
+Some content is easier to localize as an asset than as text — a hand-lettered title card, for example. Assets carry a **locale**, and the [Assets library](/cms/assets) can filter by it, so you can provide per-language versions of an image or audio file.
+
+## Audio Localization and text-to-speech
+
+The **Audio** entry in the Backstage sidebar opens **Audio Localization**: voice audio for each speech bubble, per locale. Stat cards show **Total Bubbles**, **With Audio**, **Missing Audio**, and **Completion** for the selected locale.
+
+For each bubble you can:
+
+- **Upload** an audio file (MP3, WAV, OGG, M4A) — e.g. from a voice actor.
+- **Generate TTS** — pick a voice from the catalogue (with gender, age, style, and a preview sample where available) and click **Generate Audio**. If a [character](/cms/characters) has an assigned voice, that's the natural choice for their lines.
+
+Generated jobs run in the background — the **Job Queue** panel tracks **Processing** (with progress and Cancel), **Completed** (with playback), and **Failed** (with Retry) jobs.
+
+Existing tracks can be played, deleted, or trimmed: the **Waveform & trim** view lets you set a playback window **non-destructively** — the file is unchanged, only the played region is trimmed.
+
+<Callout kind="tip">
+Run [Preflight validation](/cms/validation) before publishing — it reports missing translations and bubbles without audio so nothing slips through.
+</Callout>

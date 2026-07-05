@@ -1,0 +1,193 @@
+---
+title: Assets
+description: The Assets catalog — registering images, audio, video, subtitles, vectors, JSON, and plugin payloads with variants and localized resolution.
+---
+
+The optional `assets` section is the manifest's media registry. Every image, audio file, video, subtitle track, vector graphic, JSON blob, or plugin payload is registered **once** in the catalog under a stable ID, then referenced everywhere else by that ID (layer `assetId`, `meta.cover`, audio tracks, extras, preload hints).
+
+`Assets` has two optional properties: `base` and `catalog`.
+
+## `assets.base` — base URLs
+
+Optional per-category base URLs. All properties are absolute [`Uri`](/schema/manifest-structure#uri-colorhex-timestamp)s: `mediaBase`, `imageBase`, `audioBase`, `videoBase`, `sfxBase`, `thumbsBase`, `pluginsBase`.
+
+Variant `src` values may then be relative paths resolved against the matching base — keeping catalogs short and letting you swap CDNs by changing one line:
+
+```json
+{
+  "assets": {
+    "base": {
+      "imageBase": "https://cdn.example.com/comic/images/",
+      "audioBase": "https://cdn.example.com/comic/audio/"
+    }
+  }
+}
+```
+
+## Catalog items
+
+`catalog` is an array of typed items discriminated by `category`. All items share the `AssetCommon` base and add a `variants` array (always `minItems: 1`). Unknown properties are rejected.
+
+### Shared properties (`AssetCommon`)
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | Yes | Catalog ID referenced by layers, tracks, covers, extras |
+| `locale` | `LocaleCode` | — | Marks the whole asset as locale-specific |
+| `alt` | `LocalizedString` | — | Alternative text (accessibility) |
+| `caption` | `LocalizedString` | — | Caption text |
+| `transcript` | `LocalizedString` | — | Transcript for audio/video (accessibility) |
+| `durationMs` | integer ≥ 0 | — | Media duration in milliseconds |
+| `sha256` | string | — | Content hash, pattern `^[A-Fa-f0-9]{64}$` |
+| `tags` | `string[]` | — | Free-form tags |
+
+### Item types by `category`
+
+| `category` | Schema def | Variant type | Extra properties |
+|------------|-----------|--------------|------------------|
+| `"image"` | `AssetCatalogItemImage` | `ImageVariant` | — |
+| `"audio"` | `AssetCatalogItemAudio` | `AudioVariant` | `role`: `ambient` \| `music` \| `voiceover` \| `sfx` \| `ui` \| `none` |
+| `"video"` | `AssetCatalogItemVideo` | `VideoVariant` | `poster`: `VideoPoster` (schema 1.1+) |
+| `"subtitle"` | `AssetCatalogItemSubtitle` | `SubtitleVariant` | — |
+| `"vector"` | `AssetCatalogItemVector` | `VectorVariant` | — |
+| `"json"` | `AssetCatalogItemJson` | `JsonVariant` | — |
+| `"pluginPayload"` | `AssetCatalogItemPluginPayload` | `JsonVariant` | — |
+
+## Variant types
+
+Variants are alternative encodings/resolutions of the same asset. Consumers pick the best variant for the device, format, and locale.
+
+### `ImageVariant`
+
+| Property | Type | Required | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `src` | string | Yes | — | URL or path (relative to the category base) |
+| `mime` | string | Yes | pattern `^image/` | e.g. `image/avif`, `image/jpeg` |
+| `w` | integer | Yes | ≥ 1 | Intrinsic width in pixels |
+| `h` | integer | Yes | ≥ 1 | Intrinsic height in pixels |
+| `density` | number | — | 0.5–4 | Device pixel ratio this variant targets |
+
+### `AudioVariant`
+
+| Property | Type | Required | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `src` | string | Yes | — | URL or path |
+| `mime` | string | Yes | pattern `^audio/` | e.g. `audio/mpeg`, `audio/ogg` |
+| `bitrateKbps` | integer | — | ≥ 8 | Bitrate |
+| `channels` | integer | — | 1–6 | Channel count |
+| `sampleRateHz` | integer | — | ≥ 8000 | Sample rate |
+| `loop` | boolean | — | default `false` | Variant is loop-safe |
+| `locale` | `LocaleCode` | — | — | Locale-specific recording (e.g. voiceover) |
+
+### `VideoVariant`
+
+| Property | Type | Required | Constraints | Description |
+|----------|------|:--:|-------------|-------------|
+| `src` | string | Yes | — | URL or path |
+| `mime` | string | Yes | pattern `^(video/\|application/vnd\.apple\.mpegurl)` | e.g. `video/mp4`, or HLS playlists |
+| `w` | integer | Yes | ≥ 16 | Width in pixels |
+| `h` | integer | Yes | ≥ 16 | Height in pixels |
+| `fps` | number | — | ≥ 1 | Frame rate |
+| `codec` | string | — | — | e.g. `h264` |
+| `streaming` | boolean | — | default `false` | Variant is a streaming manifest (HLS) |
+| `locale` | `LocaleCode` | — | — | Locale-specific variant |
+| `direction` | string | — | `forward` \| `reverse`, default `forward` | Schema 1.1+. `reverse` marks a pre-rendered, time-reversed encode (typically without audio) used for smooth `pingpong` playback; the player falls back to frame-stepping when no reverse variant exists. See [Video](/schema/video) |
+
+### `VideoPoster` (schema 1.1+)
+
+Poster/preview frame on a video catalog item, shown before playback starts (click-to-play, reduced-motion presentations):
+
+| Property | Type | Required | Constraints |
+|----------|------|:--:|-------------|
+| `src` | string | Yes | — |
+| `mime` | string | — | pattern `^image/` |
+| `w` / `h` | integer | — | ≥ 1 |
+
+### `SubtitleVariant`
+
+| Property | Type | Required | Constraints |
+|----------|------|:--:|-------------|
+| `src` | string | Yes | — |
+| `mime` | string | Yes | `text/vtt` \| `application/x-subrip` |
+| `locale` | `LocaleCode` | Yes | — |
+
+### `VectorVariant`
+
+| Property | Type | Required | Constraints |
+|----------|------|:--:|-------------|
+| `src` | string | Yes | — |
+| `mime` | string | Yes | `image/svg+xml` \| `application/pdf` |
+
+### `JsonVariant`
+
+Used by both `json` and `pluginPayload` items:
+
+| Property | Type | Required | Constraints |
+|----------|------|:--:|-------------|
+| `src` | string | Yes | — |
+| `mime` | string | Yes | pattern `^application/json$` |
+
+## Example
+
+```json
+{
+  "assets": {
+    "base": {
+      "imageBase": "https://cdn.example.com/comic/images/",
+      "videoBase": "https://cdn.example.com/comic/video/"
+    },
+    "catalog": [
+      {
+        "id": "img-alley",
+        "category": "image",
+        "alt": { "en-US": "Dark city alley in the rain" },
+        "variants": [
+          { "src": "alley-2048.avif", "mime": "image/avif", "w": 2048, "h": 1536, "density": 2 },
+          { "src": "alley-1024.jpg", "mime": "image/jpeg", "w": 1024, "h": 768, "density": 1 }
+        ]
+      },
+      {
+        "id": "sfx-rain",
+        "category": "audio",
+        "role": "sfx",
+        "variants": [
+          { "src": "https://cdn.example.com/comic/audio/rain-loop.mp3", "mime": "audio/mpeg", "loop": true }
+        ]
+      },
+      {
+        "id": "vid-pendulum",
+        "category": "video",
+        "durationMs": 3000,
+        "alt": { "en-US": "Pendulum swing, forward/backward" },
+        "variants": [
+          { "src": "pendulum-1280.mp4", "mime": "video/mp4", "w": 1280, "h": 720, "fps": 30, "codec": "h264", "direction": "forward" },
+          { "src": "pendulum-1280-reverse.mp4", "mime": "video/mp4", "w": 1280, "h": 720, "fps": 30, "codec": "h264", "direction": "reverse" }
+        ],
+        "poster": { "src": "pendulum-poster.jpg", "mime": "image/jpeg", "w": 1280, "h": 720 }
+      },
+      {
+        "id": "sub-intro",
+        "category": "subtitle",
+        "variants": [
+          { "src": "https://cdn.example.com/comic/subs/intro.en-US.vtt", "mime": "text/vtt", "locale": "en-US" },
+          { "src": "https://cdn.example.com/comic/subs/intro.de-DE.vtt", "mime": "text/vtt", "locale": "de-DE" }
+        ]
+      }
+    ]
+  }
+}
+```
+
+## Localized asset resolution
+
+Localization can happen at three levels, from coarse to fine:
+
+1. **Item level** — `AssetCommon.locale` marks an entire catalog entry as belonging to one locale (e.g. a lettered artwork per language). Publish one item per locale and resolve by ID + locale.
+2. **Variant level** — `AudioVariant`, `VideoVariant`, and `SubtitleVariant` carry their own `locale`, so one catalog entry can hold all language versions. Consumers pick the variant whose `locale` best matches the reader's, walking the fallback chain to `meta.default_locale`.
+3. **Reference level** — the general `AssetRef` form (`{ "assetId": "…", "variant": "…", "locale": "…" }`) can pin a specific variant/locale at the point of use. See [Layers](/schema/layers#assetref).
+
+Text-level localization (`alt`, `caption`, `transcript`) uses [`LocalizedString`](/schema/manifest-structure#localizedstring) as everywhere else. The overall fallback algorithm is described in [Localization](/concepts/localization).
+
+<Callout kind="alert">
+Schema validation does not check that `assetId` references resolve to catalog entries, or that `src` URLs exist. The CLI warns when a manifest has panels but no `assets` section at all — see [Validation](/schema/validation).
+</Callout>

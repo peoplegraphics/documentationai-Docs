@@ -1,0 +1,156 @@
+---
+title: Animations & Timeline
+description: Animate panel layers with keyframes, choose easing curves, preview motion in the Timeline panel, and control panel timing and transitions in PanelWave.
+---
+
+Animations bring individual panels to life: a character slides into frame, a background fades in, a clue zooms toward the reader. In PanelWave you build these effects from **keyframes** — snapshots of a layer property at a point in time — and the editor fills in the motion between them.
+
+Two parts of the editor work together:
+
+- The **Animations section** of the Inspector (right sidebar, with a panel selected) is where you create and edit a panel's animation.
+- The **Timeline panel** (bottom of the editor) is where you preview and fine-tune it, and where you see your whole story's autoplay timing at a glance.
+
+<Callout kind="info">
+  Each panel has **one animation** (with as many keyframes as you like). This keeps motion design per panel simple and predictable — if you need several effects, put multiple keyframes on multiple layers inside the same animation.
+</Callout>
+
+## What you can animate
+
+Keyframes always target a **layer** of the current panel (see [Layers](/cms/editor/layers)). Nine properties are animatable:
+
+| Property | What it does | Typical range |
+|---|---|---|
+| Opacity | Transparency, from invisible to fully opaque | 0 – 1 |
+| Transform X | Horizontal position offset in pixels | −1000 – 1000 |
+| Transform Y | Vertical position offset in pixels | −1000 – 1000 |
+| Scale | Uniform size multiplier (1 = 100%) | 0 – 5 |
+| Rotation | Rotation angle in degrees | −360 – 360 |
+| Blur | Gaussian blur radius in pixels | 0 – 50 |
+| Brightness | Brightness multiplier (1 = normal) | 0 – 2 |
+| Contrast | Contrast multiplier (1 = normal) | 0 – 2 |
+| Saturation | Color saturation (0 = grayscale, 1 = normal) | 0 – 2 |
+
+<Callout kind="tip">
+  Position, opacity, and scale animate smoothly on every device. The filter properties (Blur, Brightness, Contrast, Saturation) are more demanding — use them for short accents rather than long-running loops.
+</Callout>
+
+## Creating an animation
+
+<Steps>
+  <Step title="Select the panel">
+    Click the panel on the canvas or in the structure tree. The Inspector shows its properties, including the **Animations** section.
+  </Step>
+  <Step title="Open the Animation Editor">
+    Click **+ Add Animation**. The **New Animation** dialog opens. (If the panel already has an animation, use the pencil button to edit it instead.)
+  </Step>
+  <Step title="Set the animation basics">
+    Under **Animation Settings**, enter a **Name** (for example "Hero entrance"), a **Duration (ms)** (minimum 100 ms), and optionally tick **Loop Animation** to repeat it continuously.
+  </Step>
+  <Step title="Add keyframes">
+    Click **+ Add Keyframe** and fill in the form: the **Layer** to animate, the **Property**, the **Time (ms)** within the animation, the target **Value**, and an **Easing** curve. Repeat for every point of change — usually one keyframe at time 0 and one at the end, plus any in-between steps.
+  </Step>
+  <Step title="Save">
+    Click **Create Animation** (or **Update Animation**). The animation is saved with the panel, and the Inspector card shows its name, duration, loop state, and keyframe count.
+  </Step>
+</Steps>
+
+<Callout kind="alert">
+  The keyframe form needs at least one layer in the panel — if you see "No layers available. Create layers in the panel first", add artwork layers before animating.
+</Callout>
+
+Keyframes are listed sorted by time. Click a keyframe in the list to expand it and change its time, value, or easing inline; the trash button deletes it. To remove the whole animation, use the trash button on the animation card in the Inspector.
+
+### Example: fade in and settle
+
+A simple two-property entrance over 1.5 seconds:
+
+- Opacity: `0` at 0 ms (Ease In) → `1` at 1000 ms
+- Transform Y: `-300` at 0 ms (Ease Out) → `0` at 1200 ms
+
+The layer drops in from above while fading in, and the Ease Out curve makes it decelerate naturally as it lands.
+
+## Easing
+
+Easing controls the speed curve **between** a keyframe and the next one:
+
+| Easing | Motion | Good for |
+|---|---|---|
+| Linear | Constant speed | Mechanical motion, scrolling backgrounds |
+| Ease | Slow start and end, fast middle | Most natural motion (good default) |
+| Ease In | Slow start, then accelerating | Falling objects, exits |
+| Ease Out | Fast start, then decelerating | Objects coming to rest, entrances |
+| Ease In-Out | Gentle at both ends | Smooth, elegant transitions and loops |
+
+## The Timeline panel
+
+The Timeline at the bottom of the editor is your preview and pacing tool. It shows **every panel of the current format in reading order** as a continuous sequence, so you can judge the flow of the whole chapter, not just one panel.
+
+### Transport controls
+
+| Control | What it does |
+|---|---|
+| Play/Pause | Starts or pauses playback (`Space`) |
+| Stop | Stops and resets to the start |
+| Previous / Next Frame | Steps one frame back or forward (`←` / `→`) |
+| Loop | Repeats playback when the end is reached |
+| Timecode field | Shows the current position — type a time (`HH:MM:SS:FF`, `MM:SS`, or seconds) and press Enter to jump there |
+| FPS | Frame rate for the timecode display: 24, 25, 30, or 60 |
+
+During playback the canvas automatically switches to the panel under the playhead, and any [audio tracks](/cms/editor/audio) play in sync — so what you see and hear is close to what readers get in autoplay.
+
+### Tracks
+
+- **Panel track** — one bar per panel, in reading order. Click a bar to select that panel (the structure tree and Inspector follow along). Drag the handle at a bar's right edge to change the panel's display duration directly.
+- **Layer tracks** — keyframes of the selected panel's animation appear as diamond markers. Each track has visibility and lock toggles.
+- **Audio tracks** — panel audio and chapter-wide sequence audio, with mute buttons and volume/fade indicators. See [Audio](/cms/editor/audio).
+- **Markers** — comments and bookmarks you can place as notes along the timeline.
+
+### Navigation and editing aids
+
+- **Zoom** from 10% to 500% with the slider or the zoom buttons; the ruler adapts its tick spacing.
+- **Snap to Grid** (magnet button) with grid sizes of 0.1 s, 0.5 s, 1 s, or 5 s.
+- The **focus button** hides other panels' clips so you can concentrate on the selected panel.
+- Click or drag on the ruler to **scrub**; drag the playhead directly or move it with the keyboard.
+- Select keyframes and markers with click / Ctrl+click / a drag rectangle; copy (`Ctrl+C`), paste at the playhead (`Ctrl+V`), cut (`Ctrl+X`), duplicate (`Ctrl+D`), or delete (`Delete`) them. `Home` and `End` jump to the start and end.
+
+More shortcuts are listed on the [Keyboard Shortcuts](/cms/editor/shortcuts) page.
+
+## Panel timing (display duration)
+
+In autoplay, each panel stays on screen for its **Display Duration**. You control it in two places:
+
+- **Inspector → Format Views → Display Duration (ms)** — between 100 ms and 60 000 ms. Leave it empty to fall back to the work-wide `secondsPerPanel` setting.
+- **Timeline** — drag the right edge of a panel bar; the following panels shift accordingly and the new duration is saved automatically.
+
+<Callout kind="tip">
+  Vary durations to build rhythm: quick action panels at 2–4 s, standard panels at 3–5 s, text-heavy panels at 7 s or more. The timeline footer shows the total runtime.
+</Callout>
+
+For panels with video, the duration can lock itself to the video's length — see [Video Panels](/cms/editor/video-panels).
+
+## Transitions between panels
+
+Panel-to-panel transitions are separate from layer animations: in the PanelWave format they belong to the **edges of the navigation graph** that connect panels (see [Graph](/schema/graph)).
+
+In the editor:
+
+- The [Graph editor](/cms/editor/graph) is where you create and connect edges and set their conditions.
+- When a [hotspot](/cms/editor/hotspots) navigates the reader (a **Go To** action), you pick the **Transition Effect** in the Action Builder: **None**, **Fade**, **Slide**, **Zoom**, or **Crossfade**.
+
+## Exporting timing data
+
+The timeline footer offers **Preview Export**, **Export JSON**, and **Export EDL**. The JSON export carries panel timing, keyframes, and audio cues for automated video rendering; the EDL file (an industry-standard edit decision list) can be imported into external video editors such as Premiere or DaVinci Resolve. See [Export](/cms/export) for the full export options.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Animations in the format" icon="file-json" href="/schema/animations">
+    How animations are stored in the PanelWave manifest.
+  </Card>
+  <Card title="Audio in the editor" icon="volume-2" href="/cms/editor/audio">
+    Panel and sequence audio tracks in the timeline.
+  </Card>
+  <Card title="Layers" icon="layers" href="/cms/editor/layers">
+    The layers your keyframes animate.
+  </Card>
+</Columns>

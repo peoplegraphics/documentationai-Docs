@@ -1,0 +1,122 @@
+---
+title: Hotspots
+description: Draw rectangle, circle, and polygon hotspots, attach actions and mutations, and gate them with variable conditions in the PanelWave editor.
+---
+
+Hotspots are the clickable areas that make your graphic novel interactive: a door the reader can open, a clue they can inspect, a choice that branches the story. You draw a hotspot on a panel, then attach **actions** (what happens on click), optional **mutations** (dynamic visual changes), and an optional **visibility condition**.
+
+## Drawing a hotspot
+
+Hotspots come in three shapes, each with its own drawing tool:
+
+| Shape | Tool | Shortcut | What you get |
+|---|---|---|---|
+| **Rectangle** | Rectangle | `R` | A rectangle centered on your click |
+| **Circle** | Circle | `C` | A circle centered on your click |
+| **Polygon** | Pen | `P` | A starter polygon whose vertices you reshape |
+
+<Steps>
+  <Step title="Open a panel">
+    Hotspots are drawn in panel view — double-click a panel on the [canvas](/cms/editor/canvas) to enter it.
+  </Step>
+  <Step title="Pick a shape tool">
+    Select **Rectangle**, **Circle**, or **Pen** from the tool palette — or right-click the canvas and choose **Add Hotspot** → **Rectangle** / **Circle** / **Polygon**.
+  </Step>
+  <Step title="Click the canvas">
+    The hotspot appears at the click point, drawn as a dashed, lightly tinted overlay with its label above it. It is selected and ready to edit.
+  </Step>
+</Steps>
+
+<Callout kind="info">
+  The dashed overlay is an editing aid — readers never see it. In the published work the area is simply clickable.
+</Callout>
+
+## Editing the shape
+
+Select a hotspot (click it with the shape tool, or **Tab** / **Shift+Tab** to cycle through a panel's hotspots) and drag its control points:
+
+- **Rectangle** — 8 handles: corners resize from that corner, edge handles move that side.
+- **Circle** — a center handle moves the whole circle; a radius handle scales it.
+- **Polygon** — every vertex is a draggable handle. In the Inspector's **Shape (polygon)** section you can also type exact coordinates for each point, remove a point (a polygon keeps at least 3), or click **+ Add Point**.
+
+The Inspector's **Shape** section always mirrors the canvas: for rectangles it shows **X**, **Y**, **Width**, **Height**; for circles **Center X**, **Center Y**, **Radius** — the values sync with your canvas edits.
+
+## Naming and accessibility
+
+In **Basic Properties**:
+
+- **Label** — the hotspot's name, edited per language (the field shows the active locale, e.g. **Label (en-US)**; switch locales in the editor header — see [Localization](/cms/localization)).
+- **ARIA Label** — a screen-reader description, so interactive areas stay accessible.
+- **Visible** and **Locked** — the usual editing toggles.
+
+## Actions — what happens on click
+
+The **Actions** section lists the hotspot's actions. Click **+ Add Action** to open the Action Builder, pick an **Action Type**, fill in its settings, and save. A hotspot can carry several actions; each shows a summary with **Edit** and **Remove** buttons.
+
+<Tabs>
+  <Tab title="Navigate" icon="arrow-right">
+    **Navigate (Go To Panel/Page)** jumps the reader elsewhere in the story. Choose a **Target Type** (Panel or Page), enter the **Panel ID** or **Page Number**, and pick a **Transition Effect**: None, Fade, Slide, Zoom, or Crossfade. This is the building block for choices and branching — see [Graph](/cms/editor/graph) for how branches fit into your story flow.
+  </Tab>
+  <Tab title="Set Variables" icon="variable">
+    **Set Variables** changes story state. Add one or more rows, each with a variable name, an operation, and a value:
+    - **Set** — assign the value
+    - **Increment** — add to a number
+    - **Toggle** — flip a true/false value
+
+    This is how a hotspot remembers things ("the reader took the key", "score + 10"). Manage the variables themselves in the [Variables designer](/cms/editor/variables).
+  </Tab>
+  <Tab title="Open Extras" icon="gift">
+    **Open Extras** shows a bonus-content item. Enter the **Extras ID** of the content you created in the [Extras manager](/cms/extras).
+  </Tab>
+  <Tab title="Open Modal" icon="panel-top">
+    **Open Modal** pops up a dialog over the story. Set a **Modal ID** and the **Modal Content** text.
+  </Tab>
+  <Tab title="Trigger Plugin Event" icon="plug">
+    **Trigger Plugin Event** sends an event to a plugin. Pick the **Plugin ID** (Image Zoom, 360° Panorama, or Gallery), an **Event Name**, and optional **Event Data** as JSON.
+  </Tab>
+</Tabs>
+
+## Mutations — dynamic visual changes
+
+Mutations change how the hotspot itself looks or behaves in response to the reader. Click **+ Add Mutation** in the **Mutations** section, choose a **Trigger Event**, and add one or more property mutations:
+
+- **Triggers:** **On Hover**, **On Click**, or **When Variable Changes** (the last one takes a condition expression, e.g. `hasKey === true`).
+- **Properties you can mutate:** Visible, Opacity, Scale, Rotation, Position, Color — each with a target value, a **Duration (ms)**, and an **Easing** curve (Linear, Ease, Ease In, Ease Out, Ease In Out).
+
+A typical use: a subtle **On Hover** scale-up so readers can discover what's clickable.
+
+## Transition
+
+The **Transition** section styles the moment the hotspot fires: an **Effect** (None, Fade, Slide, Zoom, Crossfade), a **Duration (ms)**, and an **Easing** function.
+
+## Conditions — showing hotspots only sometimes
+
+The **Visibility Condition** section makes a hotspot appear only when your story state allows it. You can type an expression into **Visible If** directly (for example `variable.hasKey === true`), but the friendlier way is the **Build Condition** button, which opens the Condition Builder:
+
+1. Click **+ Add Condition** and fill in the **Variable** name, its **Type** (String, Number, Boolean), an **Operator** (equals, not equals; greater/less than for numbers; contains, starts with, ends with for strings), and a **Value**.
+2. With two or more conditions, choose how to combine them: **AND (all must be true)** or **OR (any can be true)**.
+3. The **Expression Preview** shows the resulting expression as you build. Click **Apply Condition** to save it to the hotspot.
+
+You don't need to know any syntax — the builder writes the expression for you. Under the hood, conditions evaluate against the variables of your work; read [Variables in the editor](/cms/editor/variables) and [Variables concepts](/concepts/variables) to understand scopes and how state persists for the reader.
+
+<Callout kind="tip">
+  Classic pattern: hotspot A runs a **Set Variables** action (`hasKey` → true). Hotspot B, elsewhere in the story, has the visibility condition `variable.hasKey === true` — it only becomes clickable once the reader found the key.
+</Callout>
+
+## Finding panels with hotspots
+
+The structure tree's filter bar has a **Show panels with hotspots** toggle, handy for auditing interactivity across a long work. Always test your hotspots in [Preview](/cms/preview) before [publishing](/cms/publishing).
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Hotspots in the format" icon="target" href="/schema/hotspots">
+    How hotspots are stored in the PanelWave manifest.
+  </Card>
+  <Card title="Variables" icon="variable" href="/cms/editor/variables">
+    Define the state your conditions and actions use.
+  </Card>
+  <Card title="Story graph" icon="git-branch" href="/cms/editor/graph">
+    Wire branching navigation between panels.
+  </Card>
+</Columns>
