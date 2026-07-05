@@ -1,5 +1,5 @@
 {
-  "name": "PanelWave",
+  "name": "PanelWave Docs",
   "template": "atlas",
   "initialRoute": "introduction",
   "colors": {
@@ -15,12 +15,17 @@
     "following": true
   },
   "css": [
-    { "src": "styles/custom.css" }
+    {
+      "src": "styles/custom.css"
+    }
   ],
   "navbar": {
     "actions": {
       "links": [
-        { "title": "panelwave.org", "link": "https://panelwave.org" }
+        {
+          "title": "panelwave.org",
+          "link": "https://panelwave.org"
+        }
       ]
     }
   },
@@ -34,21 +39,57 @@
             "group": "Getting Started",
             "icon": "rocket",
             "pages": [
-              { "title": "Introduction", "path": "introduction", "icon": "home" },
-              { "title": "Quickstart", "path": "quickstart", "icon": "zap" }
+              {
+                "title": "Introduction",
+                "path": "introduction",
+                "icon": "home"
+              },
+              {
+                "title": "Quickstart",
+                "path": "quickstart",
+                "icon": "zap"
+              }
             ]
           },
           {
             "group": "Core Concepts",
             "icon": "lightbulb",
             "pages": [
-              { "title": "Architecture", "path": "concepts/architecture", "icon": "layers" },
-              { "title": "The Manifest", "path": "concepts/manifest", "icon": "file-text" },
-              { "title": "Graph Navigation", "path": "concepts/graph-navigation", "icon": "git-branch" },
-              { "title": "Localization", "path": "concepts/localization", "icon": "globe" },
-              { "title": "Variables", "path": "concepts/variables", "icon": "variable" },
-              { "title": "Assets", "path": "concepts/assets", "icon": "image" },
-              { "title": "Monetization", "path": "concepts/monetization", "icon": "credit-card" }
+              {
+                "title": "Architecture",
+                "path": "concepts/architecture",
+                "icon": "layers"
+              },
+              {
+                "title": "The Manifest",
+                "path": "concepts/manifest",
+                "icon": "file-text"
+              },
+              {
+                "title": "Graph Navigation",
+                "path": "concepts/graph-navigation",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Localization",
+                "path": "concepts/localization",
+                "icon": "globe"
+              },
+              {
+                "title": "Variables",
+                "path": "concepts/variables",
+                "icon": "variable"
+              },
+              {
+                "title": "Assets",
+                "path": "concepts/assets",
+                "icon": "image"
+              },
+              {
+                "title": "Monetization",
+                "path": "concepts/monetization",
+                "icon": "credit-card"
+              }
             ]
           }
         ]
@@ -61,43 +102,143 @@
             "group": "Overview",
             "icon": "book-open",
             "pages": [
-              { "title": "Format Overview", "path": "schema/overview", "icon": "home" },
-              { "title": "Versioning", "path": "schema/versioning", "icon": "git-branch" },
-              { "title": "Validation", "path": "schema/validation", "icon": "check-circle" }
+              {
+                "title": "Format Overview",
+                "path": "schema/overview",
+                "icon": "home"
+              },
+              {
+                "title": "Versioning",
+                "path": "schema/versioning",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Validation",
+                "path": "schema/validation",
+                "icon": "check-circle"
+              }
             ]
           },
           {
             "group": "Manifest Reference",
             "icon": "file-text",
             "pages": [
-              { "title": "Manifest Structure", "path": "schema/manifest-structure", "icon": "file-text" },
-              { "title": "Meta & Characters", "path": "schema/meta", "icon": "info" },
-              { "title": "Settings", "path": "schema/settings", "icon": "settings" },
-              { "title": "Assets", "path": "schema/assets", "icon": "image" },
-              { "title": "Variables", "path": "schema/variables", "icon": "variable" },
-              { "title": "Chapters & Pages", "path": "schema/chapters-and-pages", "icon": "book-open" },
-              { "title": "Graph & Edges", "path": "schema/graph", "icon": "git-branch" },
-              { "title": "Panels", "path": "schema/panels", "icon": "square" },
-              { "title": "Layers", "path": "schema/layers", "icon": "layers" },
-              { "title": "Speech Bubbles", "path": "schema/speech-bubbles", "icon": "message-circle" },
-              { "title": "Hotspots", "path": "schema/hotspots", "icon": "mouse-pointer" },
-              { "title": "Animations & Transitions", "path": "schema/animations", "icon": "play" },
-              { "title": "Audio", "path": "schema/audio", "icon": "volume-2" },
-              { "title": "Video", "path": "schema/video", "icon": "video" },
-              { "title": "Variants & Partials", "path": "schema/variants", "icon": "shuffle" },
-              { "title": "Extras", "path": "schema/extras", "icon": "star" },
-              { "title": "Paywall", "path": "schema/paywall", "icon": "lock" },
-              { "title": "Tracking", "path": "schema/tracking", "icon": "bar-chart" },
-              { "title": "UI Settings", "path": "schema/ui", "icon": "monitor" },
-              { "title": "Extensions & Plugins", "path": "schema/extensions", "icon": "puzzle" }
+              {
+                "title": "Manifest Structure",
+                "path": "schema/manifest-structure",
+                "icon": "file-text"
+              },
+              {
+                "title": "Meta & Characters",
+                "path": "schema/meta",
+                "icon": "info"
+              },
+              {
+                "title": "Settings",
+                "path": "schema/settings",
+                "icon": "settings"
+              },
+              {
+                "title": "Assets",
+                "path": "schema/assets",
+                "icon": "image"
+              },
+              {
+                "title": "Variables",
+                "path": "schema/variables",
+                "icon": "variable"
+              },
+              {
+                "title": "Chapters & Pages",
+                "path": "schema/chapters-and-pages",
+                "icon": "book-open"
+              },
+              {
+                "title": "Graph & Edges",
+                "path": "schema/graph",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Panels",
+                "path": "schema/panels",
+                "icon": "square"
+              },
+              {
+                "title": "Layers",
+                "path": "schema/layers",
+                "icon": "layers"
+              },
+              {
+                "title": "Speech Bubbles",
+                "path": "schema/speech-bubbles",
+                "icon": "message-circle"
+              },
+              {
+                "title": "Hotspots",
+                "path": "schema/hotspots",
+                "icon": "mouse-pointer"
+              },
+              {
+                "title": "Animations & Transitions",
+                "path": "schema/animations",
+                "icon": "play"
+              },
+              {
+                "title": "Audio",
+                "path": "schema/audio",
+                "icon": "volume-2"
+              },
+              {
+                "title": "Video",
+                "path": "schema/video",
+                "icon": "video"
+              },
+              {
+                "title": "Variants & Partials",
+                "path": "schema/variants",
+                "icon": "shuffle"
+              },
+              {
+                "title": "Extras",
+                "path": "schema/extras",
+                "icon": "star"
+              },
+              {
+                "title": "Paywall",
+                "path": "schema/paywall",
+                "icon": "lock"
+              },
+              {
+                "title": "Tracking",
+                "path": "schema/tracking",
+                "icon": "bar-chart"
+              },
+              {
+                "title": "UI Settings",
+                "path": "schema/ui",
+                "icon": "monitor"
+              },
+              {
+                "title": "Extensions & Plugins",
+                "path": "schema/extensions",
+                "icon": "puzzle"
+              }
             ]
           },
           {
             "group": "Examples & Tooling",
             "icon": "terminal",
             "pages": [
-              { "title": "Example Manifests", "path": "schema/examples", "icon": "file-text" },
-              { "title": "CLI", "path": "schema/cli", "icon": "terminal" }
+              {
+                "title": "Example Manifests",
+                "path": "schema/examples",
+                "icon": "file-text"
+              },
+              {
+                "title": "CLI",
+                "path": "schema/cli",
+                "icon": "terminal"
+              }
             ]
           }
         ]
@@ -110,37 +251,113 @@
             "group": "Getting Started",
             "icon": "rocket",
             "pages": [
-              { "title": "Overview", "path": "player/overview", "icon": "home" },
-              { "title": "Installation", "path": "player/installation", "icon": "package" },
-              { "title": "Quickstart: Embed", "path": "player/quickstart-embed", "icon": "zap" }
+              {
+                "title": "Overview",
+                "path": "player/overview",
+                "icon": "home"
+              },
+              {
+                "title": "Installation",
+                "path": "player/installation",
+                "icon": "package"
+              },
+              {
+                "title": "Quickstart: Embed",
+                "path": "player/quickstart-embed",
+                "icon": "zap"
+              }
             ]
           },
           {
             "group": "Using the Player",
             "icon": "play",
             "pages": [
-              { "title": "Reader Interface", "path": "player/reader-interface", "icon": "monitor" },
-              { "title": "Configuration", "path": "player/configuration", "icon": "settings" },
-              { "title": "Inputs & Outputs", "path": "player/inputs-outputs", "icon": "code" },
-              { "title": "Audio Playback", "path": "player/audio", "icon": "volume-2" },
-              { "title": "Saving & Progress", "path": "player/saving-progress", "icon": "save" },
-              { "title": "Localization", "path": "player/localization", "icon": "globe" },
-              { "title": "Paywall & Entitlement", "path": "player/paywall-entitlement", "icon": "lock" },
-              { "title": "Tracking Events", "path": "player/tracking", "icon": "bar-chart" },
-              { "title": "Plugins", "path": "player/plugins", "icon": "puzzle" }
+              {
+                "title": "Reader Interface",
+                "path": "player/reader-interface",
+                "icon": "monitor"
+              },
+              {
+                "title": "Configuration",
+                "path": "player/configuration",
+                "icon": "settings"
+              },
+              {
+                "title": "Inputs & Outputs",
+                "path": "player/inputs-outputs",
+                "icon": "code"
+              },
+              {
+                "title": "Audio Playback",
+                "path": "player/audio",
+                "icon": "volume-2"
+              },
+              {
+                "title": "Saving & Progress",
+                "path": "player/saving-progress",
+                "icon": "save"
+              },
+              {
+                "title": "Localization",
+                "path": "player/localization",
+                "icon": "globe"
+              },
+              {
+                "title": "Paywall & Entitlement",
+                "path": "player/paywall-entitlement",
+                "icon": "lock"
+              },
+              {
+                "title": "Tracking Events",
+                "path": "player/tracking",
+                "icon": "bar-chart"
+              },
+              {
+                "title": "Plugins",
+                "path": "player/plugins",
+                "icon": "puzzle"
+              }
             ]
           },
           {
             "group": "Architecture",
             "icon": "cpu",
             "pages": [
-              { "title": "Architecture", "path": "player/architecture", "icon": "layers" },
-              { "title": "Services", "path": "player/services", "icon": "server" },
-              { "title": "Components", "path": "player/components", "icon": "square" },
-              { "title": "Balloon Renderer", "path": "player/balloon-renderer", "icon": "message-circle" },
-              { "title": "State & Conditions", "path": "player/state-and-conditions", "icon": "git-branch" },
-              { "title": "Performance", "path": "player/performance", "icon": "gauge" },
-              { "title": "Development", "path": "player/development", "icon": "wrench" }
+              {
+                "title": "Architecture",
+                "path": "player/architecture",
+                "icon": "layers"
+              },
+              {
+                "title": "Services",
+                "path": "player/services",
+                "icon": "server"
+              },
+              {
+                "title": "Components",
+                "path": "player/components",
+                "icon": "square"
+              },
+              {
+                "title": "Balloon Renderer",
+                "path": "player/balloon-renderer",
+                "icon": "message-circle"
+              },
+              {
+                "title": "State & Conditions",
+                "path": "player/state-and-conditions",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Performance",
+                "path": "player/performance",
+                "icon": "gauge"
+              },
+              {
+                "title": "Development",
+                "path": "player/development",
+                "icon": "wrench"
+              }
             ]
           }
         ]
@@ -153,51 +370,159 @@
             "group": "Getting Started",
             "icon": "rocket",
             "pages": [
-              { "title": "Overview", "path": "cms/overview", "icon": "home" },
-              { "title": "Account & Team", "path": "cms/account", "icon": "user" },
-              { "title": "Works", "path": "cms/works", "icon": "book" }
+              {
+                "title": "Overview",
+                "path": "cms/overview",
+                "icon": "home"
+              },
+              {
+                "title": "Account & Team",
+                "path": "cms/account",
+                "icon": "user"
+              },
+              {
+                "title": "Works",
+                "path": "cms/works",
+                "icon": "book"
+              }
             ]
           },
           {
             "group": "The Editor",
             "icon": "edit",
             "pages": [
-              { "title": "Editor Layout", "path": "cms/editor/layout", "icon": "layout" },
-              { "title": "Canvas", "path": "cms/editor/canvas", "icon": "frame" },
-              { "title": "Pages & Panels", "path": "cms/editor/pages-panels", "icon": "square" },
-              { "title": "Layers", "path": "cms/editor/layers", "icon": "layers" },
-              { "title": "Speech Bubbles", "path": "cms/editor/speech-bubbles", "icon": "message-circle" },
-              { "title": "Hotspots", "path": "cms/editor/hotspots", "icon": "mouse-pointer" },
-              { "title": "Animations & Timeline", "path": "cms/editor/animations", "icon": "play" },
-              { "title": "Audio", "path": "cms/editor/audio", "icon": "volume-2" },
-              { "title": "Video Panels", "path": "cms/editor/video-panels", "icon": "video" },
-              { "title": "Graph Editor", "path": "cms/editor/graph", "icon": "git-branch" },
-              { "title": "Variables & Conditions", "path": "cms/editor/variables", "icon": "variable" },
-              { "title": "Keyboard Shortcuts", "path": "cms/editor/shortcuts", "icon": "keyboard" }
+              {
+                "title": "Editor Layout",
+                "path": "cms/editor/layout",
+                "icon": "layout"
+              },
+              {
+                "title": "Canvas",
+                "path": "cms/editor/canvas",
+                "icon": "frame"
+              },
+              {
+                "title": "Pages & Panels",
+                "path": "cms/editor/pages-panels",
+                "icon": "square"
+              },
+              {
+                "title": "Layers",
+                "path": "cms/editor/layers",
+                "icon": "layers"
+              },
+              {
+                "title": "Speech Bubbles",
+                "path": "cms/editor/speech-bubbles",
+                "icon": "message-circle"
+              },
+              {
+                "title": "Hotspots",
+                "path": "cms/editor/hotspots",
+                "icon": "mouse-pointer"
+              },
+              {
+                "title": "Animations & Timeline",
+                "path": "cms/editor/animations",
+                "icon": "play"
+              },
+              {
+                "title": "Audio",
+                "path": "cms/editor/audio",
+                "icon": "volume-2"
+              },
+              {
+                "title": "Video Panels",
+                "path": "cms/editor/video-panels",
+                "icon": "video"
+              },
+              {
+                "title": "Graph Editor",
+                "path": "cms/editor/graph",
+                "icon": "git-branch"
+              },
+              {
+                "title": "Variables & Conditions",
+                "path": "cms/editor/variables",
+                "icon": "variable"
+              },
+              {
+                "title": "Keyboard Shortcuts",
+                "path": "cms/editor/shortcuts",
+                "icon": "keyboard"
+              }
             ]
           },
           {
             "group": "Content Management",
             "icon": "folder",
             "pages": [
-              { "title": "Asset Library", "path": "cms/assets", "icon": "image" },
-              { "title": "Characters", "path": "cms/characters", "icon": "users" },
-              { "title": "Extras", "path": "cms/extras", "icon": "star" },
-              { "title": "Localization", "path": "cms/localization", "icon": "globe" },
-              { "title": "Import", "path": "cms/import", "icon": "download" },
-              { "title": "Validation & Preflight", "path": "cms/validation", "icon": "check-circle" }
+              {
+                "title": "Asset Library",
+                "path": "cms/assets",
+                "icon": "image"
+              },
+              {
+                "title": "Characters",
+                "path": "cms/characters",
+                "icon": "users"
+              },
+              {
+                "title": "Extras",
+                "path": "cms/extras",
+                "icon": "star"
+              },
+              {
+                "title": "Localization",
+                "path": "cms/localization",
+                "icon": "globe"
+              },
+              {
+                "title": "Import",
+                "path": "cms/import",
+                "icon": "download"
+              },
+              {
+                "title": "Validation & Preflight",
+                "path": "cms/validation",
+                "icon": "check-circle"
+              }
             ]
           },
           {
             "group": "Publishing & Monetization",
             "icon": "send",
             "pages": [
-              { "title": "Preview", "path": "cms/preview", "icon": "eye" },
-              { "title": "Publishing", "path": "cms/publishing", "icon": "send" },
-              { "title": "Export", "path": "cms/export", "icon": "upload" },
-              { "title": "Monetization", "path": "cms/monetization", "icon": "credit-card" },
-              { "title": "Analytics", "path": "cms/analytics", "icon": "bar-chart" },
-              { "title": "Community", "path": "cms/community", "icon": "users" }
+              {
+                "title": "Preview",
+                "path": "cms/preview",
+                "icon": "eye"
+              },
+              {
+                "title": "Publishing",
+                "path": "cms/publishing",
+                "icon": "send"
+              },
+              {
+                "title": "Export",
+                "path": "cms/export",
+                "icon": "upload"
+              },
+              {
+                "title": "Monetization",
+                "path": "cms/monetization",
+                "icon": "credit-card"
+              },
+              {
+                "title": "Analytics",
+                "path": "cms/analytics",
+                "icon": "bar-chart"
+              },
+              {
+                "title": "Community",
+                "path": "cms/community",
+                "icon": "users"
+              }
             ]
           }
         ]
@@ -206,15 +531,28 @@
         "tab": "Help Center",
         "icon": "help-circle",
         "pages": [
-          { "title": "Help Center", "path": "help-center", "icon": "home" },
+          {
+            "title": "Help Center",
+            "path": "help-center",
+            "icon": "home"
+          },
           {
             "group": "FAQ",
             "icon": "help-circle",
             "expandable": false,
             "pages": [
-              { "title": "General", "path": "help-center/faq/general" },
-              { "title": "For Creators", "path": "help-center/faq/creators" },
-              { "title": "For Developers", "path": "help-center/faq/developers" }
+              {
+                "title": "General",
+                "path": "help-center/faq/general"
+              },
+              {
+                "title": "For Creators",
+                "path": "help-center/faq/creators"
+              },
+              {
+                "title": "For Developers",
+                "path": "help-center/faq/developers"
+              }
             ]
           },
           {
@@ -222,9 +560,18 @@
             "icon": "alert-triangle",
             "expandable": false,
             "pages": [
-              { "title": "Validation Errors", "path": "help-center/troubleshooting/validation-errors" },
-              { "title": "Player Embedding", "path": "help-center/troubleshooting/player-embedding" },
-              { "title": "CMS Uploads", "path": "help-center/troubleshooting/cms-uploads" }
+              {
+                "title": "Validation Errors",
+                "path": "help-center/troubleshooting/validation-errors"
+              },
+              {
+                "title": "Player Embedding",
+                "path": "help-center/troubleshooting/player-embedding"
+              },
+              {
+                "title": "CMS Uploads",
+                "path": "help-center/troubleshooting/cms-uploads"
+              }
             ]
           },
           {
@@ -232,7 +579,10 @@
             "icon": "book-open",
             "expandable": false,
             "pages": [
-              { "title": "Your First Graphic Novel", "path": "help-center/guides/first-graphic-novel" }
+              {
+                "title": "Your First Graphic Novel",
+                "path": "help-center/guides/first-graphic-novel"
+              }
             ]
           }
         ]
@@ -241,9 +591,14 @@
         "tab": "Changelog",
         "icon": "clock",
         "pages": [
-          { "title": "Changelog", "path": "changelog", "icon": "history" }
+          {
+            "title": "Changelog",
+            "path": "changelog",
+            "icon": "history"
+          }
         ]
       }
     ]
-  }
+  },
+  "title": "PanelWave Docs"
 }
