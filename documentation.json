@@ -14,6 +14,9 @@
     "indexing": true,
     "following": true
   },
+  "css": [
+    { "src": "styles/custom.css" }
+  ],
   "navbar": {
     "actions": {
       "links": [
