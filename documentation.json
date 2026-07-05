@@ -600,5 +600,10 @@
       }
     ]
   },
-  "title": "PanelWave Docs"
+  "title": "PanelWave Docs",
+  "customCss": [
+    {
+      "src": "styles/custom.css"
+    }
+  ]
 }
