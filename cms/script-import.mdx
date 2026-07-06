@@ -1,0 +1,108 @@
+---
+title: Script Import (Fountain)
+description: Turn a screenplay in Fountain format into a PanelWave work — AI-suggested chapters, panels, and speech bubbles, reviewed and reorganized by you before anything is created.
+---
+
+The CMS can turn a **screenplay** into a graphic novel skeleton. Upload a script in the open [Fountain](https://fountain.io/) format and the import wizard walks you from raw text to a ready-to-illustrate work:
+
+1. The script is **parsed** (scenes, dialogue, characters — with exact line numbers).
+2. AI suggests a **chapter → panel → speech-bubble structure** with an art brief per panel.
+3. You **review and reorganize** everything in a tree editor.
+4. AI lays the panels out as **pages for every output format** you target.
+5. You fine-tune the layouts in a drag & drop preview.
+6. The work is created and opens in the [editor](/cms/editor/layout).
+
+The result is a complete, navigable work — panels, prepositioned speech bubbles, page layouts, characters, and a linear reading graph. **No artwork yet, by design**: you add images or video behind the bubbles in the editor afterwards.
+
+<Callout kind="info">
+Every AI output in this flow is a **suggestion**. Nothing touches your works until the final **Create work** step — and everything the AI proposes is editable before that.
+</Callout>
+
+## What the AI will never change
+
+The import treats your script as untouchable source material:
+
+- **Dialogue is imported verbatim.** The AI may organize lines into panels, but rewritten, merged, or invented dialogue is detected and replaced with the exact script text.
+- **No line is dropped.** Every dialogue line ends up in exactly one (or more, if deliberately repeated) speech bubble; anything the AI omits is recovered automatically and flagged.
+- **Speakers stay correct.** A bubble's character is always the speaker from the script, never the AI's guess.
+- **Full provenance.** Every bubble remembers its source line — click the line badge in the review step to see the original script passage.
+
+## Running an import
+
+<Steps>
+  <Step title="Open the script importer">
+    On the [My Works](/cms/works) page, click **Import Script** (next to **Import**). The wizard opens at the upload step.
+  </Step>
+  <Step title="Upload your script">
+    Drop a `.fountain` (or `.txt`) file onto the drop zone, pick the **script language** (all imported text is stored under this locale), and click **Suggest structure**.
+  </Step>
+  <Step title="Watch the analysis">
+    The script is parsed and summarized — scenes, dialogue lines, and the detected cast with line counts appear while the AI works through the scenes. Long scripts are processed in chunks with live progress.
+  </Step>
+  <Step title="Review the structure">
+    The tree editor shows **chapters → panels → speech bubbles**. Reorganize freely (see below), then click **Continue**.
+  </Step>
+  <Step title="Choose output formats">
+    Pick every screen or print shape the work targets — phones, desktop, print pages, square, video frames. Pages are laid out **separately per format**.
+  </Step>
+  <Step title="Fine-tune the layouts">
+    A simplified preview shows each page with numbered panel rectangles. Drag to move, resize with the handles, move panels between pages — per format. Reading order recomputes automatically.
+  </Step>
+  <Step title="Create the work">
+    Review the summary and click **Create work**. The manifest is built, validated against the [open format](/schema/overview), and imported atomically. When it's done, open the work straight in the editor.
+  </Step>
+</Steps>
+
+Imports are **resumable** — leave the wizard at any point and continue later from the *Open imports* list on the upload step.
+
+## The structure review in detail
+
+The tree editor (step 4) is where you shape the book:
+
+- **Chapters pane** — rename, reorder (drag), add or delete chapters. Deleting a chapter moves its panels to the previous one; nothing is lost.
+- **Panels & bubbles tree** — drag bubbles between panels, reorder panels, and use the row actions: **add bubble**, **duplicate panel**, **split panel** at any bubble, **merge with next**, delete. Silent panels (no bubbles) are valid — great for establishing shots.
+- **Inspector** — edit the selected panel's **art brief** (the drawing instruction handed to your artist), camera hint, and mood; or a bubble's **kind** (speech, thought, shout, whisper, caption, narration, SFX), speaker, and text.
+- **Cast panel** — rename display names and **merge duplicate cues** (e.g. `THE KING` and `KING`) — all bubbles are re-attributed.
+- **Undo/redo** — <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd>, and every change autosaves to the import session.
+
+## What the Fountain parser understands
+
+Standard Fountain screenplay elements are recognized: the title page, scene headings (`INT./EXT.`, including `(FLASHBACK)` and `(CONTINUOUS)` markers), action, character cues with extensions (`(V.O.)`, `(O.S.)`, `(CONT'D)`), parentheticals, dual dialogue, transitions (`CUT TO:`, `> FADE OUT.`), centered text, forced elements (`!SUPER:` becomes a caption), sections, synopses, notes, and boneyard comments.
+
+Cues map to bubble kinds automatically — `(whispering)` becomes a whisper bubble, `V.O.` becomes narration, ALL-CAPS lines become shouts — and you can change any of it in the review step.
+
+## Limits and quotas
+
+| Limit | Value |
+|---|---|
+| File type / size | `.fountain` or `.txt`, up to **1 MB** |
+| Script size | up to 400 scenes / 5,000 dialogue lines |
+| Open import sessions | 3 at a time |
+| AI passes per session | 10 (retries included) |
+| Imports per month | depends on your plan — see below |
+
+Script imports are metered per plan tier. When the monthly allowance is reached, the wizard tells you how much was used and which plan raises the limit. Completed imports count; retrying a failed step inside a session does not count as a new import.
+
+<Callout kind="tip">
+If the AI service is temporarily unavailable, the import **still works**: a deterministic fallback produces a simpler (scene-by-scene) suggestion, clearly marked as such, and you can refine it in the review step as usual.
+</Callout>
+
+## After the import
+
+The created work is a normal PanelWave work:
+
+- **Add artwork** — panels have no image or video layers yet. The art brief on each panel (from the script's action lines) is in the panel description; add [layers](/cms/editor/layers) behind the bubbles.
+- **Position the bubbles** — bubbles are prepositioned (captions on top, dialogue stacked in reading order, alternating sides per speaker) as a readable starting point, not a final lettering pass. Refine them with the [speech bubble tools](/cms/editor/speech-bubbles).
+- **Add branching** — the import creates a linear reading [graph](/cms/editor/graph); add choices and conditions in the graph editor.
+- **Localize** — all text is keyed under the locale you chose at upload; add languages in the [Localization Workshop](/cms/localization).
+
+## Common errors
+
+| Message | Cause / fix |
+|---|---|
+| *Only .fountain and .txt files are supported* | Rename/export your script as Fountain plain text |
+| *Script exceeds the 1 MB limit* | Split the script or remove embedded notes |
+| *You already have 3 open import sessions…* | Finish or discard a session from the *Open imports* list |
+| *Monthly AI import limit reached…* | Your plan's allowance is used up for this month |
+| *This session has used its 10 AI passes* | Start a fresh import session |
+| *Import worker unavailable* | The background service is down — the session is kept; use **Retry** later |

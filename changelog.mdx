@@ -5,6 +5,33 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-06" description="CMS" tags={["feature"]}>
+  ## CMS — AI-assisted script import (Fountain)
+
+  Turn a screenplay in the open [Fountain](https://fountain.io/) format into a
+  PanelWave work — reviewed by you at every step:
+
+  - **Upload & parse** — scenes, dialogue, and cast are extracted with exact
+    source-line provenance; a parse summary shows what was found.
+  - **AI structure suggestion** — chapters, panels with art briefs, and typed
+    speech bubbles (speech, thought, shout, whisper, caption, narration, SFX).
+    Dialogue is guaranteed verbatim: rewritten or dropped lines are detected
+    and restored automatically.
+  - **Structure review** — a three-pane tree editor with drag & drop, panel
+    split/merge, cast merging, a source-line drawer, undo/redo, and autosave.
+  - **AI page layouts** — pages laid out per output format (mobile, desktop,
+    print, square, video …), refined in a drag & drop preview.
+  - **Work creation** — a schema-valid manifest is built and imported
+    atomically; speech bubbles come prepositioned, artwork is added behind
+    them in the editor afterwards.
+  - **Plan-tier metering** — script imports are allowance-gated per
+    subscription tier, with per-session retry caps.
+  - Resilient by design: if the AI service is unavailable, a deterministic
+    fallback still produces an editable suggestion.
+
+  Details: [Script Import (Fountain)](/cms/script-import).
+</Update>
+
 <Update label="2026-07-05" description="Documentation" tags={["feature"]}>
   ## Documentation site — initial release
 

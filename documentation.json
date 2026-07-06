@@ -483,6 +483,12 @@
                 "icon": "download"
               },
               {
+                "title": "Script Import (Fountain)",
+                "path": "cms/script-import",
+                "icon": "clapperboard",
+                "badge": "New"
+              },
+              {
                 "title": "Validation & Preflight",
                 "path": "cms/validation",
                 "icon": "check-circle"
