@@ -67,19 +67,21 @@ Tail options (part of `BalloonConfig.tail`):
 
 ## The configuration cascade
 
-The effective style of every bubble is computed in `SpeechBubblesComponent.resolveEffectiveConfig()` by merging three levels with `mergeBalloonConfig(base, override)` (a deep merge for the nested `tail` and `hideBorder` objects):
+The effective style of every bubble is computed in `SpeechBubblesComponent.resolveEffectiveConfig()` by merging four levels with `mergeBalloonConfig(base, override)` (a deep merge for the nested `tail` and `hideBorder` objects):
 
 ```mermaid
 graph LR
     D[DEFAULT_BALLOON_CONFIG] --> W[Work defaults<br/>settings.typography.balloon_config]
     W --> C[Character override<br/>character.balloonConfig]
-    C --> B[Per-bubble override<br/>bubble.balloonConfig]
+    C --> P[Named preset<br/>balloonPresets via bubble.styleRef]
+    P --> B[Per-bubble override<br/>bubble.balloonConfig]
     B --> R[Effective BalloonConfig]
 ```
 
-1. **Base**: the work-level config (`settings.typography.balloon_config`) or, if absent, `DEFAULT_BALLOON_CONFIG` (`normal` type, `cornerRadius: 0.5`, `maxWidth: 120`, `maxHeight: 80`, `'Ames Italic', sans-serif` at 12 px, 2 px black stroke, white fill, tail enabled at 180°/45 px).
+1. **Base**: the work-level config (`settings.typography.balloon_config`) merged onto `DEFAULT_BALLOON_CONFIG` (`normal` type, `cornerRadius: 0.5`, `maxWidth: 120`, `maxHeight: 80`, `'Ames Italic', sans-serif` at 12 px, 2 px black stroke, white fill, tail enabled at 180°/45 px) — partial work configs keep sane defaults for whatever they leave unset. When the `workBalloonConfig`/`characters` inputs are not bound, both are read from the loaded manifest via `ManifestService`.
 2. **Character**: if the bubble has a `characterId` and that character defines `balloonConfig`, it is merged on top — this is how each character gets a consistent voice style.
-3. **Bubble**: the bubble's own `balloonConfig` override wins last.
+3. **Named preset** (schema 1.3+): if the bubble sets `styleRef`, the matching entry from `settings.typography.balloonPresets` is merged next. Unknown names are ignored.
+4. **Bubble**: the bubble's own `balloonConfig` override wins last.
 
 The merged config is converted for the renderer with `balloonConfigToRenderOptions()` and `balloonConfigToTailOptions()` (which returns `null` when the tail is disabled and the type is not `connector`). All four symbols — `DEFAULT_BALLOON_CONFIG`, `mergeBalloonConfig`, `balloonConfigToRenderOptions`, `balloonConfigToTailOptions` — are exported from the public API.
 

@@ -5,6 +5,48 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-12" description="Format 1.3" tags={["feature"]}>
+  ## Format 1.3 — reusable style presets & implicit speech toggle
+
+  Additive, backward-compatible release: every valid 1.0–1.2 manifest remains valid unchanged.
+
+  - **Reusable style presets** — like CSS classes for the manifest. Named text
+    styles in `settings.typography.textStyles` (referenced by
+    `TextLayer.styleRef`) and named balloon presets in
+    `settings.typography.balloonPresets` (referenced by
+    `SpeechBubble.styleRef`). Shared styling is defined once and edited in one
+    place; the balloon cascade becomes work → character → **preset** → bubble.
+    Sample 11 replaced 104 identical caption style blocks and 79 repeated
+    balloon overrides with one text style and six balloon presets.
+  - **The speech toggle is implicit** — every speech bubble is inherently
+    subject to the reader's speech toggle (initial state:
+    `settings.ui.speechDefault`). The per-bubble
+    `visibleIf: {"var": "prefs.speech"}` boilerplate is obsolete; `visibleIf`
+    is reserved for story logic, and a forgotten boilerplate line can no
+    longer make a bubble immune to the toggle.
+  - **Player** — text layers and balloons resolve `styleRef` presets; the
+    toolbar speech toggle is functional and seeded from `speechDefault`.
+  - **CMS** — presets are exported with the manifest, `styleRef` round-trips
+    through the editor, validation warns about dangling preset references,
+    and legacy `prefs.speech` boilerplate is stripped on export.
+
+  Details: [Settings](/schema/settings), [Speech Bubbles](/schema/speech-bubbles), [Layers](/schema/layers), [Versioning](/schema/versioning).
+</Update>
+
+<Update label="2026-07-12" description="Format 1.2" tags={["feature"]}>
+  ## Format 1.2 — leaner manifests
+
+  Relaxing, backward-compatible release:
+
+  - **`mime` optional** on image/audio/video/subtitle/vector variants —
+    consumers derive the MIME type from the `src` file extension.
+  - **Edge transition inheritance** — edges without a `transition` inherit the
+    active format's `settings.outputPresets[format].defaultTransition`.
+  - **Export discipline** — exporters omit values equal to schema defaults.
+
+  Details: [Versioning](/schema/versioning).
+</Update>
+
 <Update label="2026-07-06" description="CMS" tags={["feature"]}>
   ## CMS — AI-assisted script import (Fountain)
 

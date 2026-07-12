@@ -192,7 +192,7 @@ $ panelwave upgrade old-manifest.json --dry-run
 ```
 
 <Callout kind="alert">
-The current CLI release (1.0.0) targets manifest version **1.0.0** as "latest" — it predates format 1.1. Running `upgrade` on a manifest that declares `panelwave.version: "1.1.0"` will rewrite the version back to `1.0.0`. Until a CLI release aligned with format 1.1 ships, only use `upgrade` on pre-1.0 drafts, and prefer `--dry-run` first. Validation is unaffected: `validate` uses the current schema file, which accepts both 1.0 and 1.1 manifests (see [Versioning](/schema/versioning)).
+The current CLI release (1.0.0) targets manifest version **1.0.0** as "latest" — it predates formats 1.1–1.3. Running `upgrade` on a manifest that declares a newer `panelwave.version` will rewrite the version back to `1.0.0`. Until a CLI release aligned with the current format ships, only use `upgrade` on pre-1.0 drafts, and prefer `--dry-run` first. Validation is unaffected: `validate` uses the current schema file, which accepts 1.0 through 1.3 manifests (see [Versioning](/schema/versioning)).
 </Callout>
 
 ### Exit codes

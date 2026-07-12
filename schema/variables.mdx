@@ -11,7 +11,7 @@ The optional `variables` section declares the state that drives everything condi
 
 | Property | Type | Required | Default | Description |
 |----------|------|:--:|:--:|-------------|
-| `id` | string | Yes | — | Variable name; pattern `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` — dot-namespaced segments, e.g. `prefs.speech`, `path.choice`, `user.age` |
+| `id` | string | Yes | — | Variable name; pattern `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` — dot-namespaced segments, e.g. `prefs.hints`, `path.choice`, `user.age` |
 | `type` | string | Yes | — | `boolean` \| `number` \| `integer` \| `string` \| `enum` \| `date` \| `time` \| `datetime` |
 | `scope` | string | Yes | — | `global` \| `chapter` \| `page` \| `session` \| `persistent` — see below |
 | `enum` | `string[]` (min 1, unique) | When `type` is `"enum"` | — | Allowed values |
@@ -21,7 +21,7 @@ The optional `variables` section declares the state that drives everything condi
 | `readOnly` | boolean | — | `false` | Story content cannot mutate this variable; its value comes from the environment |
 
 <Callout kind="info">
-Note the stricter ID pattern: unlike a general [`Identifier`](/schema/manifest-structure#identifier), variable IDs are dot-separated segments (`prefs.speech` is valid, `prefs..speech` or a leading dot is not). Plugin state variables use the reserved `plugin.` prefix — see [Panels](/schema/panels#plugins).
+Note the stricter ID pattern: unlike a general [`Identifier`](/schema/manifest-structure#identifier), variable IDs are dot-separated segments (`prefs.hints` is valid, `prefs..hints` or a leading dot is not). Plugin state variables use the reserved `plugin.` prefix — see [Panels](/schema/panels#plugins).
 </Callout>
 
 ## The five scopes
@@ -45,12 +45,12 @@ How the player stores and restores `persistent` values is an implementation conc
   "variables": {
     "definitions": [
       {
-        "id": "prefs.speech",
+        "id": "prefs.hints",
         "type": "boolean",
         "default": true,
         "scope": "persistent",
         "visibility": "public",
-        "description": "Reader wants speech bubbles shown"
+        "description": "Reader wants hint overlays shown"
       },
       {
         "id": "path.choice",
@@ -77,8 +77,12 @@ How the player stores and restores `persistent` values is an implementation conc
 **Read** them in any `JsonLogic` field:
 
 ```json
-{ "visibleIf": { "var": "prefs.speech" } }
+{ "visibleIf": { "var": "prefs.hints" } }
 ```
+
+<Callout kind="info">
+Don't define a variable to mirror the reader's speech preference: since schema 1.3, speech bubbles are [implicitly subject to the speech toggle](/schema/speech-bubbles#the-implicit-speech-toggle) — no `prefs.speech`-style boilerplate needed.
+</Callout>
 
 ```json
 { "condition": { "==": [ { "var": "path.choice" }, "left" ] } }

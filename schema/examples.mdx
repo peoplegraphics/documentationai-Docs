@@ -39,12 +39,11 @@ Start here to understand [chapters, pages, and placements](/schema/chapters-and-
 
 The same noir setting, but exercising most optional sections at once:
 
-- **Variables** with three scopes: a persistent reader preference, a session-scoped choice, and a read-only global (see [Variables](/schema/variables)):
+- **Variables** with two scopes: a session-scoped choice and a read-only global (see [Variables](/schema/variables)). Earlier revisions also defined a `prefs.speech` preference wired to every bubble's `visibleIf`; that boilerplate is gone since schema 1.3 made the [speech toggle implicit](/schema/speech-bubbles#the-implicit-speech-toggle):
 
 ```json
 "variables": {
   "definitions": [
-    { "id": "prefs.speech", "type": "boolean", "default": true, "scope": "persistent", "visibility": "public" },
     { "id": "path.choice", "type": "enum", "enum": ["none", "left", "right"], "default": "none", "scope": "session", "visibility": "public" },
     { "id": "user.age", "type": "integer", "default": 18, "scope": "global", "visibility": "private", "readOnly": true }
   ]
@@ -145,6 +144,14 @@ A single-chapter manifest (`panelwave.version: "1.1.0"`) that systematically exe
   }
 }
 ```
+
+## 08–11 — full-story literature adaptations
+
+Four album-length samples adapt public-domain classics (Sherlock Holmes ×2, Jules Verne ×2) with complete story data, bilingual text (en-US/de-DE), per-chapter sequence audio, branching viewpoints, and premium-gated finale chapters.
+
+The largest, **11_verne_20000_leagues** (61 A4 pages, 183 panels, `panelwave.version: "1.3.0"`), is the showcase for the schema 1.3 [reusable style presets](/schema/settings#reusable-style-presets): all 104 captions reference a single `caption` entry in `settings.typography.textStyles`, and all 79 speech bubbles reference one of six `balloonPresets` (speech/shout/thought × tail direction) via `styleRef` — the two whisper one-offs demonstrate combining a preset with a small inline `balloonConfig` override.
+
+**09_sherlock_speckled_band** demonstrates what `visibleIf` is *for* now that the [speech toggle is implicit](/schema/speech-bubbles#the-implicit-speech-toggle): three clue bubbles appear only after the reader taps the matching hotspot (`{ "var": "band.clue.vent" }` etc.) — pure story logic, no speech-preference boilerplate anywhere.
 
 ## Related pages
 

@@ -85,7 +85,12 @@ Only `kind` is required.
 |----------|------|-------------|
 | `text` | `LocalizedString` | Localized text content |
 | `content` | string | Plain-string alternative to `text` (written by the CMS) |
-| `style` | object | `font` (string), `sizePt` (number 4–200), `color` (`ColorHex`), `strokeColor` (`ColorHex`), `strokeWidth` (number 0–20) |
+| `styleRef` | `Identifier` | **Schema 1.3+.** Name of a reusable preset in [`settings.typography.textStyles`](/schema/settings#reusable-style-presets). Unknown names are ignored |
+| `style` | `TextStyle` | Inline styling: `font` (string), `sizePt` (number 4–200), `color` (`ColorHex`), `strokeColor` (`ColorHex`), `strokeWidth` (number 0–20). When `styleRef` is also set, inline fields override the preset field-by-field |
+
+<Callout kind="tip">
+When many layers share the same look (e.g. every caption of an album), define it once in `settings.typography.textStyles` and reference it via `styleRef` instead of repeating identical `style` blocks. Resolution cascade: work typography defaults → preset → inline `style`.
+</Callout>
 
 ### `PluginLayer` (`kind: "plugin"`)
 
@@ -132,8 +137,11 @@ A layered panel with parallax, a conditional overlay, and a caption:
       "z": 30,
       "opacity": 0.95,
       "text": { "en-US": "Left path chosen.", "de-DE": "Linker Pfad gewählt." },
-      "style": { "font": "Helvetica", "sizePt": 16, "color": "#ffffff", "strokeColor": "#000000", "strokeWidth": 2 }
+      "styleRef": "caption",
+      "style": { "sizePt": 16 }
     }
   ]
 }
 ```
+
+The caption references the work's `caption` preset from `settings.typography.textStyles` and only overrides the size inline — see [Settings](/schema/settings#reusable-style-presets).

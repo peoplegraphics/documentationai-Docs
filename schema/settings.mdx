@@ -19,6 +19,39 @@ Global text and page styling defaults for the work.
 | `balloon_config` | `BalloonConfig` | — | — | Default balloon styling for **all** speech bubbles in this work; start of the balloon cascade (work → character → bubble). See [Speech Bubbles](/schema/speech-bubbles) |
 | `panel_border_style` | object | — | — | Default panel border: `color` (`ColorHex`), `thickness` (integer 0–10, default 1, px), `style` (`solid` \| `dashed` \| `dotted` \| `none`, default `solid`) |
 | `gutter_width` | integer | `10` | 0–50 | Space between panels in pixels |
+| `textStyles` | map of `TextStyle` | — | keys are `Identifier`s | **Schema 1.3+.** Named, reusable text style presets referenced by `TextLayer.styleRef`. See below |
+| `balloonPresets` | map of `BalloonConfigOverride` | — | keys are `Identifier`s | **Schema 1.3+.** Named, reusable balloon presets referenced by `SpeechBubble.styleRef`. See below |
+
+### Reusable style presets
+
+Both maps work like CSS classes for the manifest: define shared styling once, reference it by name, and restyle every referencing element by editing the preset in one place.
+
+- **`textStyles`** maps a preset name to a [`TextStyle`](/schema/layers#textlayer-kind-text) (`font`, `sizePt`, `color`, `strokeColor`, `strokeWidth`). A [text layer](/schema/layers) opts in with `styleRef`; its inline `style` fields override the preset field-by-field.
+- **`balloonPresets`** maps a preset name to a `BalloonConfigOverride`. A [speech bubble](/schema/speech-bubbles) opts in with `styleRef`; the preset slots into the balloon cascade as **work → character → preset → bubble**.
+
+```json
+{
+  "settings": {
+    "typography": {
+      "textStyles": {
+        "caption": { "font": "CrimsonPro", "sizePt": 14, "color": "#fdf6e3", "strokeColor": "#0a1a24", "strokeWidth": 3 }
+      },
+      "balloonPresets": {
+        "speech-down-right": { "tail": { "position": 150, "length": 50 } },
+        "shout-down-right": { "balloonType": "shout", "strokeWidth": 4, "tail": { "position": 150, "length": 50 } }
+      }
+    }
+  }
+}
+```
+
+<Callout kind="tip">
+Before presets, restyling the captions of a 61-page album meant editing 100+ identical inline `style` blocks. [Sample 11](/schema/examples) uses one `caption` text style and six balloon presets for all of its 104 captions and 79 bubbles.
+</Callout>
+
+<Callout kind="info">
+A `styleRef` that names no existing preset is **ignored** by consumers (the element renders as if `styleRef` were unset). Authoring tools should warn about dangling references — the CMS validation panel does.
+</Callout>
 
 ## `settings.ui`
 
@@ -29,7 +62,7 @@ Reader-behavior defaults. The player exposes matching toggles (controlled via [U
 | `mangaMode` | boolean | `false` | — | Right-to-left reading direction |
 | `autoplayDefault` | boolean | `false` | — | Start in autoplay mode |
 | `secondsPerPanel` | number | — | 0.5–120 | Autoplay dwell time per panel; a panel's own `durationMs` overrides this |
-| `speechDefault` | boolean | `true` | — | Speech bubbles visible by default |
+| `speechDefault` | boolean | `true` | — | Initial state of the reader's speech-bubble toggle. **Schema 1.3+:** every speech bubble is implicitly gated by this toggle — see [Speech Bubbles](/schema/speech-bubbles#the-implicit-speech-toggle) |
 | `audioDefault` | boolean | `true` | — | Music/ambient audio on by default |
 | `sfxDefault` | boolean | `true` | — | Sound effects on by default |
 | `scrollingDefault` | boolean | `true` | — | Scrolling navigation enabled by default |
@@ -75,7 +108,13 @@ Individual panels can further restrict views per format with `formatViews` (`all
       "default_font_size": 14,
       "default_page_bg_color": "#111111",
       "gutter_width": 10,
-      "panel_border_style": { "color": "#000000", "thickness": 1, "style": "solid" }
+      "panel_border_style": { "color": "#000000", "thickness": 1, "style": "solid" },
+      "textStyles": {
+        "caption": { "font": "Roboto", "sizePt": 14, "color": "#ffffff", "strokeColor": "#000000", "strokeWidth": 3 }
+      },
+      "balloonPresets": {
+        "whisper-soft": { "balloonType": "whisper", "strokeWidth": 1 }
+      }
     },
     "ui": {
       "mangaMode": false,

@@ -30,8 +30,8 @@ Defined as `$defs/AudioTrack`, used in `panels.<panelId>.audio[]` and in [extras
     "p1": {
       "audio": [
         { "assetId": "sfx-rain", "role": "ambient", "loop": true, "gain": 0.3 },
-        { "assetId": "vo-p1-line", "role": "voiceover", "startAtMs": 0,
-          "visibleIf": { "var": "prefs.speech" } }
+        { "assetId": "vo-p1-line-left", "role": "voiceover", "startAtMs": 0,
+          "visibleIf": { "==": [ { "var": "path.choice" }, "left" ] } }
       ]
     }
   }

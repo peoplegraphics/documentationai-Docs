@@ -3,7 +3,7 @@ title: Speech Bubbles
 description: Reference for SpeechBubble, BalloonConfig, TailConfig, HideBorderConfig, and BoundingBox — the 9 balloon types and the styling cascade.
 ---
 
-Speech bubbles carry dialogue, thoughts, and narration inside a panel. Each bubble is a `SpeechBubble` object in a panel's `speechBubbles` array. Bubbles are positioned with normalized coordinates, hold localized text, and are styled through a three-level **balloon configuration cascade** rendered by the player's ComicBalloon SVG engine (see [Balloon Renderer](/player/balloon-renderer)).
+Speech bubbles carry dialogue, thoughts, and narration inside a panel. Each bubble is a `SpeechBubble` object in a panel's `speechBubbles` array. Bubbles are positioned with normalized coordinates, hold localized text, and are styled through a four-level **balloon configuration cascade** rendered by the player's ComicBalloon SVG engine (see [Balloon Renderer](/player/balloon-renderer)).
 
 ## `SpeechBubble`
 
@@ -16,8 +16,9 @@ Defined as `$defs/SpeechBubble`. Lives in `chapters[].panels.<panelId>.speechBub
 | `shape` | `BoundingBox` | Yes | Position and size of the bubble in normalized panel coordinates (0–1). |
 | `characterId` | `Identifier` | No | Speaker; references a character in `meta.characters`. Pulls in that character's balloon overrides. |
 | `audioAssetId` | `Identifier` | No | Voice-over audio asset for this bubble (asset catalog ID). |
-| `balloonConfig` | `BalloonConfigOverride` | No | Per-bubble style overrides, merged onto character or work-level defaults. |
-| `visibleIf` | `JsonLogic` | No | Condition controlling bubble visibility, evaluated against [variables](/schema/variables). |
+| `styleRef` | `Identifier` | No | **Schema 1.3+.** Name of a reusable preset in [`settings.typography.balloonPresets`](/schema/settings#reusable-style-presets). Unknown names are ignored. |
+| `balloonConfig` | `BalloonConfigOverride` | No | Per-bubble style overrides, merged last (onto the `styleRef` preset, character, or work-level defaults). |
+| `visibleIf` | `JsonLogic` | No | **Story-logic** visibility condition, evaluated against [variables](/schema/variables). Do **not** use it to honor the reader's speech preference — that gating is implicit since schema 1.3 (see below). |
 | `tail` | object | No | Editor-computed balloon tail geometry (tip/anchor points, width). Free-form. |
 | `tailStyle` | string | No | Editor tail style preset (e.g. `"normal"`). |
 | `textStyle` | object | No | Editor text styling (font, color, alignment, padding). Free-form. |
@@ -45,19 +46,29 @@ Axis-aligned bounding box using normalized coordinates (0–1), relative to the 
 `BoundingBox` sets `additionalProperties: false` — a bubble `shape` must contain **only** `x`, `y`, `w`, `h`. A `type` property (as used by the hotspot `Shape` union) is not valid here.
 </Callout>
 
+## The implicit speech toggle
+
+Since schema 1.3, **every speech bubble is inherently subject to the reader's global speech toggle**. The toggle's initial state comes from [`settings.ui.speechDefault`](/schema/settings#settingsui) (default: on), and the player ANDs it on top of any `visibleIf` — a bubble renders only when *both* the toggle is on *and* its `visibleIf` (if any) is truthy.
+
+<Callout kind="alert">
+Do **not** write `visibleIf: { "var": "prefs.speech" }` (or similar) on bubbles to honor the speech preference. That pre-1.3 boilerplate is obsolete — and it was a bug waiting to happen: forgetting it on a single bubble made that bubble immune to the toggle. `visibleIf` is reserved for actual story logic, like sample 09's clue bubbles that appear once `{ "var": "band.clue.vent" }` is set.
+</Callout>
+
 ## The styling cascade
 
-Balloon styling merges three levels, most specific wins:
+Balloon styling merges four levels, most specific wins:
 
 ```mermaid
 graph LR
     A["Work defaults<br/>settings.typography.balloon_config<br/>(BalloonConfig)"] --> B["Character override<br/>meta.characters[].balloonConfig<br/>(BalloonConfigOverride)"]
-    B --> C["Per-bubble override<br/>speechBubbles[].balloonConfig<br/>(BalloonConfigOverride)"]
+    B --> P["Named preset<br/>settings.typography.balloonPresets[styleRef]<br/>(BalloonConfigOverride, schema 1.3+)"]
+    P --> C["Per-bubble override<br/>speechBubbles[].balloonConfig<br/>(BalloonConfigOverride)"]
 ```
 
 1. **Work defaults** — a complete `BalloonConfig` at `settings.typography.balloon_config` (see [Settings](/schema/settings)). Anything unset falls back to the schema defaults below.
 2. **Character override** — a partial `BalloonConfigOverride` on the character (`meta.characters[].balloonConfig`), merged onto the work defaults for every bubble spoken by that character.
-3. **Per-bubble override** — a partial `BalloonConfigOverride` on the bubble itself, merged last.
+3. **Named preset** (schema 1.3+) — the `BalloonConfigOverride` from `settings.typography.balloonPresets` that the bubble references via `styleRef`. Lets many bubbles share one editable definition instead of repeating identical overrides.
+4. **Per-bubble override** — a partial `BalloonConfigOverride` on the bubble itself, merged last. With a preset in play this is only needed for true one-offs (e.g. a single whisper on top of a shared tail preset).
 
 The merge is field-by-field, and the nested `tail` and `hideBorder` objects merge field-by-field too (a character can set `tail.curve` without losing the work-level `tail.length`). The player implements this in `mergeBalloonConfig`.
 
@@ -126,7 +137,7 @@ Hides a segment of the balloon border, useful when stacking balloons so they app
 
 ## Example
 
-A work-level default, a character override, and a bubble that overrides both:
+A work-level default, a named preset, a character override, and a bubble combining all of them:
 
 ```json
 {
@@ -141,6 +152,9 @@ A work-level default, a character override, and a bubble that overrides both:
         "strokeColor": "#000000",
         "fillColor": "#ffffff",
         "tail": { "enabled": true, "position": 180, "length": 45 }
+      },
+      "balloonPresets": {
+        "speech-down-right": { "tail": { "position": 150, "length": 50 } }
       }
     }
   },
@@ -175,8 +189,8 @@ A work-level default, a character override, and a bubble that overrides both:
                 "de-DE": "Du wirst niemals entkommen!"
               },
               "shape": { "x": 0.55, "y": 0.1, "w": 0.35, "h": 0.2 },
-              "balloonConfig": { "fontSize": 16 },
-              "visibleIf": { "var": "prefs.speech" }
+              "styleRef": "speech-down-right",
+              "balloonConfig": { "fontSize": 16 }
             }
           ]
         }
@@ -185,13 +199,13 @@ A work-level default, a character override, and a bubble that overrides both:
     }
   ],
   "panelwave": {
-    "version": "1.1.0",
+    "version": "1.3.0",
     "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json"
   }
 }
 ```
 
-The bubble renders as a shout balloon (character), light red (character), 16 px text (bubble), with the work-level tail settings except the character's right curve — and only when the `prefs.speech` variable is truthy.
+The bubble renders as a shout balloon (character), light red (character), 16 px text (bubble), with the preset's tail direction/length on top of the character's right curve — and it disappears automatically whenever the reader turns speech off. No `visibleIf` needed for that.
 
 ## Related pages
 

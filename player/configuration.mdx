@@ -58,19 +58,23 @@ The manifest sections below shape player behavior. They are authored by the crea
 | `mangaMode` | `boolean` | Right-to-left reading by default |
 | `autoplayDefault` | `boolean` | Autoplay enabled by default |
 | `secondsPerPanel` | `number` | Default autoplay dwell time |
-| `speechDefault` / `audioDefault` / `sfxDefault` | `boolean` | Default toggle states for speech bubbles, audio, SFX |
+| `speechDefault` / `audioDefault` / `sfxDefault` | `boolean` | Default toggle states for speech bubbles, audio, SFX. `speechDefault` is **applied**: it seeds the speech toggle, which implicitly gates every bubble (schema 1.3) |
 | `scrollingDefault` | `boolean` | Scrolling mode by default |
 | `videoPlayModeDefault` | `VideoPlayMode` | Work-level default for video layers (`once` if absent) — **applied** |
 | `videoStartModeDefault` | `VideoStartMode` | Work-level default start trigger (`on-view` if absent) — **applied** |
 | `videoMutedDefault` | `boolean` | Work-level default muted state (`true` if absent) — **applied** |
 
 <Callout kind="alert">
-In the current build the shell **applies the three video defaults** (they cascade into every video layer via `resolveVideoConfig`), while the non-video defaults (`autoplayDefault`, `speechDefault`, …) are declared in the type but not yet read at startup. Treat them as forward-looking manifest data.
+In the current build the shell **applies the three video defaults** (they cascade into every video layer via `resolveVideoConfig`) and **`speechDefault`** (it seeds the speech toggle, which hides/shows all bubbles). The remaining non-video defaults (`autoplayDefault`, `audioDefault`, …) are declared in the type but not yet read at startup — treat those as forward-looking manifest data.
 </Callout>
 
 ### `settings.typography.balloon_config`
 
-Work-level default styling for all speech bubbles (`BalloonConfig`): balloon type, corner radius, font family/size, stroke and fill colors, tail geometry, hide-border effect. The player merges this with per-character and per-bubble overrides via `mergeBalloonConfig` — see [Speech Bubbles](/schema/speech-bubbles) and [Balloon Renderer](/player/balloon-renderer).
+Work-level default styling for all speech bubbles (`BalloonConfig`): balloon type, corner radius, font family/size, stroke and fill colors, tail geometry, hide-border effect. The player merges this with per-character, per-preset (`styleRef`, schema 1.3+), and per-bubble overrides via `mergeBalloonConfig` — see [Speech Bubbles](/schema/speech-bubbles) and [Balloon Renderer](/player/balloon-renderer).
+
+### `settings.typography.textStyles` and `balloonPresets` (schema 1.3+)
+
+Named, reusable style presets. Text layers resolve `styleRef` against `textStyles` in the layer renderer (inline `style` fields win); speech bubbles resolve `styleRef` against `balloonPresets` inside the balloon cascade. Unknown `styleRef`s are ignored. See [Settings](/schema/settings#reusable-style-presets).
 
 ### `settings.preload`
 

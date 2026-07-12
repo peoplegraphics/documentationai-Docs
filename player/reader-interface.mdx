@@ -55,7 +55,7 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 |---|---|
 | **View** | Toggle page/panel view. Disabled when the manifest defines no pages. |
 | **Language** (globe) | Opens the language modal. Only shown when the work has more than one locale. |
-| **Speech** | Toggle speech bubbles on/off. |
+| **Speech** | Toggle speech bubbles on/off. Seeded from `settings.ui.speechDefault`; hides **all** bubbles implicitly (schema 1.3) — no per-bubble `visibleIf` boilerplate involved. |
 | **Audio** | Mute/unmute audio. |
 | **SFX** | Enable/disable sound effects. |
 | **Autoplay** | Start/stop automatic advancing. While active, the button shows a progress bar and **−/+** controls to adjust the seconds-per-panel (0.5–120 s in 1-s steps). |
@@ -70,7 +70,7 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 | **✕** | Close the toolbar. |
 
 <Callout kind="alert">
-**Work in progress:** in the current build, several toolbar actions are visual placeholders that log to the console instead of acting — the Speech/Audio/SFX toggles, Like, Bookmark, Alt (cycle alternatives), and Choices. Also, the shell currently always reports "no alternatives / no branches" to the toolbar, so the Alt and Choices buttons do not appear yet. View toggle, language, autoplay, thumbnails, ToC, settings, characters, extras, share, and comments are functional.
+**Work in progress:** in the current build, several toolbar actions are visual placeholders that log to the console instead of acting — the Audio/SFX toggles, Like, Bookmark, Alt (cycle alternatives), and Choices. Also, the shell currently always reports "no alternatives / no branches" to the toolbar, so the Alt and Choices buttons do not appear yet. View toggle, language, **speech toggle**, autoplay, thumbnails, ToC, settings, characters, extras, share, and comments are functional.
 </Callout>
 
 ## Autoplay
