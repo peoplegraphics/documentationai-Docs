@@ -1,6 +1,6 @@
 ---
 title: Speech Bubbles
-description: Add and style speech balloons in the PanelWave editor — nine balloon types, inline text editing, tail control, character styles, and per-locale dialogue.
+description: Add and style speech balloons in the PanelWave editor — ten balloon types, narrator caption boxes, inline text editing, tail control, character styles, and per-locale dialogue.
 ---
 
 Speech bubbles carry your dialogue. In PanelWave they are real comic balloons — rendered by the same balloon engine the open-source player uses — so what you see in the editor is exactly what readers get. Balloons size themselves to their text automatically and inherit their look from a style cascade you control at three levels.
@@ -9,7 +9,7 @@ Speech bubbles carry your dialogue. In PanelWave they are real comic balloons �
 
 <Steps>
   <Step title="Pick the Speech Bubble tool">
-    Select **Speech Bubble** in the tool palette (shortcut `S`), or right-click the canvas and choose **Add Speech Bubble**.
+    Select **Speech Bubble** in the tool palette (shortcut `S`), or right-click the canvas and open the **Add Speech Bubble** submenu.
   </Step>
   <Step title="Click where the balloon should sit">
     A balloon appears at the click point, styled by your work's default balloon style, and the inline text editor opens immediately.
@@ -18,6 +18,11 @@ Speech bubbles carry your dialogue. In PanelWave they are real comic balloons �
     The balloon grows and shrinks live as you type. Press **Ctrl+Enter** (or **Cmd+Enter**) or click outside to commit; **Escape** cancels.
   </Step>
 </Steps>
+
+The right-click **Add Speech Bubble** submenu lists every balloon type directly — **Normal**, **Rectangle**, **Narrator**, **Thought**, **Shout**, **Whisper**, and **Connector** are placed at the click point, while the placement entries snap to the panel border for you:
+
+- **Narrator Top / Narrator Top-Left / Narrator Top-Right** — a sharp-cornered narrator caption box, flush against the panel's top border (centered, in the left corner, or in the right corner), created without a tail.
+- **Panel Top / Panel Top-Left / Panel Top-Right** — the corresponding *cut* balloon types, whose open cut edge sits exactly on the panel border.
 
 To edit text later, **double-click the bubble** on the canvas — the inline editor reopens, using the balloon's own font and size. You can also edit the text in the Inspector's **Text** field.
 
@@ -31,14 +36,19 @@ With a bubble selected:
 
 Fine-grained tail settings (position angle, length, curve direction, curve amount) live in the **Balloon Style** panel described below.
 
-## The nine balloon types
+<Callout kind="tip">
+  When you drag a **Narrator** or **Panel Top** caption box, the panel border is **magnetic**: within a small distance the box snaps flush to the top or bottom edge, the left or right edge, or the horizontal center — so hitting the border by hand is easy.
+</Callout>
 
-The **Type** dropdown in the Balloon Style panel offers nine shapes:
+## The ten balloon types
+
+The **Type** dropdown in the Balloon Style panel offers ten shapes:
 
 | Type | Use it for |
 |---|---|
 | **Normal** | Standard rounded speech balloon |
-| **Rectangle** | Square-cornered caption/dialogue box |
+| **Rectangle** | Caption/dialogue box with slightly softened corners |
+| **Narrator** | True sharp-cornered rectangle for narration caption boxes |
 | **Panel Top** | Balloon cut flat along the panel's top edge |
 | **Panel Top-Right** | Balloon tucked into the panel's top-right corner |
 | **Panel Top-Left** | Balloon tucked into the panel's top-left corner |
@@ -46,6 +56,18 @@ The **Type** dropdown in the Balloon Style panel offers nine shapes:
 | **Shout** | Jagged burst for yelling |
 | **Whisper** | Dashed outline for quiet speech |
 | **Connector** | Joined balloon segment for multi-balloon dialogue chains |
+
+## Caption boxes stay on the border
+
+The **Panel Top / Top-Left / Top-Right** types are glued to the panel's top border by definition — the cut edge *is* the border. The editor enforces this everywhere: in panel view, in page view, after text edits, and after switching device formats, the top edge always sits exactly on the panel border (corners additionally keep their side). Narrator boxes re-glue to whichever border edges they touch, but you can also place them freely anywhere in the panel.
+
+## One work, many formats
+
+Bubble geometry is stored **relative to the panel artwork** (the same normalized `shape` box the [format defines](/schema/speech-bubbles)), so a bubble keeps its position on every device format — author in DIN A4, and the balloon points at the same spot on the artwork in Square or Bigscreen layouts, in the editor and in the player.
+
+Lettering size is handled **per format**: text keeps the same comfortable reading size on each target screen — unchanged in A4-sized formats, moderately larger on big screens, smaller on phone formats — instead of growing with the artwork. Balloons re-measure around their anchored position when you open a panel in another format, so captions never end up half-empty or overflowing.
+
+In **page view**, panels are much smaller than in panel view, so balloons get a readability boost: they may grow until their text is comfortably legible at your current zoom, but never beyond three quarters of their panel, never below their authored size — and tail tips and glued border edges stay exactly where they belong.
 
 ## The style cascade
 
@@ -71,7 +93,7 @@ Only the fields you explicitly change are stored at each level. That means resty
 
 Select a bubble and open the Inspector's balloon tab. Under **Balloon Style** you get a live preview plus:
 
-- **Type** — the nine balloon types above.
+- **Type** — the ten balloon types above.
 - **Roundness** — corner roundness slider (hidden for Rectangle, Thought, and Shout, which have fixed shapes).
 - **Max Width** / **Max Height** — the size limits the auto-sizing works within.
 - **Font** and **Font Size** — comic lettering fonts, grouped in the dropdown.

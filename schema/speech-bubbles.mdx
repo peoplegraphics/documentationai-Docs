@@ -1,6 +1,6 @@
 ---
 title: Speech Bubbles
-description: Reference for SpeechBubble, BalloonConfig, TailConfig, HideBorderConfig, and BoundingBox — the 9 balloon types and the styling cascade.
+description: Reference for SpeechBubble, BalloonConfig, TailConfig, HideBorderConfig, and BoundingBox — the 10 balloon types and the styling cascade.
 ---
 
 Speech bubbles carry dialogue, thoughts, and narration inside a panel. Each bubble is a `SpeechBubble` object in a panel's `speechBubbles` array. Bubbles are positioned with normalized coordinates, hold localized text, and are styled through a four-level **balloon configuration cascade** rendered by the player's ComicBalloon SVG engine (see [Balloon Renderer](/player/balloon-renderer)).
@@ -42,6 +42,10 @@ Axis-aligned bounding box using normalized coordinates (0–1), relative to the 
 | `w` | number (0–1) | Yes | Width as a fraction of the panel. |
 | `h` | number (0–1) | Yes | Height as a fraction of the panel. |
 
+<Callout kind="info">
+The coordinates are **panel-relative**: `0/0` is the panel artwork's top-left corner, `1/1` its bottom-right. Players map the box onto the rendered panel container, so a bubble keeps its position on the artwork regardless of the device format. (The CMS editor serializes bubbles in exactly this space — a caption glued to the panel's top border has `y: 0` in every format.)
+</Callout>
+
 <Callout kind="alert">
 `BoundingBox` sets `additionalProperties: false` — a bubble `shape` must contain **only** `x`, `y`, `w`, `h`. A `type` property (as used by the hotspot `Shape` union) is not valid here.
 </Callout>
@@ -78,7 +82,7 @@ Complete balloon styling configuration, used at the work level as defaults (`$de
 
 | Property | Type | Default | Description |
 |---|---|---|---|
-| `balloonType` | enum | `"normal"` | Visual type of the balloon shape — see the 9 types below. |
+| `balloonType` | enum | `"normal"` | Visual type of the balloon shape — see the 10 types below. |
 | `cornerRadius` | number (0–1) | `0.5` | Shape roundness (0 = rectangle, 1 = ellipse). |
 | `maxWidth` | number (40–800) | `120` | Maximum balloon width in pixels (balloon auto-sizes to text). |
 | `maxHeight` | number (30–600) | `80` | Maximum balloon height in pixels. |
@@ -90,14 +94,15 @@ Complete balloon styling configuration, used at the work level as defaults (`$de
 | `tail` | `TailConfig` | — | Tail (pointer from balloon toward the speaker). |
 | `hideBorder` | `HideBorderConfig` | — | Border-hiding segment for layered balloon effects. |
 
-### The 9 balloon types
+### The 10 balloon types
 
 `balloonType` accepts exactly these enum values:
 
 | Type | Rendering |
 |---|---|
 | `normal` | Standard balloon; roundness controlled by `cornerRadius`. |
-| `rectangle` | Rectangular balloon (corner radius forced to 0). |
+| `rectangle` | Rectangular balloon (corner radius forced to 0, keeping a subtle 8&nbsp;px rounding). |
+| `narrator` | True sharp-cornered rectangle for narration caption boxes — unlike `rectangle`, the corners have **no** rounding at all. Additive extension, mid-1.3. |
 | `cutTop` | Balloon with a cut/flattened top edge. |
 | `cutTopRight` | Cut top with the cut biased to the right. |
 | `cutTopLeft` | Cut top with the cut biased to the left. |

@@ -5,6 +5,33 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-13" description="Format 1.3.x · CMS editor" tags={["feature", "bugfix"]}>
+  ## Narrator caption boxes & format-independent speech bubbles
+
+  - **New `narrator` balloon type** — a true sharp-cornered rectangle for
+    narration caption boxes (unlike `rectangle`, which keeps a subtle corner
+    rounding). Additive enum extension across schema, `@panelwave/types`, the
+    player's ComicBalloon renderer (new `sharpCorners` flag), and the CMS.
+  - **Panel-relative bubble geometry** — the CMS now stores a bubble's `shape`
+    box exactly as the format defines it: normalized against the **panel
+    artwork**, not the editing canvas. Bubbles keep their position on every
+    device format, and Panel-Top / narrator caption boxes stay glued to the
+    panel border everywhere — panel view, page view, and player.
+  - **Per-format lettering size** — balloon text keeps the same comfortable
+    reading size on each target screen: unchanged in A4-sized formats,
+    moderately larger on big screens, smaller on phones — never proportional
+    to the artwork. Page view renders balloons text-fitted, with a readability
+    boost capped at 75% of the panel.
+  - **Editor quality of life** — the *Add Speech Bubble* context menu offers
+    all ten balloon types including snap-to-border Narrator/Panel-Top
+    placements; the panel border is magnetic when dragging caption boxes;
+    speech bubbles resize via their corner handles; the canvas backing store
+    is HiDPI-aware (crisp lettering on scaled displays); and the editor
+    restores your last page/panel view after a browser reload.
+
+  Details: [Speech Bubbles (format)](/schema/speech-bubbles), [Speech Bubbles (editor)](/cms/editor/speech-bubbles), [Balloon Renderer](/player/balloon-renderer), [Canvas](/cms/editor/canvas).
+</Update>
+
 <Update label="2026-07-12" description="Format 1.3" tags={["feature"]}>
   ## Format 1.3 — reusable style presets & implicit speech toggle
 

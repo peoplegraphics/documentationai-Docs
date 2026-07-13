@@ -1,6 +1,6 @@
 ---
 title: Balloon Renderer (ComicBalloon)
-description: How the ComicBalloon SVG engine draws speech bubbles — the nine balloon types, tail geometry, the mergeBalloonConfig cascade, and why the renderer is shared with the CMS.
+description: How the ComicBalloon SVG engine draws speech bubbles — the ten balloon types, tail geometry, the mergeBalloonConfig cascade, and why the renderer is shared with the CMS.
 ---
 
 Speech bubbles in the player are drawn by **ComicBalloon**, a framework-free SVG renderer in `projects/player/src/lib/utils/comic-balloon.ts`, configured through helpers in `utils/balloon-config.ts` and driven by `SpeechBubblesComponent` (`pw-speech-bubbles`). For the manifest format of bubbles, see [Speech Bubbles](/schema/speech-bubbles).
@@ -33,14 +33,15 @@ const result = balloon.render('HELLO WORLD!', { position: 180, length: 45 });
 
 The returned `BalloonRenderResult` exposes `update()`, `updateTail()`, and `updateText()` for cheap re-renders, plus the final `width`/`height` and the `SVGSVGElement`.
 
-## The nine balloon types
+## The ten balloon types
 
 `BalloonConfig.balloonType` selects the shape; `balloonConfigToRenderOptions()` maps it onto the renderer flags:
 
 | Type | Rendering |
 |---|---|
 | `normal` | Squircle body with the configured `cornerRadius` |
-| `rectangle` | Squircle with `cornerRadius` forced to `0` (rounded rectangle) |
+| `rectangle` | Squircle with `cornerRadius` forced to `0` (rounded rectangle with a subtle 8 px corner) |
+| `narrator` | True rectangle with sharp 90° corners (`cornerRadius: 0` **plus** the `sharpCorners` render flag) — narration caption boxes |
 | `thought` | Cloud outline with pseudo-random bumps; tail is three shrinking circles |
 | `shout` | Jagged burst outline with randomized spikes; the tail replaces the nearest spike |
 | `whisper` | Normal shape with a dashed stroke (`stroke-dasharray: 6 4`) |
