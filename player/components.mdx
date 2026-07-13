@@ -73,7 +73,7 @@ Overlays render on top of the viewport content:
 
 | Component | Selector | Role |
 |---|---|---|
-| `SpeechBubblesComponent` | `pw-speech-bubbles` | Renders all of a panel's speech bubbles with the [ComicBalloon SVG engine](/player/balloon-renderer); resolves localized text, positions bubbles from normalized `shape` coordinates, re-renders when comic fonts finish loading, emits `bubbleClick` and `bubbleAudioPlay` |
+| `SpeechBubblesComponent` | `pw-speech-bubbles` | Renders all of a panel's speech bubbles with the [ComicBalloon SVG engine](/player/balloon-renderer); resolves localized text, positions bubbles from normalized `shape` coordinates, scales lettering per screen (`readingScale`), re-renders when comic fonts finish loading, emits `bubbleClick` and `bubbleAudioPlay` |
 | `HotspotsOverlayComponent` | `pw-hotspots-overlay` | Interactive clickable areas (`rect`, `circle`, `polygon`) with keyboard focus/activation; emits `hotspotClick`, `hotspotActivate`, `hotspotFocus` |
 | `PaywallOverlayComponent` | `pw-paywall-overlay` | The paywall gate UI; emits `PaywallAction`s (see [Paywall & Entitlement](/player/paywall-entitlement)) |
 | `AgeGateComponent` | `pw-age-gate` | Age verification prompt; emits an `AgeVerificationResult` |

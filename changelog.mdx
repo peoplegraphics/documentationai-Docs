@@ -22,6 +22,12 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     moderately larger on big screens, smaller on phones — never proportional
     to the artwork. Page view renders balloons text-fitted, with a readability
     boost capped at 75% of the panel.
+  - **Player: per-screen lettering** — the open-source player applies the same
+    rule at playback time. Balloons render at their measured, text-fitting
+    size scaled by the player viewport (DIN A4 height = 1.0); the stored
+    `shape` box is a position anchor with border-flush edges glued, no longer
+    a display size. Lettering stays comfortably readable on every device
+    instead of blowing up on big screens.
   - **Editor quality of life** — the *Add Speech Bubble* context menu offers
     all ten balloon types including snap-to-border Narrator/Panel-Top
     placements; the panel border is magnetic when dragging caption boxes;

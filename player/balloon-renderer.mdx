@@ -91,8 +91,8 @@ The merged config is converted for the renderer with `balloonConfigToRenderOptio
 `SpeechBubblesComponent` renders bubbles imperatively (it owns a DOM container rather than templating each balloon):
 
 - Localized text is resolved per bubble with locale fallback (exact locale → same base language → first available). Bubbles with no text for the current locale are skipped.
-- Position comes from the bubble's normalized `shape` box (`x`/`y`/`w`/`h` in 0–1 coordinates) multiplied by the container size; the balloon is centered on the box center.
-- Because the CMS stores the *measured* balloon size in the shape box, the natural-size SVG is scaled to `shape.w × containerWidth` with a CSS transform, clamped to 0.25–4× as protection against legacy geometry.
+- Position comes from the bubble's normalized `shape` box (`x`/`y`/`w`/`h` in 0–1 panel coordinates): the balloon anchors on the box center — and edges of the authored box that sit flush on the panel border stay **glued** to that border, so narrator and Panel-Top caption boxes keep sitting exactly on the edge at every screen size.
+- Display size follows the **per-screen reading scale**, not the box: the natural-size SVG is scaled by the `readingScale` input (player viewport height relative to the DIN A4 authoring frame, 1123 px). Lettering keeps the same comfortable reading size on every screen — moderately larger on big displays, smaller on phones — instead of growing proportionally with the panel. The scale is capped so a balloon never exceeds its panel container (page view) and clamped to 0.25–4×.
 - Balloons are re-rendered on input changes and once more on `document.fonts.ready`, so late-arriving comic fonts cannot leave stale text measurements.
 - Each balloon wrapper gets `role="img"`, an `aria-label` with the text, keyboard activation (Enter/Space), and click handling that emits `bubbleClick` and — when the bubble has an `audioAssetId` — `bubbleAudioPlay`.
 

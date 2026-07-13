@@ -65,7 +65,7 @@ The **Panel Top / Top-Left / Top-Right** types are glued to the panel's top bord
 
 Bubble geometry is stored **relative to the panel artwork** (the same normalized `shape` box the [format defines](/schema/speech-bubbles)), so a bubble keeps its position on every device format — author in DIN A4, and the balloon points at the same spot on the artwork in Square or Bigscreen layouts, in the editor and in the player.
 
-Lettering size is handled **per format**: text keeps the same comfortable reading size on each target screen — unchanged in A4-sized formats, moderately larger on big screens, smaller on phone formats — instead of growing with the artwork. Balloons re-measure around their anchored position when you open a panel in another format, so captions never end up half-empty or overflowing.
+Lettering size is handled **per format**: text keeps the same comfortable reading size on each target screen — unchanged in A4-sized formats, moderately larger on big screens, smaller on phone formats — instead of growing with the artwork. Balloons re-measure around their anchored position when you open a panel in another format, so captions never end up half-empty or overflowing. The open-source player applies the exact same rule at playback time (see [Balloon renderer](/player/balloon-renderer)), so what you letter is what readers get on every device.
 
 In **page view**, panels are much smaller than in panel view, so balloons get a readability boost: they may grow until their text is comfortably legible at your current zoom, but never beyond three quarters of their panel, never below their authored size — and tail tips and glued border edges stay exactly where they belong.
 

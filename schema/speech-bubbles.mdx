@@ -44,6 +44,8 @@ Axis-aligned bounding box using normalized coordinates (0–1), relative to the 
 
 <Callout kind="info">
 The coordinates are **panel-relative**: `0/0` is the panel artwork's top-left corner, `1/1` its bottom-right. Players map the box onto the rendered panel container, so a bubble keeps its position on the artwork regardless of the device format. (The CMS editor serializes bubbles in exactly this space — a caption glued to the panel's top border has `y: 0` in every format.)
+
+For **display**, the box acts as the position anchor: the reference player centers the balloon on the box center, keeps border-flush edges glued to the panel border, and sizes the balloon from its measured text at a per-screen reading scale — lettering stays comfortably readable on every screen instead of scaling with the panel.
 </Callout>
 
 <Callout kind="alert">
