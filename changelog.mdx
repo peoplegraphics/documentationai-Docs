@@ -5,6 +5,31 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-13" description="CMS editor · video playback" tags={["feature", "bugfix"]}>
+  ## Video panels play in the editor, and better timeline transport
+
+  - **In-editor video playback** — a video panel now plays right on the editing
+    canvas. Hover it for a **play / pause / stop** toolbar, and in Panel View the
+    footage fills the canvas so you can check framing. Clicks outside the toolbar
+    still select and drag the panel as before.
+  - **Timeline drives the video** — when you run the timeline, each video panel
+    plays automatically while the playhead is inside its time range, seeking to
+    match the playhead and pausing when it leaves. Scrubbing while paused shows
+    the matching frame, so the timeline preview mirrors reader autoplay.
+  - **Jump-to-start / jump-to-end buttons** — the single-arrow buttons step one
+    frame (so at the end they barely move); new **⏮ / ⏭** buttons snap the
+    playhead to the first or last panel and switch the canvas to it, matching the
+    `Home` / `End` keys.
+  - **No more autoplay "Loading…" flash** — panel images are preloaded, so
+    switching panels during autoplay no longer flashes a grey placeholder while
+    each image decodes.
+  - **Fixes** — video posters now resolve reliably on the canvas (asset-id
+    matching and asset-list variants), and the Preview tab loads its manifest on
+    a direct visit instead of showing "No Manifest Available".
+
+  Details: [Video Panels](/cms/editor/video-panels), [Animations & Timeline](/cms/editor/animations).
+</Update>
+
 <Update label="2026-07-13" description="Format 1.3.x · CMS editor" tags={["feature", "bugfix"]}>
   ## Narrator caption boxes & format-independent speech bubbles
 

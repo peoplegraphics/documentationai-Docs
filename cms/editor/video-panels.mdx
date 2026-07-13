@@ -28,7 +28,7 @@ You can keep working during processing — settings that need the video's durati
   </Tab>
 </Tabs>
 
-On the canvas, the layer shows the video's **poster frame** with a small badge in the corner indicating the play mode and effective duration (a placeholder appears until the poster is ready). The editor canvas doesn't play the video — use [Preview](/cms/preview) to watch it in the real player.
+On the canvas, the layer shows the video's **poster frame** with a small badge in the corner indicating the play mode and effective duration (a placeholder appears until the poster is ready). You can play the footage right in the editor (see below), or open [Preview](/cms/preview) to watch the whole panel exactly as readers will, with the real player applying your play and start modes.
 
 ## Playback settings
 
@@ -63,6 +63,18 @@ Select the video layer and open **Video Properties** in the Inspector:
 
 <Callout kind="tip">
   Keep **Muted** enabled for autoplaying video: browsers block unmuted autoplay, so an "On view" video with sound may not start for many readers. If the sound matters, use **On click**, or pair a muted video with an [audio track](/cms/editor/audio).
+</Callout>
+
+## Previewing video in the editor
+
+Once a video has finished processing, its panel plays directly on the editor canvas — no need to jump to Preview for a quick look.
+
+- **Transport toolbar** — hover the video panel and a small **play / pause / stop** bar appears over it. Use it to scrub through the footage while you position layers, bubbles, and hotspots. The toolbar is the only interactive part of the overlay: clicks anywhere else on the panel still select and drag it as usual.
+- **Panel view fills the canvas** — with the video panel focused in **Panel View**, the video is shown at the full canvas size so you can check framing against the artwork.
+- **Timeline autoplay drives it** — when you run the [Timeline](/cms/editor/animations), the video plays automatically while the playhead is inside that panel's time range, seeking to match the playhead (and pausing when it leaves). Scrubbing the timeline while paused shows the matching video frame. This makes the timeline preview a faithful stand-in for reader autoplay.
+
+<Callout kind="info">
+  This in-editor preview is a convenience for authoring. The **start mode** (On view / On mouseover / On click) and the exact loop behaviour are applied by the real player — confirm the final experience in [Preview](/cms/preview).
 </Callout>
 
 ## Poster images

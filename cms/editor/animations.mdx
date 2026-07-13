@@ -91,12 +91,17 @@ The Timeline at the bottom of the editor is your preview and pacing tool. It sho
 |---|---|
 | Play/Pause | Starts or pauses playback (`Space`) |
 | Stop | Stops and resets to the start |
+| Jump to Start / End | Snaps the playhead to the very first or last panel and shows it (`Home` / `End`) |
 | Previous / Next Frame | Steps one frame back or forward (`←` / `→`) |
 | Loop | Repeats playback when the end is reached |
 | Timecode field | Shows the current position — type a time (`HH:MM:SS:FF`, `MM:SS`, or seconds) and press Enter to jump there |
 | FPS | Frame rate for the timecode display: 24, 25, 30, or 60 |
 
-During playback the canvas automatically switches to the panel under the playhead, and any [audio tracks](/cms/editor/audio) play in sync — so what you see and hear is close to what readers get in autoplay.
+<Callout kind="tip">
+  The single-arrow buttons step **one frame** at a time, so at the end of the timeline they barely move. Use the **Jump to Start / End** buttons (or `Home` / `End`) to snap all the way back to the first panel or forward to the last — the canvas jumps to that panel too, even when paused.
+</Callout>
+
+During playback the canvas automatically switches to the panel under the playhead, and any [audio tracks](/cms/editor/audio) and [video panels](/cms/editor/video-panels) play in sync — so what you see and hear is close to what readers get in autoplay. Panel images are preloaded so switching panels doesn't flash a placeholder.
 
 ### Tracks
 
