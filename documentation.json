@@ -492,6 +492,11 @@
                 "title": "Validation & Preflight",
                 "path": "cms/validation",
                 "icon": "check-circle"
+              },
+              {
+                "title": "Validation Code Reference",
+                "path": "cms/validation-codes",
+                "icon": "list-checks"
               }
             ]
           },
