@@ -72,7 +72,7 @@ An asset exceeds its size budget:
 
 Large files slow down loading for readers, especially on mobile networks — oversized images block publishing outright.
 
-**How to fix:** re-export the source at a smaller resolution or higher compression (WebP/AVIF for images, AAC/Opus for audio, H.264/H.265 for video), then use **Replace File** on the asset in the [Asset Library](/cms/assets). The panel references stay intact.
+**How to fix:** re-export the source at a smaller resolution or higher compression (WebP/AVIF for images, AAC/Opus for audio, H.264/H.265 for video), then use **Replace File** on the asset in the [Asset Library](/cms/assets). The panel references stay intact. The issue's **Used in** links take you to each panel that displays the asset, so you can judge whether a smaller crop or a different asset is the better fix.
 
 ## Video loop-from without mode
 
@@ -104,7 +104,7 @@ A video layer's loop-from timestamp lies at or beyond the end of the video file,
 
 An image asset has no alternative text in any locale. Screen readers announce nothing useful for the image, and the work loses accessibility quality.
 
-**How to fix:** either select the image layer in the editor and fill in the **A11y** inspector tab, or open the asset's **Edit Metadata** dialog in the [Asset Library](/cms/assets). Describe what the image shows, not that it is an image. Alt text is localizable — provide it per locale where the meaning differs.
+**How to fix:** either select the image layer in the editor and fill in the **A11y** inspector tab, or open the asset's **Edit Metadata** dialog in the [Asset Library](/cms/assets). Describe what the image shows, not that it is an image. Alt text is localizable — provide it per locale where the meaning differs. Use the issue's **Used in** links to jump to the panels where the image appears and see it in context.
 
 ## Missing description
 
