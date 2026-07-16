@@ -40,6 +40,8 @@ After upload, a background pipeline optimizes every asset. You keep working whil
 - **Audio** — AAC and Opus variants with broadcast loudness normalization (EBU R128), waveform data for the editor's audio views, and the duration in milliseconds.
 - **Video** — a web-friendly H.264 rendition (up to 1920px wide), a poster frame, and scrubbing thumbnails, plus dimensions and duration.
 
+One more variant is created **on demand**: when preflight flags an image as too large to publish, its **Optimize** fix produces an `optimized` WebP derivative that the published work ships instead of the original — see [Validation](/cms/validation#auto-fixes). The full-quality original always stays in your library.
+
 Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage.
 
 <Callout kind="info">
@@ -47,6 +49,14 @@ Readers automatically get the best variant their device supports — you never h
 </Callout>
 
 ## Finding and organizing assets
+
+### Folders
+
+The Assets tab has a **folder pane**: **All assets**, **Unfiled**, and your own folder tree (folders can be nested). Create, rename, move, and delete folders from the pane, and **drag assets onto a folder** to file them — an asset can live in more than one folder. Each folder shows how many assets it holds, and selecting a folder scopes the asset list below to it.
+
+Folders are an organizational layer only — they don't change asset URLs or how anything is exported.
+
+### Search, filters, and sorting
 
 The Assets toolbar offers:
 
@@ -87,6 +97,16 @@ For images, a zoom button opens a **lightbox** with zoom controls (`+`, `-`, `0`
 ## Alt text and accessibility
 
 Give important artwork **alt text** via **Edit Metadata**. [Preflight validation](/cms/validation) warns about image layers without alt text, and the player exposes it to screen readers.
+
+## Picking assets anywhere
+
+Wherever the CMS asks for an asset — the content and thumbnail of an [extra](/cms/extras), a [character](/cms/characters) portrait or reference image, a page's background image or texture, a video layer's footage — a **Browse library…** button opens the shared **asset picker**:
+
+- **Left** — your folder tree (plus **All assets** and **Unfiled**) for narrowing by folder.
+- **Center** — the searchable library, pre-filtered to the asset type the field expects (you can widen the filter), with an **Upload** button so new files land in the currently selected folder and are picked immediately.
+- **Right** — a large preview with the asset's details (type, dimensions, duration, size, locale, folder, upload date). Images render full-size; video and audio play inline.
+
+Double-click an asset (or select it and click **Select**) to use it. The choosing field shows the asset as a chip you can change or clear.
 
 ## Where else assets appear
 

@@ -72,7 +72,11 @@ An asset exceeds its size budget:
 
 Large files slow down loading for readers, especially on mobile networks — oversized images block publishing outright.
 
-**How to fix:** re-export the source at a smaller resolution or higher compression (WebP/AVIF for images, AAC/Opus for audio, H.264/H.265 for video), then use **Replace File** on the asset in the [Asset Library](/cms/assets). The panel references stay intact. The issue's **Used in** links take you to each panel that displays the asset, so you can judge whether a smaller crop or a different asset is the better fix.
+For images, the check judges the **effective shipped size**: when an `optimized` variant exists, its size is what counts, not the original upload's.
+
+**How to fix (images):** click **Optimize** on the issue — or **Optimize all (n)** on the group — in preflight or in the publish wizard. The CMS re-encodes the image as WebP in the background (stepping down quality, then resolution, until it fits), keeps your full-quality original in the library, and ships the optimized variant in the published work. The issue clears automatically once the job finishes. See [Auto-fixes](/cms/validation#auto-fixes).
+
+**How to fix (manual, or audio/video):** re-export the source at a smaller resolution or higher compression (WebP/AVIF for images, AAC/Opus for audio, H.264/H.265 for video), then use **Replace File** on the asset in the [Asset Library](/cms/assets). The panel references stay intact. The issue's **Used in** links take you to each panel that displays the asset, so you can judge whether a smaller crop or a different asset is the better fix.
 
 ## Video loop-from without mode
 

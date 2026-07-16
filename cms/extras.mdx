@@ -28,10 +28,12 @@ Click **Add Extra** (the new extra lands in the currently selected tab). The dia
 
 - **Title** (required) and an optional **Description** — these are the default-language fallbacks.
 - **Translations** — pick a locale and enter a localized title and description; empty fields fall back to the defaults. See [Localization](/cms/localization).
-- **Content Type** — Image, Video, Audio, PDF, or Text. For Text you write the content directly; for media types you enter a URL or path (validated to start with `http(s)://`, `/`, or `./`).
+- **Content Type** — Image, Video, Audio, PDF, or Text. For Text you write the content directly. For media types the content can come from two sources:
+  - **Browse library…** opens the [asset picker](/cms/assets#picking-assets-anywhere) — choose an existing asset from the work's library or upload a new file right in the dialog. The linked asset shows as a compact chip (thumbnail, filename, and an **×** to unlink); dimensions, duration, and file size are filled in automatically.
+  - Or enter an **external URL or path** (validated to start with `http(s)://`, `/`, or `./`) — for content hosted elsewhere.
 - **Status** — **Published** or **Draft (hidden from readers)**. Drafts stay visible in the manager but are **excluded from the exported manifest** and from the reader preview.
 - **Character** — required when the extra lives in the **Character Sheets** bucket. Sheets without a linked character are dropped from the export.
-- **Poster URL** (video) or **Thumbnail URL** (everything else), optional.
+- **Poster** (video) or **Thumbnail** (everything else), optional — likewise a library pick or an external URL.
 - **Width/Height** for images, **Duration** for audio/video.
 - Three toggles:
   - **Requires Entitlement (Gated)** — the extra is locked behind a purchase; set the **Required Tier** (e.g. `premium`). See [Monetization](/cms/monetization).
@@ -42,6 +44,10 @@ Click **Create Extra** / **Update Extra** to save.
 
 <Callout kind="tip">
 The gated, shareable, and downloadable toggles are also available directly on each card — no need to open the editor for quick changes.
+</Callout>
+
+<Callout kind="info">
+Prefer linking a **library asset** over pasting its URL: the extra stays connected to the asset, so **Replace File** in the [Assets library](/cms/assets) updates it automatically, and readers always receive a fresh, working link. External URLs remain fully supported for content hosted outside PanelWave.
 </Callout>
 
 ## Managing the grid

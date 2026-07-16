@@ -61,6 +61,14 @@ Issues that can be fixed automatically show a **Fix** button — for example rem
 - Tick multiple fixable issues (or select a whole category) and click **Apply fixes to selected**.
 - **Undo** the most recent applied fixes — removed content is restored from a snapshot.
 
+### Optimizing oversized images
+
+Images over the 5 MB publish limit get their own fix: an **Optimize** button on each oversized-image error, plus **Optimize all (n)** on the group. Optimizing runs in the background — the CMS re-encodes the image as WebP, stepping down quality (and, if needed, resolution) until it fits the budget — and the issue list polls until the queued jobs finish and the errors clear on their own.
+
+- Your **original stays untouched** in the library at full quality; the fix adds an `optimized` variant, and the published work ships that variant instead.
+- The size check judges the **effective shipped size**, so an already-optimized image doesn't get flagged again.
+- **Undo** removes the optimized variant and restores the previous state.
+
 <Callout kind="alert">
 Auto-fixes are convenient but not always what you want — a "broken link" fix removes the reference rather than restoring the missing target. Review the suggestion before fixing, and prefer **Open in editor** when the real fix is authoring work.
 </Callout>
@@ -74,7 +82,7 @@ The [Validation Code Reference](/cms/validation-codes) covers every code individ
 | Missing alt text | **Open in editor**, select the layer, add alt text in the **A11y** inspector tab (or via the asset's **Edit Metadata** in the [Assets library](/cms/assets)) |
 | Missing translations | Open the [Localization Workshop](/cms/localization), filter by **Show Only Missing** |
 | Unreachable panel | Open the [Graph Editor](/cms/editor/graph) and connect the panel — or delete it if it's leftover |
-| Oversized asset | Re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
+| Oversized asset | Images: click **Optimize** on the issue (see [above](#optimizing-oversized-images)). Audio/video, or when you want manual control: re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
 | Missing title/description/cover | Fill them in under [Work Properties](/cms/works) → Metadata |
 | Empty panel | Add content, or delete the panel in the Tree |
 

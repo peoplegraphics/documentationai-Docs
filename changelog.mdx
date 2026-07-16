@@ -5,6 +5,55 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-16" description="CMS · asset folders, asset picker & extras" tags={["feature", "bugfix"]}>
+  ## Organize the library, pick assets anywhere, and upload straight into Extras
+
+  - **Asset folders** — the Assets tab gains a folder pane (nested folders,
+    drag-to-file, per-folder counts, an **Unfiled** view). Folders are purely
+    organizational and never affect exports.
+  - **One asset picker everywhere** — a new **Browse library…** dialog with the
+    folder tree on the left, the searchable/filterable library in the center,
+    and a large preview with details on the right. It opens pre-filtered to the
+    type a field expects, and an in-dialog **Upload** drops new files into the
+    selected folder and picks them immediately.
+  - **Extras take library assets** — an extra's content and thumbnail can now be
+    picked from the library or uploaded on the spot, in addition to external
+    URLs. Linked assets appear as a chip (change / clear), auto-fill dimensions,
+    duration, and file size, and stay connected — **Replace File** on the asset
+    updates the extra automatically.
+  - **Characters too** — portrait and reference images gain a **From library**
+    button next to upload and URL paste. Page background images/textures and
+    video layers use the same picker.
+  - **Fix: images no longer expire** — character portraits and extras previously
+    stored short-lived signed links that broke ~24 hours after saving. Stored
+    links are now durable and re-signed on every read, and published manifests
+    always carry fresh asset URLs.
+
+  Details: [Assets](/cms/assets), [Extras](/cms/extras), [Characters](/cms/characters).
+</Update>
+
+<Update label="2026-07-16" description="CMS · publish unblockers" tags={["feature", "bugfix"]}>
+  ## Optimize oversized images from preflight, and a faster path between work areas
+
+  - **Optimize / Optimize all** — oversized-image errors (over the 5 MB publish
+    limit) now carry an **Optimize** button in preflight and in the publish
+    wizard. The CMS re-encodes the image as WebP in the background (stepping
+    down quality, then resolution, until it fits), keeps your full-quality
+    original in the library, and ships the optimized variant. The issue list
+    polls until the queued jobs finish and the errors clear on their own;
+    **Undo** restores the previous state.
+  - **Fair size check** — the oversized check now judges the *effective shipped
+    size*, so an already-optimized image isn't flagged again.
+  - **Work-areas menu** — a grid-icon dropdown in the editor header jumps
+    straight to Characters, Extras, the Graph Editor, Paywall & Entitlement,
+    Localization, Audio, and Analytics.
+  - **Fixes** — publishing no longer fails with a 404 on the validation call;
+    the works list shows creators again; failed optimize jobs can be retried
+    immediately instead of silently doing nothing.
+
+  Details: [Validation](/cms/validation#optimizing-oversized-images), [Publishing](/cms/publishing), [Editor Layout](/cms/editor/layout).
+</Update>
+
 <Update label="2026-07-13" description="CMS editor · video playback" tags={["feature", "bugfix"]}>
   ## Video panels play in the editor, and better timeline transport
 
