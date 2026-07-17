@@ -8,8 +8,8 @@ Publishing is how your work leaves the workshop and reaches readers. PanelWave s
 1. **Work status** — a label (*Draft*, *Review*, *Published*, *Archived*) that organizes your library and signals where each work is in its lifecycle.
 2. **The publish pipeline** — a guided flow that validates the work, packages it into a [manifest](/concepts/manifest), and deploys it (with assets and audio) so the PanelWave Player can serve it to readers.
 
-<Callout kind="alert">
-  In the current release, work statuses are fully available, but the guided **Publish** flow described further below is still being rolled out — the **Publish** button in the editor header and the "Publish Work" command are present but not yet active. This page documents both so you know what's here today and what the full flow looks like.
+<Callout kind="info">
+  The guided **Publish** flow is now active end-to-end: preflight validation, environment selection, manifest build, and release history/rollback all work as described below. Production delivery still targets the CDN configured for your instance; the **Preview** environment additionally produces a shareable player link (see the environment step).
 </Callout>
 
 ## Work statuses
@@ -47,6 +47,8 @@ When you publish, the CMS walks you through a four-step wizard titled **Publish 
     - **Preview** — "Share with team"
 
     Each environment has its own content delivery network, so you can rehearse a release on staging before going live.
+
+    A **Preview** publish additionally mints an unguessable, revocable **preview manifest link**. Anyone with the link can load the work in a PanelWave Player **without a CMS login** — hand it to teammates, testers, or an external reviewer. Because the link is public-by-URL, treat it like a shared secret.
   </Step>
   <Step title="Publishing Options">
     - **Version Tag (optional)** — a label such as `v1.0.0`, `beta`, or `final` to identify this release later.
@@ -59,7 +61,9 @@ When you publish, the CMS walks you through a four-step wizard titled **Publish 
   </Step>
 </Steps>
 
-On success you'll see **"Published Successfully! Your work is now live and accessible"** together with the **Manifest URL** (with copy and open buttons), the environment, files uploaded, total size, duration, and the backup ID.
+On success you'll see **"Published Successfully! Your work is now live and accessible"** together with the **Manifest URL** (with copy and open buttons), the environment, files uploaded, the **total size with its breakdown** ("manifest *x* + *N* assets *y*"), duration, and the backup ID.
+
+The same size figures are available any time without publishing: the **Metadata** tab of Work Properties has a read-only **Size &amp; Content** section showing the manifest size, the asset count and payload, and the total — useful for keeping an eye on a work's weight as it grows.
 
 <Callout kind="tip">
   Publishing keeps running on the server even if you close the wizard mid-way. Reopening the wizard for the same work within a few minutes reattaches to the running publish and continues showing its progress.

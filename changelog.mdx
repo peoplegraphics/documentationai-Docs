@@ -5,6 +5,38 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-17" description="CMS · AI page import, upscaling credits, publish pipeline live" tags={["feature", "bugfix"]}>
+  ## Import finished pages, upscale panels, and publish for real
+
+  - **Page Import (AI panel splitting)** — a new importer for artists who already
+    have finished works as flat page images. Upload PNG/JPEG/WebP pages, AI
+    detects the panels (regular grids, full-bleed artwork, and nested inset
+    panels) with a selectable **EU/US or manga reading direction**, and a review
+    step lets you move/resize/add/delete panels and fix the reading order before
+    anything is created. On import every panel is cropped borderless from the
+    full-resolution page, saved as an asset, and placed at its original position
+    on a PanelWave page — with a linear reading graph so the work is playable
+    immediately. See [Page Import](/cms/page-import).
+  - **AI upscaling with credits** — optionally enlarge small panel crops for
+    sharp desktop/4K display (Standard 1440 / High 2560 / Ultra 3840 px
+    targets). Upscaling is billed in **credits**, PanelWave's new prepaid wallet
+    for metered AI features: plans include a monthly allowance, the wizard shows
+    the exact cost against your balance before you commit, and panels that fail
+    to upscale import at original resolution with their reserved credits
+    returned automatically.
+  - **The publish pipeline is live** — the guided Publish flow (preflight →
+    environment → options → confirm) now runs end-to-end, and a **Preview**
+    publish mints an unguessable, revocable **preview manifest link** that any
+    PanelWave Player can load without a CMS login — ideal for sharing a
+    work-in-progress with testers. See [Publishing](/cms/publishing).
+  - **Size &amp; Content stats** — the publish result and the Work Properties
+    Metadata tab now break a work's weight down into manifest size, asset count
+    and payload, and the total.
+  - **Player demo: external manifests** — the demo app accepts
+    `?manifest=<url>`, so a CMS preview link opens directly in the standalone
+    player. See [Contributing](/player/development).
+</Update>
+
 <Update label="2026-07-16" description="CMS · asset folders, asset picker & extras" tags={["feature", "bugfix"]}>
   ## Organize the library, pick assets anywhere, and upload straight into Extras
 

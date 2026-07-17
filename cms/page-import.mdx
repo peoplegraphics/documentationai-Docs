@@ -1,0 +1,138 @@
+---
+title: Page Import (AI panel splitting)
+description: Turn finished comic pages into a PanelWave work — AI detects the panels on each page image, you review and correct them, and every panel becomes its own asset placed at its original position.
+---
+
+Many artists already have finished works as **flat page images** — Photoshop exports, scans, or CBZ pages. The **Page Import** wizard turns them into an interactive PanelWave work without manual cropping:
+
+1. You upload the **page images** and choose the reading direction and page format.
+2. AI **detects the panels** on every page — rectangles, nesting, and reading order.
+3. You **review and correct** the detection: move, resize, add, delete, and reorder panels.
+4. The importer **crops every panel** (inside its border) from the full-resolution page, saves it as an [asset](/cms/assets), and rebuilds each page — every panel placed at its original position, in reading order, with linear navigation wired up.
+
+<Callout kind="info">
+The AI detection is a **suggestion**; the review step is the final authority. Nothing touches your works until you click **Import** — and until then the session is fully resumable and discardable.
+</Callout>
+
+<Callout kind="tip">
+**Prepare your pages with speech-bubble layers hidden** if you can. The importer ignores bubbles when finding panels, but anything baked into the image ends up inside the panel crops. You'll typically re-letter with PanelWave's [speech bubbles](/cms/editor/speech-bubbles) afterwards — that's what makes the work translatable.
+</Callout>
+
+## Running an import
+
+<Steps>
+  <Step title="Open the page importer">
+    On the [My Works](/cms/works) page, click **Import Pages** (next to **Import Script**). To append pages to an existing work instead of creating a new one, open the importer from that work.
+  </Step>
+  <Step title="Add your pages">
+    Drop the page images (PNG, JPEG, or WebP) onto the drop zone, or browse. Reorder them with the arrows — this order becomes the page order of the work.
+  </Step>
+  <Step title="Choose the settings">
+    - **Reading direction** — **EU/US** (rows top to bottom, panels left → right) or **Manga** (right → left). This drives the suggested reading order.
+    - **Page format** — the PanelWave page your panels are placed on; **DIN A4 portrait** by default. If your pages have a different shape, they are fitted centered without distortion.
+    - **Target** — create a new work, or append to the chapter you came from.
+    - **AI upscaling** (optional) — enlarge small panel crops for sharp desktop/4K display, billed in credits (see [below](#upscaling-and-credits)).
+
+    **Start import** uploads the pages and begins detection.
+  </Step>
+  <Step title="Watch the detection">
+    Each page is analyzed individually with live progress. Failed pages don't stop the others — retry them individually.
+  </Step>
+  <Step title="Review the panels">
+    The heart of the wizard (details below): check every page's rectangles and reading order, fix what the AI got wrong, then click **Import**.
+  </Step>
+  <Step title="Open the work">
+    Crops are saved as assets, pages and panels are created, and the finished work opens straight in the [editor](/cms/editor/layout).
+  </Step>
+</Steps>
+
+Imports are **resumable** — leave the wizard at any point and continue from the *Open imports* list.
+
+## The review step in detail
+
+For each page (thumbnail rail on the left) you see the page image with the detected panels drawn on top:
+
+- **Move and resize** — drag a rectangle, or drag its handles. Numbered badges show the reading order.
+- **Add** — click **Add panel**, then draw the rectangle on the page.
+- **Delete** — select a panel and press <kbd>Delete</kbd> (or the Delete button).
+- **Reading order** — the ordered list on the right; move panels up or down.
+- **Nested panels** — an inset panel floating *inside* a larger one (common with full-bleed artwork) is marked blue and dashed; use **Nested inside** in the inspector to fix the relationship. Insets render above their parent in the finished work.
+- **Warnings** — the AI flags its own uncertainty ("a panel may be missing or merged"); treat those pages with extra attention.
+- **Re-detect this page** — runs the AI again for a single page after you've, say, realized a page was exported wrong.
+
+Everything autosaves; the original AI suggestion is kept so your edits are never silently mixed with it.
+
+### What detection handles
+
+- **Regular panel grids** with gutters — the bread-and-butter case.
+- **Full-bleed panels** whose artwork runs to the page edges.
+- **Nested panels** — framed panels floating on top of a larger (often full-bleed) background panel.
+
+Slanted or non-rectangular panels get their best rectangular bounding box — adjust in review. Detection quality varies with art style; busy, low-contrast, or unusually structured pages simply need a little more correction. That is what the review step is for.
+
+## Upscaling and credits
+
+Panel crops inherit the resolution of your page files. A panel cut from a ~1400 px wide page is often only 400–900 px — fine on phones, soft on desktop, and clearly blurry in full-screen panel view on a 4K display. The optional **AI upscaling** step enlarges undersized crops faithfully (no invented detail) to a quality target you pick:
+
+| Target | Long edge | Good for |
+|---|---|---|
+| **Standard** | 1440 px | Laptop page view |
+| **High** (default) | 2560 px | Desktop / QHD panel view |
+| **Ultra** | 3840 px | 4K panel view |
+
+Only panels **below** the target are upscaled; large crops are never touched (and never charged). Before the import runs, the review step shows the exact cost — how many panels will be upscaled and how many **credits** that takes, next to your balance.
+
+**Credits** are PanelWave's prepaid wallet for metered AI features (upscaling sends your images to a third-party AI service with real per-image cost — the settings step notes this):
+
+- Paid plans include a **monthly credit allowance**; it is applied automatically.
+- The **exact cost is reserved up-front** and only actually spent per successfully upscaled panel. If a panel can't be upscaled (or the service is unavailable), it imports at its original resolution and the reserved credits **return to your wallet automatically** — a partial failure never fails the import and never costs you the failed panels.
+- Short on credits? The wizard says exactly how many are needed versus available; the import stays blocked until you lower the quality target, disable upscaling, or top up.
+
+## Limits and quotas
+
+| Limit | Value |
+|---|---|
+| File types | PNG, JPEG, WebP |
+| Page size | up to **25 MB** per image |
+| Pages per import | up to **40** |
+| Open import sessions | 3 at a time |
+| Detection retries | ~3 passes per page (session-wide) |
+| Imports per month | shares the AI-import allowance of your plan (with [Script Import](/cms/script-import)) |
+
+A completed import counts once against the monthly allowance; retrying failed steps inside a session does not.
+
+## After the import
+
+The result is a normal PanelWave work:
+
+- **Every panel is an image asset** (the borderless crop) set as the panel's background layer — manage them in the [Asset Library](/cms/assets); web-optimized variants are generated automatically.
+- **Pages match your originals** — each panel sits at its original position on the page, in the reading order you confirmed.
+- **A linear reading [graph](/cms/editor/graph)** is created for new works, so the work is immediately playable in [Preview](/cms/preview); add choices and branching later.
+- **Now letter it** — add [speech bubbles](/cms/editor/speech-bubbles) on top of the artwork so the work can be [localized](/cms/localization), and bring in [audio](/cms/editor/audio) or [hotspots](/cms/editor/hotspots) as you like.
+
+## Common errors
+
+| Message | Cause / fix |
+|---|---|
+| *Only PNG, JPEG and WebP page images are supported* | Export/convert the pages to a supported format |
+| *Page images must be 25 MB or smaller* | Re-export with reasonable compression |
+| *A session holds at most 40 pages* | Split the book into several imports (append to the same work) |
+| *You already have 3 open page-import sessions…* | Finish or discard a session from the *Open imports* list |
+| *Monthly AI import limit reached…* | Your plan's AI-import allowance is used up for this month |
+| *Detection retry limit reached for this session* | Start a fresh import for the affected pages |
+| *This import needs N upscale credit(s)…* | Lower the quality target, disable upscaling, or top up credits |
+| *Import worker unavailable* | The background service is down — the session is kept; use **Retry** later |
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Script Import" icon="clapperboard" href="/cms/script-import">
+    Start from a screenplay instead of finished pages.
+  </Card>
+  <Card title="Import" icon="download" href="/cms/import">
+    Bring in an existing PanelWave JSON manifest.
+  </Card>
+  <Card title="Speech Bubbles" icon="message-circle" href="/cms/editor/speech-bubbles">
+    Letter the imported pages the PanelWave way.
+  </Card>
+</Columns>

@@ -485,7 +485,12 @@
               {
                 "title": "Script Import (Fountain)",
                 "path": "cms/script-import",
-                "icon": "clapperboard",
+                "icon": "clapperboard"
+              },
+              {
+                "title": "Page Import (AI)",
+                "path": "cms/page-import",
+                "icon": "images",
                 "badge": "New"
               },
               {
