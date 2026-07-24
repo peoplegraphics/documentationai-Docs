@@ -71,6 +71,12 @@
                 "icon": "git-branch"
               },
               {
+                "title": "The Infinite Canvas",
+                "path": "concepts/infinite-canvas",
+                "icon": "map",
+                "badge": "New"
+              },
+              {
                 "title": "Localization",
                 "path": "concepts/localization",
                 "icon": "globe"
@@ -157,6 +163,12 @@
                 "title": "Graph & Edges",
                 "path": "schema/graph",
                 "icon": "git-branch"
+              },
+              {
+                "title": "Infinite Canvas",
+                "path": "schema/canvas",
+                "icon": "map",
+                "badge": "New"
               },
               {
                 "title": "Panels",
@@ -276,6 +288,12 @@
                 "title": "Reader Interface",
                 "path": "player/reader-interface",
                 "icon": "monitor"
+              },
+              {
+                "title": "Canvas View",
+                "path": "player/canvas-view",
+                "icon": "map",
+                "badge": "New"
               },
               {
                 "title": "Configuration",
@@ -440,6 +458,12 @@
                 "title": "Graph Editor",
                 "path": "cms/editor/graph",
                 "icon": "git-branch"
+              },
+              {
+                "title": "Canvas Layout Board",
+                "path": "cms/editor/canvas-layout",
+                "icon": "map",
+                "badge": "New"
               },
               {
                 "title": "Variables & Conditions",

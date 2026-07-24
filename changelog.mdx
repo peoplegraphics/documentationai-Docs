@@ -5,6 +5,64 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-24" description="Format 1.4.0 · The Infinite Canvas — schema, player & CMS" tags={["feature"]}>
+  ## The infinite canvas: one continuous plane, a camera on the trail
+
+  Format **1.4.0** brings Scott McCloud's *infinite canvas* to the whole
+  PanelWave stack: a chapter's panels can live on one continuous world-space
+  plane, and the reader's screen becomes a camera that glides between them
+  along the story graph. A single-column layout is a webtoon-style vertical
+  strip; free 2D placement with camera trails is the full experience. All
+  additive — works without a canvas are untouched, and print keeps using
+  pages. See [The Infinite Canvas](/concepts/infinite-canvas).
+
+  **Format (schema 1.4.0)** — all additive; see [Infinite Canvas](/schema/canvas):
+  - **`Chapter.canvas`** — world-unit panel `placements` (1 wu = 1 CSS px at
+    zoom 1; rotation, stacking, panel-relative `enterFraming`), `revealMode`
+    spoiler protection (`always` / `on-approach` / `on-visit`), plane
+    `background`, camera policy (`fitMode`, `overview`, `freeRoam`,
+    `bounds`), and presentational `decorations` with parallax depth.
+  - **`Edge.cameraMove`** — camera travel per graph edge: `direct` / `arc` /
+    `waypoints` paths, `hold` / `pull-back` / `dive` zoom profiles, duration,
+    easing, and a `reducedMotionFallback` transition. Inherits like
+    `transition` via the new `FormatPreset.defaultCameraMove`.
+  - **`FormatPreset.canvasView`** — per-format opt-in; players without it (or
+    without canvas support) fall back to panel view.
+  - `@panelwave/cli` validates the new semantic rules (placement keys must be
+    chapter panels, performance budget, waypoint consistency) and its
+    `upgrade` target is now synchronized at `1.4.0`.
+
+  **Player** — a third view mode alongside panel and page view; see
+  [Canvas View](/player/canvas-view):
+  - Camera glides with authored paths and zoom profiles (motion-safety speed
+    cap, interruptible by the reader), overview zoom (`O`), guided or
+    free-roam input on touch, mouse, and keyboard.
+  - Virtualized rendering (≤ 12 mounted panels regardless of chapter size),
+    **variant-by-zoom** image selection (overview mounts thumbnails,
+    close-ups load full resolution, upgrade-only — no flicker), and
+    settle-time neighbor preloading honoring `settings.preload`.
+  - Accessibility built in: no gliding under reduced motion (cross-fade
+    reframes instead), full keyboard traversal, `aria-hidden`/`inert` on
+    non-current panels, graph-driven reading order.
+  - New embedding API: `viewModeOverride` input and throttled `cameraChange`
+    output.
+
+  **CMS** — a new authoring surface; see
+  [Canvas Layout Board](/cms/editor/canvas-layout):
+  - Spatial board with live panel artwork, graph-edge arrows, drag/resize
+    with snap, align/distribute, and auto-layout presets (**vertical strip**
+    for webtoon-shaped works, layered **graph layouts** for branching 2D
+    canvases).
+  - Camera-move inspector with **path ghosting** and draggable waypoints,
+    **gap calipers** showing distance-as-time in beats, an **enter-framing**
+    tool, per-panel reveal modes, and decoration authoring (opacity,
+    parallax, rotation).
+  - Work Properties → Output gains per-format **Infinite Canvas View**
+    toggles; publish preflight validates canvas integrity; the
+    [Preview](/cms/preview) tab's new **View** selector compares panel and
+    canvas modes on the live manifest.
+</Update>
+
 <Update label="2026-07-17" description="CMS · AI page import, upscaling credits, publish pipeline live" tags={["feature", "bugfix"]}>
   ## Import finished pages, upscale panels, and publish for real
 

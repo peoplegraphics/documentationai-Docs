@@ -1,0 +1,127 @@
+---
+title: Canvas View
+description: The player's infinite-canvas view mode — camera glides over a continuous plane, guided and free-roam input, reveal modes, performance, and accessibility.
+---
+
+Canvas view is the player's third view mode (alongside panel and page view):
+all placed panels of a chapter share one continuous world-space plane, and a
+camera glides between them along the story graph. It activates automatically
+when the chapter has a [canvas layout](/schema/canvas) **and** an output
+preset enables `canvasView`; otherwise the player falls back to panel view.
+
+<Callout kind="info">
+  Navigation semantics don't change in canvas view. "Next" still asks the flow
+  engine to pick the target via graph edges, conditions, and priorities —
+  canvas view only changes what happens *visually*. `panelChange`, tracking
+  events, variables, and paywall checks behave exactly as in panel view.
+</Callout>
+
+## The camera
+
+The camera is a persistent position + zoom over the plane, managed by
+`CanvasCameraService`:
+
+- **Arrivals** frame the target panel (or its `enterFraming` sub-rect) using
+  the chapter's `fitMode`.
+- **Camera moves** between panels follow the traversed edge's `cameraMove` —
+  `direct`, `arc`, or authored `waypoints` paths with `hold`, `pull-back`, or
+  `dive` zoom profiles. Zoom interpolates logarithmically so scaling feels
+  perceptually linear.
+- **Motion safety**: travel speed is capped (a player constant, not
+  authorable) — durations too short for the distance are stretched.
+- **Interrupts**: reader input during a glide cancels it — the reader owns
+  the camera, like a map app. Navigation state is already final; only the
+  animation stops.
+- **Back-navigation** retraces the original edge's path with waypoints
+  reversed.
+
+## Input model
+
+| Input | Guided (`freeRoam: "off"`) | Free roam |
+|---|---|---|
+| Tap right/left edge zone, Arrow keys | next / previous via the graph | same |
+| Drag / single-finger pan | — | pan the camera |
+| Pinch / Ctrl+wheel | zoom | zoom at cursor |
+| Plain wheel | — | pan |
+| Tap a panel | advance if it's an out-edge target of the current panel (condition-gated) | same, plus jump to already-visited panels |
+| `O` | toggle overview (zoom out to the whole canvas, and back) | same |
+| `+` / `-` | zoom in / out | same |
+
+With `freeRoam: "between-moves"` (the default) panning is available while the
+camera is idle; `"always"` also allows grabbing the camera mid-glide.
+
+## Reveal modes
+
+- `always` — rendered whenever on screen.
+- `on-approach` — revealed once the camera nears it, then stays revealed.
+- `on-visit` — a dark veil replaces the artwork until the trail reaches the
+  panel, so an overview zoom never spoils secret branches or gated content.
+
+## Performance
+
+The plane is unbounded, but the working set is not:
+
+- **DOM virtualization** — only panels intersecting the camera rect (inflated
+  by one viewport in every direction) are mounted, nearest first, capped at
+  **12 panels** regardless of chapter size. The current panel is always
+  mounted.
+- **Variant-by-zoom** — each mounted panel selects the smallest
+  [image variant](/schema/assets) that covers its actual display width
+  (placement width × zoom × devicePixelRatio, quantized to 256 px steps).
+  Overview zoom mounts thumbnails; close-ups load the full-resolution encode.
+  Re-resolution happens when the camera settles — never per frame — and is
+  upgrade-only while a panel stays mounted, so loaded art never flickers back
+  to a thumbnail.
+- **Neighbor preloading** — on camera settle the player warms the current
+  panel's out-edge targets (high priority) and the nearest placements
+  (medium), each at the variant it would render at, honoring
+  `settings.preload` (`strategy`, `panelsAhead`, `maxConcurrent`) plus
+  network-awareness (connection type, data-saver).
+- **Compositing** — the whole plane moves with a single transform;
+  non-current panels use CSS containment.
+
+## Accessibility & reduced motion
+
+- Under `prefers-reduced-motion` (or the shell's `reducedMotion` input) the
+  camera **never glides**: reframes are instant, softened by a short
+  cross-fade; an authored `reducedMotionFallback` transition takes precedence.
+- Keyboard-only traversal is complete (arrows, `O`, `+`/`-`).
+- Non-current panels carry `aria-hidden` and `inert` — virtualized and
+  ambient panels never trap focus. Screen readers follow the graph
+  linearization; the canvas is presentation only.
+
+## Embedding API
+
+Hosts embedding `PlayerShellComponent` get:
+
+```html
+<pw-player-shell
+  [manifest]="manifest"
+  [viewModeOverride]="'auto'"
+  (cameraChange)="onCamera($event)">
+</pw-player-shell>
+```
+
+<ResponseField name="viewModeOverride" field-type="'auto' | 'panel' | 'canvas'">
+  `auto` (default) keeps the manifest-driven behavior — canvas chapters enter
+  canvas view automatically. `panel` forces classic panel view (used by the
+  CMS preview's view selector); `canvas` enters canvas view whenever the
+  chapter allows it.
+</ResponseField>
+
+<ResponseField name="cameraChange" field-type="output">
+  Throttled camera state (`{ x, y, zoom }` in world units) for hosts and
+  analytics.
+</ResponseField>
+
+The toolbar's view toggle cycles panel → page → canvas for chapters where
+each mode is available.
+
+<Columns cols={2}>
+  <Card title="Schema: Infinite Canvas" icon="map" href="/schema/canvas">
+    The format side — placements, camera moves, reveal modes.
+  </Card>
+  <Card title="Performance" icon="gauge" href="/player/performance">
+    General player performance mechanics.
+  </Card>
+</Columns>

@@ -94,7 +94,9 @@ Panels can additionally hint specific assets via `preloadHints` — see [Panels]
 |----------|------|:--:|-------------|
 | `panelView` | boolean | `true` | Allow panel-by-panel viewing in this format |
 | `pageView` | boolean | `false` | Allow whole-page viewing in this format (requires [page layouts](/schema/chapters-and-pages)) |
+| `canvasView` | boolean | `false` | Enable [infinite-canvas view](/schema/canvas) in this format (1.4+). Renders only for chapters that define a `canvas`; players fall back to panel view otherwise |
 | `defaultTransition` | [`Transition`](/schema/manifest-structure#transition) | — | Default transition between panels in this format; individual [edges](/schema/graph) override it |
+| `defaultCameraMove` | [`CameraMove`](/schema/canvas#edgecameramove--trail-dynamics) | — | Default canvas-view camera move for edges without an explicit `cameraMove` (1.4+) |
 
 Individual panels can further restrict views per format with `formatViews` (`allowPageView` / `allowPanelView` / `minimalFocusRect`) — see [Panels](/schema/panels).
 

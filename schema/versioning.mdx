@@ -16,9 +16,9 @@ Every manifest declares which format version it was written for in the required 
 ```json
 {
   "panelwave": {
-    "version": "1.3.0",
+    "version": "1.4.0",
     "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json",
-    "generator": "panelwave-sample-gen/1.3"
+    "generator": "panelwave-sample-gen/1.4"
   }
 }
 ```
@@ -37,11 +37,11 @@ The format follows semantic versioning:
 
 The schema file lives in a directory named after the **major** version. Minor versions are additive and ship **in place** within that directory:
 
-- Current format version: **1.3.0**
+- Current format version: **1.4.0**
 - Schema location: `schema/1.0/panelwave.schema.json`
 - Schema `$id`: `https://panelwave.org/schema/1.0/panelwave.schema.json` (unchanged by minor releases)
 
-This is why a `1.3.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1/1.2/1.3 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
+This is why a `1.4.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1/1.2/1.3/1.4 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
 
 ## Compatibility rules as encoded in the schema
 
@@ -50,6 +50,17 @@ This is why a `1.3.0` manifest still points its `schema` URI at the `1.0/` path 
 **Forward compatibility (new manifests, old consumers).** The schema is strict about unknown properties (`additionalProperties: false` / `unevaluatedProperties: false` on most objects), so a 1.0-era validator will reject fields introduced later. Custom data that must survive round-trips belongs in `x-` prefixed [extension fields](/schema/extensions) instead.
 
 **Deprecation policy.** Deprecated fields are marked with `"deprecated": true` in the schema and remain supported for at least one major version.
+
+### What changed in 1.4.0
+
+All additive; existing manifests remain valid unchanged. Introduces the **infinite canvas** — a chapter's panels on one continuous world-space plane, read by a camera that follows the story graph:
+
+- **`Chapter.canvas`** (`CanvasLayout`): world-unit `placements` (map of panel id → `CanvasPlacement` with `x/y/w/h`, `z`, `r`, `origin`, panel-relative `enterFraming`, `revealMode`), plane `background`, `camera` policy (`fitMode`, `overview`, `freeRoam`, `bounds`), and presentational `decorations`. World units: 1 unit = 1 CSS px at zoom 1.
+- **`Edge.cameraMove`** (`CameraMove`): per-edge camera travel — `path` (`direct` | `arc` | `waypoints` + `WorldPoint[]`), `zoomProfile` (`hold` | `pull-back` | `dive`), `durationMs`, `easing`, `reducedMotionFallback`. Inherits like `transition`: edge → `settings.outputPresets[format].defaultCameraMove` → built-in direct move.
+- **`FormatPreset.canvasView`** (default `false`) and `FormatPreset.defaultCameraMove`: canvas view renders only when the active format enables it and the chapter has a canvas — otherwise players fall back to panel view. Print formats ignore `canvas`.
+- Semantic validation rules (placement keys must be chapter panels, etc.) are enforced by the CLI and CMS preflight — JSON Schema cannot express them structurally.
+
+Details: [Infinite Canvas](/schema/canvas), [Graph](/schema/graph), [Settings](/schema/settings).
 
 ### What changed in 1.3.0
 
@@ -106,8 +117,8 @@ The upgrade currently performs these normalizations:
 - Renames the pre-1.0 draft layer field `type` to `kind`
 - Adds a missing `graph.edges` array
 
-<Callout kind="alert">
-The CLI's upgrade target is currently `1.0.0` — it has not yet been synchronized with the 1.1–1.3 format releases (its bundled *validation* schema is current, though). Since 1.1/1.2/1.3 are purely additive or relaxing, older manifests need no migration to be read by current consumers; run `--dry-run` first and review the reported steps before overwriting files.
+<Callout kind="info">
+The CLI's upgrade target is `1.4.0` (synchronized with the current format release). Since 1.1–1.4 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 After upgrading, always re-validate:

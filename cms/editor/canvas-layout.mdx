@@ -1,0 +1,130 @@
+---
+title: Canvas Layout Board
+description: Arrange a chapter's panels on the infinite canvas — spatial placement, camera moves with path ghosting, enter framing, gap calipers, reveal modes, and decorations.
+---
+
+The Canvas Layout Board is where you author the [infinite
+canvas](/schema/canvas): a full-screen spatial tool that places a chapter's
+panels on one continuous plane, shows the story graph as arrows between them,
+and edits the camera choreography the reader will experience. Open it from
+the workspace navigation (**Canvas Layout**).
+
+<Callout kind="tip">
+  Think in **world units**: 1 unit = 1 player pixel at zoom 1. Panels placed
+  at their natural size (e.g. 1024 × 576) render pixel-perfect; the empty
+  space *between* panels reads as time — wider gaps slow the story down.
+</Callout>
+
+## The board
+
+- **Panels** render with their real artwork, positioned at their world
+  coordinates. Drag to move, drag the corner handle to resize (16-unit snap),
+  shift-click for multi-select.
+- **Graph edges** overlay as arrows: dashed for conditional edges, highlighted
+  when an edge carries a custom camera move. The trail and the space are
+  visible together — that's the point of the board.
+- **Viewport**: drag empty space to pan, wheel to zoom, **Fit** to frame
+  everything.
+- Undo/redo covers every board operation (moves, resizes, framing,
+  decorations) with the editor's standard history.
+
+Changes save automatically (debounced) to the chapter; the save state is
+shown in the header.
+
+## Starting a layout
+
+Chapters without a canvas open with a proposed **vertical strip** — the
+webtoon shape — which is not saved until you touch it. The auto-layout menu
+offers:
+
+- **Vertical strip** — a single column in reading order (distance-as-time
+  gaps included). This alone gives you a webtoon-style work.
+- **Graph ↓ / Graph →** — layered layouts computed from the story graph
+  (branches fan out top-down or left-right), the right starting point for 2D
+  canvases with parallel paths.
+
+Align and distribute tools work on any multi-selection.
+
+## Camera moves — click an edge
+
+Selecting an edge opens the **camera move inspector** and draws the *path
+ghost* — the dashed line the camera will travel:
+
+- **Zoom profile**: `hold`, `pull-back` (zoom out to see both panels, glide,
+  zoom back in — best for long hops), or `dive`.
+- **Path**: `direct`, `arc`, or `waypoints` — add waypoints and drag the dots
+  directly on the board to bend the camera around spoilers or scenery.
+- **Duration and easing** complete the move. Without a custom move, the edge
+  inherits the format's default camera move.
+
+The inspector also shows the **gap caliper**: the world-unit distance between
+the two panels and its distance-as-time equivalent in *beats* (1 beat ≈ one
+viewport height). Use it to pace the reading rhythm deliberately.
+
+## Enter framing — where the camera lands
+
+For a selected panel, **Add enter framing** draws a movable, resizable rect
+defining the sub-area the camera frames on arrival — e.g. the top third of a
+tall falling-scene panel, letting the reader roam down the rest. **Reset to
+full panel** clears it.
+
+## Reveal modes
+
+The toolbar's reveal selector controls spoiler protection per panel:
+
+- **Always visible** (default)
+- **On approach** — revealed when the camera gets close
+- **Hidden until visited** — a veil covers the artwork until the trail
+  arrives; recommended for secret branches and [paywalled](/cms/monetization)
+  panels so the overview zoom can't leak them.
+
+## Decorations
+
+**Add decoration** places an image asset (via the asset picker) as set
+dressing on the plane — arrows, scenery, trail markers. Decorations render
+beneath panels and are purely presentational. Select one to edit opacity,
+**parallax depth** (higher values trail the camera and read as depth),
+rotation, stacking, or to delete it.
+
+## Camera policy
+
+Two chapter-wide settings live in the board's toolbar:
+
+- **Free roam**: *Guided only* (camera moves only along the trail — the safe
+  choice for phone-first works), *Roam between moves* (default), or *Always
+  free*.
+- **Fit**: how arrivals fit a panel into the viewport (`contain`, `cover`,
+  `width`, `height`).
+
+## Enabling canvas view for readers
+
+Canvas view renders only for output formats that enable it. In **Work
+Properties → Output**, the *Infinite Canvas View* checkboxes write the
+per-format toggles. If a work has canvas chapters and no format enables the
+view yet, publishing applies safe on-screen defaults (landscape formats on,
+print always off) — readers always keep the panel-view fallback.
+
+## Previewing
+
+The [Preview](/cms/preview) tab's **View** selector switches the embedded
+player between *Auto*, *Panel view*, and *Canvas view*, so you can compare
+both reading experiences on the live manifest without changing settings.
+
+## Publish checks
+
+The [validation](/cms/validation) preflight enforces canvas integrity:
+placements pointing at deleted panels and canvases without placements block
+publishing; unplaced reachable panels and very large canvases (&gt; 150
+placements) warn.
+
+<Columns cols={3}>
+  <Card title="Schema: Infinite Canvas" icon="map" href="/schema/canvas">
+    The underlying format fields.
+  </Card>
+  <Card title="Player: Canvas View" icon="monitor" href="/player/canvas-view">
+    What readers experience.
+  </Card>
+  <Card title="Graph Editor" icon="git-branch" href="/cms/editor/graph">
+    Author the trail the camera follows.
+  </Card>
+</Columns>

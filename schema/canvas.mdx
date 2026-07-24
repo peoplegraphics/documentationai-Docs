@@ -1,0 +1,228 @@
+---
+title: Infinite Canvas
+description: Schema 1.4 reference for the infinite canvas — world-space panel placements, camera moves on graph edges, reveal modes, decorations, and the canvasView format toggle.
+---
+
+Since format **1.4.0**, a chapter can place its panels on one continuous
+world-space plane — Scott McCloud's *infinite canvas*. The reader's screen
+becomes a camera that glides across the plane along the story graph instead of
+swapping panels. A single-column layout yields a webtoon-style vertical strip;
+free 2D placement with camera trails is the full experience.
+
+<Callout kind="info">
+  The canvas is purely **spatial**. The graph remains the trail: branching,
+  conditions, variables, paywalls, and analytics are untouched, and
+  panel-internal coordinates (layers, speech bubbles, hotspots) never change.
+  Players without canvas support — or formats without `canvasView` — fall back
+  to classic panel view.
+</Callout>
+
+## World units
+
+**1 world unit (wu) = 1 CSS pixel at camera zoom 1.0.** By convention, panels
+are placed at their natural authoring size (a standard 16:9 panel is
+`w: 1024, h: 576`), so layers keep their pixel coordinates unchanged. The
+plane is conceptually infinite — coordinates are unbounded and negatives are
+allowed; the effective extent is the union of placements.
+
+## `Chapter.canvas` — the layout
+
+```json
+{
+  "id": "ch-1",
+  "panels": { "top": {}, "deep": {}, "secret": {} },
+  "graph": { "entry": "top", "edges": [{ "from": "top", "to": "deep" }] },
+  "canvas": {
+    "background": { "color": "#0b0b10" },
+    "placements": {
+      "top":    { "x": 0,    "y": 0,    "w": 1024, "h": 576 },
+      "deep":   { "x": 128,  "y": 1400, "w": 768,  "h": 1600,
+                  "enterFraming": { "x": 0, "y": 0, "w": 1, "h": 0.36 } },
+      "secret": { "x": 1500, "y": 900,  "w": 512,  "h": 512,
+                  "r": -4, "revealMode": "on-visit" }
+    },
+    "camera": {
+      "fitMode": "contain",
+      "overview": { "enabled": true, "maxZoomOut": 0.05 },
+      "freeRoam": "between-moves",
+      "bounds": "auto"
+    },
+    "decorations": [
+      { "assetId": "deco-rope", "x": 480, "y": 600, "w": 96, "h": 580,
+        "opacity": 0.8, "parallaxDepth": 0.15 }
+    ]
+  }
+}
+```
+
+### `placements` — panel id → `CanvasPlacement`
+
+Keys must be panel ids of the same chapter.
+
+<ResponseField name="x / y" field-type="number" required="true">
+  Top-left corner in world units. Unbounded; negatives allowed.
+</ResponseField>
+
+<ResponseField name="w / h" field-type="number" required="true">
+  Size in world units (&gt; 0). Use the panel's natural authoring size so
+  layers render 1:1 at zoom 1.
+</ResponseField>
+
+<ResponseField name="z" field-type="integer">
+  Stacking order on the plane (0–9999). Overlapping panels are allowed.
+</ResponseField>
+
+<ResponseField name="r" field-type="number">
+  Rotation in degrees (−180…180, default 0), around `origin`
+  (normalized, default center `0.5/0.5`).
+</ResponseField>
+
+<ResponseField name="enterFraming" field-type="object">
+  Panel-relative normalized rect the camera frames when this panel becomes
+  current — e.g. land on the top third of a tall panel. Defaults to the whole
+  panel, fitted per the camera policy's `fitMode`.
+</ResponseField>
+
+<ResponseField name="revealMode" field-type="string">
+  `always` (default) — visible whenever on screen. `on-approach` — revealed
+  when the camera nears it. `on-visit` — hidden/veiled until the trail reaches
+  it (spoiler protection at overview zoom; recommended for panels behind
+  paywalls or secret branches).
+</ResponseField>
+
+### `camera` — chapter camera policy
+
+<ResponseField name="fitMode" field-type="string">
+  How a panel's framing rect is fitted into the viewport on arrival:
+  `contain` (default), `cover`, `width`, `height`.
+</ResponseField>
+
+<ResponseField name="overview" field-type="object">
+  `enabled` (default `true`) and `maxZoomOut` — the lowest zoom factor when
+  zooming out to see the whole canvas (default `0.05`).
+</ResponseField>
+
+<ResponseField name="freeRoam" field-type="string">
+  Reader camera freedom: `off` (camera only moves along the trail —
+  webtoon-like guided reading), `between-moves` (default — pan/zoom while
+  idle), `always`.
+</ResponseField>
+
+<ResponseField name="bounds" field-type="string | object">
+  Camera travel bounds: `"auto"` (default — union of placements plus margin)
+  or an explicit world rect `{ x, y, w, h }`.
+</ResponseField>
+
+### `background` and `decorations`
+
+`background` sets the plane's `color` and optionally a backdrop image
+(`assetId` + `repeat: "tile" | "stretch" | "fixed"`). `decorations` are
+non-panel set dressing (arrows, scenery, trail markers) — purely
+presentational, each with `assetId`, world-space `x/y/w/h`, and optional `z`,
+`r`, `opacity`, and `parallaxDepth` (0 = locked to the plane; higher values
+trail the camera and read as depth).
+
+## `Edge.cameraMove` — trail dynamics
+
+Camera travel lives on graph edges, next to `transition`, with the same
+inheritance chain: edge → `settings.outputPresets[format].defaultCameraMove` →
+a built-in direct move (hold zoom, 800 ms, ease-in-out).
+
+```json
+{
+  "from": "mid",
+  "to": "secret",
+  "condition": { "var": "hasLantern" },
+  "cameraMove": {
+    "path": "waypoints",
+    "waypoints": [{ "x": 1350, "y": 2100 }],
+    "zoomProfile": "dive",
+    "durationMs": 1400,
+    "easing": "ease-in-out",
+    "reducedMotionFallback": { "type": "fade", "durationMs": 200 }
+  }
+}
+```
+
+<ResponseField name="path" field-type="string">
+  `direct` (default), `arc` (gentle curve), or `waypoints` (through the
+  authored `waypoints` world points).
+</ResponseField>
+
+<ResponseField name="zoomProfile" field-type="string">
+  `hold` (default) keeps the framing zoom; `pull-back` zooms out far enough to
+  see source and target together, glides, and zooms back in — the signature
+  orientation-preserving move for long hops; `dive` zooms straight into the
+  target.
+</ResponseField>
+
+<ResponseField name="durationMs / easing" field-type="integer / string">
+  0–60000 ms; `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out`. Players
+  cap effective travel speed, so very short durations over long distances are
+  stretched for motion safety.
+</ResponseField>
+
+<ResponseField name="reducedMotionFallback" field-type="object">
+  A [Transition](/schema/graph) used instead of the glide when the reader
+  prefers reduced motion. Players never glide under reduced motion — the
+  default fallback is a short fade.
+</ResponseField>
+
+`Edge.transition` and `Edge.cameraMove` coexist: the same edge uses
+`transition` in panel view and `cameraMove` in canvas view.
+
+## Enabling canvas view — `FormatPreset.canvasView`
+
+Canvas view renders only when the active output format enables it **and** the
+chapter defines a canvas — otherwise players silently fall back to panel view.
+Print formats ignore `canvas` entirely; [pages](/schema/chapters-and-pages)
+remain the print model.
+
+```json
+{
+  "settings": {
+    "outputPresets": {
+      "flex-landscape": {
+        "panelView": true,
+        "canvasView": true,
+        "defaultCameraMove": { "zoomProfile": "pull-back", "durationMs": 900 }
+      },
+      "mobile-portrait": { "panelView": true, "canvasView": false },
+      "a4-portrait": { "pageView": true }
+    }
+  }
+}
+```
+
+## Validation rules
+
+JSON Schema cannot express cross-map key consistency, so consumers enforce
+these semantically (the [CLI](/schema/cli) `validate` command and the CMS
+publish preflight apply the same rules):
+
+| Rule | Severity |
+|---|---|
+| Every `placements` key must be a panel of the same chapter | Error |
+| `canvas` present but without placements | Error |
+| Panels reachable from `graph.entry` without a placement (players lay strays out heuristically) | Warning |
+| More than 150 placed panels (performance budget) | Warning |
+| `cameraMove.path: "waypoints"` without waypoints (treated as `direct`) | Warning |
+| `canvasView` enabled but no chapter has a canvas — or vice versa | Warning |
+
+## Accessibility contract
+
+The graph remains the canonical linearization: screen readers and keyboard
+traversal follow the trail, and the canvas is presentation only. Reveal modes
+never hide content from the reading order — they only defer *visual* display.
+
+<Columns cols={3}>
+  <Card title="Graph & Edges" icon="git-branch" href="/schema/graph">
+    Edges, conditions, transitions — the trail the camera follows.
+  </Card>
+  <Card title="Player: Canvas View" icon="map" href="/player/canvas-view">
+    How the player renders the plane, camera, and inputs.
+  </Card>
+  <Card title="CMS: Canvas Layout" icon="map" href="/cms/editor/canvas-layout">
+    Authoring the canvas on the layout board.
+  </Card>
+</Columns>
