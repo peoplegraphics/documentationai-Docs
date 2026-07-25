@@ -69,7 +69,16 @@ Preferences are saved to your account and follow you across devices:
 **Account Information** shows your user ID, creation date, role, and team count. The **Danger Zone** offers:
 
 - **Export my data** — downloads your profile, preferences, team memberships, and your teams' works as JSON.
-- **Deactivate account** — signs you out and blocks future sign-ins. Type the confirmation keyword to enable the button. Your content is retained; contact support to reactivate or fully delete it.
+- **Deactivate account** — signs you out and blocks future sign-ins. Type the confirmation keyword to enable the button. Your content is retained; contact support to reactivate.
+- **Delete account permanently** — type `DELETE` to enable the **Delete my account** button. Your account is deactivated immediately, all sessions are signed out, and after a **30-day grace period** it is permanently deleted (anonymized). Works of teams where you are the only member are moved to the trash.
+
+<Callout kind="danger">
+Deletion cannot be undone after the grace period. Within the 30 days, contact support to cancel the pending deletion and restore your account. If you are the sole owner of a team that has other members, transfer ownership first — the same guard applies as for deactivation.
+</Callout>
+
+### Data retention
+
+Housekeeping runs automatically in the background: sessions that expired or were revoked disappear from the **Active sessions** history after 90 days, and raw reading events behind the [analytics dashboard](/cms/analytics) are deleted after 24 months (the aggregated daily metrics remain).
 
 ## Teams and roles
 

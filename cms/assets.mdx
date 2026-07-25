@@ -36,7 +36,7 @@ You don't need to do anything to enable this; the CMS picks the right upload met
 
 After upload, a background pipeline optimizes every asset. You keep working while it runs; the asset card shows **Processing…** until it's done.
 
-- **Images** — AVIF and WebP variants are generated for fast delivery, plus a 400px thumbnail; EXIF metadata is stripped. Dimensions are read and stored.
+- **Images** — AVIF and WebP variants are generated for fast delivery, plus a 400px thumbnail; EXIF metadata is stripped. Dimensions are read and stored. Large artwork additionally gets a **responsive size ladder** — WebP renditions at 640, 1280, 1920, and 2560 px width (only sizes smaller than the original are created), so a phone never downloads desktop-sized files.
 - **Audio** — AAC and Opus variants with broadcast loudness normalization (EBU R128), waveform data for the editor's audio views, and the duration in milliseconds.
 - **Video** — a web-friendly H.264 rendition (up to 1920px wide), a poster frame, and scrubbing thumbnails, plus dimensions and duration.
 
@@ -45,8 +45,10 @@ One more variant is created **on demand**: when preflight flags an image as too 
 Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage.
 
 <Callout kind="info">
-Readers automatically get the best variant their device supports — you never have to export "web versions" yourself. See [Assets in the format](/concepts/assets) for how variants appear in the manifest.
+Readers automatically get the best variant their device supports — you never have to export "web versions" yourself. Published manifests list the size ladder alongside the full-quality primary file, and the [player picks by actual display size](/player/performance#asset-variant-selection). See [Assets in the format](/concepts/assets) for how variants appear in the manifest.
 </Callout>
+
+The editor benefits too: asset lists, the picker, and the canvas load a rendition matched to the size actually on screen instead of the full-resolution original, so large libraries stay snappy.
 
 ## Finding and organizing assets
 

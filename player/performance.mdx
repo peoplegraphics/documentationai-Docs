@@ -49,6 +49,18 @@ Manifests can list multiple encodings/resolutions per asset (see [Assets](/schem
 - `resolveAssetUrl(assetId, assetBase, category)` — resolves relative asset references against the category-specific base URLs (`imageBase`, `audioBase`, `videoBase`, `pluginsBase`, with `mediaBase` as the fallback); absolute URLs pass through untouched.
 - Supporting utilities: `isAbsoluteUrl`, `getAssetFromCatalog`, `getFileExtension`, `guessMimeType`, `isMimeTypeSupported`, `calculateOptimalDimensions`, `estimateImageSize`.
 
+### Variant-by-zoom in every view mode
+
+Variant selection is not a one-time choice at load — the viewport binds a **per-panel target width** to every layer renderer and re-selects as display conditions change:
+
+- **Target width per view mode**: panel view uses container width × zoom × `devicePixelRatio`; page view uses the panel placement's fraction of the page width × `devicePixelRatio`; [canvas view](/player/canvas-view#performance) uses placement width × camera zoom × `devicePixelRatio`.
+- **Quantized to 256 px steps**, so small zoom changes don't retrigger loads.
+- **Upgrade-only per mounted panel** — once a higher-resolution variant is shown, the panel never downgrades back to a thumbnail while mounted; tracked widths are pruned on unmount.
+- **Settle-based recomputation**: target widths recompute immediately on panel/page change, and after a **180 ms settle** on zoom or resize — never per frame.
+- **Out-edge preloading**: in panel view, the player warms the artwork of the current panel's outgoing-edge target panels at the current target width via `PreloadService`, honoring `settings.preload` (`strategy` `none`/`panelsAhead`, `maxConcurrent`) and the network-awareness rules above.
+
+Together with the CMS-generated [responsive size ladder](/cms/assets#automatic-processing) in published manifests, this means an overview or phone reader downloads small WebP rungs while a zoomed-in 4K reader gets the full-resolution encode.
+
 ## Rendering performance
 
 - **OnPush everywhere.** Every component uses `ChangeDetectionStrategy.OnPush`; state flows in through inputs and RxJS subscriptions.

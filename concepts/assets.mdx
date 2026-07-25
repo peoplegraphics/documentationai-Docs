@@ -71,7 +71,7 @@ Finally the chosen `src` is resolved against the matching base URL. Loaded image
 
 Creators never write catalogs by hand. In the CMS [asset library](/cms/assets) you upload source files; the platform then:
 
-- transcodes and generates the **resolution and format variants** automatically (images and video are processed by dedicated media workers),
+- transcodes and generates the **resolution and format variants** automatically — images get AVIF/WebP encodes plus a responsive WebP size ladder (640–2560 px widths); images and video are processed by dedicated media workers,
 - records dimensions and metadata into the catalog,
 - ties **localized uploads** to the right variant locale via the [localization workflow](/cms/localization),
 - and writes the finished `assets` section into the exported manifest.

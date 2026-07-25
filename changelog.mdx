@@ -5,6 +5,34 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-07-25" description="CMS & Player · Responsive image variants, account deletion" tags={["feature"]}>
+  ## Right-sized artwork everywhere — and GDPR self-service
+
+  - **Responsive image variants (CMS)** — the media pipeline now renders every
+    image into a **WebP size ladder** (640 / 1280 / 1920 / 2560 px wide; only
+    sizes below the original are created). Published manifests list the rungs
+    as ascending variants while the full-quality primary file stays first, so
+    older players keep working unchanged; a backfill job brings existing
+    libraries up to date. The editor itself also loads size-matched renditions
+    in asset lists, the picker, and on the canvas. See [Assets](/cms/assets).
+  - **Variant-by-zoom in the player** — panel and page view now pick the image
+    variant by actual display size (container width × zoom ×
+    devicePixelRatio, quantized, upgrade-only — no flicker back to
+    thumbnails), completing the selection machinery canvas view shipped with
+    format 1.4. Panel view additionally preloads the next panels along
+    outgoing graph edges at the size they will render at, honoring
+    `settings.preload`. See [Performance](/player/performance).
+  - **Delete your account yourself** — the profile's Danger Zone gains a
+    permanent **Delete account** action with typed confirmation: immediate
+    deactivation and sign-out everywhere, then anonymization after a
+    **30-day grace period** (support can cancel within the window). Works of
+    teams where you were the only member go to the trash. See
+    [Account & Team](/cms/account).
+  - **Automatic data retention** — background housekeeping now deletes raw
+    analytics events after 24 months (aggregated dashboard metrics are kept)
+    and expired/revoked sessions after 90 days.
+</Update>
+
 <Update label="2026-07-24" description="Format 1.4.0 · The Infinite Canvas — schema, player & CMS" tags={["feature"]}>
   ## The infinite canvas: one continuous plane, a camera on the trail
 
