@@ -5,6 +5,46 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-14" description="CMS · Supported page formats per work" tags={["feature"]}>
+  ## Pick your page formats — per work, from creation to export
+
+  - **Page Formats step in the create-work wizard** — choose every screen or
+    print shape the work targets (all eleven formats of the schema's
+    [`OutputFormat`](/schema/manifest-structure#outputformat) enum, from
+    Mobile portrait to US Letter and Video 16:9) and badge one as the
+    **default** for previews and exports. Starter templates pre-select
+    fitting formats. With "Start with a first chapter" ticked, the wizard
+    now seeds an empty **Page 1 in every selected format**, so the editor
+    is never empty. See [Works](/cms/works#creating-a-work).
+  - **Supported-formats editor in Work Properties → Output** — add formats
+    later (with an optional empty first page per chapter; chapters that
+    already have pages in that format are skipped) or remove them again.
+    Removing a format that still has pages warns first and **keeps** the
+    pages — they reappear when the format is re-added. The default format
+    cannot be removed. See [Works](/cms/works#output).
+  - **The editor honors the list** — the canvas format switcher offers only
+    the work's supported formats, and a remembered selection that is no
+    longer supported falls back to the default format. Works from before
+    this feature keep seeing all formats until they save an explicit
+    selection. The switcher also gained the missing frames: US Letter
+    portrait/landscape, Video 16:9, and Flex landscape.
+</Update>
+
+<Update label="2026-08-13" description="Platform · PanelWave goes live (private beta)" tags={["feature", "bugfix"]}>
+  ## panelwave.org is live
+
+  - **The hosted CMS is live in a gated private beta** on **panelwave.org**,
+    with automated deployments. Public work URLs (the slug preview in the
+    create-work wizard) now show the panelwave.org domain.
+  - **Export fixes** — PDF, PPT, and video exports handle partially
+    specified options again (generators fill sensible defaults), and the
+    export data pipeline was aligned with the current manifest schema. See
+    [Export](/cms/export).
+  - **Smarter AI import** — the [script](/cms/script-import) and
+    [page](/cms/page-import) importers upgraded to a stronger reasoning
+    model for panel, layout, and bubble suggestions.
+</Update>
+
 <Update label="2026-07-25" description="CMS & Player · Responsive image variants, account deletion" tags={["feature"]}>
   ## Right-sized artwork everywhere — and GDPR self-service
 

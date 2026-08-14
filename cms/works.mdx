@@ -7,19 +7,24 @@ description: Manage your projects on the My Works page — create works with the
 
 ## Creating a work
 
-Click **Create New Work** to open the three-step wizard:
+Click **Create New Work** to open the four-step wizard:
 
 <Steps>
   <Step title="Basic Info">
     Enter the **Work Title** and the **URL Slug** (lowercase letters, numbers, and hyphens; auto-generated from the title). The wizard checks slug availability live — you'll see **Available** or **Already taken**.
 
-    Optionally pick a starter template (**Webcomic**, **Branching Novel**, **All-Ages Story**, **Graphic Novel**) to pre-fill languages, age rating, and tags — you can still adjust everything in the next steps.
+    Optionally pick a starter template (**Webcomic**, **Branching Novel**, **All-Ages Story**, **Graphic Novel**) to pre-fill languages, age rating, tags, and page formats — you can still adjust everything in the next steps.
   </Step>
   <Step title="Languages">
     Choose the **Default Language** and tick any **Additional Languages**. The list is grouped by region and searchable; **Select all** and **Clear** help with large selections. You can add or remove languages later in the [Localization Workshop](/cms/localization).
   </Step>
+  <Step title="Page Formats">
+    Pick every **page format** — screen or print shape — the work targets: from **Mobile portrait** and **Tablet portrait** through **Desktop**, **Big screen**, and **Square** to the print and video shapes (**A4**, **US Letter**, **Video 16:9**, **Flex landscape**). Pages are laid out separately per format, so select only what you actually plan to design for.
+
+    One selected card is badged **Default** — that format is used for previews and exports. The first format you select becomes the default automatically; **Make default** on any other selected card changes it, and the default itself cannot be deselected. You can add or remove formats later in [Work Properties → Output](#output).
+  </Step>
   <Step title="Details">
-    Pick an **Age Rating** — **Everyone** (all ages), **Teen** (13+), **Mature** (17+), or **Adult** (18+) — and add optional **Tags** (press Enter, comma, or **Add**). Tick **Start with a first chapter** to have "Chapter 1" created so the editor isn't empty. Click **Create Work**.
+    Pick an **Age Rating** — **Everyone** (all ages), **Teen** (13+), **Mature** (17+), or **Adult** (18+) — and add optional **Tags** (press Enter, comma, or **Add**). Tick **Start with a first chapter** to have "Chapter 1" created with an empty **Page 1 in every selected format**, so the editor isn't empty in any of them. Click **Create Work**.
   </Step>
 </Steps>
 
@@ -95,7 +100,16 @@ The **Default Locale**, the set of **Supported Locales**, and the **Reading Dire
 Default **Ambient**, **SFX**, and **Voice** volume levels, and the default panel **Transition Effect** and **Transition Duration**.
 
 ### Output
-The **Default Format** used for previews and exports.
+The set of **Supported Page Formats** and which of them is the **Default**:
+
+- Every supported format appears in the editor's [format switcher](/cms/editor/canvas), and each format keeps its own set of page layouts.
+- One format is badged **Default** — it is used for previews and exports and cannot be removed; click **Make default** on another supported format first.
+- **Adding a format** asks whether to also create an empty first page in the new format for each chapter, so the editor isn't empty there. Chapters that already have pages in that format are skipped.
+- **Removing a format** that still has pages shows a warning first: the pages are **kept**, but no longer shown in the editor or included in exports until you re-add the format. Nothing is deleted.
+
+<Callout kind="info">
+Works created before supported formats existed have no stored selection — they support **all** formats until you save an explicit list here.
+</Callout>
 
 ### Video Defaults
 Defaults applied to new video layers (view mode, start mode, **Muted by default**) unless overridden per layer — see [Video Panels](/cms/editor/video-panels).
