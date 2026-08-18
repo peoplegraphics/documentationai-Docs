@@ -5,6 +5,46 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-18" description="CMS · Team comments & high-contrast theme" tags={["feature"]}>
+  ## Talk about the work where the work is
+
+  - **Team comments are live in the CMS** — a **Comments** section in
+    backstage holds the work-level discussion, and a speech-bubble button in
+    the editor header opens a **comments drawer** that targets the most
+    specific thing you have open: the selected panel, otherwise the current
+    page, otherwise the whole work. Threaded replies, six emoji reactions,
+    edit/delete of your own comments, and Newest/Popular/Oldest sorting.
+    Comments are **team-internal**: only members of the work's team can read
+    or post. See [Community](/cms/community).
+  - **Moderation & abuse protection** — every comment route now requires
+    membership of the work that owns the target. Authors with a verified
+    email post immediately, others are held for review; spam-shaped content
+    (too many links, blocklisted terms) is **held rather than rejected**, and
+    rapid-fire posting is rate-limited.
+  - **High-contrast theme** — a third theme joins Light and Dark, selectable
+    in [Profile → Preferences](/cms/account#preferences) and cycled from the
+    editor's user menu, with a full token set in both the app and the editor
+    canvas.
+  - **Accessibility polish** — progress bars, tab strips, and tooltips across
+    the app moved onto shared, ARIA-correct components: real tablists with
+    arrow-key navigation in the Extras manager, tooltips instead of bare
+    `title` attributes in the works list, and progress values clamped against
+    misreporting backends.
+</Update>
+
+<Update label="2026-08-17" description="Brand · The real PanelWave icon" tags={["feature"]}>
+  ## The placeholder mark retires
+
+  - The **CMS** shows the PanelWave brand icon in the editor and backstage
+    headers and ships a complete favicon/app-icon set — browser tab,
+    bookmarks, apple-touch-icon, and a web manifest for installs.
+  - The **website** renders the icon next to the wordmark in header and
+    footer, replaces the placeholder favicon set, and the press page's Media
+    Assets now offer the real icon and full logo lockup for download.
+  - The **auth screens** greet you with the brand mark instead of a generic
+    icon.
+</Update>
+
 <Update label="2026-08-14" description="CMS · Supported page formats per work" tags={["feature"]}>
   ## Pick your page formats — per work, from creation to export
 

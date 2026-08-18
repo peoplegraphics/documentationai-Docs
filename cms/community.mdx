@@ -1,26 +1,49 @@
 ---
 title: Community
-description: The state of PanelWave's community features — comments, reactions, likes, watchlists, and sharing — and what creators can use today.
+description: PanelWave's community features — team comments live in the CMS today, plus the reader-facing toolkit (reactions, likes, watchlists, sharing) that is still on its way.
 ---
 
-PanelWave is building a community layer around published works: comments, reactions, likes, watchlists, and social sharing. This page describes what that toolkit contains — and, honestly, how much of it you can use right now.
+PanelWave is building a community layer around published works: comments, reactions, likes, watchlists, and social sharing. The first piece is now live — **team comments inside the CMS**. The reader-facing side is still on its way; this page is honest about which is which.
 
-<Callout kind="alert">
-  **Current status:** the community building blocks below are implemented in the platform but are **not yet visible anywhere in the CMS or reader experience**. There is no screen where creators or readers interact with comments or likes today, and no moderation dashboard exists yet. Treat this page as a preview of what is coming rather than a guide to something you can click.
+<Callout kind="success">
+  **New:** comments are now usable in the CMS — as a work-level discussion in backstage and as a drawer inside the editor. They are **team-internal**: only members of the work's team can read or write them. Reader-facing comments, likes, watchlists, and sharing are not surfaced anywhere yet.
 </Callout>
 
-## What the toolkit includes
+## Team comments in the CMS
 
-### Comments
+Comments are the discussion channel for the people making the work — art notes, lettering feedback, review remarks — attached to the thing they are about.
 
-A threaded comment section designed to attach to a work, a chapter, or an individual panel:
+### Where to find them
 
-- Readers write comments (up to 5,000 characters) and post replies one level deep.
-- Sorting by **Newest**, **Popular**, or **Oldest**.
-- Six emoji reactions on any comment: 👍 like, ❤️ love, 😂 laugh, 😮 surprised, 😢 sad, 😠 angry.
-- Authors can **Edit** and **Delete** their own comments (edited comments are labeled).
-- Comments load in pages of 20 with a **Load More Comments** button.
-- New comments can be held back for review — the author then sees *"Your comment is pending moderation."* A creator-facing moderation view (approving, rejecting, or pinning comments) is planned but does not exist yet; pinned comments can already be displayed with a **Pinned** badge.
+- **Backstage → Comments** — a work-level thread for discussion that isn't about one specific spot. It sits in the backstage sidebar next to Validation, and in the editor's **Work areas** menu.
+- **The editor's comments drawer** — a speech-bubble button in the editor header opens a side drawer that targets **the most specific thing you have open**: the selected panel, otherwise the current page, otherwise the whole work. A scope line at the top of the drawer always tells you what you are commenting on. Switch selection while the drawer is open and it follows.
+
+### What you can do in a thread
+
+- Write comments up to 5,000 characters and post replies one level deep.
+- Sort by **Newest**, **Popular**, or **Oldest**; comments load in pages of 20 with a **Load More Comments** button.
+- React with six emoji: 👍 like, ❤️ love, 😂 laugh, 😮 surprised, 😢 sad, 😠 angry.
+- **Edit** and **Delete** your own comments (edited comments are labeled).
+- Pinned comments display with a **Pinned** badge.
+
+### Who can see what
+
+Comment threads are scoped to the work's team. You must be signed in and a member of the team that owns the work to read or post — comments on one team's work are invisible to everyone else, including other signed-in creators.
+
+### Moderation and abuse protection
+
+- Authors with a **verified email** post immediately; otherwise a new comment is held and its author sees *"Your comment is pending moderation."*
+- Comments that look like spam — an unusual number of links, or terms on the platform's blocklist — are **held for review rather than rejected**, so a false positive never destroys what you wrote.
+- Posting very rapidly is rate-limited; wait a moment and try again.
+- A creator-facing moderation view (approving, rejecting, or pinning held comments yourself) is planned but does not exist yet — held comments are reviewed platform-side for now.
+
+## What's still coming: the reader-facing layer
+
+The building blocks below are implemented in the platform but are **not yet visible to readers** anywhere:
+
+### Reader comments
+
+The same threaded comment system, opened up to your audience on published works — with the moderation queue above standing between the internet and your comment section.
 
 ### Likes
 
@@ -34,9 +57,9 @@ A star button that lets readers follow a work: **Add to Watchlist** / **Remove f
 
 A share menu for a work, chapter, or panel offering **Twitter**, **Facebook**, **Reddit**, **Email**, and **Copy Link**, along with a share counter ("Shared 12 times").
 
-## What you can do today
+## Reaching readers today
 
-While the community layer is being wired up, these creator tools are live now:
+While the reader-facing layer is being wired up, these creator tools are live now:
 
 <Columns cols={3}>
   <Card title="Analytics" icon="chart-bar" href="/cms/analytics">
@@ -51,5 +74,5 @@ While the community layer is being wired up, these creator tools are live now:
 </Columns>
 
 <Callout kind="info">
-  Watch the [changelog](/changelog) for announcements as community features become available in the CMS and the reading experience.
+  Watch the [changelog](/changelog) for announcements as community features reach the reading experience.
 </Callout>
