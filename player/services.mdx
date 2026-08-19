@@ -13,6 +13,7 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `PlayerStateService` | Current panel and locale (reactive) |
 | `VariableStoreService` | Scoped variables, mutations, persistence |
 | `FlowEngineService` | Graph traversal and edge condition evaluation |
+| `HotspotActionService` | Executes hotspot actions (mutations, plugin events) and returns UI effects |
 | `VariantService` | Panel/layer variant selection |
 | `ImageCacheService` | LRU image cache with memory budget |
 | `PreloadService` | Priority-based, network-aware asset preloading |
@@ -58,6 +59,7 @@ A second, extended implementation exists at `src/lib/state/player-state.service.
 - `setDefinitions(definitions)` — register `VariableDefinition`s and initialize defaults; enforces `readOnly` and per-type validation (`boolean`, `number`/`integer` with `min`/`max`, `string` with `pattern`, `enum`, date/time types) on later writes.
 - `get(id, scope, scopeId?)` / `set(id, value, scope, scopeId?)` / `has(...)` — the five scopes are `global`, `chapter`, `page`, `session`, `persistent`; chapter/page scopes are keyed by a `scopeId`.
 - `applyMutation(mutation, scope, scopeId?)` — applies `set`, `increment`, `decrement`, `toggle`, `append`, `remove`, `clear`.
+- `applyMutations(mutations, { chapterId?, pageId? })` — batch-applies manifest-shaped `Mutation[]` (as carried by hotspot and edge actions), resolving each variable's scope from its definition; variables without a definition fall back to `session` scope.
 - `createContext(chapterId?, pageId?)` — flattens all scopes into one object for JSON Logic evaluation.
 - `resetScope(scope, scopeId?)`, `resetAll()` — reset and re-apply defaults; `persistent` scope round-trips through `localStorage` (`pw-variables-persistent`).
 - `store: Observable<VariableStore>` — reactive snapshot stream.
@@ -70,6 +72,19 @@ A second, extended implementation exists at `src/lib/state/player-state.service.
 - `getPreviousPanels(graph, panelId)` — reverse lookup over incoming edges.
 - Analysis helpers: `getPossibleNextPanels`, `getEdgesToPanel`, `hasOutgoingEdges`, `isEndpoint`, `isEntry`, `getEntry`, `findEndpoints`, `hasPath` (BFS, bounded depth), `findPath` (BFS shortest path), `hasCycles` (DFS), `getReachablePanels`.
 - Entitlement bridges: `checkPanelEntitlement`, `checkChapterEntitlement`, `checkWorkEntitlement` delegate to `EntitlementService`.
+
+## HotspotActionService
+
+`services/hotspot-action.service.ts` — executes a hotspot's [action](/schema/hotspots#hotspotaction) when the reader activates it. Pure side effects happen inside the service; UI side effects come back as a typed effect the shell applies — which keeps the service fully unit-testable.
+
+- `execute(action, { chapterId?, pageId? }): HotspotUiEffect` — behavior per action type:
+  - `goTo` — applies the action's `mutations` first (via `VariableStoreService.applyMutations`), then returns `{ kind: 'navigate', to, transition? }`; the shell navigates with the transition.
+  - `setVariables` — applies the mutations; returns `{ kind: 'none' }`.
+  - `openExtras` — returns `{ kind: 'openExtras', extrasId }`; the shell opens the extras viewer at that item.
+  - `openModal` — returns `{ kind: 'openModal', title, content }` (both `LocalizedString`s); the shell shows `pw-action-modal`.
+  - `pluginEvent` — forwards to `PluginHostService.emitEventToPlugins(event, { pluginId, payload })`; returns `{ kind: 'none' }`.
+
+After every activation the shell rebuilds the variable context, so `visibleIf`-gated hotspots, edges, and variants react immediately. Every activation is also recorded as a `hotspot_click` tracking event — see [Tracking](/player/tracking#reading-session-and-hotspot-events).
 
 ## VariantService
 

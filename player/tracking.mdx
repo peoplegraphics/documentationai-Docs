@@ -123,9 +123,41 @@ interface VideoTrackingPayload {
 
 `reason: 'stall-skip'` marks videos the autoplay watchdog or the page-view sequencer skipped because the source never finished — valuable for spotting broken encodes in the wild.
 
-<Callout kind="info">
-In the current build the **video events** are what the shell feeds through the tracking pipeline automatically (they respect consent and the whitelist). Navigation/decision events are available to you via the shell's outputs — forward them yourself as shown below.
-</Callout>
+## Reading-session and hotspot events
+
+Beyond video events, the shell instruments the reading session automatically — every event below flows through the same consent/whitelist pipeline:
+
+| Event | When | Payload highlights |
+|---|---|---|
+| `session_start` | Once, when tracking is configured | `deviceType`, `locale`, `totalPanels` (reading-order count) |
+| `panel_view` | Each panel the reader lands on (deduplicated) | `panelId`, `chapterId`, `panelOrder` |
+| `work_complete` | Once, when the reader reaches an end panel | `panelId`, `chapterId` |
+| `hotspot_click` | Every click/tap on panel content | see below |
+| `session_end` | On page hide / destroy, followed by a synchronous flush (`sendBeacon`) | — |
+
+### `hotspot_click`
+
+Activating a [hotspot](/schema/hotspots) — and, deliberately, also clicking panel artwork that hits **no** hotspot — records a `hotspot_click`:
+
+```json
+{
+  "type": "hotspot_click",
+  "data": {
+    "panelId": "p-12",
+    "chapterId": "ch-1",
+    "hotspotId": "hs-door",
+    "x": 0.3142,
+    "y": 0.6108,
+    "hit": true
+  }
+}
+```
+
+- `x` / `y` are **normalized (0–1), panel-relative** coordinates of the click.
+- `hit: true` carries the `hotspotId`; `hit: false` marks a **dead click** — a tap that missed every hotspot — and omits `hotspotId`.
+- Keyboard activations report the shape's centroid.
+
+Dead clicks are recorded on purpose: they show where readers *try* to interact, which powers the click heatmap in the CMS — see [Analytics (CMS)](/cms/analytics#click-heatmap). Like every event, `hotspot_click` respects consent and must be present in the manifest's `eventWhitelist` to be recorded.
 
 ## Forwarding player activity yourself
 

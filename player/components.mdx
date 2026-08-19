@@ -74,7 +74,7 @@ Overlays render on top of the viewport content:
 | Component | Selector | Role |
 |---|---|---|
 | `SpeechBubblesComponent` | `pw-speech-bubbles` | Renders all of a panel's speech bubbles with the [ComicBalloon SVG engine](/player/balloon-renderer); resolves localized text, positions bubbles from normalized `shape` coordinates, scales lettering per screen (`readingScale`), re-renders when comic fonts finish loading, emits `bubbleClick` and `bubbleAudioPlay` |
-| `HotspotsOverlayComponent` | `pw-hotspots-overlay` | Interactive clickable areas (`rect`, `circle`, `polygon`) with keyboard focus/activation; emits `hotspotClick`, `hotspotActivate`, `hotspotFocus` |
+| `HotspotsOverlayComponent` | `pw-hotspots-overlay` | Renders a panel's [hotspots](/schema/hotspots) from their normalized manifest geometry (`rect`, `circle`, `polygon`), filters them by `visibleIf` against the current variables, resolves localized labels/`ariaLabel`s, and shows a gentle pulse indicator (respecting reduced motion). Click and keyboard activation (`Enter`/`Space` at the shape centroid) emit `hotspotActivate` with normalized coordinates; the shell executes the action and records the click |
 | `PaywallOverlayComponent` | `pw-paywall-overlay` | The paywall gate UI; emits `PaywallAction`s (see [Paywall & Entitlement](/player/paywall-entitlement)) |
 | `AgeGateComponent` | `pw-age-gate` | Age verification prompt; emits an `AgeVerificationResult` |
 | `ContentWarningOverlayComponent` | `pw-content-warning-overlay` | Content warning interstitial before gated content |
@@ -82,7 +82,7 @@ Overlays render on top of the viewport content:
 
 ## Modals (`components/modals/`)
 
-Modal dialogs opened from the toolbar; each has a visibility input and a close output managed by the shell:
+Modal dialogs opened from the toolbar (or by a hotspot action); each has a visibility input and a close output managed by the shell:
 
 | Component | Selector | Role |
 |---|---|---|
@@ -90,7 +90,8 @@ Modal dialogs opened from the toolbar; each has a visibility input and a close o
 | `SettingsModalComponent` | `pw-settings-modal` | Reader preferences (speech, audio, autoplay speed, accessibility) |
 | `LanguageModalComponent` | `pw-language-modal` | Locale picker fed from `meta.locales` |
 | `CharacterRosterComponent` | `pw-character-roster` | Character gallery mapped from `meta.characters` (portrait, name, bio) |
-| `ExtrasViewerComponent` | `pw-extras-viewer` | Bonus content from the manifest's `extras` section |
+| `ExtrasViewerComponent` | `pw-extras-viewer` | Bonus content from the manifest's `extras` section; an `initialExtraId` input opens a specific item (used by the `openExtras` hotspot action) |
+| `ActionModalComponent` | `pw-action-modal` | Simple localized title + content dialog opened by the `openModal` hotspot action (plain text — manifest content is never rendered as HTML) |
 | `ShareModalComponent` | `pw-share-modal` | Sharing options |
 | `CommentsDrawerComponent` | `pw-comments-drawer` | Comments side drawer (UI surface; persistence is host-provided) |
 

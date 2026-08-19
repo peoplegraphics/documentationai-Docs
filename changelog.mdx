@@ -5,6 +5,35 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-19" description="Player & CMS · Hotspots come alive + click heatmap" tags={["feature", "bugfix"]}>
+  ## Hotspots now actually work — and you can watch readers use them
+
+  - **Interactive hotspots in the player** — the hotspots you draw in the
+    editor now render and act in the published work: readers see a gentle
+    pulsing outline (respecting reduced motion), and activating a hotspot
+    runs its action — **navigate** with variable changes and a transition,
+    **set variables**, **open extras** at a specific item, **open a modal**
+    with localized text, or **trigger a plugin event**. Fully
+    keyboard-accessible with localized screen-reader labels, in panel and
+    page view. See [the reader's view](/player/reader-interface#interactive-hotspots).
+  - **Click heatmap in the analytics dashboard** — a new section shows
+    *where* readers click on each panel as a cool-to-hot density overlay,
+    with hotspot outlines, per-hotspot hit counts, and the **dead-click**
+    share: taps that hit no hotspot, i.e. places readers expect
+    interactivity. Reads raw clicks, so it updates without waiting for the
+    nightly aggregation. See [Click heatmap](/cms/analytics#click-heatmap).
+  - **Reading funnel & panel engagement documented** — the dashboard's
+    per-panel drop-off funnel and views/dwell/bounce table now have
+    [reference docs](/cms/analytics#reading-funnel).
+  - **Editor fix** — hotspots are reloaded when you reopen a panel (they
+    previously disappeared from the canvas after a reload while still being
+    saved), and hotspot geometry is stored in the format's normalized
+    coordinates so exports are always schema-valid.
+  - **Tracking** — the player records `hotspot_click` events with normalized
+    coordinates and a hit/miss flag, consent-gated and whitelisted like every
+    other event. See [Tracking](/player/tracking#reading-session-and-hotspot-events).
+</Update>
+
 <Update label="2026-08-18" description="CMS · Team comments & high-contrast theme" tags={["feature"]}>
   ## Talk about the work where the work is
 

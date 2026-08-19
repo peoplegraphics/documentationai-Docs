@@ -28,7 +28,7 @@ Hotspots come in three shapes, each with its own drawing tool:
 </Steps>
 
 <Callout kind="info">
-  The dashed overlay is an editing aid — readers never see it. In the published work the area is simply clickable.
+  The dashed overlay is an editing aid — readers never see it. In the published work the player renders the area as a clickable region with a **gentle pulsing outline** so readers can discover it (disabled for readers who prefer reduced motion), plus a highlight on hover and full keyboard access. See [the reader's view](/player/reader-interface#interactive-hotspots).
 </Callout>
 
 ## Editing the shape
@@ -107,16 +107,24 @@ You don't need to know any syntax — the builder writes the expression for you.
 
 The structure tree's filter bar has a **Show panels with hotspots** toggle, handy for auditing interactivity across a long work. Always test your hotspots in [Preview](/cms/preview) before [publishing](/cms/publishing).
 
+## Measuring hotspot engagement
+
+Once a published version is being read, the analytics dashboard's **[Click heatmap](/cms/analytics#click-heatmap)** shows where readers actually click on each panel — hotspot hits ranked per hotspot, plus **dead clicks** (taps that hit nothing). A hot cluster outside your hotspots is a reader telling you where the next hotspot belongs.
+
+<Callout kind="info">
+  A hotspot needs at least a shape, a label, and **one action** to appear in the published work — hotspots without an action are left out of the export (the format requires one), so a silent, do-nothing area can never ship by accident.
+</Callout>
+
 ## Related pages
 
 <Columns cols={3}>
   <Card title="Hotspots in the format" icon="target" href="/schema/hotspots">
     How hotspots are stored in the PanelWave manifest.
   </Card>
+  <Card title="Click heatmap" icon="mouse-pointer" href="/cms/analytics#click-heatmap">
+    See where readers actually click on your panels.
+  </Card>
   <Card title="Variables" icon="variable" href="/cms/editor/variables">
     Define the state your conditions and actions use.
-  </Card>
-  <Card title="Story graph" icon="git-branch" href="/cms/editor/graph">
-    Wire branching navigation between panels.
   </Card>
 </Columns>

@@ -1,6 +1,6 @@
 ---
 title: Analytics
-description: Read the PanelWave analytics dashboard — reads, completion, reading time, device and locale breakdowns, comparisons, and CSV export.
+description: Read the PanelWave analytics dashboard — reads, completion, reading time, audience breakdowns, the reading funnel, per-panel engagement, the click heatmap, and CSV export.
 ---
 
 The **Analytics Dashboard** shows how readers engage with a published work: how often it is read, how far readers get, and how long they stay. Open a work's backstage and choose **Analytics** in the navigation (it is also available from the work card's **More actions** menu in the works list).
@@ -44,6 +44,32 @@ Below the tiles, two panels show where your sessions come from:
 
 Geographic (country-level) data is not collected — device and locale are the two audience dimensions available.
 
+## Reading funnel
+
+The **Reading funnel** shows where readers drop off, panel by panel in reading order: each step is a panel with the number of sessions that reached it, and the header summarizes how many sessions completed the work (e.g. *"12 of 20 sessions completed (60%)"*). A steep drop between two steps is your clearest signal for a pacing problem, a confusing branch — or a well-placed [paywall boundary](/cms/monetization).
+
+## Panel engagement
+
+**Panel engagement** ranks your panels by views, with a bar chart on top and a table below showing per-panel **Views**, **Avg dwell** (how long readers stay on the panel), and **Bounce rate** (sessions that saw only this panel and left). Long dwell can mean a beloved splash page — or a panel readers get stuck on; pair it with the funnel to tell the difference.
+
+<Callout kind="info">
+  Funnel and per-panel metrics come from the same **nightly aggregation** as the key metrics — they appear once reading sessions have been processed.
+</Callout>
+
+## Click heatmap
+
+The **Click heatmap** shows *where* readers click on a panel — every tap, whether it landed on a [hotspot](/cms/editor/hotspots) or not:
+
+1. Pick a panel from the **Panel** selector (it lists the panels that have reader activity).
+2. The panel renders with a **density overlay**: cool blue where a few readers clicked, hot red where many did. Defined hotspot regions are outlined with their click counts.
+3. The header summarizes the split — e.g. *"120 clicks — 85 on hotspots, 35 dead (29%)"* — and the **Hotspot hits** list ranks your hotspots by clicks.
+
+**Dead clicks** (taps that hit no hotspot) are the interesting part: a hot cluster *outside* every hotspot means readers expect something there to be interactive — consider putting a hotspot where they're already tapping, or making the existing one bigger. A hotspot with few hits despite traffic may be too subtle or oddly placed.
+
+<Callout kind="tip">
+  Unlike the other sections, the click heatmap reads **raw click events**, so fresh clicks show up without waiting for the nightly aggregation. Very busy panels are sampled to the most recent 5,000 clicks (the header says *"sampled"* when that happens).
+</Callout>
+
 ## Exporting the data
 
 **Export CSV** downloads the per-day detail for the current range and filters as a CSV file (one row per day, plus a totals row) — handy for your own spreadsheets or sharing with collaborators.
@@ -56,6 +82,7 @@ Geographic (country-level) data is not collected — device and locale are the t
 - **Compare with previous period** is the quickest way to judge whether a new chapter, a promotion, or a price change moved the needle — look for the green/red change badges.
 - Filtering by **device** can reveal layout problems: if phone sessions complete far less than desktop sessions, [preview](/cms/preview) the work in the phone frame and check panel legibility.
 - Filtering by **locale** shows whether a [translation](/cms/localization) is pulling its weight.
+- The **click heatmap** is your interactivity audit: dead-click clusters show where readers *want* a hotspot; a cold hotspot is one they can't find.
 
 <Callout kind="tip">
   Because aggregation runs nightly, don't expect today's reads to appear immediately — check back the next day when judging a release or announcement.

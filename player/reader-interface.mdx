@@ -33,6 +33,18 @@ Panel view shows one panel at a time and follows the chapter's [graph](/concepts
 
 If the manifest defines page layouts, the **View** toolbar button toggles between panel view and page view. Page view renders all panels of a page in their placed positions; next/previous then move page by page, and the current panel follows the page's reading order. Video panels on a page play one after another in reading order (see [video sequencing behavior](/schema/video)).
 
+### Interactive hotspots
+
+Panels can carry [hotspots](/schema/hotspots) — clickable regions the creator drew in the CMS. In panel and page view they render as invisible click targets with a **gentle pulsing outline** so readers can discover them (the pulse is disabled under reduced motion); hovering or focusing a hotspot shows its outline. Activating one runs its action:
+
+- **Navigate** (`goTo`) — jumps to the target panel, applying any variable changes and playing the configured transition. This is how in-panel story choices work.
+- **Set variables** — changes story state in place (conditional hotspots, edges, and variants react immediately).
+- **Open extras** — opens the extras viewer at a specific bonus item.
+- **Open modal** — shows a small dialog with localized title and text.
+- **Plugin event** — hands the interaction to an embedded plugin.
+
+Hotspots are keyboard-accessible: `Tab` moves between them, `Enter`/`Space` activates, and each announces its localized label (or `ariaLabel`) to screen readers. Clicks on a hotspot never double as tap-to-advance. In canvas view hotspot regions are shown but tapping a panel keeps its navigation meaning.
+
 ### Input methods
 
 | Input | Action |
@@ -96,7 +108,8 @@ Changes apply on **Save**; **Cancel** (or clicking the backdrop, or `Esc`) resto
 - **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation.
 - **Language modal** (`pw-language-modal`) — pick from the work's `meta.locales`; switching updates content and player UI immediately ([Localization](/player/localization)).
 - **Character roster** (`pw-character-roster`) — characters with portrait and description from the manifest.
-- **Extras viewer** (`pw-extras-viewer`) — bonus content.
+- **Extras viewer** (`pw-extras-viewer`) — bonus content; an `openExtras` hotspot opens it directly at the targeted item.
+- **Action modal** (`pw-action-modal`) — the small localized dialog an `openModal` hotspot shows.
 - **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation.
 - **Share modal** and **comments drawer** — social features (surface only; persistence is up to the host application).
 - **Paywall overlay** and **age gate** — shown for gated or age-restricted content when the integrator wires an entitlement adapter; see [Paywall & Entitlement](/player/paywall-entitlement).
