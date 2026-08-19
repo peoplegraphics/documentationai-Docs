@@ -145,7 +145,6 @@ These standalone components are part of the public API and can be used on their 
 | `AgeGateComponent` | `pw-age-gate` | `visible`, `minimumAge` (default 18), `locale`, `warningMessage`, `allowDismiss` → `verify: AgeVerificationResult`, `close` |
 | `VideoLayerComponent` | `pw-video-layer` | `src`, `poster`, `playMode`, `startMode`, `muted`, `startAtMs`, `loopFromMs`, … → `videoPlay`, `videoPause`, `videoEnd`, `videoLoop`, `passComplete`, `videoError` |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | `manifest: PluginManifest` → `loaded`, `failed` |
-| `VariantSelectorComponent` | `pw-variant-selector` | `visible`, `variantGroup` → `variantSelected`, `close` |
 
 Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `LayerViewMode` (`'panel' | 'page'`).
 

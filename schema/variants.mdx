@@ -21,6 +21,12 @@ Conditions use [JSON Logic](https://jsonlogic.com/) with `{ "var": "..." }` refe
 { "==": [{ "var": "path.choice" }, "left"] }
 ```
 
+## Selection order
+
+Variants are evaluated **in array order**; the **first** variant whose `when` is truthy applies. When no variant matches, the base panel renders unchanged. A condition that fails to evaluate (unknown operator, malformed logic) counts as *false*. Players re-evaluate variants whenever a variable changes — hotspot mutations, edge mutations, and host `setVariable` calls all take effect immediately.
+
+Because the first match wins, order variants from most to least specific when their conditions can overlap. Players may additionally offer readers a manual variant toggle (the reference player's "Alt" toolbar button) as a session-scoped shadow override that cycles automatic → each variant → base → automatic.
+
 ## `PanelPartial`
 
 Defined as `$defs/PanelPartial` — a subset of the [Panel](/schema/panels) object. Every property is optional; a property that is present **replaces** the base panel's value wholesale (e.g. an overriding `layers` array replaces the entire base layer list, so repeat any base layers you want to keep).

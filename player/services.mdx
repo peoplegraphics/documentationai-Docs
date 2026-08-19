@@ -14,7 +14,7 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `VariableStoreService` | Scoped variables, mutations, persistence |
 | `FlowEngineService` | Graph traversal and edge condition evaluation |
 | `HotspotActionService` | Executes hotspot actions (mutations, plugin events) and returns UI effects |
-| `VariantService` | Panel/layer variant selection |
+| `variant-utils` (pure functions) | Panel variant selection & override application |
 | `ImageCacheService` | LRU image cache with memory budget |
 | `PreloadService` | Priority-based, network-aware asset preloading |
 | `AudioEngineService` | Web Audio playback with per-role buses |
@@ -86,9 +86,9 @@ A second, extended implementation exists at `src/lib/state/player-state.service.
 
 After every activation the shell rebuilds the variable context, so `visibleIf`-gated hotspots, edges, and variants react immediately. Every activation is also recorded as a `hotspot_click` tracking event — see [Tracking](/player/tracking#reading-session-and-hotspot-events).
 
-## VariantService
+## Variant resolution (variant-utils)
 
-`services/variant.service.ts` — selects panel/layer variants from a `VariantGroup` using its own condition vocabulary (`always`, `age`, `choice`, `variable`, `random`, `time`, `playthrough`, `achievement`, combinable with `and`/`or`/`not`) and selection modes `first-match`, `highest-priority`, `random-match`. Also applies variants (`applyVariantToPanel`, `applyVariantToLayer`), supports manual overrides, and keeps a selection history. Details in [State & Conditions](/player/state-and-conditions#variants).
+Panel variants are resolved by the pure helpers in `utils/variant-utils.ts` (`selectVariant`, `applyVariantOverrides`, `resolvePanelVariant`, `resolvePanels`) — first matching JSON Logic `when` in manifest order wins, overrides replace fields wholesale. The shell owns the wiring (effective panel, manual Alt-button overrides, `.variant-active` indicator). Details in [State & Conditions](/player/state-and-conditions#variants).
 
 ## ImageCacheService
 

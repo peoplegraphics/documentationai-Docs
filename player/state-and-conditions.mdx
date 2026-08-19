@@ -3,7 +3,7 @@ title: State, Conditions & Navigation
 description: How the player evaluates variables, JSON Logic conditions, graph edges, mutations, and panel variants at runtime, and how graph traversal decides the next panel.
 ---
 
-Branching stories in PanelWave are driven by three cooperating pieces: the **variable store** (state), **JSON Logic** (conditions on graph edges), and the **flow engine** (graph traversal). A separate **variant system** selects alternative panel/layer content. This page explains the runtime mechanics; the format itself is specified in [Graph](/schema/graph), [Variables](/schema/variables), and [Variants](/schema/variants).
+Branching stories in PanelWave are driven by three cooperating pieces: the **variable store** (state), **JSON Logic** (conditions on graph edges), and the **flow engine** (graph traversal). Panel **variants** reuse the same variables and JSON Logic to select alternative panel content. This page explains the runtime mechanics; the format itself is specified in [Graph](/schema/graph), [Variables](/schema/variables), and [Variants](/schema/variants).
 
 ## Variables: scopes, defaults, validation
 
@@ -111,29 +111,19 @@ Navigation is also gated by monetization: the shell checks its `entitlementAdapt
 
 ## Variants
 
-Panel and layer **variants** are alternative content selected at render time by `VariantService` — a system separate from edge conditions, with its own declarative condition vocabulary (`VariantCondition`):
+Panel **variants** are the manifest's [`PanelVariant`](/schema/variants) objects, resolved at render time by the pure `variant-utils` helpers (exported from the package):
 
-| Condition `type` | Matches when |
-|---|---|
-| `always` | Always |
-| `age` | `context.userAge` is within `minAge`/`maxAge` |
-| `choice` | All `requiredChoices` are in `choiceHistory` and no `excludedChoices` are |
-| `variable` | `variables[variableKey]` compares to `variableValue` via `variableOperator` (`eq`, `ne`, `gt`, `gte`, `lt`, `lte`, `contains`) |
-| `random` | A random roll is below `probability` (deterministic when `context.randomSeed` is set) |
-| `time` | Now is inside `timeRange` (HH:MM) and/or `dateRange` |
-| `playthrough` | `playthroughCount` is within `playthroughMin`/`playthroughMax` |
-| `achievement` | All `requiredAchievements` are in `context.achievements` |
+- `selectVariant(panel, context)` — evaluates each variant's JSON Logic `when` against the flattened variable context, **in manifest order**; the first truthy match is selected. Evaluation errors count as false (fail closed).
+- `applyVariantOverrides(panel, variant)` — replaces the overridden fields wholesale, restricted to the schema's `PanelPartial` keys (a variant can never swap ids or nest further variants). Returns a new object; the base panel is never mutated.
+- `resolvePanelVariant(panel, context, forcedVariantId?)` — combines both, with an optional forced selection (a variant id forces that variant, `null` forces the base panel) used by the manual toggle. When nothing applies, the *same* panel reference is returned, keeping identity comparisons and `OnPush` bindings stable.
+- `resolvePanels(panels, context)` — resolves a whole chapter's panel record (page and canvas views).
 
-Conditions compose with `and` / `or` / `not`. A `VariantGroup` is resolved by `selectVariant(group, context?)`:
+The shell derives an **effective panel** from the raw manifest state with these helpers and re-resolves whenever the variable context changes — hotspot mutations, edge mutations, and host `setVariable()` calls all take effect immediately. Autoplay `durationMs` and video-layer logic read the effective panel, so variants can retime a panel or swap its media.
 
-1. Every variant's condition is evaluated against the `VariantContext` (choice history, variables, playthrough count, achievements, user age, seed).
-2. If nothing matches, the group's `defaultVariant` is used when present.
-3. Otherwise the group `mode` picks among the matches: `first-match`, `highest-priority`, or `random-match`.
-
-Applying a selection: `applyVariantToPanel(panel, variant)` overrides `layers`, `duration`, `transition`, and `audio`; `applyVariantToLayer(layer, variant)` either merges `layerOverrides` or swaps in a full `layerReplacement`. The service records every application (`getAppliedOverrides()`, `getHistory()`), supports `debugMode`/`logSelections`, and allows manual per-panel overrides when `allowManualOverride` is enabled (used by `pw-variant-selector`).
+Reader-facing UI: the toolbar's **Alt** button appears on panels with variants and cycles a session-scoped shadow override (automatic → each variant → base → automatic); a `.variant-active` chip shows the applied variant's id whenever one is in effect.
 
 <Callout kind="info">
-Keep the two condition systems apart: **edges** use raw JSON Logic against the flattened variable context; **variants** use the typed `VariantCondition` objects above. A variable can drive both.
+Edges, `visibleIf` and variants all share **one** condition language — JSON Logic over the flattened variable context. Dot-namespaced variable ids (`path.choice`) resolve as nested paths in that context.
 </Callout>
 
 ## Putting it together
@@ -142,5 +132,5 @@ A typical interactive beat — the reader clicks a hotspot that represents a cho
 
 1. The hotspot handler applies mutations, e.g. `applyMutation({ op: 'set', var: 'doorChoice', value: 'left' }, 'chapter', chapterId)`.
 2. The host navigates: `createContext(chapterId)` flattens state, `getNextPanel()` finds the edge whose condition `{ "==": [{ "var": "doorChoice" }, "left"] }` now passes.
-3. The next panel renders; if it defines variants, `VariantService` may swap layers based on the same variables.
+3. The next panel renders; if it defines variants, the shell re-resolves them against the same variables and renders the effective panel.
 4. State that should outlive the session (achievements, unlocked endings) lives in the `persistent` scope and survives reloads.

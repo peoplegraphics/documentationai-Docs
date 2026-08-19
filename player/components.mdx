@@ -110,8 +110,6 @@ Modal dialogs opened from the toolbar (or by a hotspot action); each has a visib
 | `WaveFabComponent` | `pw-wave-fab` | Circular floating action button that toggles the toolbar |
 | `ToastContainerComponent` | `pw-toast-container` | Transient toast notifications |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | Sandboxed iframe host for a plugin instance, paired with `PluginHostService` |
-| `VariantSelectorComponent` | `pw-variant-selector` | UI for manually cycling through variants during development/testing (pairs with `VariantService` manual overrides) |
-
 ## Public API exports
 
-Only a subset of components is exported from `public-api.ts` for direct use by hosts: `PlayerShellComponent`, `PwIconComponent`, `SpeechBubblesComponent`, `PaywallOverlayComponent`, `AgeGateComponent`, `PluginSandboxComponent`, `VariantSelectorComponent`, and `VideoLayerComponent`. Everything else is an internal building block reached through the shell. If you need an internal component externally, export it deliberately through `public-api.ts` (see [Development](/player/development)).
+Only a subset of components is exported from `public-api.ts` for direct use by hosts: `PlayerShellComponent`, `PwIconComponent`, `SpeechBubblesComponent`, `PaywallOverlayComponent`, `AgeGateComponent`, `PluginSandboxComponent`, and `VideoLayerComponent`. Everything else is an internal building block reached through the shell. If you need an internal component externally, export it deliberately through `public-api.ts` (see [Development](/player/development)).
