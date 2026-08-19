@@ -28,7 +28,7 @@ export interface EntitlementAdapter {
 
 How the shell uses it:
 
-- **At startup**, `getContext()` is called once and every returned key/value is written into the **global variable scope** — so manifest conditions (edges, variants) can reference entitlement flags like `{"var": "premium"}`.
+- **At startup**, `getContext()` is called once and every returned key/value is **seeded** into variables (a privileged write that may populate `readOnly` definitions; values land in each definition's declared scope, global for undeclared ids) — so manifest conditions (edges, visibleIf, variants) can reference entitlement flags like `{"var": "premium"}` or a verified `{"var": "user.age"}` that in-story content cannot tamper with.
 - **Before every panel navigation**, `hasAccess(panelId)` is awaited; a `false` result blocks the navigation and surfaces an error.
 
 ```typescript

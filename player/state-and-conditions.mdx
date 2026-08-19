@@ -17,10 +17,20 @@ Branching stories in PanelWave are driven by three cooperating pieces: the **var
 | `session` | — | Current browser session |
 | `persistent` | — | Survives reloads (`localStorage` key `pw-variables-persistent`) |
 
-`setDefinitions(definitions)` registers the manifest's `VariableDefinition`s and initializes defaults. After that, every `set()` is checked:
+`setDefinitions(definitions)` registers the manifest's `VariableDefinition`s and initializes defaults — the shell does this automatically at startup from `manifest.variables.definitions`. After that, every `set()` is checked:
 
 - **Read-only** definitions reject writes (with a console warning; the write is dropped).
 - **Type validation** per definition: `boolean`; `number`/`integer` with optional `min`/`max`; `string` with optional regex `pattern`; `enum` against the allowed list; `date`/`time`/`datetime` as strings. Invalid writes are dropped.
+
+### How values get set
+
+In order at startup, then at runtime:
+
+1. **Manifest defaults** — each definition's `default` initializes its declared scope.
+2. **Host seeding** — the shell's `initialVariables` input, then the entitlement adapter's `getContext()`, go through the privileged `seed()`: types are still validated, but `readOnly` variables MAY be populated. This is the channel for externally-verified facts (an account system's `user.age`, entitlement flags): declare the variable `readOnly` + `visibility: 'private'` and no hotspot mutation or settings edit can ever change it.
+3. **In-story mutations** — hotspot `setVariables`/`goTo` mutations and edge actions, via `set()` (read-only and type guards apply).
+4. **Reader edits** — the settings modal's Variables tab lists variables that are public (the default when `visibility` is omitted) and not read-only; saved edits apply through `set()` and re-resolve conditional content immediately.
+5. **Host API** — `PlayerShellComponent.setVariable(key, value, scope)` at any time (same guards).
 
 ## Mutations
 

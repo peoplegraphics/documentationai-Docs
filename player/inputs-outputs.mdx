@@ -21,7 +21,11 @@ import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/p
 </ResponseField>
 
 <ResponseField name="entitlementAdapter" field-type="EntitlementAdapter">
-  Adapter for paywall integration. The shell calls `getContext()` once at startup (merging the returned key/values into global-scope variables) and `hasAccess(panelId)` before each panel navigation. See [Paywall & Entitlement](/player/paywall-entitlement) for the interface definition.
+  Adapter for paywall integration. The shell calls `getContext()` once at startup (seeding the returned key/values into variables — including `readOnly` ones) and `hasAccess(panelId)` before each panel navigation. See [Paywall & Entitlement](/player/paywall-entitlement) for the interface definition.
+</ResponseField>
+
+<ResponseField name="initialVariables" field-type="Record<string, unknown>">
+  Host-supplied initial variable values, keyed by variable id and seeded once at initialization through a privileged path: unlike runtime mutations, these MAY populate variables the manifest declares `readOnly` — the channel for externally-sourced facts (e.g. a verified `user.age`) that in-story content and the settings UI must never change. Values land in each definition's declared scope (global for undeclared ids); the entitlement adapter's context is seeded afterwards and wins on collisions.
 </ResponseField>
 
 <ResponseField name="locale" field-type="LocaleCode">
