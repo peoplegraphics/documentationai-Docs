@@ -5,6 +5,52 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-19" description="Format, Player & CMS · Panel variants go live" tags={["feature", "bugfix"]}>
+  ## One panel, many stories — panel variants work end-to-end
+
+  The format's conditional-content feature is no longer just a schema
+  entry: variants authored in the CMS now publish into the manifest and
+  actually render in the player. The same panel can resolve a conflict
+  by committee for one reader and at high noon for another — or soften
+  its artwork for readers below an age threshold.
+
+  - **Selection rule codified** — variants are evaluated in manifest
+    order and the **first** one whose JSON Logic `when` matches the
+    current variables applies; overridden fields **replace** the base
+    panel's values wholesale. Unknown or failing conditions count as
+    false, so gated content fails closed. See
+    [Panel Variants](/schema/variants#selection-order).
+  - **Live in the player** — variants re-resolve the moment a variable
+    changes (hotspot choices, edge mutations, host calls), and can swap
+    layers, speech bubbles, hotspots, titles, even the panel's autoplay
+    duration. Readers get an **Alt** toolbar button on panels with
+    variants to cycle alternatives manually, plus an on-screen chip
+    showing the active variant. See
+    [State & Conditions](/player/state-and-conditions#variants).
+  - **Trustworthy inputs for gating** — a new `initialVariables` player
+    input (and the entitlement adapter's context) **seed variables at
+    startup through a privileged path** that may populate `readOnly`
+    definitions. Declare `user.age` read-only, seed it from your account
+    system, and no in-story mutation or settings edit can ever change
+    it. See [Inputs & Outputs](/player/inputs-outputs).
+  - **Reader-editable preferences** — the settings modal's Variables tab
+    is live: variables marked public (the default) and not read-only can
+    be changed mid-read, with variants updating immediately — "EU style"
+    vs. "US style" is one dropdown away.
+  - **Authoring in the CMS** — the panel inspector's variant editor now
+    speaks the format natively: a visual JSON Logic condition builder
+    over your defined variables, typed override editors for titles and
+    durations, and copy-from-panel seeding for layer/bubble/hotspot
+    overrides. Publish validation flags duplicate variant ids, missing
+    conditions, and references to undefined variables, and variant texts
+    flow through translation extraction and write-back like any other
+    localizable string.
+  - **Fixed along the way** — published manifests previously **dropped
+    variants silently**, and dot-namespaced variable ids like
+    `path.choice` never resolved in any JSON Logic condition (this also
+    affected conditional edges and `visibleIf`). Both work now.
+</Update>
+
 <Update label="2026-08-19" description="Player & CMS · Hotspots come alive + click heatmap" tags={["feature", "bugfix"]}>
   ## Hotspots now actually work — and you can watch readers use them
 
