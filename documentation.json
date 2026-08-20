@@ -399,6 +399,11 @@
                 "icon": "user"
               },
               {
+                "title": "Plans & Limits",
+                "path": "cms/plans",
+                "icon": "wallet"
+              },
+              {
                 "title": "Works",
                 "path": "cms/works",
                 "icon": "book"
