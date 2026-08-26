@@ -5,6 +5,35 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-26" description="CMS · Fountain import polish & speed" tags={["feature", "bugfix"]}>
+  ## Script import: faster passes, finished works that feel finished
+
+  A round of quality and speed work on the [Fountain script
+  importer](/cms/script-import), based on real end-to-end imports:
+
+  - **Much faster AI passes** — the structure pass completes in about a
+    minute, and page layouts for all output formats are now generated
+    **in parallel** instead of one format at a time (a 4-format import
+    that took ~20 minutes now takes a few).
+  - **Real titles everywhere** — panels are titled from their art brief
+    and every page gets an **AI-generated title** describing its
+    content; no more trees full of "Imported Panel" / "Imported Page".
+  - **Bubbles arrive finished** — speech bubbles are styled by kind
+    through the balloon engine from the first render, are visible in
+    page view, and have their **speaker pre-assigned** to the created
+    character.
+  - **Supported formats stick** — the created work is restricted to the
+    output formats chosen in the wizard, so editor format pickers only
+    offer what you target.
+  - **Structure review upgrades** — bubbles can be moved to any panel
+    via the inspector (including collapsed panels and other chapters),
+    **+ Panel** inserts after the current selection, and panel/bubble
+    ids renumber to reading order after every edit.
+  - **Big screen format clarified** — it is a 4K (3840×2160, 16:9)
+    format holding 4–12 panels per page; pickers and layout guidance
+    now say so.
+</Update>
+
 <Update label="2026-08-19" description="Format, Player & CMS · Panel variants go live" tags={["feature", "bugfix"]}>
   ## One panel, many stories — panel variants work end-to-end
 

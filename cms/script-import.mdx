@@ -12,7 +12,7 @@ The CMS can turn a **screenplay** into a graphic novel skeleton. Upload a script
 5. You fine-tune the layouts in a drag & drop preview.
 6. The work is created and opens in the [editor](/cms/editor/layout).
 
-The result is a complete, navigable work — panels, prepositioned speech bubbles, page layouts, characters, and a linear reading graph. **No artwork yet, by design**: you add images or video behind the bubbles in the editor afterwards.
+The result is a complete, navigable work — titled panels and pages, styled and prepositioned speech bubbles with their speakers assigned, page layouts, characters, and a linear reading graph. The work is restricted to the output formats you selected, so the editor's format pickers only offer what you actually target. **No artwork yet, by design**: you add images or video behind the bubbles in the editor afterwards.
 
 <Callout kind="tip">
 Starting from **finished page images** instead of a script? Use [Page Import](/cms/page-import) — AI splits each page into panels and rebuilds it with the artwork in place.
@@ -47,7 +47,7 @@ The import treats your script as untouchable source material:
     The tree editor shows **chapters → panels → speech bubbles**. Reorganize freely (see below), then click **Continue**.
   </Step>
   <Step title="Choose output formats">
-    Pick every screen or print shape the work targets — phones, desktop, print pages, square, video frames. Pages are laid out **separately per format**.
+    Pick every screen or print shape the work targets — phones, desktop, 4K big screens, print pages, square, video frames. Pages are laid out **separately per format** (formats are processed in parallel), and the created work is restricted to exactly these formats. Every page gets an **AI-generated title** derived from its content.
   </Step>
   <Step title="Fine-tune the layouts">
     A simplified preview shows each page with numbered panel rectangles. Drag to move, resize with the handles, move panels between pages — per format. Reading order recomputes automatically.
@@ -64,8 +64,9 @@ Imports are **resumable** — leave the wizard at any point and continue later f
 The tree editor (step 4) is where you shape the book:
 
 - **Chapters pane** — rename, reorder (drag), add or delete chapters. Deleting a chapter moves its panels to the previous one; nothing is lost.
-- **Panels & bubbles tree** — drag bubbles between panels, reorder panels, and use the row actions: **add bubble**, **duplicate panel**, **split panel** at any bubble, **merge with next**, delete. Silent panels (no bubbles) are valid — great for establishing shots.
-- **Inspector** — edit the selected panel's **art brief** (the drawing instruction handed to your artist), camera hint, and mood; or a bubble's **kind** (speech, thought, shout, whisper, caption, narration, SFX), speaker, and text.
+- **Panels & bubbles tree** — drag bubbles between panels, reorder panels, and use the row actions: **add bubble**, **duplicate panel**, **split panel** at any bubble, **merge with next**, delete. **+ Panel** inserts right after the selected panel (or the selected bubble's panel). Silent panels (no bubbles) are valid — great for establishing shots.
+- **Automatic renumbering** — panel and bubble ids always follow reading order: reorder, insert, split, or delete anything and `ch1-p001, ch1-p002, …` renumber immediately.
+- **Inspector** — edit the selected panel's **art brief** (the drawing instruction handed to your artist), camera hint, and mood, or move it to another chapter; for a bubble, edit its **kind** (speech, thought, shout, whisper, caption, narration, SFX), speaker, and text, or use **Move to panel** to send it to any panel — including collapsed ones and panels in other chapters, which drag & drop can't reach.
 - **Cast panel** — rename display names and **merge duplicate cues** (e.g. `THE KING` and `KING`) — all bubbles are re-attributed.
 - **Undo/redo** — <kbd>Ctrl</kbd>+<kbd>Z</kbd> / <kbd>Ctrl</kbd>+<kbd>Y</kbd>, and every change autosaves to the import session.
 
@@ -95,8 +96,8 @@ If the AI service is temporarily unavailable, the import **still works**: a dete
 
 The created work is a normal PanelWave work:
 
-- **Add artwork** — panels have no image or video layers yet. The art brief on each panel (from the script's action lines) is in the panel description; add [layers](/cms/editor/layers) behind the bubbles.
-- **Position the bubbles** — bubbles are prepositioned (captions on top, dialogue stacked in reading order, alternating sides per speaker) as a readable starting point, not a final lettering pass. Refine them with the [speech bubble tools](/cms/editor/speech-bubbles).
+- **Add artwork** — panels have no image or video layers yet. Every panel is titled after its art brief and every page carries its AI-generated title, so the structure tree stays readable; the full art brief (from the script's action lines) is in the panel description. Add [layers](/cms/editor/layers) behind the bubbles.
+- **Position the bubbles** — bubbles arrive styled by kind (speech, thought, shout, …), with their speaker already assigned to the matching [character](/cms/characters), and prepositioned (captions on top, dialogue stacked in reading order, alternating sides per speaker) as a readable starting point — not a final lettering pass. Refine them with the [speech bubble tools](/cms/editor/speech-bubbles).
 - **Add branching** — the import creates a linear reading [graph](/cms/editor/graph); add choices and conditions in the graph editor.
 - **Localize** — all text is keyed under the locale you chose at upload; add languages in the [Localization Workshop](/cms/localization).
 
