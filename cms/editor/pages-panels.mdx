@@ -74,12 +74,14 @@ Pages position their panels with **percentages of the page**, not fixed pixels �
 
 Pages also belong to a **page format**: each format the work supports (see [Work Properties → Output](/cms/works#output)) keeps its **own set of pages**, so the phone-shaped and the A4 layout of the same scene are separate pages you design independently. The [format selector](/cms/editor/canvas#canvas-toolbar) above the canvas chooses which format's pages you see and edit.
 
-To edit page-level settings, right-click a page and choose **Page Properties**. The dialog is organized into four sections and **saves automatically** as you edit:
+In the manifest and in exports, pages get **format-scoped ids**: each format has its own letter and counter, so the first format's pages are `pg-A1`, `pg-A2`, …, the second format's `pg-B1`, `pg-B2`, … — every format's page numbering starts at 1.
 
-- **Layout & Structure** — the chapter the page belongs to and a **Layout Template** starting point: Blank, 2 Panels Horizontal, 3 Panels Vertical, Splash (Full Page), 4 Panels Grid, or Custom.
-- **Visual Properties** — background settings and **Page Margins** (top/right/bottom/left, in pixels).
+To edit page-level settings, right-click a page and choose **Page Properties**. The panel looks and behaves like the panel inspector — the same collapsible sections, which remember their open/closed state — and **saves automatically** as you edit:
+
+- **Layout & Structure** — the page **Title** (edited in the locale currently selected in the header, like other localized text), the chapter the page belongs to, and a **Layout Template** starting point: Blank, 2 Panels Horizontal, 3 Panels Vertical, Splash (Full Page), 4 Panels Grid, or Custom.
+- **Visual Properties** — a **Background Color** picker (a curated palette of paper whites, sand/cream tones, and soft pastels, plus custom colors by hex code and a Recent row), optional background image/texture, and **Page Margins** (top/right/bottom/left, in pixels). The background color renders on the canvas immediately and is part of the published work.
 - **Transitions & Audio** — **Transition In** and **Transition Out** effects for entering/leaving the page (fade, slide-left, slide-right, cut, zoom).
-- **Production** — a workflow **Status** (Draft, Review, Final, Published) and **Production Notes** for your team. Notes are internal and never appear in the published work.
+- **Production** — a workflow **Status** shown as four colored buttons (Draft, Review, Final, Published) and **Production Notes** for your team. Notes are internal and never appear in the published work.
 
 Arranging the panels themselves — moving, resizing, aligning, distributing — happens visually on the canvas in page view; see [Canvas](/cms/editor/canvas#page-view-vs-panel-view).
 

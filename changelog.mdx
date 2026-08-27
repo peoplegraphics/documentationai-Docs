@@ -5,6 +5,55 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-28" description="CMS · Page properties overhaul & editor reliability" tags={["feature", "bugfix"]}>
+  ## Page backgrounds that publish, page ids that make sense, edits that stick
+
+  An evening of page-properties and reliability work in the
+  [CMS editor](/cms/editor/layout):
+
+  - **Page Properties, reworked** — the dialog now looks and behaves
+    exactly like Panel Properties: shared sections with persisted
+    collapse state, and the page **title and chapter resolve through the
+    current locale** (titles previously showed empty for BCP-47 locales
+    like `en-US`). The production **Status** is a compact row of four
+    colored buttons instead of a radio list.
+  - **Page background colors that actually publish** — the background
+    color picker works now: a curated preset palette for graphic-novel
+    pages (paper whites, grayscale steps, sand/cream tones, soft
+    pastels), custom colors by hex code, and a persisted Recent row.
+    The chosen color renders on the canvas **immediately**, and the
+    page's `visual` block now flows into published manifests — it was
+    previously dropped, so page backgrounds never reached the
+    [player](/player/overview). Along the way: saving page properties
+    no longer fails when a value is cleared, and saved properties no
+    longer vanish on reload.
+  - **Format-scoped page ids** — pages in the manifest used to share one
+    running counter across all [page formats](/cms/works#output), so
+    the second format's pages started at `pg-41`. Each format now gets
+    its own letter and counter: `pg-A1…pg-A17`, `pg-B1…pg-B13`, …
+    Existing works pick the new scheme up automatically.
+  - **Panel auto-fit in every format** — when a panel receives its first
+    image or video, its proportions now adjust to the artwork in **all
+    page formats the work supports**, not just the one you are viewing.
+    The panel keeps its top-left position and only ever shrinks, so it
+    always stays on the page; panels that already contain media are
+    never resized by later drops.
+  - **Panel-view edits always show up** — layers added or edited in
+    [panel view](/cms/editor/canvas#page-view-vs-panel-view) now appear
+    in page view right away (previously new images could stay invisible
+    until a browser reload), and edits made moments before switching
+    panels are saved first instead of being lost or written to the
+    wrong panel.
+  - **Asset library loads everything** — works with more than 50 assets
+    showed only the newest 50 in the Assets tab (which also made
+    deleting one asset look like it removed others). The full library
+    now loads, folder counts refresh after a delete, and **deleting an
+    asset also removes all its generated variants** (responsive sizes,
+    thumbnails, posters, video renditions) from storage.
+  - **A11y tab restyled** — the accessibility inspector now matches the
+    other inspector tabs and works in dark and high-contrast themes.
+</Update>
+
 <Update label="2026-08-27" description="CMS · Asset library organization & video editing polish" tags={["feature", "bugfix"]}>
   ## Organize faster, drop with confidence, edit video with bubbles in view
 
