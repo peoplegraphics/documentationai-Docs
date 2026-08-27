@@ -19,9 +19,13 @@ Every image, audio clip, video, and font in your work lives in the **Assets** li
 There are two ways to get files in:
 
 - Click **Upload** in the Assets toolbar and pick one or more files.
-- **Drag & drop** files anywhere onto the editor — a "Drop files here to upload" zone appears.
+- **Drag & drop** files anywhere onto the editor — a "Drop files here to upload" zone appears. Dropping files directly **onto a folder** in the folder pane uploads them into that folder.
 
 While uploading, each file shows an **Uploading…** card with a live progress bar, status, and any error message. Newly uploaded assets appear with a **Processing…** indicator until automatic processing finishes.
+
+<Callout kind="info">
+When a folder is selected in the folder pane, new uploads are **filed into that folder automatically** — the Upload button shows the target folder as a small chip so there are no surprises. Select **All assets** or **Unfiled** to upload without filing.
+</Callout>
 
 ### Large files and resumable uploads
 
@@ -36,9 +40,11 @@ You don't need to do anything to enable this; the CMS picks the right upload met
 
 After upload, a background pipeline optimizes every asset. You keep working while it runs; the asset card shows **Processing…** until it's done.
 
-- **Images** — AVIF and WebP variants are generated for fast delivery, plus a 400px thumbnail; EXIF metadata is stripped. Dimensions are read and stored. Large artwork additionally gets a **responsive size ladder** — WebP renditions at 640, 1280, 1920, and 2560 px width (only sizes smaller than the original are created), so a phone never downloads desktop-sized files.
+- **Images** — AVIF and WebP variants are generated for fast delivery, plus a 400px thumbnail; EXIF metadata is stripped. Large artwork additionally gets a **responsive size ladder** — WebP renditions at 640, 1280, 1920, and 2560 px width (only sizes smaller than the original are created), so a phone never downloads desktop-sized files.
 - **Audio** — AAC and Opus variants with broadcast loudness normalization (EBU R128), waveform data for the editor's audio views, and the duration in milliseconds.
-- **Video** — a web-friendly H.264 rendition (up to 1920px wide), a poster frame, and scrubbing thumbnails, plus dimensions and duration.
+- **Video** — a web-friendly H.264 rendition (up to 1920px wide), a poster frame, and scrubbing thumbnails.
+
+**Dimensions and duration are measured right in your browser at upload time** and stored with the asset immediately — so a freshly uploaded image or video can be placed on the canvas with the correct aspect ratio before background processing even starts (the server verifies dimensions independently as a fallback).
 
 One more variant is created **on demand**: when preflight flags an image as too large to publish, its **Optimize** fix produces an `optimized` WebP derivative that the published work ships instead of the original — see [Validation](/cms/validation#auto-fixes). The full-quality original always stays in your library.
 
@@ -54,7 +60,16 @@ The editor benefits too: asset lists, the picker, and the canvas load a renditio
 
 ### Folders
 
-The Assets tab has a **folder pane**: **All assets**, **Unfiled**, and your own folder tree (folders can be nested). Create, rename, move, and delete folders from the pane, and **drag assets onto a folder** to file them — an asset can live in more than one folder. Each folder shows how many assets it holds, and selecting a folder scopes the asset list below to it.
+The Assets tab has a **folder pane**: **All assets**, **Unfiled**, and your own folder tree (folders can be nested). Create, rename, move, and delete folders from the pane, and **drag assets onto a folder** to file them — an asset can live in more than one folder. Each folder shows how many assets it holds, and selecting a folder scopes the asset list below to it (and makes it the target for new uploads, see above).
+
+### Selecting multiple assets
+
+**Shift-click** (or Ctrl-click) asset cards to build a multi-selection — selected cards get a highlight and a check badge, and the toolbar shows an *N selected* chip with a clear button. Dragging any selected asset then drags the **whole selection**:
+
+- Drop it on a **folder** to file every selected asset there at once.
+- Drop it on **Unfiled** to remove them all from their folders.
+
+A plain click clears the selection and opens the asset's details as usual.
 
 Folders are an organizational layer only — they don't change asset URLs or how anything is exported.
 
@@ -68,7 +83,7 @@ The Assets toolbar offers:
 - **Sort** by file name, uploaded date, last updated, or file size.
 - A **grid/list view** toggle.
 
-Each asset card shows a thumbnail (or a type icon for audio/video/fonts), the filename, type, locale, file size, image dimensions, and how many processed variants exist.
+Each asset card shows a thumbnail — images use their 400px rendition, **videos show their poster frame** (or a clapper icon until transcoding finishes), audio and fonts a type icon — plus the filename, type, locale, file size, image dimensions, and how many processed variants exist.
 
 To place an asset in your comic, **drag it from the Assets tab onto the canvas** — it becomes a layer on the current panel (see [Layers](/cms/editor/layers)).
 
@@ -92,7 +107,9 @@ Right-click an asset (or use the **⋮** button) for the context menu:
 
 ## The details panel
 
-**View Details** opens a side panel with everything about the asset: filename, ID, type, locale, size, dimensions, duration (for audio/video), your metadata (title, alt text, description, tags), the list of generated variants (each with preview and **Copy URL**), and upload/edit timestamps.
+**View Details** opens a side panel with everything about the asset: filename, ID, type, locale, size, dimensions, duration (for audio/video), the **folders** it is filed under, your metadata (title, alt text, description, tags), the list of generated variants (each with preview and **Copy URL**), and upload/edit timestamps. Video previews play with the poster frame as their still.
+
+Dimensions and duration are shown **live**: if an older asset is missing them, the panel briefly shows *Measuring…* while they are read from the media and stored — the values then stay with the asset for good.
 
 For images, a zoom button opens a **lightbox** with zoom controls (`+`, `-`, `0` to reset), arrow-key navigation between images, and an optional slideshow (Space to start/pause).
 

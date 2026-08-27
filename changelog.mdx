@@ -5,6 +5,42 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-27" description="CMS · Asset library organization & video editing polish" tags={["feature", "bugfix"]}>
+  ## Organize faster, drop with confidence, edit video with bubbles in view
+
+  A day of asset-library and canvas work in the [CMS](/cms/overview):
+
+  - **Multi-select in the asset library** — Shift/Ctrl-click assets to
+    build a selection, then drag any of them to file the **whole
+    selection** into a folder (or onto **Unfiled** to clear their
+    folders). A toolbar chip shows the selection count.
+  - **Uploads land in the selected folder** — with a folder active, the
+    **Upload** button shows the target folder as a chip and new files are
+    filed there automatically; folder counts refresh as uploads finish.
+  - **Assets always know their size** — image and video **dimensions
+    (and video duration) are measured in the browser at upload** and
+    stored immediately; older assets are measured on first use. Dropped
+    media now always keeps its true aspect ratio: the first image or
+    video in a panel becomes its background and the **panel's
+    proportions adjust to the media**, so artwork never appears
+    stretched. Freshly uploaded images also render in page view right
+    away.
+  - **Video posters everywhere** — the poster frame now serves as the
+    video's thumbnail in the [asset library](/cms/assets) grid, the
+    asset picker, and the details panel; videos uploaded before poster
+    support get posters backfilled automatically.
+  - **Speech bubbles stay on top of video** — in the editor,
+    [bubbles](/cms/editor/speech-bubbles), the play-mode badge, and
+    selection handles now render **above a video panel even during
+    playback**, so you can position dialogue against moving footage
+    (see [Video Panels](/cms/editor/video-panels)).
+  - **Details drawer upgrades** — the asset details panel shows the
+    asset's **folders** and live dimensions/duration (with a brief
+    *Measuring…* state for older assets).
+  - **Fixed:** switching to a panel without artwork no longer keeps
+    showing the previously edited panel's layers in the editor.
+</Update>
+
 <Update label="2026-08-26" description="CMS · Fountain import polish & speed" tags={["feature", "bugfix"]}>
   ## Script import: faster passes, finished works that feel finished
 
