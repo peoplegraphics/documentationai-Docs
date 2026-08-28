@@ -5,7 +5,7 @@ description: The Assets catalog — registering images, audio, video, subtitles,
 
 The optional `assets` section is the manifest's media registry. Every image, audio file, video, subtitle track, vector graphic, JSON blob, or plugin payload is registered **once** in the catalog under a stable ID, then referenced everywhere else by that ID (layer `assetId`, `meta.cover`, audio tracks, extras, preload hints).
 
-`Assets` has two optional properties: `base` and `catalog`.
+`Assets` has three optional properties: `base`, `catalog`, and — since schema 1.5 — `folders`.
 
 ## `assets.base` — base URLs
 
@@ -40,6 +40,7 @@ Variant `src` values may then be relative paths resolved against the matching ba
 | `durationMs` | integer ≥ 0 | — | Media duration in milliseconds |
 | `sha256` | string | — | Content hash, pattern `^[A-Fa-f0-9]{64}$` |
 | `tags` | `string[]` | — | Free-form tags |
+| `folderIds` | `Identifier[]` | — | Since schema 1.5: ids of [`assets.folders`](#assetsfolders--authoring-folder-tree-schema-15) entries this asset is filed under (n:m, unique) |
 
 ### Item types by `category`
 
@@ -52,6 +53,19 @@ Variant `src` values may then be relative paths resolved against the matching ba
 | `"vector"` | `AssetCatalogItemVector` | `VectorVariant` | — |
 | `"json"` | `AssetCatalogItemJson` | `JsonVariant` | — |
 | `"pluginPayload"` | `AssetCatalogItemPluginPayload` | `JsonVariant` | — |
+
+## `assets.folders` — authoring folder tree (schema 1.5+)
+
+Optional array of `AssetFolder` objects mirroring the authoring tool's asset-library folder structure, so it survives transfers between authoring systems (e.g. the CMS's [work archives](/cms/export#archive-export)). **Rendering consumers may ignore this block** — it carries no presentation semantics.
+
+| Property | Type | Required | Description |
+|----------|------|:--:|-------------|
+| `id` | [`Identifier`](/schema/manifest-structure#identifier) | Yes | Folder id referenced by asset `folderIds` |
+| `name` | string (min length 1) | Yes | Display name |
+| `parentId` | `Identifier` | — | Parent folder for nesting; absent = top level |
+| `order` | integer ≥ 0 | — | Sort position among siblings |
+
+Assets point at folders (not the other way around) via `folderIds` on the catalog entry; one asset may be filed in several folders.
 
 ## Variant types
 

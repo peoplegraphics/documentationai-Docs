@@ -1,13 +1,13 @@
 ---
 title: Export
-description: Turn a PanelWave work into a PDF, PowerPoint deck, or video — export options, presets, batch export, job progress, and downloads.
+description: Turn a PanelWave work into a PDF, PowerPoint deck, video, or a portable work archive — export options, presets, batch export, job progress, and downloads.
 ---
 
 Exports produce **offline versions** of your work for print, pitching, and social media. They are separate from [publishing](/cms/publishing): publishing puts the interactive work online for readers, while an export renders it into a conventional file you can download and share anywhere.
 
 ## Export formats
 
-<Columns cols={3}>
+<Columns cols={2}>
   <Card title="PDF Export" icon="file-text" href="#pdf-options">
     High-quality PDF document — for print, review copies, and email.
   </Card>
@@ -16,6 +16,9 @@ Exports produce **offline versions** of your work for print, pitching, and socia
   </Card>
   <Card title="Video Export" icon="clapperboard" href="#video-options">
     Animated video presentation — for trailers and social clips.
+  </Card>
+  <Card title="Work Archive" icon="archive" href="#archive-export">
+    Self-contained `.zip` of the whole work — for transfer and backup.
   </Card>
 </Columns>
 
@@ -30,7 +33,7 @@ The quickest way to export today is from **My Works**:
     Tick the checkbox on one or more work cards (or use **Select all**).
   </Step>
   <Step title="Pick a format">
-    In the bulk action bar, choose **PDF**, **PPT**, or **Video** from the format dropdown.
+    In the bulk action bar, choose **PDF**, **PPT**, **Video**, or **Archive (.zip)** from the format dropdown.
   </Step>
   <Step title="Click Export">
     Each selected work is queued as its own export job — you'll see a confirmation like "Queued 3 exports (pdf)".
@@ -84,6 +87,20 @@ Recurring setups can be saved as one-click **presets**. Three are built in:
 - **1080p social clip** — 1080p / 30 fps video with audio
 
 Type a name into **"Save these options as…"** inside any export dialog to add your own; custom presets can be deleted with their **×** button.
+
+## Archive export
+
+The **Archive (.zip)** format is different from the presentation formats above: instead of rendering the work for readers, it packages the work itself for **transfer and backup**. One archive contains:
+
+- The work's manifest covering **all page formats** — chapters, pages, panels, speech bubbles, hotspots, characters, extras, variables, and settings
+- **Every asset file** — originals plus all generated variants (responsive sizes, optimized versions, video renditions, posters); nothing is re-transcoded on import
+- Your [asset library folders](/cms/assets) and all [translations](/cms/localization)
+
+Archives are queued from the works-list bulk export like any other format and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
+
+<Callout kind="info">
+  Deliberately **not** included: paywall configuration, publish history and preview links, analytics, and community data (comments, likes). Reconfigure and republish on the target system.
+</Callout>
 
 ## Tracking jobs and downloading
 

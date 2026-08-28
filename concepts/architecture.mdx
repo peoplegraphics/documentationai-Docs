@@ -36,7 +36,7 @@ The [JSON Schema](/schema/overview) (draft 2020-12) defines every object in a ma
 https://panelwave.org/schema/1.0/panelwave.schema.json
 ```
 
-Minor versions are additive and ship in-place inside the `1.0/` major-version directory — the current format version is **1.1**, and every valid 1.0 manifest remains valid. See [Versioning](/schema/versioning).
+Minor versions are additive and ship in-place inside the `1.0/` major-version directory — the current format version is **1.5**, and every valid 1.0 manifest remains valid. See [Versioning](/schema/versioning).
 
 Because the schema is the single source of truth, a format change ripples outward deliberately: schema first, then `@panelwave/types`, then player and CMS. Consumers must tolerate unknown fields, and custom data is namespaced with `x-` prefixes (see [Extensions](/schema/extensions)) so third parties can extend manifests without breaking anyone.
 

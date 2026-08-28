@@ -5,6 +5,74 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-08-28" description="Format · 1.5.0 — asset folders & localization blocks" tags={["feature"]}>
+  ## Schema 1.5.0: works that round-trip between authoring systems
+
+  Format release **1.5.0** — additive as always, every existing manifest
+  stays valid. Two new **authoring metadata** blocks let a complete work
+  travel between authoring systems without losing organization or
+  translation state (rendering consumers may ignore both):
+
+  - **`assets.folders`** + per-asset **`folderIds`** — the asset
+    library's folder tree (nested via `parentId`, ordered, n:m
+    assignment). See [Assets](/schema/assets#assetsfolders--authoring-folder-tree-schema-15).
+  - **Top-level `localization`** — the translation workflow state:
+    locale list with default/active flags, and per-string entries with
+    `defaultText`, per-locale values, stale markers, and
+    machine-translation flags. Reader-facing text stays in
+    `LocalizedString` objects as before.
+
+  `@panelwave/types` and the [CLI](/schema/cli) are synchronized
+  (validate + `upgrade` now target 1.5.0). These blocks are what the
+  CMS's new [work archive transfer](/cms/export#archive-export) is
+  built on. Details: [Versioning](/schema/versioning#what-changed-in-150).
+</Update>
+
+<Update label="2026-08-28" description="CMS · Work archive transfer & structure-tree precision" tags={["feature", "bugfix"]}>
+  ## Move whole works between systems, and a structure tree that does what you drop
+
+  An afternoon of transfer and editor work in the [CMS](/cms/overview):
+
+  - **Work archive export & import** — a work can now travel as a single
+    self-contained **`.zip` archive**: the manifest for **all** page
+    formats plus every asset file (originals and all generated variants
+    — nothing is re-transcoded on the other side), asset **folders**,
+    and **translations**. Export it from the works list like any other
+    [export format](/cms/export#archive-export), import it on any other
+    PanelWave system or account via **Import Archive** on
+    [My Works](/cms/import#importing-a-work-archive) — dev to
+    production, between accounts, or as a full local backup. Imports
+    are **atomic**, arrive as drafts with fresh ids, respect your
+    plan's limits, and can be retried from the dialog if something
+    goes wrong. Publish history, paywall configuration, analytics, and
+    community data intentionally stay behind.
+  - **Insert panels exactly where you want them** — the **Create New
+    Panel** dialog gains a **Position** select ("At the beginning" /
+    "After *panel*…", defaulting to the end), and dragging a panel from
+    **Unassigned** onto a page now inserts it **at the drop position**
+    instead of always appending — with the canvas renumbering
+    immediately rather than after a browser reload.
+  - **Deleting a shared panel no longer breaks other formats** — panels
+    that appear on pages of several [page formats](/cms/works#output)
+    are only **detached** from the page you delete them on; the other
+    formats keep their copy. Creating panels from the tree also no
+    longer corrupts existing page placements.
+  - **Speech bubbles: move between panels, stay where lettered** — a
+    bubble's right-click menu can now **move it to another panel**
+    directly on the canvas, freshly created bubbles no longer vanish
+    from page view until reload, and boosted balloons stopped drifting
+    off their tails.
+  - **Video panels behave** — a dropped video is recognized as the
+    panel's background again (so the panel adopts its proportions), and
+    the panel's **duration** syncs to the video's length on drop.
+  - **Small but daily** — timeline footer actions are reachable in the
+    collapsed timeline bar; timeline resizes grab the right panel;
+    the canvas context menu correctly enables **Arrange / Duplicate /
+    Delete** for the selected panel; and API validation errors now
+    show *what* failed ("Placement #6: x must be between 0 and 1")
+    instead of a bare "Validation failed".
+</Update>
+
 <Update label="2026-08-28" description="CMS · Page properties overhaul & editor reliability" tags={["feature", "bugfix"]}>
   ## Page backgrounds that publish, page ids that make sense, edits that stick
 

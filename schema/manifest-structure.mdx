@@ -19,9 +19,10 @@ graph LR
     M --> P[paywall · monetization]
     M --> T[tracking · analytics]
     M --> U[ui · branding]
+    M --> L[localization · translation state]
 ```
 
-`panelwave`, `meta`, and `chapters` are required; everything else is optional. The root object rejects unknown properties except `x-` prefixed [extension fields](/schema/extensions). See the [Overview](/schema/overview) for the full top-level table.
+`panelwave`, `meta`, and `chapters` are required; everything else is optional. `localization` (schema 1.5+) holds the authoring tool's translation workflow state — locale list plus per-string entries with stale and machine-translation flags — so it survives transfers between authoring systems; rendering consumers may ignore it (reader-facing text stays in `LocalizedString` objects throughout the manifest). The root object rejects unknown properties except `x-` prefixed [extension fields](/schema/extensions). See the [Overview](/schema/overview) for the full top-level table.
 
 ## A minimal valid manifest
 

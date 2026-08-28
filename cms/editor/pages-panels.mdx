@@ -43,6 +43,8 @@ You can also move through the tree with the keyboard: `↑`/`↓` walk visible r
   </Step>
 </Steps>
 
+When the target page already has panels, the **Create New Panel** dialog offers a **Position** select — **At the beginning** or **After** any existing panel — defaulting to the end, so a new panel can go straight into the right spot in the reading order.
+
 ### Context menus
 
 Every row has a right-click context menu (also available via the **⋮** button that appears on the row):
@@ -64,9 +66,13 @@ Each draggable row shows a grip handle (⋮⋮). Drag it to reorder:
 - **Pages** within a chapter
 - **Panels** within a page
 
-A "Drop here" placeholder shows where the item will land. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders.
+A "Drop here" placeholder shows where the item will land — and the item really lands **at that position**, including panels dragged in from another page or from **Unassigned**; the canvas renumbers immediately. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders.
 
 You can also drag a panel from the tree **onto the canvas** (in page view) to place it on the current page.
+
+<Callout kind="info">
+A panel can appear on pages of several [page formats](/cms/works#output) at once. **Delete Panel** on a panel that other pages still use only **detaches** it from the current page — the other formats' pages keep it. Only deleting its last page reference removes the panel itself.
+</Callout>
 
 ## Page layouts
 

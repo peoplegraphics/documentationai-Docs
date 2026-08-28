@@ -1,15 +1,40 @@
 ---
 title: Import
-description: Bring existing PanelWave graphic novels into the CMS from JSON manifest files — validation, preview, and what gets imported.
+description: Bring existing PanelWave graphic novels into the CMS — from a self-contained work archive with all media, or from a JSON manifest file.
 ---
 
-The CMS can import a complete graphic novel from a **PanelWave JSON manifest** — for example a work you previously [exported](/cms/export), a backup, or a manifest produced by other tooling against the [open format](/schema/overview).
+The CMS can import a complete graphic novel in two ways: from a **work archive** (a `.zip` that carries the whole work *including every media file*) or from a **PanelWave JSON manifest** — for example a backup, or a manifest produced by other tooling against the [open format](/schema/overview).
 
 <Callout kind="tip">
 Starting from a **screenplay** instead of a manifest? The [Script Import](/cms/script-import) turns a Fountain script into a work — with AI-suggested chapters, panels, and speech bubbles you review before anything is created.
 </Callout>
 
-## Importing a work
+## Importing a work archive
+
+A **work archive** is the `.zip` produced by the [Archive export](/cms/export#archive-export). Unlike a JSON manifest, it carries the complete work: the manifest for all page formats **plus every media file** (originals and generated variants), your asset folders, and all translations — so the imported copy is immediately editable and publishable, with nothing pointing back at the source system.
+
+<Steps>
+  <Step title="Open the archive import">
+    On the [My Works](/cms/works) page, click **Import Archive**.
+  </Step>
+  <Step title="Upload the zip">
+    Pick the archive file (up to **5 GB**). The upload goes directly to storage; progress is shown in the dialog.
+  </Step>
+  <Step title="Wait for the import">
+    The archive is validated and imported in the background: first the work's structure (in a single transaction — if anything fails, nothing is created), then the media files. The work appears in your list as a **draft** as soon as the structure is in; a marker on the card clears when all assets have arrived.
+  </Step>
+  <Step title="Retry if needed">
+    A failed import shows the reason in the dialog and offers **Retry** — already-transferred files are skipped, so retries are fast.
+  </Step>
+</Steps>
+
+Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by older format versions (1.0–1.5) are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
+
+<Callout kind="info">
+Not carried over (by design): paywall configuration, publish history and preview links, analytics, and community data (comments, likes). Configure and publish anew on the target system.
+</Callout>
+
+## Importing a JSON manifest
 
 <Steps>
   <Step title="Open the import dialog">
