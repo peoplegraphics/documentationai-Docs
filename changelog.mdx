@@ -5,6 +5,35 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-15" description="Player · Panel audio playback, working Audio/SFX toggles" tags={["feature", "bugfix"]}>
+  ## The player now plays the manifest's audio — and the toolbar toggles act on it
+
+  - **Panel audio is played by the shell.** A new `PanelAudioService`
+    starts every `panels.<id>.audio[]` track and `kind: "audio"` layer
+    when a panel becomes current and stops it on leave, honouring
+    `role`, `loop`, `gain`, `startAtMs` and `visibleIf`. A looping
+    ambience shared by consecutive panels keeps playing across them;
+    tracks the browser refuses before the first gesture are retried on
+    that gesture. Details: [Audio](/player/audio#what-the-shell-plays-automatically).
+  - **Audio and SFX toggles are real.** Audio is the master mute for
+    every bus **and** video sound (video layers follow the engine);
+    SFX mutes the `sfx` bus (incl. `ui` sounds); Speech additionally
+    mutes `voiceover`. Initial state: the reader's stored preference,
+    else the work's `settings.ui.audioDefault` / `sfxDefault` /
+    `speechDefault`. Each toggle emits its `audio_toggle` / `sfx_toggle`
+    / `speech_toggle` tracking event. [Toolbar controls](/player/reader-interface#toolbar-controls).
+  - **Settings modal preferences apply.** Speech, audio, SFX, autoplay
+    and seconds-per-panel saved in the modal now take effect and
+    persist (`localStorage` `pw-preferences`, only explicitly set keys);
+    `PlayerStateService` gained `preferences$`, `updatePreference(s)`
+    and `hasPersistedPreference`.
+  - **Audio engine fixes:** each track now has its own gain node, so
+    fades and per-track `gain` (0–2) no longer touch a whole bus (the
+    previous fade code ramped the first bus it found); mute flags
+    (`setMasterMuted`, `setRoleMuted`) are independent of volumes;
+    one-shot tracks release their element on `ended`.
+</Update>
+
 <Update label="2026-08-28" description="Format · 1.5.0 — asset folders & localization blocks" tags={["feature"]}>
   ## Schema 1.5.0: works that round-trip between authoring systems
 

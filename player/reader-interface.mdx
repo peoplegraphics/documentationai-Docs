@@ -67,9 +67,9 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 |---|---|
 | **View** | Toggle page/panel view. Disabled when the manifest defines no pages. |
 | **Language** (globe) | Opens the language modal. Only shown when the work has more than one locale. |
-| **Speech** | Toggle speech bubbles on/off. Seeded from `settings.ui.speechDefault`; hides **all** bubbles implicitly (schema 1.3) — no per-bubble `visibleIf` boilerplate involved. |
-| **Audio** | Mute/unmute audio. |
-| **SFX** | Enable/disable sound effects. |
+| **Speech** | Toggle speech bubbles on/off. Seeded from `settings.ui.speechDefault`; hides **all** bubbles implicitly (schema 1.3) — no per-bubble `visibleIf` boilerplate involved. Off also mutes the `voiceover` bus (spoken lines belong to the bubbles they voice). |
+| **Audio** | Master mute for the whole player: every audio-engine bus (ambient, music, voiceover, sfx) **and** video sound. Seeded from `settings.ui.audioDefault`. While off, video layers stay muted and show no unmute affordance. |
+| **SFX** | Mute/unmute the `sfx` bus (which also carries `ui` sounds); the rest of the mix is untouched. Seeded from `settings.ui.sfxDefault`. |
 | **Autoplay** | Start/stop automatic advancing. While active, the button shows a progress bar and **−/+** controls to adjust the seconds-per-panel (0.5–120 s in 1-s steps). |
 | **Thumbs** | Toggle the thumbnail strip (jump to any panel by its thumbnail). |
 | **ToC** | Open the table of contents (chapters and panels; selecting one navigates there). |
@@ -81,8 +81,10 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 | **Like / Bookmark / Share / Comments** | Social cluster; Share opens the share modal, Comments opens the comments drawer. |
 | **✕** | Close the toolbar. |
 
+The three sound toggles (Speech, Audio, SFX) share one rule for their initial state: a preference the reader set explicitly — from the toolbar or the settings modal, in this or an earlier session (persisted in `localStorage` under `pw-preferences`) — wins; otherwise the work's `settings.ui.speechDefault` / `audioDefault` / `sfxDefault` applies (default: on). Mutes and volumes are independent in the engine, so toggling never loses a stored level. Each toggle emits an `audio_toggle` / `sfx_toggle` / `speech_toggle` tracking event with `{ enabled }`. What the toggles act on — the panel's manifest audio, started and stopped by the shell — is described in [Audio](/player/audio#what-the-shell-plays-automatically).
+
 <Callout kind="alert">
-**Work in progress:** in the current build, several toolbar actions are visual placeholders that log to the console instead of acting — the Audio/SFX toggles, Like, Bookmark, Alt (cycle alternatives), and Choices. Also, the shell currently always reports "no alternatives / no branches" to the toolbar, so the Alt and Choices buttons do not appear yet. View toggle, language, **speech toggle**, autoplay, thumbnails, ToC, settings, characters, extras, share, and comments are functional.
+**Work in progress:** in the current build, three toolbar actions are still visual placeholders that log to the console instead of acting — Like, Bookmark, and Choices. Also, the shell currently always reports "no branches" to the toolbar, so the Choices button does not appear yet. View toggle, language, speech/audio/SFX toggles, autoplay, thumbnails, ToC, settings, characters, Alt (cycle [panel variants](/schema/variants)), extras, share, and comments are functional.
 </Callout>
 
 ## Autoplay
@@ -98,7 +100,7 @@ Autoplay is **video-aware**: when the current panel contains videos that start o
 
 The settings modal (`pw-settings-modal`) has two tabs:
 
-- **Preferences** — speech bubbles, audio, SFX, autoplay and seconds-per-panel, manga mode (right-to-left reading), reduced motion, high contrast. Includes a reset-to-defaults action.
+- **Preferences** — speech bubbles, audio, SFX, autoplay and seconds-per-panel, manga mode (right-to-left reading), reduced motion, high contrast. Includes a reset-to-defaults action. Speech, audio, SFX, autoplay and seconds-per-panel go through the same code paths as the toolbar controls (and are persisted like them); manga mode, reduced motion and high contrast are persisted in the reader's preferences but the shell does not act on them yet — reduced motion is honoured from the OS setting and the shell's `reducedMotion` input instead.
 - **Variables** — shows the work's variables whose definition has `visibility: "public"`, with type-appropriate editors (checkbox for booleans, number input with min/max, select for enums, text otherwise) and per-variable reset. This lets readers change story-affecting switches the creator exposed.
 
 Changes apply on **Save**; **Cancel** (or clicking the backdrop, or `Esc`) restores the previous values.

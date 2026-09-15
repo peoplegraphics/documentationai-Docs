@@ -5,9 +5,46 @@ description: How audio works in the PanelWave Player — the WebAudio engine, it
 
 The player ships a WebAudio-based **`AudioEngineService`** for music, ambience, voice-over, and sound effects, plus a **`UserGestureService`** that deals with browser autoplay restrictions. Video sound is handled separately by the video layer (muted by default).
 
-<Callout kind="alert">
-**Current integration status:** the audio engine is a fully functional, exported service, but the player shell does **not yet drive it automatically** from the manifest — the toolbar's Audio/SFX toggles are placeholders in this build. If your work uses audio today, inject `AudioEngineService` in your host application and drive it from the shell's `panelChange` output, as shown below.
-</Callout>
+The shell drives the engine from the manifest on its own: a **`PanelAudioService`** starts each panel's audio when the panel becomes current and stops it when the reader leaves, and the toolbar's **Audio** / **SFX** toggles (and the settings modal's audio preferences) mute the corresponding buses. Hosts only need the API below for audio the manifest does not describe — a site-wide jingle, a reader-triggered voice sample, and so on.
+
+## What the shell plays automatically
+
+For the current panel (after [variant](/schema/variants) resolution, so a variant's `audio` override wins), the shell collects:
+
+- every entry of `panels.<id>.audio[]` (schema [`AudioTrack`](/schema/audio)), and
+- every layer with `kind: "audio"` (schema `AudioLayer`; its bus comes from the catalog asset's `role`).
+
+Each entry is resolved against the asset catalog (`assets.catalog[assetId]`, category `audio`; the first variant the browser reports it can play, its `src` resolved against `assets.base.audioBase` / `mediaBase`) and started with:
+
+| Manifest field | Effect |
+|---|---|
+| `role` | Bus: `ambient`, `music`, `voiceover`, `sfx` as-is; `ui` plays on the **sfx** bus (so the SFX toggle covers it); `none` (the default) on the **music** bus (only the master Audio toggle silences it). Falls back to the catalog asset's `role`. |
+| `loop` | Loops while the panel is current. |
+| `gain` | Per-track gain 0–2 (a per-track gain node, so it never touches the bus level). |
+| `startAtMs` | Delay after panel enter; cancelled if the reader leaves first. |
+| `visibleIf` | JSON Logic against the variable context; re-evaluated on every variable change, so a track can start mid-panel when a condition becomes true. |
+
+Lifecycle rules:
+
+- **Leaving a panel** stops its tracks — looping ones with a short fade (`PANEL_AUDIO_LEAVE_FADE_MS`, 250 ms), one-shots immediately.
+- **Continuity:** a looping track that the next panel references too (same `assetId`) keeps playing uninterrupted; only its `gain` is updated. This is how a street ambience spans a scene.
+- **One-shots restart** on every panel enter that references them; a one-shot that finished releases its element on `ended`.
+- **Autoplay policy:** a track the browser refuses before the first user gesture is remembered and retried on that gesture (the `AudioContext` is resumed at the same time), so audio starts as early as the browser allows without any host code.
+- **Same panel, variables changed:** nothing restarts; only `visibleIf` results and gains are re-applied.
+- Missing or non-audio assets are skipped with a single console warning per asset.
+
+Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`) are **not** started by the shell — they need a playback clock the panel-based shell does not run; see [Sequence tracks](#sequence-tracks) for driving them from a host.
+
+### Toggles and preferences
+
+| Control | Engine effect |
+|---|---|
+| Toolbar **Audio** (settings "Enable audio") | `setMasterMuted(!enabled)` — every bus; video layers follow `masterMuted$` and stay muted too. |
+| Toolbar **SFX** (settings "Enable sound effects") | `setRoleMuted('sfx', !enabled)` |
+| Toolbar **Speech** (settings "Show speech bubbles") | also `setRoleMuted('voiceover', !enabled)` |
+| Stored `masterVolume` / `sfxVolume` preferences | `setMasterVolume` / `setRoleVolume('sfx', …)` — applied independently of the mute flags. |
+
+Initial state follows the reader's explicitly set preference when there is one (persisted in `localStorage` as `pw-preferences`, see `PlayerStateService`), else the work's `settings.ui.audioDefault` / `sfxDefault` / `speechDefault`. See [Toolbar controls](/player/reader-interface#toolbar-controls).
 
 ## Channels (buses)
 
@@ -89,8 +126,12 @@ constructor(
 |---|---|
 | `setMasterVolume(v)` / `getMasterVolume()` | Master gain, clamped to 0–1 |
 | `setRoleVolume(role, v)` / `getRoleVolume(role)` | Per-channel gain, clamped to 0–1 |
+| `setMasterMuted(bool)` / `isMasterMuted()` / `masterMuted$` | Master mute, independent of the master volume (the volume survives a mute/unmute round trip). This is what the toolbar's Audio toggle sets; video layers subscribe to `masterMuted$`. |
+| `setRoleMuted(role, bool)` / `isRoleMuted(role)` | Per-channel mute, independent of the channel volume (SFX toggle → `sfx`, Speech toggle → `voiceover`). |
+| `setTrackVolume(id, v)` | Per-track gain 0–2 of a playing track (its own gain node between the element and the bus). |
+| `isActive(id)` | Whether a track id is registered (playing or paused). |
 
-Muting a channel is `setRoleVolume('sfx', 0)`; muting everything is `setMasterVolume(0)`. This is also the intended backing for the toolbar's Audio (master/music) and SFX toggles once they are wired.
+The signal chain is `element → track gain → role gain → master gain → output`; fades ramp the track gain, so fading one track never touches its bus.
 
 ## Sequence tracks
 

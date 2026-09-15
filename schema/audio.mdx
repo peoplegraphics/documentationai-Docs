@@ -114,7 +114,7 @@ For most authoring, prefer `AudioTrack` for panel sound and `SequenceAudioTrack`
 ## Mixing model
 
 - **Gain/volume** is a linear multiplier from 0 to 2 on every audio object (`gain` on tracks/layers, `volume` on sequence tracks); 1 is the asset's natural level.
-- **Roles** partition the mix into reader-controllable groups: `music`/`ambient` fall under the audio toggle, `sfx` under the SFX toggle, `voiceover` under the speech toggle, `ui` for interface sounds.
+- **Roles** partition the mix into reader-controllable groups: the audio toggle is the master mute for everything (including video sound); `sfx` and `ui` additionally fall under the SFX toggle; `voiceover` additionally under the speech toggle; `music`, `ambient` and `none` are silenced only by the audio toggle. See [Player audio](/player/audio#what-the-shell-plays-automatically) for the bus mapping.
 - **Fades** (`fadeIn`/`fadeOut`) and `playbackRate` exist only on `SequenceAudioTrack`.
 - **Per-bubble voice-over**: a [speech bubble](/schema/speech-bubbles) can reference audio directly via `audioAssetId`.
 

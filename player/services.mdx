@@ -10,7 +10,8 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | Service | Owns |
 |---|---|
 | `ManifestService` | Loading, validating, and indexing the manifest |
-| `PlayerStateService` | Current panel and locale (reactive) |
+| `PlayerStateService` | Current panel, locale and reader preferences (reactive, preferences persisted) |
+| `PanelAudioService` | Starts/stops the current panel's manifest audio through the engine |
 | `VariableStoreService` | Scoped variables, mutations, persistence |
 | `FlowEngineService` | Graph traversal and edge condition evaluation |
 | `HotspotActionService` | Executes hotspot actions (mutations, plugin events) and returns UI effects |
@@ -47,10 +48,22 @@ Validation is structural, not full JSON Schema validation: it requires `panelwav
 
 - `currentPanel$: Observable<Panel | null>` / `setCurrentPanel(panel)` / `getCurrentPanel()`
 - `locale$: Observable<LocaleCode>` / `setLocale(locale)` / `getLocale()`
+- `preferences$: Observable<PlayerPreferences>` / `getPreferences()` / `updatePreference(key, value)` / `updatePreferences(patch)` — the reader's preferences (`speech`, `audio`, `sfx`, `autoplay`, `secondsPerPanel`, `mangaMode`, `reducedMotion`, `highContrast`, `masterVolume`, `sfxVolume`; defaults in `DEFAULT_PLAYER_PREFERENCES`). Only keys the reader set explicitly are written to `localStorage` (`PREFERENCES_STORAGE_KEY` = `pw-preferences`) and reloaded on construction; `hasPersistedPreference(key)` tells the shell whether to honour the reader's choice or a work's `settings.ui.*Default`.
 
 <Callout kind="info">
-A second, extended implementation exists at `src/lib/state/player-state.service.ts` with the full `PlayerState` shape (navigation history, preferences, overlay visibility, paywall gate, an event bus emitting `PlayerEvent`s, and `localStorage` persistence of preferences and tracking consent). It is not exported from the public API and is not injected by the shell today — contributions that extend player state should be aware of both files.
+A second, extended implementation exists at `src/lib/state/player-state.service.ts` with the full `PlayerState` shape (navigation history, overlay visibility, paywall gate, an event bus emitting `PlayerEvent`s, tracking consent). It is not exported from the public API and is not injected by the shell — contributions that extend player state should be aware of both files and target the exported one.
 </Callout>
+
+## PanelAudioService
+
+`services/panel-audio.service.ts` — the manifest-to-engine bridge the shell calls on every panel / variable-context change.
+
+- `syncPanel(panelId, panel, variableContext)` — resolves the panel's `audio[]` tracks and `kind: "audio"` layers against the asset catalog and makes the engine's playing set match: starts new tracks (honouring `startAtMs`, `gain`, `loop`, `visibleIf`), stops tracks the panel no longer wants (loops with a 250 ms fade), keeps a looping track shared with the previous panel running, and re-evaluates `visibleIf` without restarting anything when only variables changed. Idempotent for an unchanged panel.
+- `stopAll()` — shell teardown; `getDesiredTrackIds()` for diagnostics.
+- `busForRole(role)` (exported function) — manifest role → engine bus (`ui` → `sfx`, `none` → `music`).
+- Tracks refused by the browser's autoplay policy are retried, and the `AudioContext` resumed, on the first gesture reported by `UserGestureService`.
+
+See [Audio](/player/audio#what-the-shell-plays-automatically).
 
 ## VariableStoreService
 
@@ -103,8 +116,8 @@ Panel variants are resolved by the pure helpers in `utils/variant-utils.ts` (`se
 `services/audio-engine.service.ts` — Web Audio playback with a master `GainNode` and one gain bus per role: `ambient`, `music`, `voiceover`, `sfx`.
 
 - `initialize()` / `resumeContext()` — creates the `AudioContext` and probes the browser autoplay policy; call `resumeContext()` on user interaction.
-- `play(track: AudioTrack)` / `stop(id, fadeOutMs?)` / `pause(id)` / `resume(id)` / `stopAll(fadeOutMs?)` — tracks are `HTMLAudioElement`s routed through `createMediaElementSource` into their role bus; `fadeIn`/`fadeOut` use linear gain ramps.
-- `setMasterVolume(v)` / `setRoleVolume(role, v)` and getters.
+- `play(track: AudioTrack)` / `stop(id, fadeOutMs?)` / `pause(id)` / `resume(id)` / `stopAll(fadeOutMs?)` — tracks are `HTMLAudioElement`s routed through `createMediaElementSource` into a per-track `GainNode` (`volume` 0–2, fades as linear ramps on that node) and from there into their role bus; one-shot tracks release themselves on `ended`.
+- `setMasterVolume(v)` / `setRoleVolume(role, v)` and getters; `setMasterMuted(bool)` / `isMasterMuted()` / `masterMuted$` and `setRoleMuted(role, bool)` / `isRoleMuted(role)` — mutes are independent of volumes (what the toolbar toggles drive); `setTrackVolume(id, v)`, `isActive(id)`.
 - `playSequenceTracks(tracks, currentTimeMs, assetBaseUrl)` / `stopSequenceTracks(ids?)` — plays chapter timeline audio (`SequenceAudioTrack`) from the correct offset.
 - `isAutoplayAllowed()`, `getPlaybackState(id)`, `getActiveTracks()`, `destroy()`.
 

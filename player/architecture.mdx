@@ -83,7 +83,7 @@ The player's runtime state is managed with **RxJS**, not with a state-management
 - Preferences, tracking consent, and `persistent`-scope variables are persisted to `localStorage` (keys `pw-preferences`, `pw-tracking-consent`, `pw-variables-persistent`).
 
 <Callout kind="info">
-There are two `PlayerStateService` implementations in the source tree. The one exported from the public API and injected by `PlayerShellComponent` is `src/lib/services/player-state.service.ts` — a small store exposing `currentPanel$` and `locale$`. A richer store implementing the full `PlayerState` interface (overlays, preferences, viewport, event bus) exists at `src/lib/state/player-state.service.ts` but is currently **not exported and not wired into the shell**. When contributing, check which one your change targets.
+There are two `PlayerStateService` implementations in the source tree. The one exported from the public API and injected by `PlayerShellComponent` is `src/lib/services/player-state.service.ts` — a small store exposing `currentPanel$`, `locale$` and the persisted reader `preferences$`. A richer store implementing the full `PlayerState` interface (overlays, viewport, event bus) exists at `src/lib/state/player-state.service.ts` but is currently **not exported and not wired into the shell**. When contributing, check which one your change targets.
 </Callout>
 
 ## Data flow: from manifest to rendered panel
