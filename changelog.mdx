@@ -34,6 +34,46 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     one-shot tracks release their element on `ended`.
 </Update>
 
+<Update label="2026-09-15" description="CMS · The Variables designer" tags={["feature", "bugfix"]}>
+  ## Declare your story's state in the CMS, not in a hand-edited manifest
+
+  Variables used to reach a work only by importing a manifest that
+  already contained them. They now have their own Backstage page:
+
+  - **The Variables designer is enabled.** Open a work's Backstage and
+    choose **Variables** (the editor's work-areas menu has the same
+    entry) for a table of every definition — id, type, default, scope,
+    read-only/private flags, description — with a search box and
+    type/scope filters, and create / edit / duplicate / delete actions.
+    Ids may be dot-namespaced (`inventory.hasKey`), `enum` variables
+    list their allowed values, and changing a type resets a stale
+    default. Details:
+    [The Variables designer](/cms/editor/variables#the-variables-designer).
+  - **Validation on both sides.** The dialog catches a malformed or
+    duplicate id and a default that doesn't match its type, and the
+    server re-checks the same rules — what you save always validates
+    against [the schema](/schema/variables).
+  - **JSON import and export.** **Export JSON** downloads the
+    definitions as a manifest fragment
+    (`{ "variables": { "definitions": [ … ] } }`); **Import JSON**
+    accepts that fragment, a plain `{ "definitions": [ … ] }`, or a
+    bare array, and replaces the current list after a confirmation.
+    [Import and export](/cms/editor/variables#import-and-export).
+  - **Published manifests carry valid variables.** The manifest builder
+    emitted `variables.definitions` as an id-keyed map, which is not
+    what the format specifies — it is now the array the
+    [schema](/schema/variables) requires, so players read the
+    definitions as intended.
+  - **Import keeps your variables.** Importing a manifest or a
+    [work archive](/cms/import#importing-a-work-archive) silently
+    dropped its `variables` block; definitions now survive the round
+    trip, with invalid entries skipped and logged.
+
+  Reader-side *values* are still simulated in
+  [Preview](/cms/preview)'s variable overrides, which replace the old
+  standalone simulation page.
+</Update>
+
 <Update label="2026-08-28" description="Format · 1.5.0 — asset folders & localization blocks" tags={["feature"]}>
   ## Schema 1.5.0: works that round-trip between authoring systems
 
