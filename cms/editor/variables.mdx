@@ -48,12 +48,29 @@ Scope controls when a variable's value resets:
 Rule of thumb: story decisions the whole work should remember → `global` or `persistent`; short-lived puzzle state → `chapter` or `page`; things like "has seen the tutorial hint this visit" → `session`.
 </Callout>
 
-## Where variables are defined
+## The Variables designer
 
-Variable definitions are part of your work's manifest. Today they enter a work in two ways:
+Variables are defined per work in the **Variables** designer: open a work's Backstage and choose **Variables** in the sidebar (the editor's work-areas menu has the same entry). The page lists every definition in a table — id, type, default, scope, read-only/private flags, and description — with a search box and type/scope filters above it.
 
-- **Importing a manifest** — a `panelwave.json` that contains a `variables` section keeps all its definitions when you [import it](/cms/import).
-- **Hand-authoring the manifest** — for works maintained outside the CMS, define them under `variables.definitions` as described in [the schema reference](/schema/variables).
+<Steps>
+  <Step title="Create a variable">
+    Click **New Variable**. Enter the **Id** (letters and digits, optionally in dot-separated segments such as `inventory.hasKey`), pick the **Type** and **Scope**, and optionally a **Default value**, **Visibility**, the **Read-only** flag, and a **Description**. For an `enum`, list the **Allowed values** one per line; the default must be one of them.
+  </Step>
+  <Step title="Save">
+    Click **Save Variable**. The dialog validates the definition first (a malformed id, a duplicate id, a default that doesn't match the type) and points at the problem; the CMS re-checks the same rules on the server, so what you save is always valid against [the schema](/schema/variables).
+  </Step>
+  <Step title="Edit, duplicate, delete">
+    Use the row actions. Changing a type resets its default so a stale value can't be carried over. Deleting a variable does not touch the conditions or hotspot actions that mention it — they simply stop resolving, so search for the id first.
+  </Step>
+</Steps>
+
+Changes are saved immediately and land in the manifest on the next publish, in the [Preview](/cms/preview) page's variable overrides, and in the player's variable store.
+
+### Import and export
+
+- **Export JSON** downloads the definitions as a manifest fragment (`{ "variables": { "definitions": [ … ] } }`) that you can paste into a hand-maintained `panelwave.json` or keep as a backup.
+- **Import JSON** accepts the same fragment, a plain `{ "definitions": [ … ] }` object, or a bare array, and **replaces** the current list after a confirmation.
+- **Importing a whole manifest** (or a work archive) through [Import](/cms/import) keeps all definitions of its `variables` section; entries that don't pass validation are skipped and logged.
 
 A definition looks like this in the manifest:
 
@@ -80,8 +97,8 @@ A definition looks like this in the manifest:
 }
 ```
 
-<Callout kind="info">
-A visual **Variables Designer** (a table of all variables with create/edit/duplicate/delete, search, filters, and JSON import/export) exists in the CMS codebase but is **not yet enabled** in the released editor UI. Until it ships, define variables via import or the manifest, and manage their *values* with the tools below.
+<Callout kind="tip">
+Give ids a namespace that says where they belong (`story.choice`, `stats.trust`, `inventory.hasKey`, `prefs.hints`) and use an `enum` for any choice with a fixed set of outcomes — a typo in a condition then fails loudly instead of silently never matching.
 </Callout>
 
 ## Changing values from the story
