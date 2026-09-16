@@ -21,11 +21,19 @@ The locale chips under the workshop header show each language's completion perce
 
 Click **Extract Strings** to scan the work and pull every translatable string into the table — speech bubble text, titles, descriptions, and other reader-facing content. Each entry gets a stable **key**, its **default text** (the source language), a category, and a "Used in" badge telling you where it appears.
 
+Strings are listed in **story order** — the order a reader meets them: the work title, then for each chapter its title and its pages in order, with each page's panels in reading order (title, then speech bubbles), followed by panels not placed on any page, and character bios last. Translating top to bottom therefore follows the story.
+
 Run extraction again whenever you've added content; existing translations are kept and new strings are appended. You can also add free-form strings manually with **Add Entry** (key, default text, category).
+
+<Callout kind="info">
+  **Which language is the source?** Extraction takes your work's default locale as the source language. If the work has none set, it falls back to the language hinted in Work Properties (matching `en` to `en-US` and the like), and finally to the locale most of your strings actually carry — so a stray translated title can't flip the Default Text column into another language. Works extracted before story order existed list their strings last until you run **Extract Strings** once more.
+</Callout>
 
 ## The translation editor
 
 The table has four columns: **Key**, **Default Text**, **Translation** (for the selected locale), and **Actions**. Click a translation cell to edit it inline; press Escape to stop editing. Untranslated rows are tinted red, and the stat cards at the top track **Total Strings**, **Translated**, **Missing**, and **Completion**.
+
+Click the **Key**, **Default Text**, or **Translation** header to sort by that column; a second click flips the direction, and an arrow marks the active sort. Sorting by translation sinks untranslated rows to the bottom, so a completed batch floats up and the gaps collect at the end. The **Story order** button that appears in the header row returns to the default order. While a search or filter is active, a line above the table reads *"Showing N of M strings"*.
 
 Handy details:
 
@@ -42,6 +50,8 @@ When you change the source text of a string that was already translated, its tra
 
 - **Translate untranslated** machine-translates every string missing a value for the selected locale.
 - Machine-translated strings carry an **MT** badge until you confirm them with the green check (or edit them, which marks them **Modified**).
+- The source text is always a **human-entered** value — your default language where it exists, otherwise another locale you translated by hand, and as a last resort the default text with the provider detecting the language. A machine draft is never used as the source, and a string is never "translated" from a language into itself. When you translate *into* your default language (say, to fill an English column from German originals), the workshop picks the best other locale as the source automatically.
+- If the translation provider fails mid-run, the workshop keeps what was translated so far and shows a warning — *"Machine translation stopped after N string(s): … — try again in a moment"* — instead of filling the remaining rows with placeholders.
 
 ### Translation memory
 

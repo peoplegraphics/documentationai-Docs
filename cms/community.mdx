@@ -6,7 +6,7 @@ description: PanelWave's community features — team comments live in the CMS to
 PanelWave is building a community layer around published works: comments, reactions, likes, watchlists, and social sharing. The first piece is now live — **team comments inside the CMS**. The reader-facing side is still on its way; this page is honest about which is which.
 
 <Callout kind="success">
-  **New:** comments are now usable in the CMS — as a work-level discussion in backstage and as a drawer inside the editor. They are **team-internal**: only members of the work's team can read or write them. Reader-facing comments, likes, watchlists, and sharing are not surfaced anywhere yet.
+  **New:** comments are now usable in the CMS — as a work-level discussion in backstage and as a drawer inside the editor. They are **team-internal**: only members of the work's team can read or write them, and team owners, admins, and editors moderate them themselves. Reader-facing comments, likes, watchlists, and sharing are not surfaced anywhere yet.
 </Callout>
 
 ## Team comments in the CMS
@@ -17,6 +17,8 @@ Comments are the discussion channel for the people making the work — art notes
 
 - **Backstage → Comments** — a work-level thread for discussion that isn't about one specific spot. It sits in the backstage sidebar next to Validation, and in the editor's **Work areas** menu.
 - **The editor's comments drawer** — a speech-bubble button in the editor header opens a side drawer that targets **the most specific thing you have open**: the selected panel, otherwise the current page, otherwise the whole work. A scope line at the top of the drawer always tells you what you are commenting on. Switch selection while the drawer is open and it follows.
+
+  The button carries a **count badge** for that same target — the number of comments on the selected panel, page, or work (capped at "99+"). The badge turns **amber** when comments are waiting for review, and hovering the button spells it out: *"Comments on the selected panel: 4 (1 awaiting review)"*. The count refreshes when you change the selection and whenever the drawer opens or closes.
 
 ### What you can do in a thread
 
@@ -32,10 +34,29 @@ Comment threads are scoped to the work's team. You must be signed in and a membe
 
 ### Moderation and abuse protection
 
-- Authors with a **verified email** post immediately; otherwise a new comment is held and its author sees *"Your comment is pending moderation."*
-- Comments that look like spam — an unusual number of links, or terms on the platform's blocklist — are **held for review rather than rejected**, so a false positive never destroys what you wrote.
+Because every author is already a member of the work's team, comments are **approved the moment they are posted** — there is no email-verification gate. Two automatic guards still apply:
+
+- Comments that look like spam — an unusual number of links, or terms on the platform's blocklist — are **held for review rather than rejected**, so a false positive never destroys what you wrote. The author sees *"Your comment is pending moderation."* and a moderator finds the comment in the review queue.
 - Posting very rapidly is rate-limited; wait a moment and try again.
-- A creator-facing moderation view (approving, rejecting, or pinning held comments yourself) is planned but does not exist yet — held comments are reviewed platform-side for now.
+
+### Moderating as a team
+
+Team members with the **owner**, **admin**, or **editor** role see three tabs above the thread (in backstage and in the editor drawer):
+
+| Tab | Shows |
+|---|---|
+| **Discussion** | Approved comments — what everyone on the team sees. This is the only tab with the comment form, reactions, and replies. |
+| **Review queue** | Comments held by the content guard or flagged by a moderator. The tab carries a count badge while anything is waiting. |
+| **Rejected** | Comments a moderator rejected, kept so they can be restored. |
+
+Each comment in these views shows a **status badge** (`pending`, `flagged`, `rejected`) and the moderation actions that make sense for it:
+
+- **Approve** — publishes a pending or flagged comment to the discussion.
+- **Flag** — hides an approved comment from the discussion and sends it to the review queue for a second look.
+- **Reject** — removes a comment from the discussion without deleting it.
+- **Restore** — brings a rejected comment back (it reappears as approved).
+
+Moderating never deletes anything; only the author (or a moderator using **Delete**) removes a comment for good. Members with the **viewer** role see the discussion only.
 
 ## What's still coming: the reader-facing layer
 

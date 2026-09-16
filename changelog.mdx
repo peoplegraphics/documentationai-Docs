@@ -5,6 +5,101 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-16" description="CMS · Localization workshop: story order, sortable columns, source-language fixes" tags={["feature", "bugfix"]}>
+  ## Translate in the order the story is read — from the language it was written in
+
+  - **Strings list in story order.** [Extract Strings](/cms/localization#extracting-translatable-text)
+    now walks the work the way a reader does: work title, then each
+    chapter's title and its pages in order, each page's panels in
+    reading order (title, then bubbles), panels not placed on a page,
+    and character bios last. Keys embed panel ids, so the previous
+    category-then-key order shuffled bubbles at random. Existing works
+    pick up positions on their next **Extract Strings** run; until
+    then their strings list last.
+  - **Sortable Key / Default Text / Translation columns.** Click a
+    header to sort, again to flip; untranslated rows sink to the bottom
+    when sorting by translation, and a **Story order** button restores
+    the default. A *"Showing N of M strings"* line appears while a
+    filter is active. [The translation editor](/cms/localization#the-translation-editor).
+  - **Machine translation uses the real source language.** *Translate
+    untranslated* into a locale the workshop believed was the default
+    sent identical source and target languages to the provider, which
+    echoed the input back — the German column filled with English. The
+    source is now resolved explicitly (work default → Work Properties
+    hint → the locale with the most human-entered values), the per-string
+    source text is always human-entered and never the target or a
+    machine draft, and translating *into* the default language picks
+    the best other locale. A provider failure stops the run with a
+    warning and the partial result instead of silently writing
+    placeholder text. [Machine translation](/cms/localization#machine-translation).
+  - **Extraction no longer flips the source language.** After
+    confirming German translations, a re-extraction could turn the
+    Default Text column German and flag every string stale, because the
+    source locale was guessed from the first key of the title map. The
+    source is now resolved the same way as above, and a previous default
+    text that matches one of the entry's own translations no longer
+    counts as a source edit — a genuine edit still marks the entry
+    **Stale**.
+  - **Backstage layout:** Entitlement Simulation gained the standard
+    page wrapper, and the workshop's actions column is wide enough for
+    the five per-row buttons.
+</Update>
+
+<Update label="2026-09-16" description="CMS · Team comment moderation and a comment count badge" tags={["feature", "bugfix"]}>
+  ## Moderate your team's comments yourself, and see at a glance where the discussion is
+
+  - **Comments post immediately.** Authors are already members of the
+    work's team, so the email-verification gate is gone — a new comment
+    is approved on creation unless the content guard (link cap or
+    blocklist) holds it for review.
+  - **Moderation views in the CMS.** Owners, admins, and editors get
+    **Discussion / Review queue / Rejected** tabs in backstage and in
+    the editor drawer, with status badges and **Approve**, **Flag**,
+    **Reject**, and **Restore** actions. Nothing is deleted by
+    moderating. [Moderating as a team](/cms/community#moderating-as-a-team).
+  - **Count badge on the editor's Comments button.** It shows the
+    approved comments for the drawer's current target (selected panel,
+    else page, else work), turns amber while comments await review, and
+    refreshes on selection changes and when the drawer opens or closes.
+  - **Fixes:** the comment thread loaded through the dev proxy 404'd
+    (query parameters were joined with a second `?`) and pagination
+    totals were undefined (unquoted struct keys uppercased by Lucee 6.2);
+    the drawer now follows the app theme in dark mode, shows the
+    signed-in user's initial (not the first character of their id), and
+    renders author avatars.
+</Update>
+
+<Update label="2026-09-16" description="CMS · Contextual help, per-locale bubble text, true-to-canvas balloon preview" tags={["feature", "bugfix"]}>
+  ## Help where you need it, and speech bubbles that keep every language
+
+  - **Contextual help icons.** Every Backstage tool, the works list, and
+    the editor's inspector, left sidebar, and timeline carry a help icon
+    that opens the matching page of this documentation in a new tab; the
+    inspector's follows the active tab. The user menu's **Documentation**
+    entry leads to the [CMS overview](/cms/overview).
+    [Contextual help](/cms/editor/layout#contextual-help).
+  - **Speech-bubble text is kept per locale.** The editor held one
+    string per bubble, picked from the stored translations without a
+    locale preference (so a single German translation showed up in the
+    English view), and wrote that string back over every other language
+    on the next autosave. Bubbles now carry their full translation map;
+    the canvas, inline editor, and Inspector show the editing locale,
+    the header locale switch redraws every bubble, edits touch only the
+    edited locale, and a blank edit never creates a key.
+    [Dialogue in multiple languages](/cms/editor/speech-bubbles#dialogue-in-multiple-languages).
+  - **The Balloon Style preview matches the canvas.** The Inspector's
+    preview was a generic SVG sample whose shape, tail, and wrapping
+    never matched the bubble on the canvas. For a selected bubble it is
+    now drawn by the editor's own canvas renderer from the bubble's real
+    geometry with the panel's live values, scaled to fit.
+    [The Balloon Style panel](/cms/editor/speech-bubbles#the-balloon-style-panel).
+  - **Page-view autosave no longer wipes a panel's layers.** Moving a
+    bubble in panel view and switching to page view within the two-second
+    autosave window could save an empty layer list and make the panel's
+    artwork vanish. Entering page view now flushes the pending save
+    first, and page-view saves leave stored layers untouched.
+</Update>
+
 <Update label="2026-09-15" description="Player · Panel audio playback, working Audio/SFX toggles" tags={["feature", "bugfix"]}>
   ## The player now plays the manifest's audio — and the toolbar toggles act on it
 

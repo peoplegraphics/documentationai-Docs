@@ -93,7 +93,7 @@ Only the fields you explicitly change are stored at each level. That means resty
 
 ## The Balloon Style panel
 
-Select a bubble and open the Inspector's balloon tab. Under **Balloon Style** you get a live preview plus:
+Select a bubble and open the Inspector's balloon tab. Under **Balloon Style** you get a live preview plus the controls below. The preview is drawn by the **same canvas renderer as the editor**, from the selected bubble's real geometry — its text-measured box, corner radius, line wrapping at the bubble's actual width, and its tail — with the panel's live values applied and scaled down to fit (never enlarged). What you see in the preview is the balloon as it sits on the canvas. The work-default and character-style editors, which have no particular bubble to show, keep a generic sample balloon instead.
 
 - **Type** — the ten balloon types above.
 - **Roundness** — corner roundness slider (hidden for Rectangle, Thought, and Shout, which have fixed shapes).
@@ -116,6 +116,17 @@ If the dropdown is empty, add your cast in the [Characters manager](/cms/charact
 ## Dialogue in multiple languages
 
 Bubble text is localized. The Inspector's text field is labeled with the locale you are editing — for example **Text (en-US)** — and the locale switcher in the editor header changes which language you are writing. Enter each language's dialogue while that locale is active, or manage translations in bulk on the [Localization](/cms/localization) screen. Balloons re-measure per language, so longer translations still fit. See [Localization concepts](/concepts/localization) for how fallback locales work.
+
+How the editor handles the languages behind one bubble:
+
+- Every bubble keeps its **full set of translations**. The canvas, the inline editor, and the Inspector show and edit the text for the editing locale; switching the header locale redraws every bubble in that language at once (this is not an undoable edit and does not mark the work unsaved).
+- If a bubble has no text in the editing locale, the editor shows the work's **default language** (or the first available translation), so a half-translated page never renders empty balloons.
+- Edits are written back **only to the locale you are editing**; the other languages are untouched. Typing into a bubble never creates an empty translation, and clearing a field only clears that language.
+- Bubbles created before per-locale editing existed carry a plain string; the editor treats it as the work's default language.
+
+<Callout kind="tip">
+  The **Balloon Style** preview wraps and measures the translation you are currently editing, so it is a quick way to check whether a longer translation still fits the balloon's maximum width.
+</Callout>
 
 ## Audio and TTS
 
