@@ -139,7 +139,7 @@ The upgrade currently performs these normalizations:
 - Adds a missing `graph.edges` array
 
 <Callout kind="info">
-The CLI's upgrade target is always the version declared by the schema bundled in that CLI release — `1.5.0` in CLI 1.0.0, `1.6.0` from the next CLI release on; the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.6 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
+The CLI's upgrade target is always the version declared by the schema bundled in that CLI release — `1.6.0` in CLI 1.1.0 (`1.5.0` in CLI 1.0.0); the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.6 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 After upgrading, always re-validate:

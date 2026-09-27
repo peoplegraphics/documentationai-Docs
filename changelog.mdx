@@ -23,15 +23,17 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     `paywall.products`. `requireEntitlement` still names the first product, so
     older players keep working. Import accepts formats 1.0–1.6.
     [How the paywall reaches readers](/cms/monetization#how-the-paywall-reaches-readers).
-  - **Tooling.** `@panelwave/types` and `@panelwave/cli` support 1.6.0 from their
-    next release. Until then, CLI 1.0.0 validates against 1.5.0 and rejects the
-    new fields. [CLI](/schema/cli).
+  - **Tooling.** Released on npm: `@panelwave/types` 1.1.0 and `@panelwave/cli` 1.1.0
+    (bundles and targets 1.6.0), `@panelwave/player` 1.1.0 (labels Buy / Subscribe
+    options from `paywall.products`). CLI 1.0.0 still validates against 1.5.0 and
+    rejects the new fields — update with `npm install -g @panelwave/cli@latest`.
+    [CLI](/schema/cli).
 </Update>
 
-<Update label="2026-09-27" description="Player · Live inputs, paywall scopes, Buy / Subscribe, age plus entitlement (next npm release)" tags={["feature", "bugfix", "breaking"]}>
+<Update label="2026-09-27" description="Player 1.1.0 · Live inputs, paywall scopes, Buy / Subscribe, age plus entitlement" tags={["feature", "bugfix", "breaking"]}>
   ## Inputs apply after init, paywall scopes and age checks work as specified, and the overlay offers Buy / Subscribe
 
-  These changes are on the player's `master` branch and ship with the next npm release after 1.0.1.
+  Released on npm as `@panelwave/player` **1.1.0** (`npm install @panelwave/player@latest`).
 
   - **Inputs can change after init.** A new `manifest` / `manifestUrl` reloads the
     work (position, non-persistent variables, overlays, variant overrides and

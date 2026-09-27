@@ -24,7 +24,7 @@ The UI translation files are missing or outdated. Copy them from the package int
 
 ## The table of contents or thumbnail strip is empty
 
-Both list the loaded work whether you pass `manifestUrl` or `[manifest]`. If they stay empty with `manifestUrl`, you are on `@panelwave/player` **1.0.1 or earlier**, where both read only the `manifest` input — upgrade, or load the JSON yourself and bind `[manifest]` ([option B](/player/quickstart-embed#option-b-pass-the-manifest-object)).
+Both list the loaded work whether you pass `manifestUrl` or `[manifest]`. If they stay empty with `manifestUrl`, you are on `@panelwave/player` **1.0.1 or earlier**, where both read only the `manifest` input — upgrade to 1.1.0 or later, or load the JSON yourself and bind `[manifest]` ([option B](/player/quickstart-embed#option-b-pass-the-manifest-object)).
 
 ## Changing an input doesn't do anything
 
@@ -33,7 +33,7 @@ The shell reacts to input changes after initialization:
 - A new `manifestUrl` / `manifest` reloads the work. `initialChapterId`, `initialPanelId` and `initialVariables` are only read during a load — to jump to another position in the running work, call `navigateToPanel()` instead, or call `reload()` after changing them.
 - `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live; a new `entitlementSnapshot` re-evaluates the paywall.
 
-If nothing reacts, check that you bind a **new** value (a mutated object with the same reference is not a change for Angular), and that you are on a player release newer than 1.0.1 — 1.0.1 and earlier read their inputs only once. See [Inputs &amp; Outputs](/player/inputs-outputs).
+If nothing reacts, check that you bind a **new** value (a mutated object with the same reference is not a change for Angular), and that you are on player 1.1.0 or later — 1.0.1 and earlier read their inputs only once. See [Inputs &amp; Outputs](/player/inputs-outputs).
 
 ## Speech balloons use the wrong font
 
