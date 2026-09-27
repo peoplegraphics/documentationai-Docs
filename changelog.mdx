@@ -5,6 +5,29 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-27" description="Format · 1.6.0 — paywall product lists and product catalogue" tags={["feature"]}>
+  ## A paywall rule can name every product that unlocks it, and readers see each product's name and price
+
+  - **`requiredProductIds` on paywall rules.** A purchase rule can list every
+    product that unlocks it. Owning any one of them is enough, and the player
+    offers one Buy option per product.
+    [Paywall → Product lists](/schema/paywall#product-lists-requiredproductids).
+  - **`paywall.products`.** Describes the products and subscription tiers that
+    rules reference by id: localized `name` and `description`, `price`, `type`.
+    The player labels each Buy / Subscribe option with the product's name,
+    description and price in the reader's language, falling back to the rule's
+    name and price. [Paywall → Products](/schema/paywall#products-paywallproduct).
+  - **Additive.** Every 1.5 manifest stays valid. [Versioning](/schema/versioning).
+  - **CMS export.** Rules export all their unlocking products (previously only
+    the first), and each product's name, description and price go into
+    `paywall.products`. `requireEntitlement` still names the first product, so
+    older players keep working. Import accepts formats 1.0–1.6.
+    [How the paywall reaches readers](/cms/monetization#how-the-paywall-reaches-readers).
+  - **Tooling.** `@panelwave/types` and `@panelwave/cli` support 1.6.0 from their
+    next release. Until then, CLI 1.0.0 validates against 1.5.0 and rejects the
+    new fields. [CLI](/schema/cli).
+</Update>
+
 <Update label="2026-09-27" description="Player · Live inputs, paywall scopes, Buy / Subscribe, age plus entitlement (next npm release)" tags={["feature", "bugfix", "breaking"]}>
   ## Inputs apply after init, paywall scopes and age checks work as specified, and the overlay offers Buy / Subscribe
 

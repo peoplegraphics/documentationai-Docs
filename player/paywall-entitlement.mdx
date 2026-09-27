@@ -73,7 +73,7 @@ The player normalizes each manifest rule and checks it against the snapshot. Man
 | Requirement | Written as | Satisfied when |
 |---|---|---|
 | Subscription | `entitlementType: "subscription"` (+ optional `subscriptionTiers`), or `requireEntitlement: "premium"` | The reader has a tier — any tier, or one listed in `subscriptionTiers` |
-| Purchase | `entitlementType: "purchase"` (+ optional `requiredProductIds`), or any other `requireEntitlement` value | The reader bought one of the listed products (or anything, when none are listed) |
+| Purchase | `entitlementType: "purchase"` (+ optional `requiredProductIds`, a schema field since format 1.6), or any other `requireEntitlement` value | The reader bought any one of the listed products (or anything, when none are listed) |
 | Age gate | `entitlementType: "age_gate"`, or a rule with `minimumAge` / `ageGate` and no other requirement | `ageVerified` is true and `age` ≥ the minimum (default 18) |
 | Free | `entitlementType: "free"` | Always |
 
@@ -102,7 +102,7 @@ Precedence for a panel: panel rule → chapter rule for its chapter → work rul
 Here the first six panels of the work are free and the rest needs a subscription — except chapter `ch-3`: its first panel is free and its other panels need a purchase (a subscription does not unlock them, because the chapter rule wins for its panels). The `concept-art` extras block needs a purchase too; it never blocks reading.
 
 <Callout kind="info">
-`chapter-3` and `art-book` are not entitlement type names, so both rules are purchase gates. Without `requiredProductIds`, a purchase gate is satisfied by **any** product in `purchasedProductIds` — pass only the purchases that belong to this work in the snapshot. The key still names the product the overlay offers (see [below](#what-readers-see-at-a-gate)).
+`chapter-3` and `art-book` are not entitlement type names, so both rules are purchase gates. Without `requiredProductIds`, a purchase gate is satisfied by **any** product in `purchasedProductIds` — pass only the purchases that belong to this work in the snapshot. The key still names the product the overlay offers (see [below](#what-readers-see-at-a-gate)). To require specific products, list them in `requiredProductIds` (format 1.6+, e.g. `"requiredProductIds": ["chapter-3", "complete-edition"]`): then only those unlock the rule, any one of them is enough. The CMS exports every unlocking product this way.
 </Callout>
 
 To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`.
@@ -122,12 +122,12 @@ The options come from the rule that blocks the panel:
 
 | Rule | Options |
 |---|---|
-| Purchase | One **Buy** option per entry in `requiredProductIds` |
+| Purchase | One **Buy** option per entry in `requiredProductIds` (format 1.6) |
 | Subscription | One **Subscribe** option per entry in `subscriptionTiers` |
 | Neither list set | One option whose product id is the rule's `requireEntitlement` key — or the rule `id` when the key is just the type name (`"purchase"`, `"subscription"`) |
 | Age gate, free | No options (age gates use the [age gate](#age-gates) instead) |
 
-A single option is labelled with the rule's `name`; with several, each is labelled with its product id or tier. Every option shows the rule's `description` and `price` when set — rules without a price still get their options. The options are also on the gate as `gate.options` (a `PurchaseInfo[]`), so a custom overlay can render the same list.
+Each option is labelled from the manifest's [`paywall.products`](/schema/paywall#products-paywallproduct) (format 1.6): the entry with the option's id supplies its name and description — in the reader's locale, falling back to the work's default locale — and its price. Options without an entry fall back to the rule's `name` (a single option) or the product id / tier (several options), and to the rule's `description` and `price`. Rules without any price still get their options. The options are also on the gate as `gate.options` (a `PurchaseInfo[]`), so a custom overlay can render the same list.
 
 ### Handling the reader's choice
 

@@ -40,7 +40,7 @@ Click **New Paywall Rule** and fill in the dialog:
 | **Entitlement Type** | **Subscription Required**, **One-Time Purchase**, **Age Verification**, or **Free Access** |
 | **Required Subscription Tiers** | For subscription rules: any of **basic**, **premium**, **pro** |
 | **Price / Currency** | For purchase rules: the price in USD, EUR, GBP, or JPY (when empty, the first unlocking product's price is published) |
-| **Unlocking products** | For purchase rules: readers who bought one of the checked products unlock it; none checked means any purchase does |
+| **Unlocking products** | For purchase rules: readers who bought any one of the checked products unlock it; none checked means any purchase does. The player offers a Buy option for each checked product, with that product's name and price |
 | **Minimum Age** | Required for **Age Verification** rules; optional on every other rule, where it adds an age check on top of the subscription or purchase |
 | **Preview Panel Count** | How many panels readers can view before the paywall |
 | **Description** | Optional note about the rule |
@@ -131,7 +131,7 @@ You can **Reset**, **Copy State**, and **Import/Export** simulation states as JS
 
 ## How the paywall reaches readers
 
-Paywall rules travel with your work: publishing writes them into the [manifest](/concepts/manifest) as schema-valid [`paywall.rules`](/schema/paywall) — Chapter, Extras Item and Panel rules carry their target as `refId`, a purchase rule names its first unlocking product in `requireEntitlement` (the player's **Buy** option, with the rule's or the product's name and price), subscription rules list their `subscriptionTiers`, and a minimum age is written as `minimumAge` / `ageGate`. Inactive rules and rules with a missing target are left out. The [PanelWave Player](/player/paywall-entitlement) enforces them when readers hit gated content — showing the lock overlay and checking the reader's entitlements. Purchasing itself will happen on the reading site through hosted payment pages, not inside the CMS.
+Paywall rules travel with your work: publishing writes them into the [manifest](/concepts/manifest) as schema-valid [`paywall.rules`](/schema/paywall) — Chapter, Extras Item and Panel rules carry their target as `refId`, a purchase rule lists all its unlocking products in `requiredProductIds` (format 1.6 — the player offers one **Buy** option per product) and also names the first of them in `requireEntitlement` for older players; each referenced product's name, description and default price are exported in `paywall.products`, so every Buy option shows the product's own name and price, subscription rules list their `subscriptionTiers`, and a minimum age is written as `minimumAge` / `ageGate`. Inactive rules and rules with a missing target are left out. The [PanelWave Player](/player/paywall-entitlement) enforces them when readers hit gated content — showing the lock overlay and checking the reader's entitlements. Purchasing itself will happen on the reading site through hosted payment pages, not inside the CMS.
 
 ## Related pages
 

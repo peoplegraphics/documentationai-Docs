@@ -16,9 +16,9 @@ Every manifest declares which format version it was written for in the required 
 ```json
 {
   "panelwave": {
-    "version": "1.5.0",
+    "version": "1.6.0",
     "schema": "https://panelwave.org/schema/1.0/panelwave.schema.json",
-    "generator": "panelwave-sample-gen/1.5"
+    "generator": "panelwave-cms/1.0"
   }
 }
 ```
@@ -37,11 +37,11 @@ The format follows semantic versioning:
 
 The schema file lives in a directory named after the **major** version. Minor versions are additive and ship **in place** within that directory:
 
-- Current format version: **1.5.0**
+- Current format version: **1.6.0**
 - Schema location: [`1.0/panelwave.schema.json`](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) in the [panelwave/schema](https://github.com/panelwave/schema) repository
 - Schema `$id`: `https://panelwave.org/schema/1.0/panelwave.schema.json` (unchanged by minor releases; an identifier — the URL is not publicly served yet)
 
-This is why a `1.5.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1/1.2/1.3/1.4/1.5 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
+This is why a `1.6.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1/1.2/1.3/1.4/1.5/1.6 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
 
 ## Compatibility rules as encoded in the schema
 
@@ -50,6 +50,16 @@ This is why a `1.5.0` manifest still points its `schema` URI at the `1.0/` path 
 **Forward compatibility (new manifests, old consumers).** The schema is strict about unknown properties (`additionalProperties: false` / `unevaluatedProperties: false` on most objects), so a 1.0-era validator will reject fields introduced later. Custom data that must survive round-trips belongs in `x-` prefixed [extension fields](/schema/extensions) instead.
 
 **Deprecation policy.** Deprecated fields are marked with `"deprecated": true` in the schema and remain supported for at least one major version.
+
+### What changed in 1.6.0
+
+Additive; existing manifests remain valid unchanged. A purchase paywall rule can list **every product that unlocks it**, and the manifest can describe those products for readers:
+
+- **`PaywallRule.requiredProductIds`** (`Identifier[]`, unique, at least one item): owning **any one** of the listed products satisfies the rule, and players offer one Buy option per product. Only purchase rules use it.
+- Without it, nothing changes: `requireEntitlement` stays the only product hint, and a reader that cannot resolve it accepts any purchase. Exporters that also target older players keep `requireEntitlement` set to the first listed product.
+- **`paywall.products`** (`PaywallProduct[]`: required `id`, optional `name` / `description` as `LocalizedString`, `price` `{ amount, currency }`, `type` `purchase` | `subscription`): display info for the products and tiers the rules reference by id. Players label each Buy / Subscribe option with the entry's localized name, description and price, falling back to the rule's name / price, then the id. Informational only — the rules decide what unlocks what.
+
+Details: [Paywall → Product lists](/schema/paywall#product-lists-requiredproductids), [Paywall → Products](/schema/paywall#products-paywallproduct).
 
 ### What changed in 1.5.0
 
@@ -129,7 +139,7 @@ The upgrade currently performs these normalizations:
 - Adds a missing `graph.edges` array
 
 <Callout kind="info">
-The CLI's upgrade target is `1.5.0` — always the version declared by the schema bundled in that CLI release; the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.5 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
+The CLI's upgrade target is always the version declared by the schema bundled in that CLI release — `1.5.0` in CLI 1.0.0, `1.6.0` from the next CLI release on; the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.6 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 After upgrading, always re-validate:

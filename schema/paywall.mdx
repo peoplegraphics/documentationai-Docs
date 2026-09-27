@@ -12,6 +12,7 @@ Defined as `$defs/Paywall`:
 | Property | Type | Description |
 |---|---|---|
 | `rules` | `PaywallRule[]` (unique) | The list of paywall rules. |
+| `products` | `PaywallProduct[]` (unique) | Since 1.6: display info (name, description, price) for the products and subscription tiers the rules reference by id. See [Products](#products-paywallproduct). |
 
 ## `PaywallRule`
 
@@ -29,13 +30,14 @@ Defined as `$defs/PaywallRule`. Required: `scope` and `requireEntitlement`.
 | `description` | string | No | — | CMS: rule description. |
 | `entitlementType` | string | No | — | CMS entitlement kind (e.g. `purchase`, `subscription`). |
 | `subscriptionTiers` | string[] | No | — | CMS: subscription tiers that satisfy the rule. |
+| `requiredProductIds` | `Identifier[]` (unique, ≥ 1 item) | No | — | Since 1.6: the products that unlock a purchase rule — owning **any one** of them satisfies it. See [Product lists](#product-lists-requiredproductids). |
 | `price` | object | No | — | CMS embedded price: `{ "amount": number, "currency": string }`. |
 | `minimumAge` | integer ≥ 0 | No | — | CMS variant of the age restriction. |
 | `previewPanelCount` | integer ≥ 0 | No | — | CMS variant of the preview count. |
 | `targetPanelIds` | `Identifier[]` | No | — | CMS: explicit list of gated panel IDs. |
 
 <Callout kind="info">
-Properties marked "CMS" are authoring metadata written by the PanelWave CMS so its paywall editor can round-trip rules. The player reads `scope`, `refId` and `targetPanelIds` (what is gated), `requireEntitlement` / `entitlementType` and `subscriptionTiers` (what unlocks it), `previewPanels` / `previewPanelCount` (the free preview), `ageGate` / `minimumAge` (an extra age check), and `name`, `description` and `price` (the Buy / Subscribe options it offers).
+Properties marked "CMS" are authoring metadata written by the PanelWave CMS so its paywall editor can round-trip rules. The player reads `scope`, `refId` and `targetPanelIds` (what is gated), `requireEntitlement` / `entitlementType`, `subscriptionTiers` and `requiredProductIds` (what unlocks it), `previewPanels` / `previewPanelCount` (the free preview), `ageGate` / `minimumAge` (an extra age check), and `name`, `description` and `price` (the Buy / Subscribe options it offers).
 </Callout>
 
 ### Scope constraints
@@ -64,6 +66,36 @@ Details and a combined example: [Player: How rules are evaluated](/player/paywal
 
 For gated bonus content, extras blocks additionally carry their own `gated`/`requiredTier` flags — see [Extras](/schema/extras).
 
+### Product lists (`requiredProductIds`)
+
+Since format **1.6.0**, a purchase rule can name every product that unlocks it:
+
+- `requiredProductIds` is an array of unique product ids (`Identifier` strings from the host's product catalogue) with at least one entry.
+- A reader satisfies the rule when they own **at least one** of the listed products.
+- Players offer one **Buy** option per listed product.
+- It only applies to purchase rules (`entitlementType: "purchase"`, or a `requireEntitlement` that is a product key). Subscription, age-gate and free rules ignore it.
+- **When it is absent**, the pre-1.6 behaviour applies: `requireEntitlement` is the only product hint — a value that is not an entitlement type name names the single product to offer — and a reader that cannot resolve it treats **any** purchase as satisfying the rule.
+
+To show readers a name and price per product, describe the products in [`paywall.products`](#products-paywallproduct). Exporters that also target players older than 1.6 should keep `requireEntitlement` set to the first listed product — the PanelWave CMS does this.
+
+## Products (`PaywallProduct`)
+
+Since format **1.6.0**, the optional `paywall.products` array describes the products and subscription tiers the rules sell, so readers can label each **Buy** / **Subscribe** option. Defined as `$defs/PaywallProduct`; `additionalProperties: false`.
+
+| Property | Type | Required | Description |
+|---|---|---|---|
+| `id` | `Identifier` | Yes | The id rules use to reference it: an entry of `requiredProductIds`, a product-key `requireEntitlement`, or an entry of `subscriptionTiers`. |
+| `name` | `LocalizedString` | No | Reader-facing product name. |
+| `description` | `LocalizedString` | No | Reader-facing description. |
+| `price` | `{ amount, currency }` | No | Display price: `amount` (number ≥ 0) and `currency` (ISO 4217 code), both required when `price` is present. |
+| `type` | `"purchase"` \| `"subscription"` | No | One-time purchase or subscription tier. Informational — the referencing rule decides how the option is sold. |
+
+How readers use it: an option whose id has an entry takes the entry's `name` and `description` (in the reader's locale, falling back like any [localized string](/schema/manifest-structure)) and its `price`. Without an entry, the option falls back to the rule's `name` (a single option) or the bare id (several options), and to the rule's `description` / `price`.
+
+- Entries are **informational**: the rules decide what unlocks what, and your checkout stays the authority on the charged price.
+- Entries no rule references are allowed and ignored.
+- Ids should be unique within the array. JSON Schema cannot enforce this on a property; the player uses the first entry for an id.
+
 ## Examples
 
 ### Gate one chapter after a free preview
@@ -85,6 +117,43 @@ For gated bonus content, extras blocks additionally carry their own `gated`/`req
 ```
 
 Readers without the `premium` entitlement see the first three panels of chapter `ch-2`, then the paywall. Only `ch-2` is gated — every other chapter stays free. (The player reads `premium` as a subscription requirement.)
+
+### Chapter unlocked by either of two products (1.6+)
+
+```json
+{
+  "paywall": {
+    "products": [
+      {
+        "id": "premium-edition",
+        "name": { "en-US": "Premium edition", "de-DE": "Premium-Ausgabe" },
+        "price": { "amount": 4.99, "currency": "EUR" },
+        "type": "purchase"
+      },
+      {
+        "id": "ch8-single",
+        "name": { "en-US": "Chapter 8 only", "de-DE": "Nur Kapitel 8" },
+        "price": { "amount": 1.99, "currency": "EUR" },
+        "type": "purchase"
+      }
+    ],
+    "rules": [
+      {
+        "id": "pw-ch8",
+        "scope": "chapter",
+        "refId": "ch-8",
+        "requireEntitlement": "premium-edition",
+        "entitlementType": "purchase",
+        "requiredProductIds": ["premium-edition", "ch8-single"],
+        "name": "The finale",
+        "price": { "amount": 2.99, "currency": "EUR" }
+      }
+    ]
+  }
+}
+```
+
+A reader who bought either the premium edition or the single chapter reads chapter `ch-8`; everyone else sees two Buy options — *Premium edition €4.99* and *Chapter 8 only €1.99* (in German: *Premium-Ausgabe*, *Nur Kapitel 8*). The manifest declares `"version": "1.6.0"` (or later) in its `panelwave` header.
 
 ### Panel-level gating with an age gate
 
