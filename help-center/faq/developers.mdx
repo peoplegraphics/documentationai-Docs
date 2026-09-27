@@ -35,7 +35,7 @@ Questions developers ask most often. For step-by-step fixes see the [troubleshoo
     Angular 20. The package's peer dependencies are `@angular/common`/`@angular/core` `^20`, `@ngx-translate/core` `^17` and `rxjs` `^7.8`; it is developed and tested against Angular 20.3 with TypeScript 5.8. See [Installation](/player/installation).
   </Expandable>
   <Expandable title="Should I use manifestUrl or manifest?">
-    `manifestUrl` is the shortest path — the shell fetches and validates the JSON itself. Bind a parsed `[manifest]` object when you need to fetch with your own auth, transform the JSON, or use the table of contents and thumbnail strip (in 1.0.x they read the `manifest` input). See [Quickstart: Embed](/player/quickstart-embed).
+    `manifestUrl` is the shortest path — the shell fetches and validates the JSON itself. Bind a parsed `[manifest]` object when you need to fetch with your own auth or transform the JSON first. Both paths give the same reader: the table of contents and thumbnail strip work either way, and assigning a new URL or object later loads the new work. See [Quickstart: Embed](/player/quickstart-embed).
   </Expandable>
   <Expandable title="Can I try a manifest without writing an Angular app?">
     Yes — open the [live demo](https://panelwave.github.io/player/) and use **Open file…** or `?manifest=<url>`. Its dev tools show variables, events and performance, and a debug overlay outlines layers, hotspots and bubbles. See [Demo App](/player/demo-app).
@@ -67,9 +67,9 @@ Questions developers ask most often. For step-by-step fixes see the [troubleshoo
     The CMS editor, where balloons are designed and tested, holds the master copy of `comic-balloon.ts` and `balloon-geometry.ts`; the player holds a synced copy (marked "do not edit") so editor and reader render balloons identically. Geometry fixes land in the CMS master and are synced into the player. See [Balloon Renderer](/player/balloon-renderer).
   </Expandable>
   <Expandable title="Why is all gated content locked even though the reader paid?">
-    The player treats the reader as anonymous until you tell it what they own. Pass an `[entitlementSnapshot]` (tier, purchased product ids, age verification), or set `entitlementEndpoint` + `readerToken` so the player fetches it. After a purchase during reading, call `refreshEntitlements()`. See [Paywall &amp; Entitlement](/player/paywall-entitlement).
+    The player treats the reader as anonymous until you tell it what they own. Pass an `[entitlementSnapshot]` (tier, purchased product ids, age verification), or set `entitlementEndpoint` + `readerToken` so the player fetches it. After a purchase during reading, call `refreshEntitlements()` or bind the new snapshot — the shell re-evaluates the gates when `[entitlementSnapshot]` changes. See [Paywall &amp; Entitlement](/player/paywall-entitlement).
   </Expandable>
   <Expandable title="How do paywalls work if the player is open source?">
-    The manifest declares the rules; your app supplies the reader's entitlements; the player evaluates them locally, stops at a gate, and emits `paywallAction` so your app runs checkout — the player never talks to a payment provider. Client-side gating is a reading-experience layer, not a security boundary: truly protected content must also be withheld server-side (e.g. signed URLs) until the reader is authorized. See [Monetization](/concepts/monetization).
+    The manifest declares the rules; your app supplies the reader's entitlements; the player evaluates them locally, stops at a gate, and emits `paywallAction` — with the Buy / Subscribe option the reader picked (`productId`) — so your app runs checkout; the player never talks to a payment provider. Client-side gating is a reading-experience layer, not a security boundary: truly protected content must also be withheld server-side (e.g. signed URLs) until the reader is authorized. See [Monetization](/concepts/monetization).
   </Expandable>
 </ExpandableGroup>

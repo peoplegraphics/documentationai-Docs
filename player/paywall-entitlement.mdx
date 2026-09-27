@@ -74,26 +74,73 @@ The player normalizes each manifest rule and checks it against the snapshot. Man
 |---|---|---|
 | Subscription | `entitlementType: "subscription"` (+ optional `subscriptionTiers`), or `requireEntitlement: "premium"` | The reader has a tier — any tier, or one listed in `subscriptionTiers` |
 | Purchase | `entitlementType: "purchase"` (+ optional `requiredProductIds`), or any other `requireEntitlement` value | The reader bought one of the listed products (or anything, when none are listed) |
-| Age gate | `entitlementType: "age_gate"`, or a rule with `minimumAge` / `ageGate` | `ageVerified` is true and `age` ≥ the minimum (default 18) |
+| Age gate | `entitlementType: "age_gate"`, or a rule with `minimumAge` / `ageGate` and no other requirement | `ageVerified` is true and `age` ≥ the minimum (default 18) |
 | Free | `entitlementType: "free"` | Always |
+
+An age on a subscription or purchase rule (`ageGate` / `minimumAge` next to `requireEntitlement` or `entitlementType`) is an **extra** check: the reader needs both. The player asks for the age first (`lockReason: "age_verification_required"`), then shows the paywall with its Buy / Subscribe options (`purchase_required` / `subscription_required`) until the entitlement is there.
 
 Which panels a rule gates:
 
 - **Panel rules** (`scope: "panel"`) gate exactly their `targetPanelIds` (or their `refId`). They take precedence, and a free preview never unlocks them.
+- **Chapter rules** (`scope: "chapter"`) gate only the panels of the chapter named in `refId`. `previewPanelCount` / `previewPanels` is counted **within that chapter** (its panels in declaration order), so `previewPanelCount: 2` keeps the chapter's first two panels free. For its panels a chapter rule wins over a work rule.
 - **Work rules** (`scope: "work"` or `"global"`) gate the whole work. The first one wins. `previewPanelCount` / `previewPanels` keeps the first *n* panels readable, counted in reading order across the **whole work** (chapters in order, panels in declaration order).
+- **Extras rules** (`scope: "extras"`) never gate panels. They lock the [extras](/schema/extras) block named in `refId`: the extras viewer shows that block with a lock and does not open it until the reader satisfies the rule.
 
-<Callout kind="alert">
-**Current limitations (1.0.x):** rules with `scope: "chapter"` are not enforced by the player — gate a chapter with a panel rule listing its panels, or with a work rule and a preview length. Rules with `scope: "extras"` are currently treated as a work-level gate.
+Precedence for a panel: panel rule → chapter rule for its chapter → work rule → free.
+
+```json
+"paywall": {
+  "rules": [
+    { "id": "work-sub", "scope": "work", "requireEntitlement": "subscription", "previewPanelCount": 6 },
+    { "id": "ch3-buy", "scope": "chapter", "refId": "ch-3", "requireEntitlement": "chapter-3",
+      "name": "Chapter 3", "price": { "amount": 2.99, "currency": "EUR" }, "previewPanelCount": 1 },
+    { "id": "art-book", "scope": "extras", "refId": "concept-art", "requireEntitlement": "art-book" }
+  ]
+}
+```
+
+Here the first six panels of the work are free and the rest needs a subscription — except chapter `ch-3`: its first panel is free and its other panels need a purchase (a subscription does not unlock them, because the chapter rule wins for its panels). The `concept-art` extras block needs a purchase too; it never blocks reading.
+
+<Callout kind="info">
+`chapter-3` and `art-book` are not entitlement type names, so both rules are purchase gates. Without `requiredProductIds`, a purchase gate is satisfied by **any** product in `purchasedProductIds` — pass only the purchases that belong to this work in the snapshot. The key still names the product the overlay offers (see [below](#what-readers-see-at-a-gate)).
 </Callout>
+
+To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`.
 
 ## What readers see at a gate
 
 When the reader tries to move onto a gated panel, **navigation stops** — they stay on the last panel they were entitled to see — and the player shows:
 
 - the **age gate** for age-gate rules (see [below](#age-gates)), or
-- the **paywall overlay** for everything else: a title for the gated scope, the reason (e.g. *"This part of the story is included with a subscription."*), and two buttons, **Sign in** and **Maybe later**. Titles and buttons are translated (English and German ship with the package); the reason sentence is English-only in 1.0.x.
+- the **paywall overlay** for everything else: a title for the gated scope, the reason (e.g. *"This part of the story is included with a subscription."*), the **Buy** / **Subscribe** options the rule offers, **Sign in** and **Maybe later**. All texts, including the reason, are translated (English and German ship with the package).
 
-Clicking a button emits `paywallAction` with `{ action, gate }` and closes the overlay. In the built-in overlay `action` is `'login'` or `'dismiss'`; the `PaywallAction` type also includes `'purchase'` and `'subscribe'` for custom overlays. Run your sign-in or checkout, then hand the player the new state:
+While the paywall or the age gate is open, the story behind it does not move: arrow keys, `T` and swipes are ignored. **Escape** still works — it dismisses the paywall (like *Maybe later*) and closes the age gate, leaving the reader on the panel they were on.
+
+### Buy and Subscribe options
+
+The options come from the rule that blocks the panel:
+
+| Rule | Options |
+|---|---|
+| Purchase | One **Buy** option per entry in `requiredProductIds` |
+| Subscription | One **Subscribe** option per entry in `subscriptionTiers` |
+| Neither list set | One option whose product id is the rule's `requireEntitlement` key — or the rule `id` when the key is just the type name (`"purchase"`, `"subscription"`) |
+| Age gate, free | No options (age gates use the [age gate](#age-gates) instead) |
+
+A single option is labelled with the rule's `name`; with several, each is labelled with its product id or tier. Every option shows the rule's `description` and `price` when set — rules without a price still get their options. The options are also on the gate as `gate.options` (a `PurchaseInfo[]`), so a custom overlay can render the same list.
+
+### Handling the reader's choice
+
+Clicking a button emits `paywallAction` and closes the overlay. The payload is `{ action, gate, productId? }`:
+
+| `action` | When | `productId` |
+|---|---|---|
+| `'purchase'` | A Buy option | The chosen product id |
+| `'subscribe'` | A Subscribe option | The chosen subscription tier |
+| `'login'` | *Sign in* | — |
+| `'dismiss'` | *Maybe later*, close, Escape or backdrop | — |
+
+Run your sign-in or checkout, then hand the player the new state:
 
 ```typescript
 import { Component, ViewChild } from '@angular/core';
@@ -104,15 +151,21 @@ import type { PaywallAction, PaywallGate } from '@panelwave/player';
 export class ReaderComponent {
   @ViewChild(PlayerShellComponent) player!: PlayerShellComponent;
 
-  async onPaywall(e: { action: PaywallAction; gate: PaywallGate }): Promise<void> {
+  async onPaywall(e: { action: PaywallAction; gate: PaywallGate; productId?: string }): Promise<void> {
     if (e.action === 'dismiss') return;
-    const snapshot = await this.checkout.run(e.gate);   // your flow
-    await this.player.refreshEntitlements(snapshot);    // closes the overlay if the gate is now open
+    const snapshot = e.action === 'login'
+      ? await this.auth.signIn()                              // your flow
+      : await this.checkout.run(e.productId!, e.action);      // 'purchase' | 'subscribe'
+    await this.player.refreshEntitlements(snapshot);          // closes the overlay if the gate is now open
   }
 }
 ```
 
-Called without an argument, `refreshEntitlements()` re-fetches from `entitlementEndpoint`.
+Called without an argument, `refreshEntitlements()` re-fetches from `entitlementEndpoint`. Binding a new `[entitlementSnapshot]` has the same effect.
+
+### Edge mutations wait for the gate
+
+An edge's `action` mutations (for example a counter the move increments) are applied only once the paywall or age gate lets the move through. A blocked attempt changes no variables; a move held by the age gate applies its mutations when the reader passes.
 
 ## Age gates
 
@@ -120,20 +173,20 @@ Age-gate rules are answered **inside the player** — no checkout involved:
 
 <Steps>
   <Step title="The reader hits an age-gated panel">
-    Navigation pauses and `pw-age-gate` asks for a birth date (month, day, year). The minimum age comes from the rule (`minimumAge` / `ageGate`, default 18). Impossible dates such as 31 February are rejected.
+    Navigation pauses and `pw-age-gate` asks for a birth date (month, day, year; month names in the reader's language). The minimum age comes from the rule (`minimumAge` / `ageGate`, default 18). Impossible dates such as 31 February are rejected. Keys typed into the date fields never reach the story.
   </Step>
   <Step title="The reader passes">
-    The result is stored on the device (`localStorage` key `pw-age-verified`), folded into the entitlement snapshot, and the interrupted navigation continues — including its transition. Returning readers on the same device are not asked again.
+    The result is stored on the device (`localStorage` key `pw-age-verified`), folded into the entitlement snapshot, and the interrupted navigation is retried — including its transition. If the rule also requires a purchase or subscription the reader doesn't have, the paywall opens next with its Buy / Subscribe options and the reader stays where they were. Returning readers on the same device are not asked again.
   </Step>
   <Step title="Or fails, or closes the dialog">
-    A too-young answer keeps the dialog open with an explanation; closing it leaves the reader where they were.
+    A too-young answer keeps the dialog open with an explanation; closing it (or pressing Escape) leaves the reader where they were.
   </Step>
 </Steps>
 
 Every answer emits `ageVerified` (`{ verified, age?, birthDate? }`) so you can record it. If your account system already verified the reader's age, pass `ageVerified: true` and `age` in the snapshot and the prompt never appears.
 
 <Callout kind="info">
-The birth-date prompt is a self-declaration, suitable as an age *gate*, not as legal age *verification*. Its texts are English-only in 1.0.x.
+The birth-date prompt is a self-declaration, suitable as an age *gate*, not as legal age *verification*. Its texts are translated (`age_gate.*` keys, see [Localization](/player/localization)).
 </Callout>
 
 ## Custom access checks
@@ -208,7 +261,7 @@ export interface EntitlementAdapter {
 </ResponseField>
 
 <ResponseField name="PaywallGate" field-type="object">
-  `scope: 'work' | 'chapter' | 'panel'`, optional `refId`, `requireEntitlement`, required `reason`, optional `preview` (`previewPanels`, `mode: 'blur' | 'low-res' | 'watermark' | 'time-limited'`, `durationSeconds`).
+  `scope: 'work' | 'chapter' | 'panel'`, optional `refId` (the chapter id for chapter gates, the panel id for panel gates), `requireEntitlement`, required `reason` (English sentence), optional `preview` (`previewPanels`, `mode: 'blur' | 'low-res' | 'watermark' | 'time-limited'`, `durationSeconds`), `ruleId` (the manifest rule that raised the gate), `lockReason` (`subscription_required`, `purchase_required`, `age_verification_required` or `entitlement_required` — the overlay translates it), and `options: PurchaseInfo[]` (what the rule offers, see [Buy and Subscribe options](#buy-and-subscribe-options)).
 </ResponseField>
 
 ```typescript
@@ -231,16 +284,20 @@ await entitlements.hasAccessToPanel('work-1', 'ch-2', 'p-9');
 - **Observables:** `getEntitlementStatus$()` and `getCurrentUser$()` for reactive UI.
 - **Age checks:** `verifyAge(minimumAge)` delegates to the adapter or falls back to `user.age`; without either it denies.
 
-The pure evaluation functions are exported too (`evaluatePanelAccess`, `evaluateWorkAccess`, `rulesFromManifest`, `satisfiesRule`, …) — for example to render lock icons in your own chapter list with exactly the player's semantics.
+The pure evaluation functions are exported too (`evaluatePanelAccess`, `evaluateWorkAccess`, `rulesFromManifest`, `satisfiesRule`, `isExtraLocked`, `chapterOrderFromManifest` — the chapter id and within-chapter index per panel, which chapter rules need, …) — for example to render lock icons in your own chapter list with exactly the player's semantics.
 
 ## Paywall UI components
 
 Both overlays are exported and can be used on their own:
 
-- **`pw-paywall-overlay`** (`PaywallOverlayComponent`) — inputs `visible`, `gate: PaywallGate`, `purchaseOptions: PurchaseInfo[]` (renders a product list instead of *Sign in*), `locale`, `title`/`message` (LocalizedString), `allowPreview`, `showLogin` (default `true`); outputs `action: PaywallAction`, `purchase: string` (product id), `close`. Escape and a backdrop click dismiss it.
+- **`pw-paywall-overlay`** (`PaywallOverlayComponent`) — inputs `visible`, `gate: PaywallGate`, `purchaseOptions: PurchaseInfo[]` (renders the options above *Sign in*), `locale`, `title`/`message` (LocalizedString), `allowPreview`, `showLogin` (default `true`); outputs `action: PaywallAction`, `purchase: string` (product id), `close`. Escape and a backdrop click dismiss it.
 - **`pw-age-gate`** (`AgeGateComponent`) — inputs `visible`, `minimumAge` (default 18), `locale`, `warningMessage`, `allowDismiss`; outputs `verify: AgeVerificationResult`, `close`.
 
-`PurchaseInfo` describes an offer: `productId`, `name`, `price: { amount, currency }`, `type: 'one-time' | 'subscription' | 'token'`, optional `description`. The shell does not pass purchase options to its overlay; build your own overlay (or checkout page) when you want a product list.
+`PurchaseInfo` describes an offer: `productId`, `name`, optional `price: { amount, currency }`, `type: 'one-time' | 'subscription' | 'token'`, optional `description`. The shell passes `gate.options` to its overlay; when you use the overlay on its own, pass your own list.
+
+<Callout kind="alert">
+`PurchaseInfo.price` is **optional** since 2026-09-27 (rules without a price still offer Buy / Subscribe). Code that reads `option.price.amount` must handle a missing price, or it no longer type-checks.
+</Callout>
 
 ## Which integration should I use?
 

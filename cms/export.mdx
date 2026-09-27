@@ -69,8 +69,8 @@ Under **Create New Export**, pick a work from the **Select Work** dropdown (or e
 | Option | Choices | Notes |
 |---|---|---|
 | **Video Resolution** | 720p HD / 1080p Full HD / 4K Ultra HD | 1080p is roughly twice the size of 720p; 4K is much larger and slowest to render |
-| **Frame Rate** | 24 fps (Cinematic) / 30 fps (Standard) / 60 fps (Smooth, ~2× size) | |
-| **Include audio narration** | on/off | Lays the work's first audio asset under the whole video as a background track; without an audio asset the video is silent |
+| **Frame Rate** | 24 fps (Cinematic) / 30 fps (Standard) / 60 fps (Smooth, ~2× size) | The video is rendered at the chosen rate (before 27 September 2026 every video came out at 30 fps) |
+| **Include panel audio (voice-over, sound effects, music)** | on/off, plus **Voice-over** / **Sound effects** / **Music & ambience** | Mixes the work's panel audio into the video — see [Soundtrack](#soundtrack). The three role toggles appear when the option is on; all are on by default |
 
 Before you start, the dialog shows an **estimated size** ("~ a few MB" up to "~ several hundred MB+") and warns when a combination — such as 4K at 60 fps — will be very large and slow. Click **Start Export** to queue the job.
 
@@ -137,7 +137,29 @@ The video export plays the work panel by panel:
 - A panel with a visible **video layer** contributes that clip (the topmost one, if there are several); any other panel contributes its topmost visible image as a still. See [Video Panels](/cms/editor/video-panels).
 - Each panel is on screen for its **Display Duration** (see [Panel duration and video length](/cms/editor/video-panels#panel-duration-and-video-length)); without one, a video panel runs for its clip's length and a still for 5 seconds (always between 0.5 and 120 seconds). A clip shorter than its panel loops, a longer one is cut.
 - Every segment is fitted into the chosen resolution without distortion (letterboxed where the aspect ratios differ).
-- The clips' own sound is not carried over; with **Include audio narration** on, the work's first audio asset plays underneath the whole video instead.
+- The clips' own sound is not carried over. With **Include panel audio** on, the video gets a soundtrack from the work's audio instead (below).
+
+#### Soundtrack
+
+With **Include panel audio (voice-over, sound effects, music)** on, the video carries the audio a reader would hear while moving through the panels at the video's pace:
+
+| Audio | Starts | Stops |
+|---|---|---|
+| A panel's [audio track](/cms/editor/audio#panel-audio-tracks) or audio layer | When its panel starts, plus the track's **Start Time** | When the file ends or the panel ends, whichever comes first. It plays again on every panel that uses it |
+| The same, set to **Loop** | When its panel starts, plus its Start Time | Keeps looping across consecutive panels that use the same file, and stops at the end of the last of them |
+| A chapter's [sequence audio track](/cms/editor/audio#sequence-audio-tracks) | At the chapter's start plus the track's start time on the timeline | After its duration (without one, the file's length), and never later than the chapter's end. Volume, fades, speed and loop are applied; muted tracks are left out |
+
+The role toggles narrow the mix:
+
+- **Voice-over** — voice-over tracks.
+- **Sound effects** — sound effects, including UI sounds.
+- **Music & ambience** — music and ambience, plus every track and audio layer without a role.
+
+Also good to know:
+
+- Panel audio that only plays under a condition (`visibleIf`) is skipped — an export has no reader variables to evaluate.
+- Files that are missing or can't be decoded are skipped (the export job records a warning for each). If nothing playable is left, the video is exported **silent** — audio never makes an export fail.
+- Before 27 September 2026 this option was called **Include audio narration** and laid the work's first audio asset under the whole video. Saved presets and queued jobs keep working and now get the panel-audio mix.
 
 The interactive **manifest** itself (the `panelwave.json` file that drives the [PanelWave Player](/player/overview)) is not produced here — it is built and deployed by the [publish flow](/cms/publishing), where each release's manifest can also be downloaded as JSON from the release history.
 

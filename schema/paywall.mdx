@@ -35,7 +35,7 @@ Defined as `$defs/PaywallRule`. Required: `scope` and `requireEntitlement`.
 | `targetPanelIds` | `Identifier[]` | No | — | CMS: explicit list of gated panel IDs. |
 
 <Callout kind="info">
-Properties marked "CMS" are authoring metadata written by the PanelWave CMS so its paywall editor can round-trip rules. Player behavior is defined by `scope`, `refId`, `requireEntitlement`, `previewPanels`, and `ageGate`.
+Properties marked "CMS" are authoring metadata written by the PanelWave CMS so its paywall editor can round-trip rules. The player reads `scope`, `refId` and `targetPanelIds` (what is gated), `requireEntitlement` / `entitlementType` and `subscriptionTiers` (what unlocks it), `previewPanels` / `previewPanelCount` (the free preview), `ageGate` / `minimumAge` (an extra age check), and `name`, `description` and `price` (the Buy / Subscribe options it offers).
 </Callout>
 
 ### Scope constraints
@@ -45,19 +45,28 @@ The schema enforces two conditional rules:
 - `scope: "work"` → `refId` must **not** be present (the rule gates the whole work).
 - `scope: "chapter" | "panel" | "extras"` → `refId` is **required** and names the gated chapter, panel, or extras block.
 
+### How the player applies scopes
+
+- **`chapter`** gates only the panels of the chapter named in `refId`. For those panels it takes precedence over a `work` rule.
+- **`extras`** never gates panels. It locks the extras block named in `refId`; the reader sees the block with a lock in the extras viewer.
+- **`panel`** gates the panel named in `refId` and takes precedence over chapter and work rules.
+- **`work`** gates every panel not covered by a panel or chapter rule.
+
+Details and a combined example: [Player: How rules are evaluated](/player/paywall-entitlement#how-rules-are-evaluated).
+
 ### Entitlement semantics
 
 `requireEntitlement` is an opaque string key. The manifest does not define what the key means or how it is granted — the player asks its host (or an entitlement provider) "does the current reader hold entitlement X?" and gates rendering accordingly:
 
 - Without the entitlement, gated content is not rendered; the player can show a paywall prompt instead (and emit the `paywall_view` [tracking event](/schema/tracking)).
-- `previewPanels` allows the first *n* panels within the gated scope to render for everyone.
+- `previewPanels` allows the first *n* panels within the gated scope to render for everyone — for a `work` rule the first *n* panels of the work in reading order, for a `chapter` rule the first *n* panels of that chapter.
 - `ageGate` adds an age requirement on top of (not instead of) the entitlement.
 
 For gated bonus content, extras blocks additionally carry their own `gated`/`requiredTier` flags — see [Extras](/schema/extras).
 
 ## Examples
 
-### Gate everything after a free first chapter
+### Gate one chapter after a free preview
 
 ```json
 {
@@ -75,7 +84,7 @@ For gated bonus content, extras blocks additionally carry their own `gated`/`req
 }
 ```
 
-Readers without the `premium` entitlement see the first three panels of chapter `ch-2`, then the paywall.
+Readers without the `premium` entitlement see the first three panels of chapter `ch-2`, then the paywall. Only `ch-2` is gated — every other chapter stays free. (The player reads `premium` as a subscription requirement.)
 
 ### Panel-level gating with an age gate
 

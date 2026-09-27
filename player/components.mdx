@@ -45,10 +45,10 @@ graph TD
 - handles keyboard shortcuts (`ArrowLeft`/`ArrowRight` navigate, `T` toggles toolbar, `O`/`+`/`-` in canvas view, `Escape` closes the topmost dialog or else hides the toolbar — with a dialog open, the other shortcuts are ignored) and swipe gestures forwarded by the viewport,
 - derives the effective reduced-motion state (host input, reader setting, live OS media query) and passes it to the viewport and canvas stage,
 - raises the paywall overlay or age gate when a navigation hits a locked panel, and resumes the interrupted navigation after a passed age gate,
-- computes the branch choices for the Choices button and traverses the chosen edge,
+- computes the branch choices (outgoing edges whose conditions pass) for the Choices button, shown only when at least two are open, and traverses the chosen edge,
 - toggles all modal/overlay visibility flags.
 
-Key inputs: `manifestUrl`, `manifest`, `locale`, `initialChapterId`, `initialPanelId`, `initialVariables`, `entitlementSnapshot`, `entitlementEndpoint`, `readerToken`, `entitlementAdapter`, `viewModeOverride`, `reducedMotion`, `secondsPerPanel`, `showToolbar`. Key outputs: `ready`, `panelChange`, `chapterChange`, `localeChange`, `variableChange`, `navigationAttempt`, `cameraChange`, `paywallAction`, `ageVerified`, `likeChange`, `bookmarkChange`, `error`. The full integrator-facing contract is documented in [Inputs & Outputs](/player/inputs-outputs).
+Key inputs: `manifestUrl`, `manifest`, `locale`, `initialChapterId`, `initialPanelId`, `initialVariables`, `entitlementSnapshot`, `entitlementEndpoint`, `readerToken`, `entitlementAdapter`, `viewModeOverride`, `reducedMotion`, `secondsPerPanel`, `autoplay`, `showToolbar` — all of them may change after init (`ngOnChanges`: a new manifest reloads via the public `reload()`, the rest apply live). Key outputs: `ready`, `panelChange`, `chapterChange`, `localeChange`, `variableChange`, `navigationAttempt`, `cameraChange`, `paywallAction`, `ageVerified`, `likeChange`, `bookmarkChange`, `error`. The full integrator-facing contract is documented in [Inputs & Outputs](/player/inputs-outputs).
 
 ## Viewport and layers
 

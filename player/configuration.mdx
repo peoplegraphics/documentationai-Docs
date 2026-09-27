@@ -12,21 +12,21 @@ When both exist for the same concern, the component input represents the reader/
 
 ## Component inputs (`pw-player-shell`)
 
-These are all the `@Input()`s the shell accepts (verified in `PlayerShellComponent`). They are read once, when the shell initializes.
+These are all the `@Input()`s the shell accepts (verified in `PlayerShellComponent`). They may change after the shell has initialized: a new `manifestUrl` / `manifest` reloads the work (re-reading the initial position, `initialVariables` and entitlement inputs), a new `entitlementSnapshot` re-evaluates the paywall, and `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live. Details: [Inputs & Outputs](/player/inputs-outputs).
 
 | Input | Type | Default | Purpose |
 |---|---|---|---|
 | `manifestUrl` | `string` | — | URL of the manifest to load (fetched with `HttpClient`). Wins over `manifest` when both are set. |
 | `manifest` | `PanelWaveManifest` | — | The manifest object, when you load or transform the JSON yourself. |
-| `locale` | `LocaleCode` | `'en-US'` | Initial content locale (BCP-47). Also sets the player UI language (mapped to its base language). |
+| `locale` | `LocaleCode` | `'en-US'` | Content locale (BCP-47). Also sets the player UI language (mapped to its base language). |
 | `initialChapterId` | `string` | — | Start at this chapter instead of the first one (or the reader's bookmark). |
 | `initialPanelId` | `string` | — | Start at this panel (requires `initialChapterId`). |
 | `initialVariables` | `Record<string, unknown>` | — | Seed story variables once at start; may set `readOnly` variables (e.g. a verified `user.age`). |
-| `showToolbar` | `boolean` | `false` | Show the toolbar initially. Readers can always toggle it (`T`, floating button, viewport click). |
+| `showToolbar` | `boolean` | `false` | Show the toolbar. Readers can always toggle it (`T`, floating button, viewport click). |
 | `viewModeOverride` | `'auto' \| 'panel' \| 'canvas'` | `'auto'` | Force panel or [canvas](/player/canvas-view) view. |
 | `reducedMotion` | `boolean` | `false` | Force reduced motion. The OS `prefers-reduced-motion` setting and the reader's Settings switch also turn it on. |
 | `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs`. Reader-adjustable in the toolbar (0.5–120 s). |
-| `autoplay` | `boolean` | `false` | Reserved. *The current build does not read it; autoplay is started by the reader via the toolbar or Settings.* |
+| `autoplay` | `boolean` | `false` | Start in autoplay once the work is ready; the reader's toolbar toggle takes over afterwards. |
 | `entitlementSnapshot` | `EntitlementSnapshot` | anonymous | What the reader owns; evaluated against the manifest's `paywall.rules`. See [Paywall & Entitlement](/player/paywall-entitlement). |
 | `entitlementEndpoint` / `readerToken` | `string` | — | Let the player fetch the snapshot itself (`{workId}` is substituted; token sent as a Bearer header). |
 | `entitlementAdapter` | shell adapter | — | Lower-level per-panel access check that replaces the manifest rules; see [Custom access checks](/player/paywall-entitlement#custom-access-checks). |

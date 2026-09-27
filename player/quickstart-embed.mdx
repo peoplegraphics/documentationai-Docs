@@ -52,11 +52,7 @@ export class ReaderComponent {
 A cross-origin manifest URL needs CORS headers on the server that hosts it (manifests published from the CMS preview send `Access-Control-Allow-Origin: *`).
 
 <Callout kind="info">
-The shell reads its inputs once, when it initializes. If both `manifestUrl` and `manifest` are set, the URL wins. To open a different work, re-create the component (see [Switching works](#switching-works)).
-</Callout>
-
-<Callout kind="alert">
-**Known limitation (1.0.x):** the table of contents and the thumbnail strip read their chapter list from the `manifest` input, so they stay empty when the work is loaded with `manifestUrl` only. If your readers need them, use option B.
+If both `manifestUrl` and `manifest` are set, the URL wins. The table of contents and the thumbnail strip list the loaded work either way. To open a different work, just change the input (see [Switching works](#switching-works)).
 </Callout>
 
 ## Option B: pass the manifest object
@@ -173,7 +169,9 @@ An explicit initial position always wins over the reader's own [bookmark](/playe
 
 ## Switching works
 
-The shell loads its manifest in `ngOnInit` and does not watch its inputs afterwards. To switch to a different work at runtime, destroy and re-create the component — the demo app does this by clearing `manifest` (which removes the element via `@if`) before assigning the new one. With `manifestUrl`, wrap the element in `@if` or a keyed `@for` the same way.
+Assign a new `manifestUrl` or `manifest` and the shell reloads: it loads the new work and starts it from the beginning (or from `initialChapterId` / `initialPanelId`, or the reader's bookmark in that work). The previous work's reading position, non-persistent variables, open overlays, variant overrides and autoplay are reset, and its analytics session is closed. You can also call `reload()` on the component to restart the current work the same way.
+
+Other inputs can change without a reload: `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live, and a new `entitlementSnapshot` re-evaluates the paywall. See [Inputs & Outputs](/player/inputs-outputs).
 
 ## Next steps
 

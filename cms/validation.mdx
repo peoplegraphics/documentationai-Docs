@@ -27,7 +27,7 @@ Click **Run Validation**. When it finishes you get a summary:
 
 ## What is checked
 
-Issues are grouped into eight categories:
+Issues are grouped into nine categories:
 
 | Category | Typical checks |
 |---|---|
@@ -35,10 +35,13 @@ Issues are grouped into eight categories:
 | **Content** | Empty panels (no layers or content) |
 | **Localization** | Strings missing translations for supported locales |
 | **Flow** | Panels unreachable from the chapter's entry point in the [graph](/cms/editor/graph) |
+| **Logic** | [Panel variants](/cms/editor/pages-panels#variants) without a condition, duplicate variant ids, conditions reading unknown variables, empty or unknown overrides (`VARIANT_*` codes) |
 | **Performance** | Oversized assets that will slow readers down |
 | **Audio** | Speech bubbles without voice audio |
 | **Integrity** | Broken references (edges or layers pointing at missing panels/assets), pages still listing deleted panels, canvas placements for missing panels |
 | **Metadata** | Missing work title, description, or cover |
+
+An issue whose category the preflight does not know is listed under an extra **Other** group, so the list always matches the counts in the summary. **Other** appears (also in the Category filter) only while it has issues; its re-run button re-runs the full validation.
 
 ## Working through issues
 

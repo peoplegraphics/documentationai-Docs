@@ -42,7 +42,7 @@ All of the following is implemented in the library source (`projects/player/src/
 | Localization | `LocalizedString` resolution with fallback chains, per-locale asset variants, runtime language switching, translated player UI via `@ngx-translate` |
 | Variables | Five scopes (`global`, `chapter`, `page`, `session`, `persistent`), typed definitions, mutations, JSON Logic context building; `persistent` scope survives reloads via `localStorage` |
 | Media | WebAudio mixer with four buses (`ambient`, `music`, `voiceover`, `sfx`), video controller with a single-active-video policy and stall watchdogs, LRU image cache, lookahead preloading |
-| Monetization | Manifest paywall rules evaluated against an entitlement snapshot you supply (or fetch from your endpoint), paywall overlay, in-player age gate, free-preview panels — checkout stays in your app |
+| Monetization | Manifest paywall rules evaluated against an entitlement snapshot you supply (or fetch from your endpoint), work, chapter, panel and extras scopes, a paywall overlay with Buy / Subscribe options derived from the rule, in-player age gate, free-preview panels — checkout stays in your app |
 | Analytics | Consent-aware `TrackingService` with event whitelisting, batching, and a configurable endpoint — driven by the manifest's `tracking` section |
 | Extensibility | Plugin system: sandboxed iframe plugins with a capability model and a postMessage protocol, plus `plugin` layers inside panels |
 | Accessibility | Keyboard navigation (Escape closes the open dialog), ARIA labels and roles throughout the UI, reduced motion from the OS setting, the reader's own setting or the host input, focus management in modals; an automated axe sweep covers every dialog, overlay and view |
@@ -76,9 +76,9 @@ The public API also exports a `PlayerComponent` with selector `pw-player` — it
 
 ## Project status
 
-The library is **released**: version 1.0 is on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player), and new versions are published from the public [GitHub repository](https://github.com/panelwave/player) by its release workflow. It supports the format through 1.5. Every change runs through lint, the unit suite, a Playwright end-to-end suite (desktop and mobile) and a bundle-size budget of 180 KB gzipped — see [Development & Contributing](/player/development).
+The library is **released**: version 1.0 is on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player), and new versions are published from the public [GitHub repository](https://github.com/panelwave/player) by its release workflow. It supports the format through 1.5. Every change runs through lint, the unit suite, a Playwright end-to-end suite (desktop and mobile) and a bundle-size budget of 180 KB minified + gzipped (about 106 KB today) — see [Development & Contributing](/player/development).
 
-A few surfaces are still deliberately thin, and the pages in this section say so where it matters: the comments drawer and share modal are UI only (persistence is the host's job), the manga-mode and high-contrast settings are stored but not yet applied, and the paywall overlay offers *Sign in* rather than a product list.
+A few surfaces are still deliberately thin, and the pages in this section say so where it matters: the comments drawer and share modal are UI only (persistence is the host's job), and the manga-mode and high-contrast settings are stored but not yet applied.
 
 ## Explore this section
 

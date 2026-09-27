@@ -135,7 +135,7 @@ Everything a host can import comes from `projects/player/src/public-api.ts`. Whe
 | Workflow | Runs on | What it does |
 |---|---|---|
 | `ci` | every push to `master` and every pull request | Lint, unit tests with coverage, production library build, Playwright E2E (chromium + mobile) |
-| `size-limit` | pull requests | Fails when the gzipped library bundle grows past **180 KB** |
+| `size-limit` | pull requests | Fails when the library bundle, minified + gzipped (what a host app ships), grows past **180 KB** — currently about 106 KB. The raw, unminified bundle gzipped (about 192 KB) is reported for reference only |
 | `demo-pages` | every push to `master` | Builds the demo app and deploys it to [panelwave.github.io/player](https://panelwave.github.io/player/) |
 | `release` | manual | Publishes a new version to npm (below) |
 

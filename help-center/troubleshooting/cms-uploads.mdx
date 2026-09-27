@@ -21,7 +21,7 @@ Forward–backward (ping-pong) playback needs a downloadable video rendition so 
 
 ## Large uploads fail midway
 
-Files of 10 MB and more upload in 5 MB parts, and each part is retried automatically up to three times — a short network hiccup doesn't cost you the upload. If a part still fails, or you close the tab, the upload stops and has to be started again from the beginning. If large uploads consistently fail, check for proxies, VPNs, or firewalls that cut off long-running transfers or block direct uploads to the storage host. See [Large files](/cms/assets#large-files).
+Files of 10 MB and more upload in 5 MB parts, and each part is retried automatically up to three times — a short network hiccup doesn't cost you the upload. If a part still fails, the upload shows as *Failed* in the **Large uploads** section of the Assets tab: click **Retry** to continue from the parts already uploaded (the CMS restarts the file by itself if storage has discarded the partial upload). You can also **Pause** an upload and **Resume** it later without losing finished parts. Reloading or closing the tab discards unfinished uploads — those have to be started again. If large uploads consistently fail, check for proxies, VPNs, or firewalls that cut off long-running transfers or block direct uploads to the storage host. See [Large files](/cms/assets#large-files).
 
 <Callout kind="info">
 Before 26 September 2026, uploads of 10 MB and more never reached the library at all. If a large video or audio file seemed to upload back then but is missing now, simply upload it again.
@@ -43,7 +43,7 @@ The [Import Archive](/cms/import#importing-a-work-archive) dialog accepts `.zip`
 
 The **Import** dialog on My Works accepts PanelWave JSON manifests only, with two hard limits in the current release:
 
-- `panelwave.version` must be exactly **`1.0.0`** (1.1 manifests are rejected even though the format is additive — adjust the version declaration if your manifest uses no 1.1-only features),
+- `panelwave.version` must be a format from **1.0 to 1.5** (patch and pre-release versions included; newer formats get *"This manifest uses format X; this CMS supports 1.0–1.5."*),
 - the file must be at most **10 MB**.
 
 The importer validates before importing and shows a preview of what will be created. See [Import](/cms/import).

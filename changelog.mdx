@@ -5,6 +5,119 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-27" description="Player · Live inputs, paywall scopes, Buy / Subscribe, age plus entitlement (next npm release)" tags={["feature", "bugfix", "breaking"]}>
+  ## Inputs apply after init, paywall scopes and age checks work as specified, and the overlay offers Buy / Subscribe
+
+  These changes are on the player's `master` branch and ship with the next npm release after 1.0.1.
+
+  - **Inputs can change after init.** A new `manifest` / `manifestUrl` reloads the
+    work (position, non-persistent variables, overlays, variant overrides and
+    autoplay reset; the previous analytics session is closed), and `reload()` is
+    public. A new `entitlementSnapshot` re-evaluates the gates (removing it makes
+    the reader anonymous). `locale`, `viewModeOverride`, `showToolbar`,
+    `autoplay`, `secondsPerPanel` and `reducedMotion` apply live.
+    [Inputs & Outputs](/player/inputs-outputs).
+  - **`autoplay` input works.** It starts autoplay once the work is ready; the
+    reader's toggle takes over from there.
+  - **Table of contents and thumbnails with `manifestUrl`.** Both now list the
+    work however it is loaded. [Quickstart: Embed](/player/quickstart-embed).
+  - **Chapter and extras paywall scopes.** A `chapter` rule gates only the
+    chapter in `refId` (its free preview counted within it) and wins over a work
+    rule for its panels. An `extras` rule never gates panels; it locks its extras
+    item. New exports `isExtraLocked`, `chapterOrderFromManifest` and
+    `PaywallService.isExtraLocked()`.
+    [How rules are evaluated](/player/paywall-entitlement#how-rules-are-evaluated).
+  - **Age on top of payment.** A rule that combines an entitlement with
+    `ageGate` / `minimumAge` now requires both: the reader answers the age gate
+    first, then sees the paywall. Before, a rule with a custom
+    `requireEntitlement` key and an age unlocked after the birth date alone, and
+    purchase or subscription rules ignored their age.
+    [Age gates](/player/paywall-entitlement#age-gates).
+  - **Buy / Subscribe on the paywall overlay.** Options come from the blocking
+    rule (its product or tiers, with name, description and price); *Sign in*
+    stays. `paywallAction` is now `{ action, gate, productId? }` with `'purchase'`
+    and `'subscribe'`, and `PaywallGate` gains `ruleId`, `lockReason` and
+    `options`. [Buy and Subscribe options](/player/paywall-entitlement#buy-and-subscribe-options).
+  - **Breaking (types): `PurchaseInfo.price` is optional.** Code that reads
+    `option.price.amount` must handle a missing price.
+  - **Edge mutations wait for the gate.** A move blocked by the paywall or age
+    gate no longer changes variables, and canvas taps now apply edge mutations.
+    [Mutations](/player/state-and-conditions#mutations).
+  - **Gates hold the story.** Arrow keys, `T` and swipes do nothing while the
+    paywall or age gate is open; Escape dismisses the paywall or closes the age
+    gate and the reader stays put. Keys in a select no longer reach the story.
+    [Input methods](/player/reader-interface#input-methods).
+  - **Translated gates and chooser.** New UI keys `age_gate.*`,
+    `branch_chooser.*` and `paywall.reason_*` (add them if you ship your own
+    translation files); month names via `Intl`. [Localization](/player/localization).
+  - **Choices only when there is a choice.** The button appears when at least
+    two paths are open. [Branch choices](/player/reader-interface#branch-choices).
+  - **Bundle budget measured as shipped.** CI checks the 180 KB budget against
+    the minified + gzipped bundle, about 106 KB today.
+    [Development & Contributing](/player/development).
+</Update>
+
+<Update label="2026-09-27" description="CMS · Paywall targets and products, schema-valid paywall export, playable panel audio" tags={["feature", "bugfix"]}>
+  ## Gate a single chapter or bonus item, name the product that unlocks it, and publish rules the player can enforce
+
+  - **Chapter and Extras Item rules.** The paywall editor's scopes are now Work
+    Level, Chapter, Panel Level and Extras Item; Chapter and Extras Item rules
+    need a picked target. A chapter rule's free preview counts panels within that
+    chapter; an extras rule locks only its item. Old *Global* rules behave as Work
+    Level rules. [Creating a rule](/cms/monetization#creating-a-rule).
+  - **Unlocking products and an optional age on any rule.** Purchase rules list
+    the products that unlock them (none checked: any purchase), and every rule can
+    add a minimum age that readers must pass in addition to paying.
+  - **Published rules the player can enforce.** Exported rules are schema-valid:
+    chapter, extras and panel rules carry their target, a purchase rule names its
+    first unlocking product (the reader's **Buy** option, with the product's price
+    as fallback), and the age travels along. Rules with a missing target are left
+    out and flagged by the new
+    [`PAYWALL_TARGET_MISSING`](/cms/validation-codes#paywall-target-missing) check
+    (an error for active rules). [How the paywall reaches readers](/cms/monetization#how-the-paywall-reaches-readers).
+  - **The simulator tests your work's own rules** with the player's logic,
+    including chapter previews, locked extras items and age plus entitlement.
+    [Simulating reader access](/cms/monetization#simulating-reader-access).
+  - **Work archives** carry rule targets and unlocking products and remap them in
+    the copy.
+  - **Panel audio plays in published works.** Exported manifests now include
+    panel audio and audio layers with their asset references, so the player can
+    play them. [Audio](/cms/editor/audio).
+</Update>
+
+<Update label="2026-09-27" description="CMS · Import 1.0–1.5, Logic issues in Preflight, large-upload controls, video soundtrack" tags={["feature", "bugfix"]}>
+  ## Import any 1.x manifest up to 1.5, see every issue, control large uploads, and export videos with their panel audio
+
+  - **JSON import accepts formats 1.0–1.5**, including patch and pre-release
+    versions, so CMS exports import back. Newer formats get *"This manifest uses
+    format X; this CMS supports 1.0–1.5."* The import now also brings settings
+    (style and output presets, video UI defaults), canvas layouts, asset folders,
+    the localization block, sequence audio tracks and typed extras, with every
+    reference remapped, and re-importing a CMS export no longer duplicates hotspot
+    edges. Paywall rules, tracking and `ui` are not imported.
+    [Import](/cms/import).
+  - **Preflight lists logic issues.** A new **Logic** group shows the `VARIANT_*`
+    issues (two of them block publishing), and an **Other** group catches anything
+    uncategorized, so the list always matches the summary.
+    [Validation & Preflight](/cms/validation).
+  - **Pause, resume, retry and cancel large uploads.** Files of 10 MB and more
+    appear in a **Large uploads** section of the Assets tab with status and
+    progress. Pause keeps finished parts; Retry continues where it failed (or
+    restarts if storage dropped the upload); Cancel cleans up storage. A page
+    reload still discards unfinished uploads. [Large files](/cms/assets#large-files).
+  - **Video export with the work's panel audio.** *Include audio narration* is now
+    **Include panel audio (voice-over, sound effects, music)** with per-role
+    toggles. Panel audio follows its panel, loops carry across panels that share
+    them, and sequence tracks play across their chapter with volume, fades, speed
+    and loop. Unusable files are skipped; existing presets keep working.
+    [Export](/cms/export).
+  - **Frame rate is honoured.** Video exports use the chosen frame rate; every
+    video used to render at 30 fps.
+  - **Privacy dialog corrected.** The in-app privacy summary now matches the
+    published policy (hosting in Germany, the actual service providers,
+    self-hosted error reporting).
+</Update>
+
 <Update label="2026-09-27" description="Open source · Repos on GitHub, SDK and player on npm" tags={["feature"]}>
   ## The open-source layers are on GitHub, and the SDK and player install from npm
 

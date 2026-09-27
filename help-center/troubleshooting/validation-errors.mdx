@@ -56,8 +56,8 @@ Variable IDs are stricter than other identifiers: they must match `^[a-zA-Z0-9]+
 
 ## CMS preflight says "Cannot Publish"
 
-The CMS runs deeper checks than the schema: broken references, duplicate IDs, unreachable graph nodes, missing captions/alt text, oversized assets, and more, grouped into eight categories with three severities. Only **errors** block publishing. Each issue includes a suggestion, an *Open in editor* shortcut, and often an auto-fix. See [Validation &amp; Preflight](/cms/validation) for the workflow and the [Validation Code Reference](/cms/validation-codes) for what each issue code means and how to fix it.
+The CMS runs deeper checks than the schema: broken references, duplicate IDs, unreachable graph nodes, missing captions/alt text, oversized assets, and more, grouped into nine categories (plus an **Other** group for anything uncategorized) with three severities. Only **errors** block publishing. Each issue includes a suggestion, an *Open in editor* shortcut, and often an auto-fix. See [Validation &amp; Preflight](/cms/validation) for the workflow and the [Validation Code Reference](/cms/validation-codes) for what each issue code means and how to fix it.
 
 ## Import into the CMS fails
 
-The work import currently accepts only manifests declaring `panelwave.version` **`1.0.0`** and at most **10 MB** of JSON. If your manifest declares `1.1.0`, adjust the version declaration (1.1 is additive over 1.0, so a manifest without 1.1-only features is valid either way). See [Import](/cms/import).
+The work import accepts manifests declaring a `panelwave.version` from **1.0 to 1.5** (patch and pre-release versions such as `1.5.1` included) and at most **10 MB** of JSON. A newer format is rejected with *"This manifest uses format X; this CMS supports 1.0–1.5."*, a missing or malformed version with *"This manifest has no valid format version (…); this CMS supports 1.0–1.5."* See [Import](/cms/import).

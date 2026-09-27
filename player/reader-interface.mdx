@@ -49,7 +49,7 @@ In [canvas view](/player/canvas-view) the hotspots of the **current** panel are 
 
 ### Branch choices
 
-When the current panel has **more than one outgoing edge**, the toolbar shows a **Choices** button. It opens the branch chooser, which lists the paths whose conditions pass right now — labelled with the edge's `label`, else the target panel's title, else "Option 1, 2, …". Picking one follows that edge exactly as a normal navigation would: its transition (or camera move in canvas view) plays and its `action` mutations are applied. The choice is tracked as `branch_choice`.
+When **at least two paths** lead on from the current panel — outgoing edges whose conditions pass right now — the toolbar shows a **Choices** button. A panel with several edges of which only one is open shows no button. The button opens the branch chooser, which lists exactly those open paths — labelled with the edge's `label`, else the target panel's title, else a translated "Option 1", "Option 2", … Picking one follows that edge exactly as a normal navigation would: its transition (or camera move in canvas view) plays and its `action` mutations are applied. The choice is tracked as `branch_choice`.
 
 **Next** still resolves the graph on its own (highest-priority valid edge), so the chooser is an *additional* way to pick a path, not a required step.
 
@@ -65,9 +65,9 @@ When the current panel has **more than one outgoing edge**, the toolbar shows a 
 | Swipe left | Navigate forward |
 | Swipe right | Navigate backward |
 
-Keyboard shortcuts are ignored while typing in an input field. `Enter`/`Space` activate the focused viewport element for keyboard users. Canvas view adds `O` (overview) and `+`/`-` (zoom) — see [Canvas View](/player/canvas-view#input-model).
+Keyboard shortcuts are ignored while typing in an input field, text area or select. `Enter`/`Space` activate the focused viewport element for keyboard users. Canvas view adds `O` (overview) and `+`/`-` (zoom) — see [Canvas View](/player/canvas-view#input-model).
 
-While a dialog is open (table of contents, settings, language, characters, extras, branch chooser, share, comments, or a hotspot's modal), the story behind it does not react: **Escape** closes the topmost dialog, and arrow keys and `T` are ignored until it is closed. The paywall and age gate handle Escape themselves while they have focus (it dismisses them like their close button), and a dismissed gate leaves the reader on the last panel they were allowed to see.
+While a dialog is open (table of contents, settings, language, characters, extras, branch chooser, share, comments, or a hotspot's modal), the story behind it does not react: **Escape** closes the topmost dialog, and arrow keys and `T` are ignored until it is closed. The **paywall** and the **age gate** block the story completely: while either is open, arrow keys, `T` and swipes do nothing. Each keeps its own **Escape** — it dismisses the paywall (like *Maybe later*) and closes the age gate — and a dismissed gate leaves the reader on the panel they were on.
 
 ## Toolbar controls
 
@@ -108,6 +108,8 @@ Each toggle is tracked (`like`, `bookmark` events, subject to consent and the ma
 
 ## Autoplay
 
+Readers start and stop autoplay from the toolbar or Settings. The host can also start a work in autoplay with the `autoplay` input; the reader's toggle takes over from there.
+
 Autoplay advances automatically using, in order of precedence:
 
 1. the current panel's own `durationMs` from the manifest,
@@ -129,12 +131,12 @@ The modal edits a working copy: changes apply on **Save**; **Cancel**, a backdro
 - **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation.
 - **Language modal** (`pw-language-modal`) — pick from the work's `meta.locales`; switching updates content and player UI immediately ([Localization](/player/localization)).
 - **Character roster** (`pw-character-roster`) — characters with portrait and description from the manifest.
-- **Extras viewer** (`pw-extras-viewer`) — the work's [extras](/schema/extras) with their real media: image galleries (with thumbnails), videos (with their poster), audio tracks, and PDFs or text documents (opened with an *Open document* link); text-only extras render as text. A filter by type (including *Other*) narrows the list. An `openExtras` hotspot opens it directly at the targeted item.
+- **Extras viewer** (`pw-extras-viewer`) — the work's [extras](/schema/extras) with their real media: image galleries (with thumbnails), videos (with their poster), audio tracks, and PDFs or text documents (opened with an *Open document* link); text-only extras render as text. A filter by type (including *Other*) narrows the list. An `openExtras` hotspot opens it directly at the targeted item. A block locked by an `extras` paywall rule is shown with a lock and does not open until the reader has the entitlement.
 - **Action modal** (`pw-action-modal`) — the small localized dialog an `openModal` hotspot shows.
 - **Branch chooser** (`pw-branch-chooser`) — the paths open from the current panel; see [Branch choices](#branch-choices).
 - **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation; it scrolls to the current panel when shown and follows along as you read.
 - **Share modal** and **comments drawer** — social features (surface only; persistence is up to the host application).
-- **Paywall overlay** and **age gate** — shown when the reader reaches content the work's paywall rules lock for them. The paywall offers *Sign in* / *Maybe later* and hands off to the host app; the age gate asks for a birth date and, once passed, continues where the reader was going and doesn't ask again on that device. See [Paywall & Entitlement](/player/paywall-entitlement).
+- **Paywall overlay** and **age gate** — shown when the reader reaches content the work's paywall rules lock for them. The paywall offers the rule's **Buy** / **Subscribe** options plus *Sign in* and *Maybe later*, and hands the choice to the host app; the age gate asks for a birth date and, once passed, continues where the reader was going and doesn't ask again on that device. See [Paywall & Entitlement](/player/paywall-entitlement).
 - **Loading & error states** — the shell shows a spinner while the manifest loads and an error screen with a retry button if loading or validation fails.
 
 ## Accessibility

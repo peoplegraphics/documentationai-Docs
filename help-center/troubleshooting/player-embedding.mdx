@@ -20,15 +20,20 @@ Work through the symptom that matches what you see. The full integration guide i
 
 ## Labels show as keys (`toolbar.like`, `paywall.sign_in`, …)
 
-The UI translation files are missing or outdated. Copy them from the package into your build output — `node_modules/@panelwave/player/src/assets/i18n` → `assets/i18n` via the `assets` entry in `angular.json` — instead of keeping your own copy, which misses keys added in newer releases. See [Installation](/player/installation#application-setup).
+The UI translation files are missing or outdated. Copy them from the package into your build output — `node_modules/@panelwave/player/src/assets/i18n` → `assets/i18n` via the `assets` entry in `angular.json` — instead of keeping your own copy, which misses keys added in newer releases (most recently `age_gate.*`, `branch_chooser.*` and `paywall.reason_*`). See [Installation](/player/installation#application-setup).
 
 ## The table of contents or thumbnail strip is empty
 
-Known limitation in 1.0.x: both read the chapter list from the `manifest` input, so they stay empty when the work is loaded with `manifestUrl` alone. Load the JSON yourself and bind `[manifest]` instead ([option B](/player/quickstart-embed#option-b-pass-the-manifest-object)).
+Both list the loaded work whether you pass `manifestUrl` or `[manifest]`. If they stay empty with `manifestUrl`, you are on `@panelwave/player` **1.0.1 or earlier**, where both read only the `manifest` input — upgrade, or load the JSON yourself and bind `[manifest]` ([option B](/player/quickstart-embed#option-b-pass-the-manifest-object)).
 
 ## Changing an input doesn't do anything
 
-The shell reads its inputs once, at initialization. To open another work, switch the language from the outside, or apply a new start position, re-create the component (e.g. clear it with `@if` and render it again). For entitlements, call `refreshEntitlements()` on the component instead.
+The shell reacts to input changes after initialization:
+
+- A new `manifestUrl` / `manifest` reloads the work. `initialChapterId`, `initialPanelId` and `initialVariables` are only read during a load — to jump to another position in the running work, call `navigateToPanel()` instead, or call `reload()` after changing them.
+- `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live; a new `entitlementSnapshot` re-evaluates the paywall.
+
+If nothing reacts, check that you bind a **new** value (a mutated object with the same reference is not a change for Angular), and that you are on a player release newer than 1.0.1 — 1.0.1 and earlier read their inputs only once. See [Inputs &amp; Outputs](/player/inputs-outputs).
 
 ## Speech balloons use the wrong font
 
@@ -48,7 +53,7 @@ See [Audio](/player/audio).
 ## Gated content is locked (or nothing is)
 
 - **Everything past the preview is locked:** the player treats the reader as anonymous until you tell it otherwise. Pass what they own via `[entitlementSnapshot]`, or let the player fetch it with `entitlementEndpoint` + `readerToken`. If the endpoint request fails, the reader stays anonymous on purpose.
-- **Nothing is locked:** check that the manifest has `paywall.rules`, and that you haven't set `[entitlementAdapter]` — an adapter replaces the manifest rules with its own `hasAccess()` answer. Rules scoped to a `chapter` are not enforced in 1.0.x; use a panel rule listing the chapter's panels, or a work rule with a preview length.
+- **Nothing is locked:** check that the manifest has `paywall.rules`, and that you haven't set `[entitlementAdapter]` — an adapter replaces the manifest rules with its own `hasAccess()` answer. A `chapter` rule gates only the chapter named in its `refId`, and an `extras` rule never gates panels — it only locks its extras block. (In 1.0.1 and earlier, chapter rules were ignored and extras rules locked the whole work.)
 - **The age gate keeps appearing / never appears:** a passed age gate is remembered per device (`pw-age-verified` in `localStorage`); private browsing forgets it. To skip the prompt for readers you have verified, pass `ageVerified: true` and `age` in the snapshot.
 - **`NullEntitlementAdapter` denies everything:** that only concerns the standalone `EntitlementService`, not the embedded shell.
 

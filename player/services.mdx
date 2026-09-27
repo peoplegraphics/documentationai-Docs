@@ -146,7 +146,7 @@ The shell wires the manifest's `tracking` section into this service on startup (
 
 ## PaywallService
 
-`services/paywall.service.ts` — the shell's gatekeeper. `setManifest(manifest)` loads the rules (via the pure functions in `entitlement/paywall-evaluator.ts`) and the reading order used for free-preview counting; `setSnapshot(snapshot)` / `getSnapshot()` hold what the reader owns (anonymous by default). `canAccess(panelId)`, `evaluate(panelId)` (an `AccessDecision` with the lock reason), `gateFor(panelId)` (a `PaywallGate` for the overlay) and `ruleFor(panelId)` answer per panel. A work without rules reports every panel accessible. See [Paywall & Entitlement](/player/paywall-entitlement).
+`services/paywall.service.ts` — the shell's gatekeeper. `setManifest(manifest)` loads the rules (via the pure functions in `entitlement/paywall-evaluator.ts`) and the reading order used for free-preview counting (work-wide for work rules, within the chapter for chapter rules); `setSnapshot(snapshot)` / `getSnapshot()` hold what the reader owns (anonymous by default). `canAccess(panelId)`, `evaluate(panelId)` (an `AccessDecision` with the lock reason), `gateFor(panelId)` (a `PaywallGate` for the overlay, including the rule's Buy / Subscribe `options`) and `ruleFor(panelId)` answer per panel; `isExtraLocked(extraId)` answers for an extras block, and the static `PaywallService.purchaseOptions(rule)` derives a rule's options. A work without rules reports every panel accessible. See [Paywall & Entitlement](/player/paywall-entitlement).
 
 ## EntitlementService
 

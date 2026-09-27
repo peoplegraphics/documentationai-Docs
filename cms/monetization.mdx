@@ -26,6 +26,7 @@ At the top, the **Content map** summarizes your gating at a glance:
 - Every panel appears as a chip marked **Free**, **Preview** (free preview before the paywall), or **Gated**, grouped by chapter.
 - A plain-language rollup explains the reader's experience, for example: *"Readers can view 12 of 40 panels free (5-panel preview). The remaining 28 panels require a premium subscription or a one-time purchase."*
 - Health warnings flag common mistakes — for example if **every** panel is gated ("readers get no free preview") or if a rule targets panels that no longer exist.
+- A red banner lists active **Chapter** or **Extras Item** rules whose target is missing, deleted, or (for extras) still a draft. Such a rule is left out of the published work, so that content would ship free.
 
 ### Creating a rule
 
@@ -34,11 +35,13 @@ Click **New Paywall Rule** and fill in the dialog:
 | Field | Description |
 |---|---|
 | **Rule Name** | A label such as "Premium Subscription" |
-| **Scope** | **Global (All Works)**, **Work Level**, or **Panel Level** |
+| **Scope** | **Work Level**, **Chapter**, **Panel Level**, or **Extras Item** |
+| **Chapter** / **Extras Item** | Shown for those scopes: pick the chapter or extras item the rule gates. Saving without a target is refused (*"Pick the chapter this rule gates."*) |
 | **Entitlement Type** | **Subscription Required**, **One-Time Purchase**, **Age Verification**, or **Free Access** |
 | **Required Subscription Tiers** | For subscription rules: any of **basic**, **premium**, **pro** |
-| **Price / Currency** | For purchase rules: the price in USD, EUR, GBP, or JPY |
-| **Minimum Age** | For age-verification rules (e.g. 18) |
+| **Price / Currency** | For purchase rules: the price in USD, EUR, GBP, or JPY (when empty, the first unlocking product's price is published) |
+| **Unlocking products** | For purchase rules: readers who bought one of the checked products unlock it; none checked means any purchase does |
+| **Minimum Age** | Required for **Age Verification** rules; optional on every other rule, where it adds an age check on top of the subscription or purchase |
 | **Preview Panel Count** | How many panels readers can view before the paywall |
 | **Description** | Optional note about the rule |
 | **Active** | Whether the rule is enforced |
@@ -48,6 +51,15 @@ Rules can be filtered by scope and status, and each rule card offers **Activate/
 <Callout kind="info">
   A **Bulk Apply to Panels** action exists on each rule for assigning many panels at once, but panel assignments made this way are not yet saved permanently in the current release.
 </Callout>
+
+How each scope gates content:
+
+- **Work Level** — the whole work; the free preview counts from the first panel.
+- **Chapter** — only the picked chapter; its free preview counts panels *within that chapter*, and for those panels a chapter rule takes precedence over a work rule.
+- **Panel Level** — the listed panels.
+- **Extras Item** — only the picked extras item (for example a bonus gallery), never story panels.
+
+With a **Minimum Age** on a subscription or purchase rule, readers need both: the player asks for their age first, then shows the paywall until they subscribe or buy. Rules created before this release with the old **Global (All Works)** scope behave as **Work Level** rules and are labelled *Work Level (legacy "global")*.
 
 <Callout kind="tip">
   Always leave a free preview. The **Preview Panel Count** is what hooks readers before they hit the paywall — the content map warns you if nothing at all is free.
@@ -100,6 +112,8 @@ Each coupon shows its status (**Active**, **Inactive**, **Expired**, or **Used u
 
 The **Entitlement** backstage screen is a sandbox for answering "what would *this* reader see?" — no real reader accounts are involved.
 
+Opened from a work's backstage, the simulator evaluates **that work's own rules** over its chapters in reading order, with the same logic as the [player](/player/paywall-entitlement#how-rules-are-evaluated) (chapter previews, extras items, age plus entitlement), and lists which extras items are locked. Opened without a work, it runs a built-in demo scenario.
+
 Click **Start Simulation**, then either pick a **Quick Scenario** — **Free User**, **Basic Subscriber**, **Premium Subscriber**, **Pro Subscriber**, **One-Time Buyer**, **Underage User** — or dial in the details yourself:
 
 - **Subscription** — has one or not, and its tier (Basic/Premium/Pro),
@@ -117,7 +131,7 @@ You can **Reset**, **Copy State**, and **Import/Export** simulation states as JS
 
 ## How the paywall reaches readers
 
-Paywall rules travel with your work: publishing writes them into the [manifest](/concepts/manifest), and the [PanelWave Player](/player/paywall-entitlement) enforces them when readers hit gated content — showing the lock overlay and checking the reader's entitlements. Purchasing itself will happen on the reading site through hosted payment pages, not inside the CMS.
+Paywall rules travel with your work: publishing writes them into the [manifest](/concepts/manifest) as schema-valid [`paywall.rules`](/schema/paywall) — Chapter, Extras Item and Panel rules carry their target as `refId`, a purchase rule names its first unlocking product in `requireEntitlement` (the player's **Buy** option, with the rule's or the product's name and price), subscription rules list their `subscriptionTiers`, and a minimum age is written as `minimumAge` / `ageGate`. Inactive rules and rules with a missing target are left out. The [PanelWave Player](/player/paywall-entitlement) enforces them when readers hit gated content — showing the lock overlay and checking the reader's entitlements. Purchasing itself will happen on the reading site through hosted payment pages, not inside the CMS.
 
 ## Related pages
 

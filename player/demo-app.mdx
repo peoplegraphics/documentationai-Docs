@@ -55,6 +55,7 @@ Everything the header does can be preset in the URL, which makes demo links easy
 | `?device=<id>` | Start in a preview frame (see the table above) |
 | `?devtools=1` | Open the dev-tools drawer on load |
 | `?vars=<url-encoded JSON>` | Seed story variables, e.g. `?vars={"user.age":12}` — passed as `initialVariables`, so read-only variables can be set too |
+| `?byUrl=1` | Hand the player the manifest **URL** (its `manifestUrl` input) instead of the parsed object, so the shell loads the work itself — use it to check the `manifestUrl` path, e.g. `?manifest=<url>&byUrl=1` |
 | `?deny=<panelId>[,<panelId>…]` | Install an entitlement adapter that refuses these panels, to try the paywall path without a backend |
 | `?embed=1` | Embed mode (see below) |
 

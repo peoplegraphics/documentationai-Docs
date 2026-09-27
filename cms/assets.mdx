@@ -33,7 +33,18 @@ Small files upload in one piece. Files of **10 MB and more** — think video or 
 
 Once all parts are in, the file is registered like any other upload — the same checks, duplicate detection, processing, and folder filing apply, and the asset stays in your library after a reload.
 
-You don't need to do anything to enable this; the CMS picks the right upload method per file. Keep the tab open until the card leaves the *Uploading…* state — an upload interrupted by closing the browser has to be started again.
+You don't need to do anything to enable this; the CMS picks the right upload method per file.
+
+While a large upload is unfinished, the Assets tab lists it in a **Large uploads** section with its status (*Uploading part 2 of 5*, *Paused*, *Failed*, …), the bytes sent and the percentage, and buttons to control it:
+
+| Button | What it does |
+|---|---|
+| **Pause** | Pauses the upload: the part in flight is cancelled, every part already uploaded is kept. |
+| **Resume** | Continues the same upload with the remaining parts. Each part is authorized right before it is sent, so even a long pause does not fail on an expired link. |
+| **Retry** | Shown when an upload failed. Continues from the parts already uploaded; if storage has discarded the partial upload, it starts the file again from the beginning automatically. |
+| **Cancel** | Stops the upload and removes the partial upload from storage. |
+
+The upload state lives in the open page only: **reloading or closing the tab** discards unfinished uploads (paused ones included), and the file has to be uploaded again.
 
 ### Upload checks
 

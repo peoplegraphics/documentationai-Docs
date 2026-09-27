@@ -17,6 +17,8 @@ Branching stories in PanelWave are driven by three cooperating pieces: the **var
 | `session` | — | Current browser session |
 | `persistent` | — | Survives reloads (`localStorage` key `pw-variables-persistent`) |
 
+When the host loads another work into a running shell (a new `manifest` / `manifestUrl`, or `reload()`), the `global`, `chapter`, `page` and `session` scopes are cleared and re-initialized from the new manifest; `persistent` values stay. Variant overrides (see [Variants](#variants)) are cleared too.
+
 `setDefinitions(definitions)` registers the manifest's `VariableDefinition`s and initializes defaults — the shell does this automatically at startup from `manifest.variables.definitions`. After that, every `set()` is checked:
 
 - **Read-only** definitions reject writes (with a console warning; the write is dropped).
@@ -45,7 +47,9 @@ State changes are expressed as mutations (`VariableMutation` — `{ op, var, val
 | `remove` | Filter `value` out of an array |
 | `clear` | Reset to the definition's default (or `null`) |
 
-Graph edges may carry `action?: Mutation[]` — mutations applied when the edge is traversed. `FlowEngineService.getNextPanel()` returns them in its typed `NavigationResult.action` (`Mutation[]`), and `PlayerShellComponent` applies them (chapter-scoped where the definition says so) on every **Next** navigation and when the reader picks the edge in the [branch chooser](/player/reader-interface#branch-choices). If you drive navigation yourself through `FlowEngineService`, apply `result.action` with `VariableStoreService.applyMutations` the same way.
+Graph edges may carry `action?: Mutation[]` — mutations applied when the edge is traversed. `FlowEngineService.getNextPanel()` returns them in its typed `NavigationResult.action` (`Mutation[]`), and `PlayerShellComponent` applies them (chapter-scoped where the definition says so) on every **Next** navigation, when the reader picks the edge in the [branch chooser](/player/reader-interface#branch-choices), and when the reader taps the edge's target in [canvas view](/player/canvas-view).
+
+The mutations are applied only **after** the paywall and age gate let the move through: a move onto a locked panel changes no variables (a counter an edge increments does not grow with every blocked attempt), and a move the age gate holds applies them once the reader passes. If you drive navigation yourself through `FlowEngineService`, apply `result.action` with `VariableStoreService.applyMutations` the same way.
 
 ## The evaluation context
 

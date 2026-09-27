@@ -13,22 +13,28 @@ import type {
 } from '@panelwave/player';
 ```
 
-All inputs are read **once**, when the shell initializes (there is no `ngOnChanges` handling). To load another work or restart with different inputs, re-create the component — see [Switching works](/player/quickstart-embed#switching-works).
+Inputs may change after the shell has initialized:
+
+- A new **`manifest`** or **`manifestUrl`** reloads the work (the same as calling [`reload()`](#public-methods)): the reading position, all non-persistent variables, open overlays, variant overrides and autoplay are reset, and the analytics session of the previous work is closed. `initialChapterId`, `initialPanelId`, `initialVariables` and the entitlement inputs are read again as part of that reload.
+- **`entitlementSnapshot`** re-evaluates the gates, like `refreshEntitlements()`. Removing it (setting it to `undefined`) makes the reader anonymous again.
+- **`locale`**, **`viewModeOverride`**, **`showToolbar`**, **`autoplay`**, **`secondsPerPanel`** and **`reducedMotion`** apply live, without a reload.
+
+See [Switching works](/player/quickstart-embed#switching-works).
 
 ## Inputs
 
 ### Content
 
 <ResponseField name="manifestUrl" field-type="string">
-  URL of a manifest to load. The shell fetches it with `HttpClient`, validates it, and starts reading; a network or validation failure emits `error` (message prefixed `Manifest load failed:`) and shows the error screen. Takes precedence over `manifest` when both are set. Cross-origin URLs need CORS headers. Known limitation: the table of contents and thumbnail strip read the `manifest` input and stay empty when you load by URL only.
+  URL of a manifest to load. The shell fetches it with `HttpClient`, validates it, and starts reading; a network or validation failure emits `error` (message prefixed `Manifest load failed:`) and shows the error screen. Takes precedence over `manifest` when both are set. Cross-origin URLs need CORS headers. Changing it later loads the new work.
 </ResponseField>
 
 <ResponseField name="manifest" field-type="PanelWaveManifest">
-  The manifest object to render, as an alternative to `manifestUrl`. Validated on load (required header, meta, and chapter structure); a validation failure emits `error` and shows the error screen.
+  The manifest object to render, as an alternative to `manifestUrl`. Validated on load (required header, meta, and chapter structure); a validation failure emits `error` and shows the error screen. Passing a new object later loads it as a new work.
 </ResponseField>
 
 <ResponseField name="locale" field-type="LocaleCode">
-  Initial content locale, BCP-47 (default `'en-US'`). Also selects the player-UI language (base language, e.g. `en`).
+  Content locale, BCP-47 (default `'en-US'`). Also selects the player-UI language (base language, e.g. `en`). Changing it switches the content and UI language live.
 </ResponseField>
 
 <ResponseField name="initialChapterId" field-type="string">
@@ -48,7 +54,7 @@ All inputs are read **once**, when the shell initializes (there is no `ngOnChang
 See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit together.
 
 <ResponseField name="entitlementSnapshot" field-type="EntitlementSnapshot">
-  What the reader owns: `{ subscriptionTier: string | null; purchasedProductIds: string[]; ageVerified: boolean; age?: number }`. Evaluated locally against the manifest's `paywall.rules`. Omitted → an anonymous reader (free preview only). Works without paywall rules are unaffected. Wins over `entitlementEndpoint` when both are set.
+  What the reader owns: `{ subscriptionTier: string | null; purchasedProductIds: string[]; ageVerified: boolean; age?: number }`. Evaluated locally against the manifest's `paywall.rules`. Omitted → an anonymous reader (free preview only). Works without paywall rules are unaffected. Wins over `entitlementEndpoint` when both are set. Passing a new snapshot re-evaluates the gates immediately (like `refreshEntitlements()`); removing it makes the reader anonymous. An age check the reader already passed on this device keeps counting.
 </ResponseField>
 
 <ResponseField name="entitlementEndpoint" field-type="string">
@@ -66,23 +72,23 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
 ### Reading behavior
 
 <ResponseField name="showToolbar" field-type="boolean">
-  Whether the toolbar is visible initially (default `false`).
+  Whether the toolbar is visible (default `false`). Changing it shows or hides the toolbar; the reader can still toggle it with `T`.
 </ResponseField>
 
 <ResponseField name="viewModeOverride" field-type="'auto' | 'panel' | 'canvas'">
-  `'auto'` (default) follows the manifest (canvas chapters open in canvas view); `'panel'` forces classic panel view; `'canvas'` enters canvas view whenever the chapter allows it. See [Canvas View](/player/canvas-view).
+  `'auto'` (default) follows the manifest (canvas chapters open in canvas view); `'panel'` forces classic panel view; `'canvas'` enters canvas view whenever the chapter allows it. A changed value applies to the running view. See [Canvas View](/player/canvas-view).
 </ResponseField>
 
 <ResponseField name="reducedMotion" field-type="boolean">
-  Force reduced motion (default `false`). Reduced motion is **also** on when the operating system asks for it (`prefers-reduced-motion`, followed live) or when the reader enabled it in Settings — this input can only add it, not turn it off. Under reduced motion, panel/page transitions and canvas camera glides are instant and on-view videos degrade to click-to-play.
+  Force reduced motion (default `false`). Reduced motion is **also** on when the operating system asks for it (`prefers-reduced-motion`, followed live) or when the reader enabled it in Settings — this input can only add it, not turn it off. Under reduced motion, panel/page transitions and canvas camera glides are instant and on-view videos degrade to click-to-play. Changes apply live.
 </ResponseField>
 
 <ResponseField name="secondsPerPanel" field-type="number">
-  Autoplay seconds per panel (default `5`) when a panel defines no `durationMs`. Readers can adjust it from 0.5 to 120 s in the toolbar.
+  Autoplay seconds per panel (default `5`) when a panel defines no `durationMs`. Readers can adjust it from 0.5 to 120 s in the toolbar. A new value re-arms a running autoplay with the new timing.
 </ResponseField>
 
 <ResponseField name="autoplay" field-type="boolean">
-  Reserved (default `false`): the current build does not read it. Autoplay is started by the reader from the toolbar or Settings, and a reader's saved autoplay preference is restored.
+  Start in autoplay (default `false`). The shell starts autoplay once the work is ready; after that the reader's toolbar toggle takes over. Changing the input later starts or stops autoplay.
 </ResponseField>
 
 ## Outputs
@@ -119,8 +125,8 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
   Canvas view only: the camera moved (throttled). See [Canvas View](/player/canvas-view).
 </ResponseField>
 
-<ResponseField name="paywallAction" field-type="EventEmitter<{ action: PaywallAction; gate: PaywallGate }>">
-  The reader acted on the paywall overlay. The built-in overlay emits `'login'` (its *Sign in* button) or `'dismiss'`; the type also allows `'purchase'` and `'subscribe'`. Open your sign-in / checkout flow here, then call `refreshEntitlements()`.
+<ResponseField name="paywallAction" field-type="EventEmitter<{ action: PaywallAction; gate: PaywallGate; productId?: string }>">
+  The reader acted on the paywall overlay: `'purchase'` or `'subscribe'` (a Buy / Subscribe option, with the chosen option's `productId` — a product id or a subscription tier), `'login'` (*Sign in*) or `'dismiss'`. `gate.options` lists everything the blocking rule offers. Open your checkout / sign-in flow here, then call `refreshEntitlements()`. See [Buy and Subscribe options](/player/paywall-entitlement#buy-and-subscribe-options).
 </ResponseField>
 
 <ResponseField name="ageVerified" field-type="EventEmitter<AgeVerificationResult>">
@@ -150,7 +156,7 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
   (localeChange)="onLocale($event)"
   (variableChange)="onVariable($event)"
   (navigationAttempt)="onNavAttempt($event)"
-  (paywallAction)="openCheckout($event.gate)"
+  (paywallAction)="onPaywall($event)"
   (ageVerified)="onAge($event)"
   (likeChange)="syncLike($event)"
   (bookmarkChange)="syncBookmark($event)"
@@ -175,6 +181,7 @@ With a template reference (`#player`) or `@ViewChild(PlayerShellComponent)` you 
 | `toggleToolbar` | `() => void` | Show/hide the toolbar |
 | `getCurrentPanelId` | `() => string \| undefined` | ID of the currently shown panel |
 | `refreshEntitlements` | `(snapshot?: EntitlementSnapshot) => Promise<void>` | Apply a new snapshot (or re-fetch from `entitlementEndpoint` when called without one) and close the paywall if the reader is now through the gate |
+| `reload` | `() => Promise<void>` | Reload the work from the current `manifest` / `manifestUrl` (what an input change and the error screen's *Retry* do): position, non-persistent variables, overlays, variant overrides and autoplay are reset |
 
 ```typescript
 import { Component, ViewChild } from '@angular/core';
@@ -211,7 +218,7 @@ These standalone components are part of the public API and can be used on their 
 | `VideoLayerComponent` | `pw-video-layer` | `src`, `poster`, `playMode`, `startMode`, `muted`, `startAtMs`, `loopFromMs`, … → `videoPlay`, `videoPause`, `videoEnd`, `videoLoop`, `passComplete`, `videoError` |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | `manifest: PluginManifest` → `loaded`, `failed` |
 
-Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `BranchChoice` (`{ edge, index, label }`), `LayerViewMode` (`'panel' | 'page'`), `EntitlementSnapshot`.
+Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `PaywallGate` and `PurchaseInfo` (see [Paywall & Entitlement](/player/paywall-entitlement#paywall-ui-components)), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `BranchChoice` (`{ edge, index, label }`), `LayerViewMode` (`'panel' | 'page'`), `EntitlementSnapshot`.
 
 <Callout kind="alert">
 `PlayerComponent` (selector `pw-player`) is also exported but is a **legacy placeholder** that renders static text. Do not embed it.

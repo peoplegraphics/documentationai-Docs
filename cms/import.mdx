@@ -60,19 +60,25 @@ Not carried over (by design): products and reader entitlements, publish history 
 The import validates the file before accepting it:
 
 - It must be valid JSON with the required top-level sections `panelwave`, `meta`, and `chapters` (see [Manifest structure](/schema/manifest-structure)).
-- The declared format version (`panelwave.version`) must be **1.0.0** — other versions are rejected with an "Unsupported version" message. Use the [PanelWave CLI](/schema/cli) to upgrade older or newer manifests if needed.
+- The declared format version (`panelwave.version`) must be a format from **1.0 to 1.5** — the range up to the version the CMS itself exports (1.5.0), so a CMS export can always be imported back. Patch and pre-release versions of a supported format are fine (`1.5.1`, `1.3.0-rc.1`). Newer formats (`1.6.0`, `2.0.0`) and missing or malformed versions are rejected before anything is imported.
 - Maximum file size: **10 MB**. The manifest references assets by URL; large media files are not embedded in the JSON.
 
 ## What gets imported
 
-Imports preserve the full content of the manifest:
+Imports preserve the content of the manifest:
 
 - Work metadata — title, description, creators, publisher, series, tags, age rating, locales
-- The assets catalog (images, audio, video entries with their variants)
-- Chapters, including their navigation **graphs**
-- Pages and their layouts
-- Panels with all layers, speech bubbles, hotspots, and interactive elements
-- [Extras](/cms/extras), [variables](/cms/editor/variables), and settings
+- The assets catalog (images, audio, video entries with their variants) and, from format 1.5, the **asset folders** with their assignments
+- Chapters, including their navigation **graphs**, entry panels and **sequence audio tracks**
+- Pages and their layouts, and **infinite-canvas layouts** (format 1.4)
+- Panels with all layers, speech bubbles, hotspots, panel variants and interactive elements
+- [Extras](/cms/extras) (typed extras buckets; unknown `x-*` buckets are skipped) and [variables](/cms/editor/variables)
+- **Settings** — typography and style presets, output presets and the video UI defaults
+- The **localization** block (format 1.5): translations and glossary
+
+References between them — panels, assets, characters, hotspot targets, canvas placements — are remapped to the new ids. Re-importing a CMS export gives an equal copy (hotspot-derived graph edges are no longer duplicated).
+
+Not imported from a JSON manifest: **paywall rules** (only the [work archive](#paywall-rules-arrive-disabled) carries them, as disabled drafts), **tracking** settings and the top-level **`ui`** block. Set those up again in the CMS.
 
 The import is atomic: if anything fails partway, nothing is created — you never end up with a half-imported work.
 
@@ -88,7 +94,8 @@ Asset entries are imported as catalog references (URLs). If the manifest points 
 | *File too large. Maximum size is 10MB.* | Strip embedded data or split the work |
 | *Invalid JSON file. Please check the file format.* | The file isn't parseable JSON — validate it with the [CLI](/schema/cli) |
 | *Invalid PanelWave graphic novel file. Missing required fields.* | `panelwave`, `meta`, or `chapters` is missing |
-| *Unsupported version: …* | The manifest declares a version other than 1.0.0 |
+| *This manifest uses format X; this CMS supports 1.0–1.5.* | The manifest declares a newer format (a minor above 1.5, or 2.x). Use a manifest in format 1.0–1.5 |
+| *This manifest has no valid format version (…); this CMS supports 1.0–1.5.* | `panelwave.version` is missing or not a version like `1.5.0` |
 
 ## Other imports in the CMS
 
