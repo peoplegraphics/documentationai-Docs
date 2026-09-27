@@ -25,6 +25,8 @@ the workspace navigation (**Canvas Layout**).
   visible together — that's the point of the board.
 - **Viewport**: drag empty space to pan, wheel to zoom, **Fit** to frame
   everything.
+- **Minimap** (bottom right): an overview of every placement with the visible
+  area outlined in yellow. Click or drag in it to move the view.
 - Undo/redo covers every board operation (moves, resizes, framing,
   decorations) with the editor's standard history.
 
@@ -116,6 +118,16 @@ The [validation](/cms/validation) preflight enforces canvas integrity:
 placements pointing at deleted panels and canvases without placements block
 publishing; unplaced reachable panels and very large canvases (&gt; 150
 placements) warn.
+
+Two more warnings protect the reading experience:
+
+- **Paywalled panels visible in the overview** — a panel behind an active
+  paywall rule whose reveal mode is not *On visit* shows its paid artwork
+  when readers zoom out. Set it to *On visit*.
+- **Low resolution for the zoom** — the camera zooms into panels, so artwork
+  narrower than twice the placement width looks soft on high-DPI screens.
+
+Deleting a panel removes its placement from the canvas automatically.
 
 <Columns cols={3}>
   <Card title="Schema: Infinite Canvas" icon="map" href="/schema/canvas">
