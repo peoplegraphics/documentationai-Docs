@@ -64,6 +64,7 @@ Together with the CMS-generated [responsive size ladder](/cms/assets#automatic-p
 ## Rendering performance
 
 - **OnPush everywhere.** Every component uses `ChangeDetectionStrategy.OnPush`; state flows in through inputs and RxJS subscriptions.
+- **Current panel first.** The artwork of the panel on screen loads eagerly with `fetchpriority="high"`, so it is never queued behind lazily loaded neighbours (this is also what browsers measure as the largest contentful paint). Every other panel's images load lazily.
 - **Viewport culling.** `ViewportComponent` can skip off-screen panels in page view (`enableViewportCulling` input) and supports lazy image loading (`enableLazyLoading`, default on).
 - **Metrics output.** The viewport emits `performanceMetrics` (`renderTime`, `panelCount`, `visiblePanelCount`, `culledPanelCount`, `transformCalculationTime`) so hosts can watch real render cost.
 - **Visibility-driven media.** `VisibilityService` (an `IntersectionObserver` wrapper with a 50% threshold, `VISIBILITY_THRESHOLD = 0.5`) gates page-view video playback, and `UserGestureService` attaches its global listeners outside the Angular zone to avoid change-detection churn on every pointer event.

@@ -7,26 +7,45 @@ description: Install and use the panelwave command line — validate, bundle, di
 
 ## Installation
 
-<Callout kind="info">
-  `@panelwave/cli` is not published to the npm registry yet. Until it is, build it from the `panelwave-packages` repository and link it locally.
-</Callout>
+The CLI is published on npm as [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli). Install it globally:
 
 ```bash
-# In your checkout of panelwave-packages
-npm install
-npm run build:cli
-
-# Make the `panelwave` binary available globally
-cd packages/cli
-npm link
+npm install -g @panelwave/cli
 ```
 
-Once the package is published, this becomes `npm install -g @panelwave/cli` (or ad hoc via `npx @panelwave/cli`).
+Or run it ad hoc without installing, e.g. in CI:
 
 ```bash
-panelwave --version   # prints the CLI version (1.0.0)
+npx @panelwave/cli validate ./my-comic/panelwave.json
+```
+
+```bash
+panelwave --version   # prints the CLI version
 panelwave --help      # command overview
 ```
+
+Releases are built and published from GitHub Actions with npm trusted publishing, so every version carries an npm [provenance attestation](https://docs.npmjs.com/generating-provenance-statements) linking it to the source commit it was built from.
+
+### Bundled schema
+
+The CLI ships its own copy of the schema (`schema/1.0/panelwave.schema.json` inside the package), so validation works offline and never fetches anything from the network. That copy is kept identical to the canonical file in [panelwave/schema](https://github.com/panelwave/schema): the SDK build fails if the bundled schema drifts from the canonical one, or if the version the CLI's `upgrade` command targets differs from the version the schema declares. In practice this means **the schema bundled in a CLI release is exactly the published format version it was built against** — currently **1.5.0**.
+
+<Callout kind="info">
+The schema's `$id` (`https://panelwave.org/schema/1.0/panelwave.schema.json`) is an identifier, not a download location you can rely on yet — the URL is not publicly served. For offline or programmatic validation, use the CLI's bundled copy or the file in the [panelwave/schema](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) repository.
+</Callout>
+
+### Source and issues
+
+The CLI lives in the [panelwave/packages](https://github.com/panelwave/packages) monorepo (npm workspaces, together with [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types)). Report bugs and request features in [its issue tracker](https://github.com/panelwave/packages/issues). To build from source:
+
+```bash
+git clone https://github.com/panelwave/packages.git
+cd packages
+npm install
+npm run build:cli      # runs the schema drift check, then compiles the CLI
+```
+
+The drift check compares against a sibling `../schema` checkout of [panelwave/schema](https://github.com/panelwave/schema) (or `$PANELWAVE_SCHEMA_DIR`); without one it only verifies the version pin and prints a warning. CI always clones panelwave/schema, so published releases are fully checked.
 
 ## `panelwave validate <file>`
 
@@ -185,14 +204,14 @@ $ panelwave upgrade old-manifest.json --dry-run
 
   old-manifest.json — 2 upgrade(s):
 
-  ~ panelwave.version — Updated version from "0.9.0" to "1.0.0"
+  ~ panelwave.version — Updated version from "0.9.0" to "1.5.0"
   + chapters[0].graph.edges — Added missing graph.edges array
 
   --dry-run: no files were modified
 ```
 
-<Callout kind="alert">
-The current CLI release (1.0.0) targets manifest version **1.0.0** as "latest" — it predates formats 1.1–1.3. Running `upgrade` on a manifest that declares a newer `panelwave.version` will rewrite the version back to `1.0.0`. Until a CLI release aligned with the current format ships, only use `upgrade` on pre-1.0 drafts, and prefer `--dry-run` first. Validation is unaffected: `validate` uses the current schema file, which accepts 1.0 through 1.3 manifests (see [Versioning](/schema/versioning)).
+<Callout kind="info">
+The upgrade target is the format version of the CLI's bundled schema — **1.5.0** in the current release (1.0.0). Formats 1.1–1.5 are purely additive or relaxing, so older manifests need no structural migration; `upgrade` normalizes the header and legacy fields. Because the target always matches the bundled schema (the build enforces it, see [Bundled schema](#bundled-schema)), `upgrade` never rewrites a manifest to a version its own `validate` would not know. Note that any other declared version — including a *newer* one — is rewritten to the target, so update the CLI (`npm install -g @panelwave/cli@latest`) before upgrading manifests written for a later format. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 ### Exit codes
@@ -205,5 +224,6 @@ The current CLI release (1.0.0) targets manifest version **1.0.0** as "latest" �
 ## Related pages
 
 - [Validation](/schema/validation) — validating with AJV directly, error anatomy
-- [Versioning](/schema/versioning) — format 1.0 vs. 1.1 and compatibility rules
+- [Versioning](/schema/versioning) — format versions 1.0–1.5 and compatibility rules
 - [Examples](/schema/examples) — sample manifests to try the commands on
+- [@panelwave/cli on npm](https://www.npmjs.com/package/@panelwave/cli) · [source on GitHub](https://github.com/panelwave/packages/tree/master/packages/cli)

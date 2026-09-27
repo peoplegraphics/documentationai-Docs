@@ -6,26 +6,25 @@ description: Complete API reference for pw-player-shell — every @Input and @Ou
 `PlayerShellComponent` (selector **`pw-player-shell`**) is the main integration surface. This page lists its complete input/output API as implemented, plus the public methods you can call on a component reference and the other components exported from the package.
 
 ```typescript
-import { PlayerShellComponent, EntitlementAdapter } from '@panelwave/player';
-import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/player';
+import { PlayerShellComponent } from '@panelwave/player';
+import type {
+  PanelWaveManifest, Panel, Chapter, LocaleCode,
+  EntitlementSnapshot, PaywallAction, PaywallGate, AgeVerificationResult, CameraState,
+} from '@panelwave/player';
 ```
+
+All inputs are read **once**, when the shell initializes (there is no `ngOnChanges` handling). To load another work or restart with different inputs, re-create the component — see [Switching works](/player/quickstart-embed#switching-works).
 
 ## Inputs
 
-<ResponseField name="manifest" field-type="PanelWaveManifest">
-  The manifest object to render. Validated on load (required header, meta, and chapter structure); a validation failure emits `error` and shows the error screen.
-</ResponseField>
+### Content
 
 <ResponseField name="manifestUrl" field-type="string">
-  URL of a manifest to load as an alternative to `manifest`. **Not implemented in the current shell** — it throws "Manifest URL loading not yet implemented". Fetch the JSON yourself and bind `manifest`.
+  URL of a manifest to load. The shell fetches it with `HttpClient`, validates it, and starts reading; a network or validation failure emits `error` (message prefixed `Manifest load failed:`) and shows the error screen. Takes precedence over `manifest` when both are set. Cross-origin URLs need CORS headers. Known limitation: the table of contents and thumbnail strip read the `manifest` input and stay empty when you load by URL only.
 </ResponseField>
 
-<ResponseField name="entitlementAdapter" field-type="EntitlementAdapter">
-  Adapter for paywall integration. The shell calls `getContext()` once at startup (seeding the returned key/values into variables — including `readOnly` ones) and `hasAccess(panelId)` before each panel navigation. See [Paywall & Entitlement](/player/paywall-entitlement) for the interface definition.
-</ResponseField>
-
-<ResponseField name="initialVariables" field-type="Record<string, unknown>">
-  Host-supplied initial variable values, keyed by variable id and seeded once at initialization through a privileged path: unlike runtime mutations, these MAY populate variables the manifest declares `readOnly` — the channel for externally-sourced facts (e.g. a verified `user.age`) that in-story content and the settings UI must never change. Values land in each definition's declared scope (global for undeclared ids); the entitlement adapter's context is seeded afterwards and wins on collisions.
+<ResponseField name="manifest" field-type="PanelWaveManifest">
+  The manifest object to render, as an alternative to `manifestUrl`. Validated on load (required header, meta, and chapter structure); a validation failure emits `error` and shows the error screen.
 </ResponseField>
 
 <ResponseField name="locale" field-type="LocaleCode">
@@ -33,27 +32,57 @@ import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/p
 </ResponseField>
 
 <ResponseField name="initialChapterId" field-type="string">
-  Chapter to open first. Without it, the player starts at the first chapter's graph entry.
+  Chapter to open first. Without any initial position, the player resumes the reader's [bookmark](/player/reader-interface#like-and-bookmark) in this work if there is one, otherwise it starts at the first chapter's graph entry.
 </ResponseField>
 
 <ResponseField name="initialPanelId" field-type="string">
   Panel to open first (used together with `initialChapterId`).
 </ResponseField>
 
-<ResponseField name="autoplay" field-type="boolean">
-  Autoplay flag (default `false`). Reserved: the current build starts autoplay only via the toolbar toggle.
+<ResponseField name="initialVariables" field-type="Record<string, unknown>">
+  Host-supplied initial variable values, keyed by variable id and seeded once at initialization through a privileged path: unlike runtime mutations, these MAY populate variables the manifest declares `readOnly` — the channel for externally-sourced facts (e.g. a verified `user.age`) that in-story content and the settings UI must never change. Values land in each definition's declared scope (global for undeclared ids); the entitlement adapter's context is seeded afterwards and wins on collisions.
+</ResponseField>
+
+### Paywall and entitlement
+
+See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit together.
+
+<ResponseField name="entitlementSnapshot" field-type="EntitlementSnapshot">
+  What the reader owns: `{ subscriptionTier: string | null; purchasedProductIds: string[]; ageVerified: boolean; age?: number }`. Evaluated locally against the manifest's `paywall.rules`. Omitted → an anonymous reader (free preview only). Works without paywall rules are unaffected. Wins over `entitlementEndpoint` when both are set.
+</ResponseField>
+
+<ResponseField name="entitlementEndpoint" field-type="string">
+  URL the shell fetches the snapshot from itself, once at startup (`{workId}` is replaced with `meta.id`). On a failed request the reader stays anonymous — they see the free preview and the gate, never paid content.
+</ResponseField>
+
+<ResponseField name="readerToken" field-type="string">
+  Sent as `Authorization: Bearer <token>` to `entitlementEndpoint`. Omit for anonymous readers.
+</ResponseField>
+
+<ResponseField name="entitlementAdapter" field-type="{ hasAccess, getContext, purchase? }">
+  Lower-level override: when set, `hasAccess(panelId)` is awaited before every panel navigation **instead of** the manifest rules, and `getContext()` is seeded into variables at startup. Note that this is the shell's own small interface, not the `EntitlementAdapter` type exported from the package — see [Custom access checks](/player/paywall-entitlement#custom-access-checks).
+</ResponseField>
+
+### Reading behavior
+
+<ResponseField name="showToolbar" field-type="boolean">
+  Whether the toolbar is visible initially (default `false`).
+</ResponseField>
+
+<ResponseField name="viewModeOverride" field-type="'auto' | 'panel' | 'canvas'">
+  `'auto'` (default) follows the manifest (canvas chapters open in canvas view); `'panel'` forces classic panel view; `'canvas'` enters canvas view whenever the chapter allows it. See [Canvas View](/player/canvas-view).
+</ResponseField>
+
+<ResponseField name="reducedMotion" field-type="boolean">
+  Force reduced motion (default `false`). Reduced motion is **also** on when the operating system asks for it (`prefers-reduced-motion`, followed live) or when the reader enabled it in Settings — this input can only add it, not turn it off. Under reduced motion, panel/page transitions and canvas camera glides are instant and on-view videos degrade to click-to-play.
 </ResponseField>
 
 <ResponseField name="secondsPerPanel" field-type="number">
   Autoplay seconds per panel (default `5`) when a panel defines no `durationMs`. Readers can adjust it from 0.5 to 120 s in the toolbar.
 </ResponseField>
 
-<ResponseField name="reducedMotion" field-type="boolean">
-  Force reduced-motion rendering (default `false`). On-view videos degrade to click-to-play; transitions are disabled.
-</ResponseField>
-
-<ResponseField name="showToolbar" field-type="boolean">
-  Whether the toolbar is visible initially (default `false`).
+<ResponseField name="autoplay" field-type="boolean">
+  Reserved (default `false`): the current build does not read it. Autoplay is started by the reader from the toolbar or Settings, and a reader's saved autoplay preference is restored.
 </ResponseField>
 
 ## Outputs
@@ -63,7 +92,7 @@ import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/p
 </ResponseField>
 
 <ResponseField name="panelChange" field-type="EventEmitter<{ panel: Panel; chapter: Chapter }>">
-  Fires on every panel navigation with the new panel and its chapter. Use it for progress tracking, deep links, or analytics forwarding.
+  Fires **once** per panel navigation with the new panel (variants already resolved) and its chapter. Use it for progress tracking, deep links, or analytics forwarding.
 </ResponseField>
 
 <ResponseField name="chapterChange" field-type="EventEmitter<Chapter>">
@@ -79,25 +108,52 @@ import type { PanelWaveManifest, Panel, Chapter, LocaleCode } from '@panelwave/p
 </ResponseField>
 
 <ResponseField name="variableChange" field-type="EventEmitter<{ key: string; value: unknown }>">
-  Fires when a variable is set through the shell's `setVariable` method.
+  Fires when a variable changes through the shell's `setVariable` method or a reader edit in the Settings modal's Variables tab.
 </ResponseField>
 
 <ResponseField name="navigationAttempt" field-type="EventEmitter<{ direction: 'next' | 'previous' | 'panel'; target?: string }>">
   Fires when a navigation is attempted (before it resolves) — useful for interstitials or analytics.
 </ResponseField>
 
-### Example: wiring all outputs
+<ResponseField name="cameraChange" field-type="EventEmitter<CameraState>">
+  Canvas view only: the camera moved (throttled). See [Canvas View](/player/canvas-view).
+</ResponseField>
+
+<ResponseField name="paywallAction" field-type="EventEmitter<{ action: PaywallAction; gate: PaywallGate }>">
+  The reader acted on the paywall overlay. The built-in overlay emits `'login'` (its *Sign in* button) or `'dismiss'`; the type also allows `'purchase'` and `'subscribe'`. Open your sign-in / checkout flow here, then call `refreshEntitlements()`.
+</ResponseField>
+
+<ResponseField name="ageVerified" field-type="EventEmitter<AgeVerificationResult>">
+  The reader answered an age gate: `{ verified: boolean; age?: number; birthDate?: Date }`. Fires for passes and fails. A pass is also stored on the device.
+</ResponseField>
+
+<ResponseField name="likeChange" field-type="EventEmitter<{ workId: string; liked: boolean }>">
+  The reader toggled **Like**. Stored on the device per work; mirror it server-side if your platform has accounts.
+</ResponseField>
+
+<ResponseField name="bookmarkChange" field-type="EventEmitter<{ workId: string; chapterId: string; panelId: string; bookmarked: boolean }>">
+  The reader set (`bookmarked: true`) or cleared the bookmark on a panel. Stored on the device per work and resumed on the next load when you pass no initial position.
+</ResponseField>
+
+`workId` in these payloads is the manifest's `meta.id` (falling back to the `manifestUrl`).
+
+### Example: wiring the outputs
 
 ```html
 <pw-player-shell
   #player
-  [manifest]="manifest"
+  [manifestUrl]="url"
+  [entitlementSnapshot]="snapshot"
   (ready)="onReady()"
   (panelChange)="onPanel($event)"
   (chapterChange)="onChapter($event)"
   (localeChange)="onLocale($event)"
   (variableChange)="onVariable($event)"
   (navigationAttempt)="onNavAttempt($event)"
+  (paywallAction)="openCheckout($event.gate)"
+  (ageVerified)="onAge($event)"
+  (likeChange)="syncLike($event)"
+  (bookmarkChange)="syncBookmark($event)"
   (error)="onError($event)">
 </pw-player-shell>
 ```
@@ -109,7 +165,7 @@ With a template reference (`#player`) or `@ViewChild(PlayerShellComponent)` you 
 | Method | Signature | Semantics |
 |---|---|---|
 | `navigateToChapter` | `(chapterId: string) => Promise<void>` | Jump to a chapter's graph entry panel |
-| `navigateToPanel` | `(chapterId: string, panelId: string) => Promise<void>` | Jump to a specific panel (entitlement-checked if an adapter is set) |
+| `navigateToPanel` | `(chapterId: string, panelId: string) => Promise<void>` | Jump to a specific panel (paywall-checked: a gated panel raises the paywall or age gate instead) |
 | `navigateNext` | `() => Promise<void>` | Follow the graph forward (condition + priority resolution) |
 | `navigatePrevious` | `() => Promise<void>` | Follow an incoming edge back |
 | `navigateToNextPage` / `navigateToPreviousPage` | `() => void` | Page-view navigation |
@@ -118,6 +174,7 @@ With a template reference (`#player`) or `@ViewChild(PlayerShellComponent)` you 
 | `getVariable` | `(key, scope?, scopeId?) => unknown` | Read a variable |
 | `toggleToolbar` | `() => void` | Show/hide the toolbar |
 | `getCurrentPanelId` | `() => string \| undefined` | ID of the currently shown panel |
+| `refreshEntitlements` | `(snapshot?: EntitlementSnapshot) => Promise<void>` | Apply a new snapshot (or re-fetch from `entitlementEndpoint` when called without one) and close the paywall if the reader is now through the gate |
 
 ```typescript
 import { Component, ViewChild } from '@angular/core';
@@ -145,12 +202,16 @@ These standalone components are part of the public API and can be used on their 
 |---|---|---|
 | `PwIconComponent` | `pw-icon` | `name` (Lucide id, e.g. `lucideSettings`) |
 | `SpeechBubblesComponent` | `pw-speech-bubbles` | `bubbles`, `locale`, `containerWidth/Height`, `workBalloonConfig`, `characters` → `bubbleClick`, `bubbleAudioPlay` |
+| `HotspotsOverlayComponent` | `pw-hotspots-overlay` | A panel's hotspots → `hotspotActivate` (see [Components](/player/components)) |
+| `ActionModalComponent` | `pw-action-modal` | The small localized dialog an `openModal` hotspot shows |
+| `BranchChooserComponent` | `pw-branch-chooser` | `visible`, `locale`, `choices: BranchChoice[]` → `choose: BranchChoice`, `close` |
+| `CanvasStageComponent` | `pw-canvas-stage` | The infinite-canvas stage behind canvas view (see [Canvas View](/player/canvas-view)) |
 | `PaywallOverlayComponent` | `pw-paywall-overlay` | `visible`, `gate`, `purchaseOptions`, `locale`, `title`, `message`, `allowPreview`, `showLogin` → `action: PaywallAction`, `purchase: string`, `close` |
 | `AgeGateComponent` | `pw-age-gate` | `visible`, `minimumAge` (default 18), `locale`, `warningMessage`, `allowDismiss` → `verify: AgeVerificationResult`, `close` |
 | `VideoLayerComponent` | `pw-video-layer` | `src`, `poster`, `playMode`, `startMode`, `muted`, `startAtMs`, `loopFromMs`, … → `videoPlay`, `videoPause`, `videoEnd`, `videoLoop`, `passComplete`, `videoError` |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | `manifest: PluginManifest` → `loaded`, `failed` |
 
-Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `LayerViewMode` (`'panel' | 'page'`).
+Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `BranchChoice` (`{ edge, index, label }`), `LayerViewMode` (`'panel' | 'page'`), `EntitlementSnapshot`.
 
 <Callout kind="alert">
 `PlayerComponent` (selector `pw-player`) is also exported but is a **legacy placeholder** that renders static text. Do not embed it.
@@ -158,4 +219,4 @@ Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe'
 
 ## Services
 
-All core services (`PlayerStateService`, `ManifestService`, `VariableStoreService`, `FlowEngineService`, `AudioEngineService`, `TrackingService`, `EntitlementService`, `PluginHostService`, and more) are `providedIn: 'root'` and exported — you can inject them next to the shell to observe or extend behavior. See [Services](/player/services) for the contributor-level reference.
+All core services (`PlayerStateService`, `ManifestService`, `VariableStoreService`, `FlowEngineService`, `AudioEngineService`, `TrackingService`, `PaywallService`, `EntitlementService`, `PluginHostService`, and more) are `providedIn: 'root'` and exported — you can inject them next to the shell to observe or extend behavior. See [Services](/player/services) for the contributor-level reference.

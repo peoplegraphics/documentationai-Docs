@@ -1,124 +1,172 @@
 ---
 title: Development & Contributing
-description: Contributing to the PanelWave Player — repository layout, building the library, running the demo app, tests and lint, commit conventions, and publishing.
+description: Contributing to the PanelWave Player — repository layout, building the library, the demo app, unit and E2E tests, CI checks, releases to npm, and the pull-request process.
 ---
 
-The player is MIT-licensed and open to contributions. This page covers the developer workflow inside the `panelwave-player` repository. For the internal design, start with [Player Architecture](/player/architecture).
+The player is MIT-licensed and developed in the open at [github.com/panelwave/player](https://github.com/panelwave/player). Issues and pull requests are welcome. This page covers the developer workflow; for the internal design, start with [Player Architecture](/player/architecture). The repository's [`CONTRIBUTING.md`](https://github.com/panelwave/player/blob/master/CONTRIBUTING.md) is the short version of the same rules.
 
 ## Repository layout
 
 ```
-panelwave-player/
+player/
 ├── angular.json              # Angular CLI workspace (projects: player, demo)
 ├── package.json              # Workspace scripts and dev dependencies
+├── CHANGELOG.md              # What changed in each release
+├── CONTRIBUTING.md
+├── SAMPLE_PLUGIN.html        # Runnable plugin example
+├── e2e/                      # Playwright specs (drive the demo app)
+├── .github/workflows/        # ci, release, demo-pages, size-limit
 ├── projects/
 │   ├── player/               # The library (published as @panelwave/player)
 │   │   ├── ng-package.json   # ng-packagr config → dist/player/
-│   │   ├── package.json      # Library package manifest
+│   │   ├── package.json      # Library package manifest (version, peer deps)
+│   │   ├── README.md         # The README shown on npm
 │   │   └── src/
 │   │       ├── public-api.ts # THE public API surface
-│   │       ├── assets/       # Fonts (balloon fonts), GUI i18n JSON
-│   │       └── lib/          # types/ utils/ services/ components/
-│   └── demo/                 # Demo app for local development
-│       └── src/app/          # Hosts pw-player-shell with sample manifests
-└── docs/                     # Per-feature implementation docs (*_COMPLETE.md)
+│   │       ├── assets/       # Balloon fonts, UI i18n JSON (en, de)
+│   │       └── lib/          # types/ utils/ services/ components/ entitlement/
+│   └── demo/                 # Demo app (see Demo App)
+└── docs/                     # Per-feature implementation notes and docs/API.md
 ```
 
-The `docs/` folder contains one deep-dive markdown file per feature (e.g. `PRELOAD_SERVICE_COMPLETE.md`, `VIEWPORT_COMPONENT_COMPLETE.md`, `BALLOON_RENDERER_SYNC.md`) — useful background, but **the source code is authoritative** when they disagree.
+The `docs/` folder holds background notes per feature — useful, but **the source code is authoritative** when they disagree.
 
-## Prerequisites and setup
+## Setup
 
-The player targets Angular 20 with TypeScript ~5.8 and RxJS 7.8. Runtime dependencies are deliberately small: `@ngx-translate/core` (GUI strings) and `json-logic-js` (conditions).
+You need **Node.js 24** (CI uses 24) with **npm 11** — the lockfile is written by npm 11, and npm 10 rejects it in `npm ci`. The library targets Angular 20 with TypeScript ~5.8 and RxJS 7.8; runtime dependencies are deliberately small (`json-logic-js` for conditions, `@ngx-translate/core` as a peer for UI strings).
 
 <Steps>
   <Step title="Clone and install">
     ```bash
-    git clone <repository-url>
-    cd panelwave-player
+    git clone https://github.com/panelwave/player.git
+    cd player
     npm install
     ```
-  </Step>
-  <Step title="Run the demo app">
-    ```bash
-    npm start
-    ```
-    Serves the demo application at `http://localhost:4200`. It embeds `pw-player-shell` with sample manifests — the fastest feedback loop while developing.
   </Step>
   <Step title="Build the library">
     ```bash
     ng build player
     ```
-    Builds via ng-packagr into `dist/player/`. Use `ng build player --watch` for incremental rebuilds while a host app consumes the built output.
+    Builds via ng-packagr into `dist/player/`. Use `ng build player --watch` for incremental rebuilds.
+  </Step>
+  <Step title="Run the demo app">
+    ```bash
+    npm start
+    ```
+    Serves the [demo app](/player/demo-app) at `http://localhost:4200`.
   </Step>
 </Steps>
 
+<Callout kind="alert">
+The demo resolves `@panelwave/player` from **`dist/player`** (a `tsconfig` path), not from the library sources. **Rebuild the library after every library change** — otherwise the demo and the E2E suite keep running the old code. Running `ng build player --watch` in a second terminal keeps them in sync.
+</Callout>
+
 ## Testing
 
-Unit tests use **Jasmine + Karma**, with `.spec.ts` files colocated next to their sources:
+### Unit tests
+
+Jasmine + Karma, with `.spec.ts` files next to their sources:
 
 ```bash
-# Interactive (watch mode, Chrome)
-ng test player
-
-# CI / single run, headless
-ng test player --watch=false --browsers=ChromeHeadless
-
-# With coverage (report at coverage/player/index.html)
-ng test player --code-coverage
+ng test player                                              # watch mode
+ng test player --watch=false --browsers=ChromeHeadless      # single run
+ng test player --watch=false --browsers=ChromeHeadless --code-coverage   # report in coverage/
 ```
 
-Services with pure logic (`FlowEngineService`, `VariableStoreService`, the utils incl. `variant-utils`) are the most test-dense areas — extend the existing specs when you change behavior there.
+On Windows, point Karma at the system Chrome: `CHROME_BIN="C:\Program Files\Google\Chrome\Application\chrome.exe"`. Services with pure logic (`FlowEngineService`, `VariableStoreService`, the paywall evaluator, the utilities) are the most test-dense areas — extend the existing specs when you change behavior there.
+
+### End-to-end tests
+
+Playwright drives the demo app, which the suite starts itself on port **4222**. It is hermetic — remote images are stubbed — and uses the demo's [URL parameters](/player/demo-app#url-parameters) (`?manifest=`, `?deny=`, `?vars=`, `?device=`, `?devtools=`) to reach specific states.
+
+```bash
+ng build player        # the demo runs against dist/player
+npm run e2e            # chromium + mobile (Pixel 7 emulation)
+npm run e2e:all        # + firefox + webkit
+npm run e2e:ui         # Playwright UI mode
+```
+
+Besides feature flows, the suite includes an accessibility sweep (axe over every dialog, overlay and view mode), reduced-motion and focus checks, a console-hygiene check (fails on any console error or warning), and heap-stability and frame-rate guards.
 
 ## Linting and code style
 
 ```bash
-ng lint
+ng lint player
 ```
 
-The workspace uses `angular-eslint` with strict `typescript-eslint` rules plus Prettier (`eslint-plugin-prettier`/`eslint-config-prettier`). Follow the Angular style guide; components are standalone, `OnPush`, and use the `pw-` selector prefix.
+The workspace uses `angular-eslint` with strict `typescript-eslint` rules plus Prettier, and lint is kept at **zero problems** for both the library and the demo. The rules that matter most:
 
-## Commit and branch conventions
+- Standalone components, `ChangeDetectionStrategy.OnPush`, `pw-` selector prefix, `inject()` over constructor injection.
+- No `any` in library code (specs may use it).
+- The manifest is untrusted input: never render manifest text as HTML, check ids against the manifest, evaluate conditions only through `evaluateJsonLogic`.
+- Accessibility is enforced by lint: every clickable element is focusable and keyboard-operable; dialogs close on Escape and backdrop click; respect reduced motion.
 
-- **Conventional commits**: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, …
-- **Branches**: `feature/*`, `bugfix/*`, `hotfix/*` off the development branch.
-- Standard flow: fork → feature branch → change + tests → `ng test player` and `ng lint` green → PR.
+## Commits, branches and pull requests
+
+- **Conventional commits**: `feat:`, `fix:`, `docs:`, `refactor:`, `test:`, `chore:`, … (e.g. `fix(viewport): keep hover nav arrows above the speech bubbles`).
+- **Branches**: `feature/*`, `bugfix/*`, `hotfix/*` off `master`.
+
+<Steps>
+  <Step title="Open the pull request against master">
+    Describe the behavior change and how you verified it (which suites ran).
+  </Step>
+  <Step title="CI must be green">
+    Lint, unit tests, the production library build and the E2E suite run on every pull request (see [CI](#continuous-integration)).
+  </Step>
+  <Step title="Note it in the changelog">
+    Add a line under **Unreleased** in `CHANGELOG.md` for anything a library consumer would notice.
+  </Step>
+  <Step title="Review">
+    One approving review from a maintainer; the maintainer merges.
+  </Step>
+</Steps>
 
 ## Working on the public API
 
 Everything a host can import comes from `projects/player/src/public-api.ts`. When you add a service, component, or utility that hosts should reach:
 
-1. Export the symbol (and its supporting types) from `public-api.ts`.
-2. Keep type definitions in `src/lib/types/` aligned with `@panelwave/types` and the [schema](/schema/overview) — format changes must land in schema, types, player, and CMS together.
-3. If you touch balloon rendering, follow the [player↔CMS sync policy](/player/balloon-renderer#why-the-renderer-is-shared-with-the-cms).
+1. Export the symbol (and its supporting types) from `public-api.ts` and document it in `docs/API.md`.
+2. Keep type definitions in `src/lib/types/` aligned with `@panelwave/types` and the [schema](/schema/overview) — format changes start in the schema, then `@panelwave/types`, then the player, in one release train.
+3. Renaming or removing an input/output is a **breaking change** (major version).
+4. Balloon geometry lives in files synced from the CMS editor — see [Balloon Renderer](/player/balloon-renderer#why-the-engine-is-shared-with-the-cms) before touching `comic-balloon.ts` or `balloon-geometry.ts`.
 
-## Building for production and publishing
+## Continuous integration
+
+| Workflow | Runs on | What it does |
+|---|---|---|
+| `ci` | every push to `master` and every pull request | Lint, unit tests with coverage, production library build, Playwright E2E (chromium + mobile) |
+| `size-limit` | pull requests | Fails when the gzipped library bundle grows past **180 KB** |
+| `demo-pages` | every push to `master` | Builds the demo app and deploys it to [panelwave.github.io/player](https://panelwave.github.io/player/) |
+| `release` | manual | Publishes a new version to npm (below) |
+
+The bundle budget is a hard limit: a change that needs more room has to make room elsewhere.
+
+## Releases
+
+`@panelwave/player` is published to npm by the **`release`** GitHub Actions workflow, never from a developer machine:
+
+1. A maintainer runs the workflow and picks the semver bump (`patch`, `minor`, `major` or `prerelease`).
+2. The workflow lints, builds, bumps `projects/player/package.json`, rebuilds, and publishes `dist/player` using **npm trusted publishing** — the registry trusts this repository's workflow via OIDC, so there is no stored npm token, and every version carries a **provenance** statement linking it to the workflow run.
+3. It commits the version bump, tags `vX.Y.Z` and creates the GitHub release.
+
+Versioning follows semver: fixes are patches, new inputs/outputs/features are minors, and removed or renamed API is a major. The [npm package page](https://www.npmjs.com/package/@panelwave/player) shows the package README (`projects/player/README.md`), so README changes appear there with the next release.
+
+To see exactly what would be published:
 
 ```bash
-# Production library build
 ng build player --configuration production
-
-# Output in dist/player/: ESM bundles, .d.ts declarations, package.json, README
-cd dist/player
-npm publish --access public
+cd dist/player && npm pack --dry-run
 ```
 
 Notes from `projects/player/ng-package.json`:
 
 - The entry file is `src/public-api.ts`; output goes to `dist/player/`.
-- `src/assets/` (balloon fonts, GUI translation JSON) is copied into the package, **except** files matching `amespro-*` — the commercial Ames Pro font files are excluded from the distributed package. The default balloon config references `'Ames Italic'` with a `sans-serif` fallback, so the renderer degrades gracefully when the font is absent.
+- `src/assets/` (balloon fonts, UI translation JSON) is copied into the package, **except** files matching `amespro-*` — the commercial Ames Pro font is never distributed. The default balloon config falls back to Comic Neue when Ames is absent.
 - The library `package.json` sets `sideEffects: false` for tree-shaking.
-
-## Demo app tips
-
-The demo project (`projects/demo/`) is a plain Angular application wired to the library source (not the built package), so changes hot-reload instantly. Use it to:
-
-- exercise sample manifests (see [Examples](/schema/examples) and the spec samples),
-- load an **external manifest** with `?manifest=<url>` — e.g. a CMS **preview manifest link** (see [Publishing](/cms/publishing)) — instead of the bundled samples,
-- test inputs/outputs interactively before writing specs,
-- reproduce bugs with a minimal manifest before filing or fixing.
 
 ## Related pages
 
 - [Installation](/player/installation) — consuming the published package
+- [Demo App](/player/demo-app) — manifest selector, device frames, dev tools
 - [Inputs & Outputs](/player/inputs-outputs) — the shell's public contract
 - [Core Services](/player/services) and [Components](/player/components) — where to make your change

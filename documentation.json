@@ -25,6 +25,10 @@
         {
           "title": "panelwave.org",
           "link": "https://panelwave.org"
+        },
+        {
+          "title": "GitHub",
+          "link": "https://github.com/panelwave"
         }
       ]
     }
@@ -277,6 +281,12 @@
                 "title": "Quickstart: Embed",
                 "path": "player/quickstart-embed",
                 "icon": "zap"
+              },
+              {
+                "title": "Demo App",
+                "path": "player/demo-app",
+                "icon": "monitor-play",
+                "badge": "New"
               }
             ]
           },

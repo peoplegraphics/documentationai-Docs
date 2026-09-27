@@ -27,7 +27,7 @@ The header stays visible at all times and is split into three areas.
 
 ### Left: where you are, and whether you're saved
 
-- **PanelWave CMS logo** — click to leave the editor and return to your works.
+- **PanelWave CMS logo** — click to leave the editor and return to your works. The small **beta** tag next to the wordmark marks the CMS as a gated beta (it also appears in the Backstage header and on the sign-in screens).
 - **Breadcrumb** — shows your current position (work › chapter › page › panel) and updates as you navigate.
 - **Branch badge** — the branch you are working on (normally `main`).
 - **Save status badge** — see [Saving](#saving-your-work) below.
@@ -51,7 +51,7 @@ The header stays visible at all times and is split into three areas.
 | **Preflight** | Runs validation checks and shows an issue count badge if problems are found. See [Validation](/cms/validation). |
 | **Publish** | Only enabled when everything is saved and preflight reports no issues. The guided publish flow behind it is still being rolled out — see [Publishing](/cms/publishing) for what's available today. |
 | **Close Editor** | Leaves the editor (you'll be asked to save if you have unsaved changes). |
-| **User menu** | Profile, settings, a theme control cycling light → dark → high contrast, keyboard shortcuts reference, a **Documentation** link to this site, and logout. |
+| **User menu** | Profile, **Exports** (your export jobs — see [Export](/cms/export)), Team, a theme control cycling light → dark → high contrast, keyboard shortcuts reference, a **Documentation** link to this site, and logout. |
 
 <Callout kind="tip">
   Press `?` anywhere in the editor to open the keyboard shortcuts overlay. The full list is on the [Shortcuts](/cms/editor/shortcuts) page.
@@ -59,7 +59,7 @@ The header stays visible at all times and is split into three areas.
 
 ### Contextual help
 
-A small **help icon** (a circled question mark) sits at the top right of most screens and editor sections. Clicking it opens the matching page of this documentation in a new tab — hover it to see which page. In the editor, the icon in the inspector header follows the active tab (Panel, Layer, Hotspot, Speech, Page, or A11y), the one in the left sidebar follows Tree, Assets, or Tools, and the timeline's icon opens [Animations](/cms/editor/animations). The works list and every Backstage tool carry one too.
+A small **help icon** (a circled question mark) sits at the top right of most screens and editor sections. Clicking it opens the matching page of this documentation in a new tab — hover it to see which page. In the editor, the icon in the inspector header follows the active tab (Panel, Layer, Hotspot, Speech, Page, or A11y; on **Perf** it opens this page), the one in the left sidebar follows Tree, Assets, or Tools, and the timeline's icon opens [Animations](/cms/editor/animations). The works list and every Backstage tool carry one too.
 
 ## Left sidebar
 
@@ -84,8 +84,31 @@ The inspector shows editable properties for whatever is selected, organized into
 | **Hotspot** | Shape, actions, and conditions of the selected hotspot. See [Hotspots](/cms/editor/hotspots). |
 | **Speech** | Text, balloon style, and audio of the selected speech bubble. See [Speech Bubbles](/cms/editor/speech-bubbles). |
 | **A11y** | Accessibility settings for the selected element — screen reader labels, captions, state properties. |
+| **Perf** | What readers download and decode for the open panel (or, in page view, the whole page), how long that takes on typical networks, and suggestions to make it lighter. See [The Performance tab](#the-performance-tab). |
 
-The **Layer**, **Hotspot**, and **Speech** tabs are grayed out until you select a matching element on the canvas, and the inspector switches to the right tab automatically when you click one. Edits in the inspector appear on the canvas immediately — there is no separate "apply" step.
+The **Layer**, **Hotspot**, and **Speech** tabs are grayed out until you select a matching element on the canvas, and the inspector switches to the right tab automatically when you click one. Edits in the inspector appear on the canvas immediately — there is no separate "apply" step. On a narrow inspector the tab strip wraps onto a second row instead of pushing tabs out of view.
+
+### The Performance tab
+
+The **Perf** tab estimates the reader's cost of what you are editing. It is read-only — it changes nothing — and updates live as you add, hide, or swap layers.
+
+- **Scope.** In panel view it covers the open panel, including unsaved edits. In page view it covers every panel placed on the current page (*"This page (4 panels)"*).
+- **Download, requests, and decoded memory.** The totals for all visible image, video, and audio layers. Pick a **Screen density** — **1×** (desktop), **2×** (most phones, the default), or **3×** (high-end phones) — and the estimate uses the same file the reader would load: for images the smallest [responsive variant](/cms/assets) wide enough for the layer at that density, for videos the H.264 variant when there is one, otherwise the original. Decoded memory is the size of the unpacked bitmap (width × height × 4 bytes), which is what actually fills a phone's memory.
+- **Load time per network.** A small table for **Slow 3G**, **4G**, and **Wi-Fi** — the panel (or page) on its own, and **With preload**, i.e. including the panels the player fetches ahead of the reader.
+- **Files.** Each media layer with the file it resolves to (a variant such as `w1280` or `optimized`, `h264`, or `original`) and its size. Sizes marked **≈** are approximated from the image area because the variant's exact size isn't recorded.
+- **Preload.** How many panels ahead the player fetches after this one, following the chapter's [graph](/cms/editor/graph) edges, and how much that adds. This follows the work's preload setting (*lookahead*, two panels ahead, unless the work says otherwise); with preloading off the tab says so.
+- **Suggestions.** Concrete fixes, as warnings or hints:
+  - an image that loads a heavy original (over 2 MB) because it has neither an optimized nor a responsive variant — run **Optimize** or the responsive backfill in the [Assets library](/cms/assets);
+  - images without responsive variants (phones download the full-size file), or far wider than they are ever shown;
+  - assets without stored dimensions (memory estimate incomplete) and layers pointing at an asset that is no longer in the library;
+  - videos without a poster frame (readers see an empty panel until playback starts) or without an H.264 variant;
+  - budgets: more than 5 MB for the panel, more than about 150 MB of decoded images, more than 15 layers, or more than 15 MB of preloaded panels on top.
+
+When nothing needs attention the tab shows *No issues found*. Open a panel with media layers if it reads *Nothing to estimate*.
+
+<Callout kind="info">
+  The numbers are estimates for planning, not measurements: network speeds follow the usual browser throttling presets, and the reader's own caching is not taken into account. Oversized files that would block publishing are still reported by [Preflight](/cms/validation).
+</Callout>
 
 ## Timeline
 
@@ -123,6 +146,12 @@ You can also save **manually at any time with `Ctrl+S`** — useful right before
 <Callout kind="info">
   If you try to close the editor or navigate away with unsaved changes, a dialog asks whether you want to save before leaving — so a mistimed click won't lose work.
 </Callout>
+
+### Read-only works
+
+A work can become **read-only** — when it is above your plan's publication limit, or when its team is suspended. You can still open it in the editor, read it, preview it, and [export](/cms/export) it; you just can't change it.
+
+A **Read-only** banner under the header explains why and what to do (for a plan limit: upgrade, buy a Work Pass, or archive a work you no longer edit). While it shows, the editor **does not auto-save** — any edits you make stay in the browser and are not sent — so you won't see a stream of permission errors. The [Localization Workshop](/cms/localization) likewise opens without its automatic string extraction. See [Plans & Limits](/cms/plans#read-only-works) for how the CMS decides which works stay editable.
 
 ## Next steps
 

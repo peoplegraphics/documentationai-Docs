@@ -45,7 +45,7 @@ State changes are expressed as mutations (`VariableMutation` — `{ op, var, val
 | `remove` | Filter `value` out of an array |
 | `clear` | Reset to the definition's default (or `null`) |
 
-Graph edges may carry `action?: Mutation[]` — mutations meant to run when the edge is traversed. `FlowEngineService.getNextPanel()` returns these in its `NavigationResult.action`, but note that **`PlayerShellComponent` does not currently apply them automatically**; applying edge actions is up to the navigation host (via `VariableStoreService.applyMutation`).
+Graph edges may carry `action?: Mutation[]` — mutations applied when the edge is traversed. `FlowEngineService.getNextPanel()` returns them in its typed `NavigationResult.action` (`Mutation[]`), and `PlayerShellComponent` applies them (chapter-scoped where the definition says so) on every **Next** navigation and when the reader picks the edge in the [branch chooser](/player/reader-interface#branch-choices). If you drive navigation yourself through `FlowEngineService`, apply `result.action` with `VariableStoreService.applyMutations` the same way.
 
 ## The evaluation context
 
@@ -117,7 +117,7 @@ Beyond stepping, the engine offers graph analysis used by tooling and the shell:
 
 ### Entitlement gating
 
-Navigation is also gated by monetization: the shell checks its `entitlementAdapter.hasAccess(panelId)` before entering a panel, and `FlowEngineService` exposes `checkPanelEntitlement` / `checkChapterEntitlement` / `checkWorkEntitlement`, which delegate to `EntitlementService` (with its 5-minute cache). See [Paywall & Entitlement](/player/paywall-entitlement).
+Navigation is also gated by monetization: before entering a panel the shell asks `PaywallService` whether the manifest's paywall rules let this reader in (or, when the host set one, its `entitlementAdapter.hasAccess(panelId)`) and raises the paywall overlay or age gate instead of navigating, and `FlowEngineService` exposes `checkPanelEntitlement` / `checkChapterEntitlement` / `checkWorkEntitlement`, which delegate to `EntitlementService` (with its 5-minute cache). See [Paywall & Entitlement](/player/paywall-entitlement).
 
 ## Variants
 

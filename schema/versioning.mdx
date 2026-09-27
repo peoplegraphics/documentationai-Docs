@@ -38,8 +38,8 @@ The format follows semantic versioning:
 The schema file lives in a directory named after the **major** version. Minor versions are additive and ship **in place** within that directory:
 
 - Current format version: **1.5.0**
-- Schema location: `schema/1.0/panelwave.schema.json`
-- Schema `$id`: `https://panelwave.org/schema/1.0/panelwave.schema.json` (unchanged by minor releases)
+- Schema location: [`1.0/panelwave.schema.json`](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) in the [panelwave/schema](https://github.com/panelwave/schema) repository
+- Schema `$id`: `https://panelwave.org/schema/1.0/panelwave.schema.json` (unchanged by minor releases; an identifier — the URL is not publicly served yet)
 
 This is why a `1.5.0` manifest still points its `schema` URI at the `1.0/` path — the 1.1/1.2/1.3/1.4/1.5 additions were merged into the same schema file, and every valid 1.0 manifest remains valid against it.
 
@@ -129,7 +129,7 @@ The upgrade currently performs these normalizations:
 - Adds a missing `graph.edges` array
 
 <Callout kind="info">
-The CLI's upgrade target is `1.5.0` (synchronized with the current format release). Since 1.1–1.5 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
+The CLI's upgrade target is `1.5.0` — always the version declared by the schema bundled in that CLI release; the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.5 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 After upgrading, always re-validate:

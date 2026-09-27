@@ -26,18 +26,18 @@ New to branching stories? Read [Graph Navigation](/concepts/graph-navigation) fi
 </Steps>
 
 <Callout kind="tip">
-A brand-new chapter shows *"This chapter has no graph yet. The graph will be automatically created when you add panels."* Add panels to the chapter first (see [Pages & Panels](/cms/editor/pages-panels)), then come back to shape the flow.
+A chapter without panels shows *"This chapter has no graph yet. Add panels to the chapter, then connect them here."* Add panels to the chapter first (see [Pages & Panels](/cms/editor/pages-panels)), then come back to shape the flow.
 </Callout>
 
 ## Reading the map
 
-Each **node** on the canvas is one panel of the chapter, labeled with the panel's title. The **Legend** (top right) explains the color coding:
+Each **node** on the canvas is one panel of the chapter, labeled with the panel's title. **Every** panel of the chapter is shown — including brand-new panels that have no connections yet — so you can draw the first edge of a fresh chapter right away. The **Legend** (top right) explains the color coding:
 
 | Element | Appearance | Meaning |
 |---|---|---|
 | Start Node | Green node | The chapter's entry panel — where reading begins |
 | Panel Node | Blue node | A regular panel |
-| End Node | Red node | A panel with no outgoing edges — the flow stops here |
+| End Node | Red node | A panel that is reached by an edge but has no outgoing edges — the flow stops here. Panels with no edges at all appear as regular panel nodes. |
 | Unconditional edge | Solid green line | Always followed |
 | Conditional edge | Dashed orange line | Only followed when its condition is true |
 
@@ -107,7 +107,7 @@ Select a single edge and the **Edge** panel opens (bottom left). It shows the ro
 
 > **Condition (JSON Logic; empty = always follow)**
 
-Leave it empty for an unconditional edge. Type a condition to make the edge conditional (it turns dashed orange). Conditions are written in **JSON Logic** — a small, safe rule format that reads almost like a sentence once you know the pattern. A rule always asks a question about your [story variables](/cms/editor/variables):
+Leave it empty for an unconditional edge — clearing the field removes an existing condition. Type a condition to make the edge conditional (it turns dashed orange). The condition is saved with the edge and shows up again the next time you open the graph; if the text isn't valid JSON, nothing is saved and the editor says *"Edge condition must be valid JSON Logic"* with an example. Conditions are written in **JSON Logic** — a small, safe rule format that reads almost like a sentence once you know the pattern. A rule always asks a question about your [story variables](/cms/editor/variables):
 
 ```json
 {"==": [{"var": "choice"}, "A"]}
@@ -167,7 +167,7 @@ The Graph Editor checks your flow continuously and shows a **Validation** panel 
 | Info | `1 isolated node(s) with no connections` | A panel with no edges at all. |
 | Info | `2 node(s) have no outgoing edges` | Dead ends — fine if they are meant as endings. |
 
-Clicking an issue highlights the affected nodes on the canvas. Some issues offer one-click **quick fixes**: **Auto-layout graph** (for unreachable nodes, so you can see them) and **Connect to entry node** (creates an edge from the entry to an orphaned panel).
+Findings from the local check and the deeper server-side check are shown together, with panel titles in place of internal ids. Each issue is a button — click it (or focus it and press <kbd>Enter</kbd>) to highlight the affected nodes on the canvas. Some issues offer one-click **quick fixes**: **Auto-layout graph** (for unreachable nodes, so you can see them) and **Connect to entry node** (creates an edge from the entry to an orphaned panel).
 
 When everything is clean you'll see: *"No issues found - graph is valid!"*
 

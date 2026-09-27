@@ -3,7 +3,11 @@ title: Example Manifests
 description: Guided tour of the seven sample manifests (01_simple to 07_video) — what each demonstrates, with key excerpts you can copy.
 ---
 
-The format repository ships seven sample manifests under `_spec/samples/`, from a minimal smoke-test file to a full branching story and a schema 1.1 video showcase. They are the fastest way to see the schema in practice — validate any of them with the [CLI](/schema/cli) (`panelwave validate <file>`) or the repository's `node validate-samples.js` script.
+PanelWave maintains a reference set of sample manifests, from a minimal smoke-test file to a full branching story and a schema 1.1 video showcase. This page walks through the first seven and the four literature adaptations that follow, with excerpts you can copy. Validate any manifest with the [CLI](/schema/cli) (`panelwave validate <file>`).
+
+<Callout kind="info">
+The full sample set is not in a public repository yet — a public samples repository is planned. Complete manifests you can download today are the player's demo manifests in [panelwave/player → `projects/demo/src/assets`](https://github.com/panelwave/player/tree/master/projects/demo/src/assets) (`sample-manifest.json`, `canvas-manifest.json`, `video-sequencing-manifest.json`), which also run in the [live demo](https://panelwave.github.io/player/).
+</Callout>
 
 | Sample | File | Demonstrates |
 |---|---|---|
@@ -16,7 +20,7 @@ The format repository ships seven sample manifests under `_spec/samples/`, from 
 | `07_video` | `panelwave_graphic_novel_sample_07_video.json` | Schema 1.1 video panels: all play/start modes, reverse variant, defaults |
 
 <Callout kind="success">
-All seven samples validate cleanly against the current schema (`node validate-samples.js` in the repository runs the check).
+All samples validate cleanly against the current schema — the same check `panelwave validate` runs with the CLI's bundled schema.
 </Callout>
 
 ## 01_simple — the linear baseline

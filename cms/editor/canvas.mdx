@@ -76,6 +76,13 @@ With two or more panels selected in page view you can align them; with three or 
 | `Ctrl+Shift+H` / `Ctrl+Shift+M` | Align horizontal center / vertical middle |
 | `Ctrl+Alt+H` / `Ctrl+Alt+Y` | Distribute horizontally / vertically |
 
+### Stacking order and matching sizes
+
+Two more right-click groups work on the whole multi-panel selection:
+
+- **Arrange** — **Bring to Front**, **Bring Forward**, **Send Backward**, and **Send to Back** apply to *every* selected panel, not just the one you right-clicked. The selection keeps its own internal stacking: panels that overlapped each other still do so in the same order after they move up or down as a group.
+- **Match Size** — **Match Width**, **Match Height**, or **Match Width & Height** copies the dimensions of the **primary** panel (the one with the solid outline — see [Selecting elements](#selecting-elements)) onto the other selected panels. A panel that would stick out past the page edge after growing is nudged back onto the page. Match Size needs at least two selected panels in page view; otherwise the entries are grayed out.
+
 ## Page view vs panel view
 
 <Tabs>
@@ -117,7 +124,7 @@ Dropped media always keeps its **true aspect ratio**: the first image or video i
 
 ## Right-click menu
 
-Right-clicking the canvas opens a context menu with actions for the current selection — adding layers and hotspots, an **Add Speech Bubble** submenu with all ten balloon types (including snap-to-border Narrator and Panel-Top placements — see [Speech Bubbles](/cms/editor/speech-bubbles)), arranging order, and the Align/Distribute submenus for multi-panel selections. Entries that don't apply to your selection are grayed out.
+Right-clicking the canvas opens a context menu with actions for the current selection — adding layers and hotspots, an **Add Speech Bubble** submenu with all ten balloon types (including snap-to-border Narrator and Panel-Top placements — see [Speech Bubbles](/cms/editor/speech-bubbles)), arranging order (**Arrange**), and the **Align**, **Distribute**, and **Match Size** submenus for multi-panel selections. Entries that don't apply to your selection are grayed out.
 
 ## Related pages
 

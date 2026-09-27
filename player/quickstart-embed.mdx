@@ -3,52 +3,38 @@ title: "Quickstart: Embed the Player"
 description: Load a PanelWave manifest and render it with pw-player-shell — a minimal, working Angular embed based on the demo application.
 ---
 
-This page shows the smallest useful integration: fetch a manifest JSON file, hand it to `pw-player-shell`, and react to player events. It mirrors the demo application that ships with the player repository (`projects/demo`).
+This page shows the smallest useful integration: point `pw-player-shell` at a manifest, and react to player events. It mirrors the demo application that ships with the player repository (`projects/demo`).
 
 ## Prerequisites
 
-- [Installation](/player/installation) completed (`provideHttpClient()` + `TranslateModule.forRoot(...)` configured).
-- A valid manifest file, e.g. `src/assets/my-story/panelwave.json`. You can export one from the [CMS](/cms/export), use a sample from the schema repository, or start from the minimal example below.
+- [Installation](/player/installation) completed (`provideHttpClient()` + `TranslateModule.forRoot(...)` configured, UI translation files and balloon fonts added).
+- A valid manifest file, e.g. `src/assets/my-story/panelwave.json`. You can export one from the [CMS](/cms/export), start from the minimal example below, or take one of the demo works from the player repository ([`projects/demo/src/assets`](https://github.com/panelwave/player/tree/master/projects/demo/src/assets): `sample-manifest.json`, `canvas-manifest.json`, `video-sequencing-manifest.json`).
 
-<Callout kind="alert">
-Pass the manifest as an **object** via `[manifest]`. The shell also has a `manifestUrl` input, but URL loading is **not implemented yet** in the shell — providing only `manifestUrl` currently produces an error. Fetch the JSON yourself (as below) and bind the object.
-</Callout>
+## Option A: load by URL
 
-## Component
+The shortest embed: give the shell the manifest's URL. It fetches the JSON with `HttpClient`, validates it, and starts reading.
 
 ```typescript
 // reader.component.ts
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { PlayerShellComponent } from '@panelwave/player';
-import type { PanelWaveManifest, Panel, Chapter } from '@panelwave/player';
+import type { Panel, Chapter } from '@panelwave/player';
 
 @Component({
   selector: 'app-reader',
-  standalone: true,
   imports: [PlayerShellComponent],
-  templateUrl: './reader.component.html',
+  template: `
+    <pw-player-shell
+      manifestUrl="assets/my-story/panelwave.json"
+      locale="en-US"
+      [showToolbar]="true"
+      (ready)="onPlayerReady()"
+      (panelChange)="onPanelChange($event)"
+      (error)="onError($event)" />
+  `,
+  styles: `:host { display: block; height: 100dvh; }`,
 })
-export class ReaderComponent implements OnInit {
-  manifest: PanelWaveManifest | null = null;
-  loading = true;
-  error: string | null = null;
-
-  constructor(private http: HttpClient) {}
-
-  ngOnInit(): void {
-    this.http.get<PanelWaveManifest>('assets/my-story/panelwave.json').subscribe({
-      next: (manifest) => {
-        this.manifest = manifest;
-        this.loading = false;
-      },
-      error: (err) => {
-        this.error = `Failed to load manifest: ${err.message}`;
-        this.loading = false;
-      },
-    });
-  }
-
+export class ReaderComponent {
   onPlayerReady(): void {
     console.log('Player is ready');
   }
@@ -58,34 +44,66 @@ export class ReaderComponent implements OnInit {
   }
 
   onError(error: Error): void {
-    this.error = error.message;
+    console.error(error.message); // e.g. "Manifest load failed: …"
   }
 }
 ```
 
-## Template
+A cross-origin manifest URL needs CORS headers on the server that hosts it (manifests published from the CMS preview send `Access-Control-Allow-Origin: *`).
 
-```html
-<!-- reader.component.html -->
-@if (loading) {
-  <p>Loading…</p>
-}
-@if (error) {
-  <p class="error">{{ error }}</p>
-}
-@if (manifest && !loading) {
-  <pw-player-shell
-    [manifest]="manifest"
-    [locale]="'en-US'"
-    [showToolbar]="true"
-    (ready)="onPlayerReady()"
-    (panelChange)="onPanelChange($event)"
-    (error)="onError($event)">
-  </pw-player-shell>
+<Callout kind="info">
+The shell reads its inputs once, when it initializes. If both `manifestUrl` and `manifest` are set, the URL wins. To open a different work, re-create the component (see [Switching works](#switching-works)).
+</Callout>
+
+<Callout kind="alert">
+**Known limitation (1.0.x):** the table of contents and the thumbnail strip read their chapter list from the `manifest` input, so they stay empty when the work is loaded with `manifestUrl` only. If your readers need them, use option B.
+</Callout>
+
+## Option B: pass the manifest object
+
+Load the JSON yourself when you need to transform it first, cache it, or fetch it with your own auth — then bind the object:
+
+```typescript
+// reader.component.ts
+import { Component, OnInit, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { PlayerShellComponent } from '@panelwave/player';
+import type { PanelWaveManifest } from '@panelwave/player';
+
+@Component({
+  selector: 'app-reader',
+  imports: [PlayerShellComponent],
+  templateUrl: './reader.component.html',
+})
+export class ReaderComponent implements OnInit {
+  private http = inject(HttpClient);
+  manifest: PanelWaveManifest | null = null;
+  error: string | null = null;
+
+  ngOnInit(): void {
+    this.http.get<PanelWaveManifest>('assets/my-story/panelwave.json').subscribe({
+      next: (manifest) => (this.manifest = manifest),
+      error: (err) => (this.error = `Failed to load manifest: ${err.message}`),
+    });
+  }
 }
 ```
 
-That's the entire integration. The shell validates the manifest, navigates to the first chapter's graph entry panel, and renders the viewport plus toolbar.
+```html
+<!-- reader.component.html -->
+@if (error) {
+  <p class="error">{{ error }}</p>
+}
+@if (manifest) {
+  <pw-player-shell
+    [manifest]="manifest"
+    locale="en-US"
+    [showToolbar]="true"
+    (error)="error = $event.message" />
+}
+```
+
+Either way that's the entire integration. The shell validates the manifest, navigates to the first chapter's graph entry panel (or to the reader's bookmark in this work, if they left one), and renders the viewport plus toolbar.
 
 ## A minimal valid manifest
 
@@ -151,9 +169,11 @@ Use the initial-position inputs to deep-link into a work (e.g. to implement resu
 </pw-player-shell>
 ```
 
+An explicit initial position always wins over the reader's own [bookmark](/player/reader-interface#like-and-bookmark).
+
 ## Switching works
 
-The shell loads its manifest in `ngOnInit`. To switch to a different work at runtime, destroy and re-create the component — the demo app does this by clearing `manifest` (which removes the element via `@if`) before assigning the new one.
+The shell loads its manifest in `ngOnInit` and does not watch its inputs afterwards. To switch to a different work at runtime, destroy and re-create the component — the demo app does this by clearing `manifest` (which removes the element via `@if`) before assigning the new one. With `manifestUrl`, wrap the element in `@if` or a keyed `@for` the same way.
 
 ## Next steps
 
@@ -165,7 +185,7 @@ The shell loads its manifest in `ngOnInit`. To switch to a different work at run
     What your readers can do once the player renders.
   </Card>
   <Card title="Paywall & Entitlement" icon="lock" href="/player/paywall-entitlement">
-    Wire up gated content with an entitlement adapter.
+    Tell the player what the reader owns and handle checkout.
   </Card>
 </Columns>
 

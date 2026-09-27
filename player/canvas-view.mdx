@@ -44,11 +44,17 @@ The camera is a persistent position + zoom over the plane, managed by
 | Pinch / Ctrl+wheel | zoom | zoom at cursor |
 | Plain wheel | — | pan |
 | Tap a panel | advance if it's an out-edge target of the current panel (condition-gated) | same, plus jump to already-visited panels |
+| Tap / `Enter` on a hotspot of the current panel | run the hotspot's action (as in panel view) | same |
 | `O` | toggle overview (zoom out to the whole canvas, and back) | same |
 | `+` / `-` | zoom in / out | same |
 
 With `freeRoam: "between-moves"` (the default) panning is available while the
 camera is idle; `"always"` also allows grabbing the camera mid-glide.
+
+Only the **current** panel's [hotspots](/schema/hotspots) are interactive: a
+press that starts on one of them is left to the hotspot instead of becoming a
+pan or a panel tap, and its action and `hotspot_click` tracking run exactly as
+in panel view. Hotspots on the other visible panels are drawn but inert.
 
 ## Reveal modes
 
@@ -82,7 +88,8 @@ The plane is unbounded, but the working set is not:
 
 ## Accessibility & reduced motion
 
-- Under `prefers-reduced-motion` (or the shell's `reducedMotion` input) the
+- Under reduced motion — the OS `prefers-reduced-motion` setting, the
+  reader's Settings switch, or the shell's `reducedMotion` input — the
   camera **never glides**: reframes are instant, softened by a short
   cross-fade; an authored `reducedMotionFallback` transition takes precedence.
 - Keyboard-only traversal is complete (arrows, `O`, `+`/`-`).

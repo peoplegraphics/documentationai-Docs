@@ -24,17 +24,26 @@ There are two ways to get files in:
 While uploading, each file shows an **Uploading…** card with a live progress bar, status, and any error message. Newly uploaded assets appear with a **Processing…** indicator until automatic processing finishes.
 
 <Callout kind="info">
-When a folder is selected in the folder pane, new uploads are **filed into that folder automatically** — the Upload button shows the target folder as a small chip so there are no surprises. Select **All assets** or **Unfiled** to upload without filing.
+When a folder is selected in the folder pane, new uploads (large ones included) are **filed into that folder automatically** — the Upload button shows the target folder as a small chip so there are no surprises. Select **All assets** or **Unfiled** to upload without filing.
 </Callout>
 
-### Large files and resumable uploads
+### Large files
 
-Small files upload directly. Large files (10 MB and up — think video or long audio) automatically switch to **resumable, chunked uploads**:
+Small files upload in one piece. Files of **10 MB and more** — think video or long audio — automatically switch to a **multipart upload**: the file goes straight to storage in 5 MB parts, the progress bar follows the parts, and a part that fails on a flaky connection is retried automatically (up to three times) before the upload gives up.
 
-- Progress survives network interruptions — when the connection returns, the upload resumes where it stopped.
-- You can even close the browser mid-upload and resume later.
+Once all parts are in, the file is registered like any other upload — the same checks, duplicate detection, processing, and folder filing apply, and the asset stays in your library after a reload.
 
-You don't need to do anything to enable this; the CMS picks the right upload method per file.
+You don't need to do anything to enable this; the CMS picks the right upload method per file. Keep the tab open until the card leaves the *Uploading…* state — an upload interrupted by closing the browser has to be started again.
+
+### Upload checks
+
+Files go from your browser directly to storage, and the CMS then checks what actually arrived before adding it to the library:
+
+- **The content must match the file type.** The first bytes of every file are inspected to confirm it really is an image, audio file, video, or font of a recognised format. A file whose content doesn't match — say, a renamed document posing as a `.png` — is rejected with *"File content does not match the declared type"* and removed from storage.
+- **SVG files are screened.** An SVG over 2 MB, or one containing scripts, `foreignObject` elements, event-handler attributes, or `javascript:` links, is rejected.
+- **Sizes come from storage.** The stored file size (used for your storage totals) is measured on the server, not taken from the browser.
+
+The same checks run for **Replace File** — before the old file is touched, so a rejected replacement leaves the asset exactly as it was — and for the panel crops that [Page Import](/cms/page-import) adds to your library.
 
 ## Automatic processing
 
@@ -48,7 +57,7 @@ After upload, a background pipeline optimizes every asset. You keep working whil
 
 One more variant is created **on demand**: when preflight flags an image as too large to publish, its **Optimize** fix produces an `optimized` WebP derivative that the published work ships instead of the original — see [Validation](/cms/validation#auto-fixes). The full-quality original always stays in your library.
 
-Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage.
+Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage — you get the existing asset back instead of a copy.
 
 <Callout kind="info">
 Readers automatically get the best variant their device supports — you never have to export "web versions" yourself. Published manifests list the size ladder alongside the full-quality primary file, and the [player picks by actual display size](/player/performance#asset-variant-selection). See [Assets in the format](/concepts/assets) for how variants appear in the manifest.
@@ -104,6 +113,8 @@ Right-click an asset (or use the **⋮** button) for the context menu:
 <Callout kind="tip">
 **Replace File** is the safe way to swap artwork after revisions: the asset keeps its ID, so layers, covers, and extras that reference it don't break.
 </Callout>
+
+A replacement must be of the same kind as the original (an image replaces an image, a video a video). Need the old version back as well? Uploading the replaced file again creates a **new, separate asset** next to the replaced one.
 
 ## The details panel
 

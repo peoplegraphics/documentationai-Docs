@@ -51,7 +51,7 @@ Every row has a right-click context menu (also available via the **⋮** button 
 
 | Node | Menu items |
 |---|---|
-| **Work** | New Chapter · Properties · Settings |
+| **Work** | New Chapter · Properties ([Work Properties](/cms/works)) · Settings (placeholder — not available yet) |
 | **Chapter** | New Page · Duplicate · Rename · Move Up · Move Down · Delete |
 | **Page** | New Panel · Page Properties · Duplicate · Rename · Move Up · Move Down · Delete |
 | **Panel** | Edit Panel · Duplicate · Move to... · Set Paywall · Content Warning · Copy as JSON · Delete Panel |
@@ -66,12 +66,14 @@ Each draggable row shows a grip handle (⋮⋮). Drag it to reorder:
 - **Pages** within a chapter
 - **Panels** within a page
 
-A "Drop here" placeholder shows where the item will land — and the item really lands **at that position**, including panels dragged in from another page or from **Unassigned**; the canvas renumbers immediately. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders.
+A "Drop here" placeholder shows where the item will land — and the item really lands **at that position**, including panels dragged in from another page or from **Unassigned**; the canvas renumbers immediately. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders, and a panel's **Move to...** opens a dialog listing every chapter and page of the work (the top level expanded) as a destination.
 
 You can also drag a panel from the tree **onto the canvas** (in page view) to place it on the current page.
 
 <Callout kind="info">
 A panel can appear on pages of several [page formats](/cms/works#output) at once. **Delete Panel** on a panel that other pages still use only **detaches** it from the current page — the other formats' pages keep it. Only deleting its last page reference removes the panel itself.
+
+Deleting a panel also removes it from every page's reading order and layout. Pages edited before that clean-up existed can still list panels that are gone (the timeline then warns *Panel not found*); [Preflight](/cms/validation-codes#dangling-page-ref) finds them and its **Fix** button removes the stale entries.
 </Callout>
 
 ## Page layouts
@@ -136,8 +138,18 @@ The rest of the Panel tab manages content that has its own documentation:
 |---|---|---|
 | **Animations** | Camera moves and timed effects for the panel | [Animations](/cms/editor/animations) |
 | **Video Tracks** / **Audio Tracks** / **Sequence Audio Tracks** | Media that plays with the panel or across a sequence | [Audio](/cms/editor/audio), [Video Panels](/cms/editor/video-panels) |
-| **Variants** | Conditional versions of the panel based on reader choices | [Variables](/cms/editor/variables) |
-| **Performance Hints** | Preload priority and memory hints for large works | — |
+| **Variants** | Conditional versions of the panel based on reader choices — see [below](#variants) | [Variables](/cms/editor/variables) |
+| **Performance Hints** | Preload priority and memory hints for large works | For what readers actually download, see the [Perf tab](/cms/editor/layout#the-performance-tab) |
+
+### Variants
+
+A variant is an alternative version of the panel that the reader sees when a condition on your [story variables](/cms/editor/variables) is true — a different line of dialogue after a choice, other artwork once a door is open. Click **+ Add Variant** in the **Variants** section to open the variant editor:
+
+- **Variant** — an id for the variant (e.g. `var-left-path`), unique within the panel.
+- **Condition (JSON Logic)** — built with the rule builder. Its variable dropdown lists the variables defined in the work's [Variables designer](/cms/editor/variables); define a variable there first if it's missing. Variants are checked in order and the **first match wins**.
+- **Overrides** — the panel fields this variant replaces (title, description, duration, layers, speech bubbles, hotspots, …). **Copy from panel** starts from the panel's current value.
+
+Each variant in the list shows its id and a *When: …* summary of its condition. Preflight reports variants that would be skipped at publish — no condition, no overrides, a duplicate id, or a condition naming an unknown variable; see the `VARIANT_*` codes in the [Validation Code Reference](/cms/validation-codes#variant-no-condition).
 
 <Callout kind="tip">
   The inspector also has an **A11y** tab for the selected element, covering screen reader settings, captions for audio/video, and interactive element accessibility — worth a pass before [publishing](/cms/publishing).

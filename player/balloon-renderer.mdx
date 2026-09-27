@@ -1,9 +1,9 @@
 ---
 title: Balloon Renderer (ComicBalloon)
-description: How the ComicBalloon SVG engine draws speech bubbles — the ten balloon types, tail geometry, the mergeBalloonConfig cascade, and why the renderer is shared with the CMS.
+description: How the ComicBalloon SVG engine draws speech bubbles — the ten balloon types, tail geometry, the mergeBalloonConfig cascade, and how the engine stays identical to the CMS editor's.
 ---
 
-Speech bubbles in the player are drawn by **ComicBalloon**, a framework-free SVG renderer in `projects/player/src/lib/utils/comic-balloon.ts`, configured through helpers in `utils/balloon-config.ts` and driven by `SpeechBubblesComponent` (`pw-speech-bubbles`). For the manifest format of bubbles, see [Speech Bubbles](/schema/speech-bubbles).
+Speech bubbles in the player are drawn by **ComicBalloon**, a framework-free SVG renderer in `projects/player/src/lib/utils/comic-balloon.ts` (with its geometry helpers in `utils/balloon-geometry.ts`), configured through helpers in `utils/balloon-config.ts` and driven by `SpeechBubblesComponent` (`pw-speech-bubbles`). For the manifest format of bubbles, see [Speech Bubbles](/schema/speech-bubbles).
 
 ## How a balloon is drawn
 
@@ -25,10 +25,10 @@ const result = balloon.render('HELLO WORLD!', { position: 180, length: 45 });
 `render(text, tailOptions)` performs these steps:
 
 1. **Measure the text** with a hidden, absolutely positioned `<div>` using the target font, size, and line height (text is rendered uppercase, matching classic comic lettering).
-2. **Size the balloon** from the measured text plus padding (default 14/18/14/18 px), with extra padding for shout and thought shapes; `maxWidth`/`maxHeight` win when set.
+2. **Size the balloon** from the measured text plus padding (default 14/18/14/18 px), with extra padding for shout and thought shapes; `maxWidth`/`maxHeight` cap the size when set. A value of `0` means "no cap" — the balloon takes its natural size in that direction.
 3. **Compute the tail tip.** A tail can be given as absolute coordinates (`x`/`y`) or as `position` (degrees, 0° = top, 180° = bottom) plus `length`; the tail base is found on the balloon outline at that angle.
 4. **Build the outline path.** The body is a *squircle* — a superellipse sampled at 180 points with exponent `n = 2 + (1 - cornerRadius) * 3`, so `cornerRadius: 1` is a pure ellipse and `cornerRadius: 0` becomes a rounded rectangle. Thought and shout types use their own path generators (`createThoughtBalloonPath`, `createShoutBalloonPath`).
-5. **Integrate the tail into the outline** (except for thought balloons, which get a chain of three shrinking bubble circles instead). Tails can be `straight` or curved `left`/`right` using quadratic Béziers scaled by `curveAmount`.
+5. **Integrate the tail into the outline** (except for thought balloons, which get a chain of three shrinking bubble circles instead). Tails can be `straight` or curved `left`/`right` using quadratic Béziers scaled by `curveAmount` (an explicit `0` draws a straight tail).
 6. **Emit SVG**: a `<path>` for the balloon (split into separate fill and stroke paths when needed), an optional `<clipPath>` for the hide-border effect, and a `<foreignObject>` containing the text `<div>` centered in the balloon.
 
 The returned `BalloonRenderResult` exposes `update()`, `updateTail()`, and `updateText()` for cheap re-renders, plus the final `width`/`height` and the `SVGSVGElement`.
@@ -62,7 +62,7 @@ Tail options (part of `BalloonConfig.tail`):
 | `position` | Angle on the outline in degrees (0 = top, 90 = right, 180 = bottom, 270 = left) |
 | `length` | Distance from the balloon edge to the tail tip, in pixels |
 | `curve` | `straight`, `left`, or `right` |
-| `curveAmount` | Curvature strength (default `0.4`) |
+| `curveAmount` | Curvature strength (default `0.4`; `0` is honoured as no curvature) |
 
 `hideBorder` (`{ enabled, angle, arc }`) suppresses a segment of the outline stroke — an `arc`-degree window centered on `angle` is clipped away with an SVG `<clipPath>` polygon while the fill stays intact. Letterers use this where a bubble merges with the panel border or another bubble.
 
@@ -96,15 +96,16 @@ The merged config is converted for the renderer with `balloonConfigToRenderOptio
 - Balloons are re-rendered on input changes and once more on `document.fonts.ready`, so late-arriving comic fonts cannot leave stale text measurements.
 - Each balloon wrapper gets `role="img"`, an `aria-label` with the text, keyboard activation (Enter/Space), and click handling that emits `bubbleClick` and — when the bubble has an `audioAssetId` — `bubbleAudioPlay`.
 
-## Why the renderer is shared with the CMS
+## Why the engine is shared with the CMS
 
-The PanelWave CMS embeds this player for preview, but its **editor** draws balloons on a Canvas 2D surface (via `Path2D` built from the same public path generators: `createSquirclePath`, `createThoughtBalloonPath`, `createShoutBalloonPath`) and auto-sizes bubbles by running this renderer headless. The CMS therefore keeps a synchronized fork of `comic-balloon.ts` and the config model.
+The PanelWave CMS embeds this player for preview, and its **editor** draws and auto-sizes balloons with the very same engine (on a Canvas 2D surface via `Path2D`, using the public path generators `createSquirclePath`, `createThoughtBalloonPath`, `createShoutBalloonPath`, and running the renderer headless for measurement). Any geometry difference between the two would be a WYSIWYG bug: what a creator letters in the editor must be exactly what readers see.
 
-The sync policy (documented in the player repo at `docs/BALLOON_RENDERER_SYNC.md`):
+To rule that out, the engine exists as **one master copy with a synced copy**:
 
-- **The player copy is canonical.** Geometry changes — path formulas, the superellipse exponent, tail math, padding, dash patterns, hide-border behavior, `DEFAULT_BALLOON_CONFIG`, and the merge/converter functions — land in the player first and are ported to the CMS fork in the same change set. Any geometry divergence is a WYSIWYG bug: what a creator letters in the editor must match what readers see.
-- **Editor-only surface stays in the CMS** (font registry, override diffing, tail-drag math) and must not be ported into the player.
+- **The CMS editor holds the master** — `comic-balloon.ts` and `balloon-geometry.ts` (tail tip ↔ compass config, squircle edge points, thought-trail circles). Balloons are designed and tested there.
+- **The player holds a synced copy** of both files. They start with a *"SYNCED FROM panelwave-cms … DO NOT EDIT HERE"* banner; a sync script in the CMS repository copies them over, and a drift check reports any difference.
+- **The config model stays in the player**: `balloon-config.ts` (`DEFAULT_BALLOON_CONFIG`, `mergeBalloonConfig`, `balloonConfigToRenderOptions`, `balloonConfigToTailOptions`) and the interfaces in `src/lib/types` are the player's own and follow the [format](/schema/speech-bubbles).
 
 <Callout kind="tip">
-If you change anything in `utils/comic-balloon.ts` or `utils/balloon-config.ts`, run the drift check described in `docs/BALLOON_RENDERER_SYNC.md` and update the CMS fork in the same change set.
+Contributing a balloon **geometry** fix to the player? Change the behavior in [`comic-balloon.ts`](https://github.com/panelwave/player/blob/master/projects/player/src/lib/utils/comic-balloon.ts) in your pull request and say so in its description — maintainers land it in the CMS master and re-sync, so the fix reaches editor and reader together. A hand edit that isn't carried into the master is overwritten by the next sync.
 </Callout>

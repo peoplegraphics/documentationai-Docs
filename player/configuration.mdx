@@ -12,32 +12,36 @@ When both exist for the same concern, the component input represents the reader/
 
 ## Component inputs (`pw-player-shell`)
 
-These are all the `@Input()`s the shell accepts (verified in `PlayerShellComponent`):
+These are all the `@Input()`s the shell accepts (verified in `PlayerShellComponent`). They are read once, when the shell initializes.
 
 | Input | Type | Default | Purpose |
 |---|---|---|---|
-| `manifest` | `PanelWaveManifest` | — | The manifest object to render. **Preferred way to load a work.** |
-| `manifestUrl` | `string` | — | URL to a manifest. *Currently not implemented in the shell — passing only a URL produces an error. Fetch the JSON yourself and use `manifest`.* |
-| `entitlementAdapter` | `EntitlementAdapter` | — | Hook for paywall/entitlement checks; see [Paywall & Entitlement](/player/paywall-entitlement). |
+| `manifestUrl` | `string` | — | URL of the manifest to load (fetched with `HttpClient`). Wins over `manifest` when both are set. |
+| `manifest` | `PanelWaveManifest` | — | The manifest object, when you load or transform the JSON yourself. |
 | `locale` | `LocaleCode` | `'en-US'` | Initial content locale (BCP-47). Also sets the player UI language (mapped to its base language). |
-| `initialChapterId` | `string` | — | Start at this chapter instead of the first one. |
+| `initialChapterId` | `string` | — | Start at this chapter instead of the first one (or the reader's bookmark). |
 | `initialPanelId` | `string` | — | Start at this panel (requires `initialChapterId`). |
-| `autoplay` | `boolean` | `false` | Reserved autoplay flag. *Note: in the current build, autoplay is started by the reader via the toolbar; this input does not auto-start it.* |
-| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs`. Reader-adjustable in the toolbar (0.5–120 s). |
-| `reducedMotion` | `boolean` | `false` | Force reduced motion (also honored automatically from the OS `prefers-reduced-motion` setting for video autostart decisions). |
+| `initialVariables` | `Record<string, unknown>` | — | Seed story variables once at start; may set `readOnly` variables (e.g. a verified `user.age`). |
 | `showToolbar` | `boolean` | `false` | Show the toolbar initially. Readers can always toggle it (`T`, floating button, viewport click). |
+| `viewModeOverride` | `'auto' \| 'panel' \| 'canvas'` | `'auto'` | Force panel or [canvas](/player/canvas-view) view. |
+| `reducedMotion` | `boolean` | `false` | Force reduced motion. The OS `prefers-reduced-motion` setting and the reader's Settings switch also turn it on. |
+| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs`. Reader-adjustable in the toolbar (0.5–120 s). |
+| `autoplay` | `boolean` | `false` | Reserved. *The current build does not read it; autoplay is started by the reader via the toolbar or Settings.* |
+| `entitlementSnapshot` | `EntitlementSnapshot` | anonymous | What the reader owns; evaluated against the manifest's `paywall.rules`. See [Paywall & Entitlement](/player/paywall-entitlement). |
+| `entitlementEndpoint` / `readerToken` | `string` | — | Let the player fetch the snapshot itself (`{workId}` is substituted; token sent as a Bearer header). |
+| `entitlementAdapter` | shell adapter | — | Lower-level per-panel access check that replaces the manifest rules; see [Custom access checks](/player/paywall-entitlement#custom-access-checks). |
 
 Example with several inputs:
 
 ```html
 <pw-player-shell
-  [manifest]="manifest"
-  [locale]="'de-DE'"
+  manifestUrl="/stories/my-story/panelwave.json"
+  locale="de-DE"
   [initialChapterId]="'ch-2'"
   [secondsPerPanel]="8"
   [reducedMotion]="prefersCalm"
   [showToolbar]="true"
-  [entitlementAdapter]="entitlements">
+  [entitlementSnapshot]="snapshot">
 </pw-player-shell>
 ```
 
@@ -58,14 +62,14 @@ The manifest sections below shape player behavior. They are authored by the crea
 | `mangaMode` | `boolean` | Right-to-left reading by default |
 | `autoplayDefault` | `boolean` | Autoplay enabled by default |
 | `secondsPerPanel` | `number` | Default autoplay dwell time |
-| `speechDefault` / `audioDefault` / `sfxDefault` | `boolean` | Default toggle states for speech bubbles, audio, SFX. `speechDefault` is **applied**: it seeds the speech toggle, which implicitly gates every bubble (schema 1.3) |
+| `speechDefault` / `audioDefault` / `sfxDefault` | `boolean` | Default toggle states for speech bubbles, audio, SFX — **applied** (a preference the reader set explicitly wins). `speechDefault` implicitly gates every bubble (schema 1.3) |
 | `scrollingDefault` | `boolean` | Scrolling mode by default |
 | `videoPlayModeDefault` | `VideoPlayMode` | Work-level default for video layers (`once` if absent) — **applied** |
 | `videoStartModeDefault` | `VideoStartMode` | Work-level default start trigger (`on-view` if absent) — **applied** |
 | `videoMutedDefault` | `boolean` | Work-level default muted state (`true` if absent) — **applied** |
 
 <Callout kind="alert">
-In the current build the shell **applies the three video defaults** (they cascade into every video layer via `resolveVideoConfig`) and **`speechDefault`** (it seeds the speech toggle, which hides/shows all bubbles). The remaining non-video defaults (`autoplayDefault`, `audioDefault`, …) are declared in the type but not yet read at startup — treat those as forward-looking manifest data.
+In the current build the shell **applies the three video defaults** (they cascade into every video layer via `resolveVideoConfig`) and **`speechDefault` / `audioDefault` / `sfxDefault`** (they seed the three sound toggles unless the reader set them). `autoplayDefault`, `secondsPerPanel`, `mangaMode` and `scrollingDefault` are declared in the type but not yet read at startup — treat those as forward-looking manifest data.
 </Callout>
 
 ### `settings.typography.balloon_config`
@@ -86,7 +90,7 @@ Fully wired: on load, the shell configures the `TrackingService` from `tracking.
 
 ### `paywall`
 
-`paywall.rules` declare which scopes (`work` | `chapter` | `panel`) require which entitlement and how many preview panels are allowed. Enforcement runs through your entitlement adapter — see [Paywall & Entitlement](/player/paywall-entitlement).
+`paywall.rules` declare which parts of the work require a subscription, a purchase or a minimum age, and how many preview panels are free. The player evaluates them against the entitlement snapshot you supply and shows the paywall overlay or age gate at a locked panel — see [Paywall & Entitlement](/player/paywall-entitlement#how-rules-are-evaluated) for exactly which rule fields are honoured.
 
 ### `ui` (top-level `UISettings`)
 

@@ -5,6 +5,249 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-27" description="Open source · Repos on GitHub, SDK and player on npm" tags={["feature"]}>
+  ## The open-source layers are on GitHub, and the SDK and player install from npm
+
+  - **Public repositories on GitHub.** The format, player, and SDK moved to
+    [github.com/panelwave](https://github.com/panelwave):
+    [panelwave/schema](https://github.com/panelwave/schema) (CC BY 4.0),
+    [panelwave/player](https://github.com/panelwave/player) (MIT), and
+    [panelwave/packages](https://github.com/panelwave/packages) (MIT; `@panelwave/types`
+    and `@panelwave/cli`). Report bugs in the matching issue tracker.
+    [Introduction → Open source](/introduction#open-source).
+  - **Install from npm.** `@panelwave/types` 1.0.0, `@panelwave/cli` 1.0.0, and
+    `@panelwave/player` 1.0.1 are published, so the build-from-source workarounds are gone:
+    `npm install @panelwave/types`, `npm install -g @panelwave/cli`,
+    `npm install @panelwave/player`. [CLI installation](/schema/cli#installation),
+    [Player installation](/player/installation).
+  - **Verifiable releases.** Every package is released from its repository's GitHub
+    Actions `release` workflow via npm trusted publishing, with a provenance attestation
+    that links each version to the commit it was built from.
+  - **The CLI's bundled schema is guaranteed current.** The CLI validates offline
+    against its own copy of the schema. The SDK build fails if that copy drifts from
+    panelwave/schema, or if `upgrade`'s target version differs from the schema's declared
+    version. The current release bundles and targets format **1.5.0**.
+    [CLI → Bundled schema](/schema/cli#bundled-schema).
+  - **Schema URL clarified.** The `$id` `https://panelwave.org/schema/1.0/panelwave.schema.json`
+    is an identifier and isn't served publicly yet. Get the file from
+    [panelwave/schema](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json)
+    or use the CLI's bundled copy. [Validation](/schema/validation#option-2-ajv-programmatically).
+</Update>
+
+<Update label="2026-09-27" description="Player · Released on npm, live demo, Escape closes dialogs" tags={["feature", "bugfix"]}>
+  ## The player is released: install it from npm, try it in the browser
+
+  - **On npm.** `npm install @panelwave/player @ngx-translate/core`. Version
+    1.0.1 is current. Setup (providers, UI translation files, balloon fonts):
+    [Installation](/player/installation).
+  - **Open source on GitHub.** The player lives at
+    [github.com/panelwave/player](https://github.com/panelwave/player) under the
+    MIT license. Every push runs lint, unit tests, the Playwright suite and a
+    180 KB (gzipped) bundle budget. [Development & Contributing](/player/development).
+  - **Live demo.** [panelwave.github.io/player](https://panelwave.github.io/player/)
+    runs the latest build and is redeployed on every push. Load your own
+    manifest, preview phone/tablet/desktop frames, or open the dev tools.
+    [Demo App](/player/demo-app).
+  - **Escape closes the open dialog.** With a dialog open, Escape closes the
+    topmost one (the language picker included), and arrow keys and `T` no longer
+    reach the story behind it. Escape only hides the toolbar when no dialog is
+    open. [Input methods](/player/reader-interface#input-methods).
+  - **One balloon engine for editor and reader.** The CMS editor now holds the
+    master copy of the speech-balloon engine and the player a synced copy, so
+    balloons render identically in both.
+    [Balloon Renderer](/player/balloon-renderer#why-the-engine-is-shared-with-the-cms).
+</Update>
+
+<Update label="2026-09-27" description="CMS · Performance tab, read-only works, stale page references, graph editor fixes" tags={["feature", "bugfix"]}>
+  ## See what readers download before you publish, and keep working when a work goes read-only
+
+  - **Performance tab in the inspector.** The new **Perf** tab estimates the
+    download size, requests and decoded memory of the open panel (or the whole
+    page in page view) at 1×/2×/3× screen density. It also shows load times on
+    Slow 3G, 4G and Wi-Fi with and without preloading, and suggests fixes: heavy
+    originals, missing responsive variants or poster frames, memory and layer
+    budgets. [The Performance tab](/cms/editor/layout#the-performance-tab).
+  - **Read-only works open again.** Works above your plan's publication limit
+    (or of a suspended team) can be opened, previewed and exported again. The
+    editor shows a **Read-only** banner and stops auto-saving instead of raising
+    a permission error on every edit, and the Localization Workshop opens without
+    an error. [Read-only works](/cms/plans#read-only-works).
+  - **Stale page references are found and fixed.** The new `DANGLING_PAGE_REF`
+    check finds pages that still list deleted panels (the timeline's *Panel not
+    found*). **Fix** cleans up that one page, and **Undo** puts it back exactly.
+    [Dangling page ref](/cms/validation-codes#dangling-page-ref).
+  - **Preflight Fix buttons work.** Fix on broken links and empty panels had
+    silently done nothing. It now applies, and can be undone.
+    [Auto-fixes](/cms/validation#auto-fixes).
+  - **Canvas board:** a minimap; deleted panels no longer leave a stale placement
+    behind; and two new warnings, for paywalled panels visible in the overview
+    and for low-resolution artwork. [Publish checks](/cms/editor/canvas-layout#publish-checks).
+  - **Graph editor:** every panel of the chapter appears, so a new chapter's
+    first edge can be drawn. Edge conditions now save and reload, and clearing
+    one removes it. New edges no longer duplicate on Save. Validation shows the
+    server's findings with panel titles.
+    [Edge conditions](/cms/editor/graph#edge-conditions).
+  - **Variant conditions list your variables.** The variant editor's variable
+    dropdown now offers the variables from the Variables designer instead of a
+    single bogus entry. [Variants](/cms/editor/pages-panels#variants).
+  - **Structure tree:** the panel **Move to...** dialog lists every chapter and
+    page again (it was always empty).
+  - **Code reference** now covers every canvas and variant check.
+    [All codes](/cms/validation-codes#all-codes-at-a-glance).
+</Update>
+
+<Update label="2026-09-27" description="CMS · Exports screen in the user menu, request limits" tags={["feature", "bugfix", "security"]}>
+  ## Find your exports from anywhere, and a fair share of the API for everyone
+
+  - **Exports screen reachable.** The user menu (your avatar, top right) has a
+    new **Exports** entry that opens the full screen with per-format options,
+    presets and the job list. It replaces the old **Settings** entry, which
+    sent you to the sign-in page. The job list's **status and type filters**
+    now actually filter, and job cards show their details instead of blanks.
+    [The Exports screen](/cms/export#the-exports-screen).
+  - **Read-only works export too,** including as an archive; only editing
+    stays blocked. [Export limits](/cms/export#export-limits).
+  - **Request limits on every endpoint.** Each account and address gets a
+    generous request budget. Going over it answers *"Too many requests. Please
+    try again in N seconds."* Sign-in is limited to 5 attempts per 15 minutes
+    per account, and password-reset emails to 3 per hour. Previously, one shared
+    sign-in limit applied to the whole platform.
+    [Too many requests](/help-center/troubleshooting/cms-uploads#too-many-requests-please-try-again-in-n-seconds).
+</Update>
+
+<Update label="2026-09-26" description="Player · Real extras, canvas hotspots, reduced motion, translated UI, demo tools" tags={["feature", "bugfix", "security"]}>
+  ## Richer extras, interactive canvas hotspots, and a player that respects motion settings
+
+  - **Extras show their real media.** Extras now show image galleries with
+    thumbnails, videos with posters, audio tracks, and PDF/text documents with an
+    *Open document* link, instead of an empty image. The *Other* filter works.
+    [Modals and overlays](/player/reader-interface#modals-and-overlays).
+  - **Hotspots work in canvas view.** The current panel's hotspots respond to
+    click, tap and keyboard exactly as in panel view (tracked as `hotspot_click`);
+    hotspots on neighbouring panels stay inert. [Canvas View](/player/canvas-view#input-model).
+  - **Reduced motion from every source.** Transitions and camera glides now
+    honour the OS `prefers-reduced-motion` setting and the reader's Settings
+    switch, not only the host's `reducedMotion` input.
+    [Accessibility](/player/reader-interface#accessibility).
+  - **Translated toolbar, comments and paywall.** Toolbar labels and tooltips,
+    comment timestamps and the paywall overlay use the UI translations (English
+    and German ship with the package). [Localization](/player/localization).
+  - **Faster first panel.** The artwork on screen loads eagerly at high priority;
+    other panels stay lazy. [Performance](/player/performance#rendering-performance).
+  - **Plugin host hardening.** Messages are accepted only from a plugin's own
+    iframe and origin, replies target that origin, and same-origin plugins lose
+    `allow-same-origin`. [Security model](/player/plugins#security-model).
+  - **Demo app tools.** A manifest selector (bundled works, any URL, or a local
+    file), responsive preview frames, and a dev-tools drawer with a variable
+    inspector, event log, FPS/heap metrics and a debug overlay.
+    [Demo App](/player/demo-app).
+  - **Fixes:**
+    - `panelChange` fires once per navigation; hosts used to receive every change twice.
+    - The Settings modal edits a working copy that Cancel and Escape discard.
+    - Share reports native sharing correctly.
+    - The table of contents follows manifest changes, and Enter navigates once.
+    - The thumbnail strip scrolls to the current panel.
+    - The age gate rejects impossible dates.
+    - Balloon `curveAmount: 0` and `maxWidth: 0` (natural width) are honoured.
+</Update>
+
+<Update label="2026-09-26" description="CMS · Large uploads, upload checks, real exports, bigger archives" tags={["feature", "bugfix", "security"]}>
+  ## Big files upload, exports show your actual art, and archives move whole works, paywall included
+
+  - **Uploads of 10 MB and more work.** Large video and audio files now go
+    straight to storage in 5 MB parts, with automatic retries for each part.
+    They then join the library like any other upload: checked, deduplicated,
+    processed, and filed into the selected folder. Large uploads used to never
+    reach the library, so re-upload any that went missing.
+    [Large files](/cms/assets#large-files).
+  - **Upload checks.** The CMS now checks what actually arrived. A file whose
+    content doesn't match its type is rejected, SVGs with scripts or embedded
+    HTML are refused, and storage sizes are measured on the server. A rejected
+    **Replace File** leaves the original untouched.
+    [Upload checks](/cms/assets#upload-checks).
+  - **PDF and PowerPoint exports show your artwork.** Exports of current works
+    used to have no images, lost text layers and printed garbled bubbles. Each
+    panel now carries its visible art, text in the default language, and bubbles
+    labelled with the speaking character, and PowerPoint embeds the images.
+    [PDF and PowerPoint](/cms/export#pdf-and-powerpoint).
+  - **Video panels in the video export.** Panels with a video layer play their
+    clip, looped or cut to the panel's display duration; other panels show their
+    artwork as a still. Everything is letterboxed to the chosen resolution.
+    [Video](/cms/export#video).
+  - **Work archives carry paywall rules.** Every rule, live or draft, is in the
+    archive and arrives **disabled**. Its settings are kept, its locked panels
+    are remapped, and a note explains where it came from.
+    [Paywall rules arrive disabled](/cms/import#paywall-rules-arrive-disabled).
+  - **Archives up to 50 GiB.** Import Archive switches to a part-wise upload
+    above 1 GiB; the previous ceiling was 5 GB.
+    [Importing a work archive](/cms/import#importing-a-work-archive).
+  - **Page Import housekeeping.** Page images of sessions abandoned for 30 days
+    are cleaned up. When you append to an existing work, your edit rights are
+    checked again at **Import**. [Limits and quotas](/cms/page-import#limits-and-quotas).
+  - **Accessible Backstage.** All 14 Backstage screens pass an automated
+    WCAG 2.1 AA check:
+    - Icon-only buttons are named after their tooltip.
+    - Dialogs take focus, close with Esc and return focus to where you were.
+    - Clickable tiles work with the keyboard.
+    - Light-theme primary and muted text colours have more contrast.
+  - **Fixes:** re-uploading the original file of a replaced asset no longer fails
+    with a server error; it becomes a separate asset. A balloon **Curve Amount**
+    of 0 now really draws a straight tail
+    ([Speech bubble style](/cms/editor/speech-bubbles)). Both CMS web apps send
+    standard browser security headers.
+</Update>
+
+<Update label="2026-09-25" description="Player · Age gate, like & bookmark, branch chooser, manifestUrl" tags={["feature", "bugfix"]}>
+  ## Age gates, bookmarks and choices, and loading a work by URL
+
+  - **Age gate.** Paywall rules with a minimum age now ask for a birth date in
+    the player instead of showing the purchase overlay. A pass is remembered on
+    the device, the reader continues where they were going, and hosts get an
+    `ageVerified` event. [Age gates](/player/paywall-entitlement#age-gates).
+  - **Like and bookmark work.** Both are stored per work on the device, tracked,
+    and emitted as `likeChange` / `bookmarkChange`. A bookmark is resumed on the
+    next visit when the host passes no start position.
+    [Like and bookmark](/player/reader-interface#like-and-bookmark).
+  - **Branch chooser.** When a panel has several outgoing paths, the toolbar's
+    **Choices** button lists the ones currently open and follows the chosen edge
+    with its transition and variable changes (tracked as `branch_choice`).
+    [Branch choices](/player/reader-interface#branch-choices).
+  - **`manifestUrl` works.** `<pw-player-shell manifestUrl="…">` loads and
+    validates the manifest itself; the "not implemented" error is gone.
+    [Quickstart: Embed](/player/quickstart-embed).
+  - **Edge actions apply.** Variable mutations on graph edges now also run on
+    ordinary **Next** navigation. [Mutations](/player/state-and-conditions#mutations).
+  - **Paywall integration documented.** Supply `entitlementSnapshot` (or
+    `entitlementEndpoint` + `readerToken`), handle `paywallAction`, and call
+    `refreshEntitlements()` after checkout. [Paywall & Entitlement](/player/paywall-entitlement).
+</Update>
+
+<Update label="2026-09-25" description="CMS · Arrange and Match Size for multi-panel selections, BCP-47 locales in Work Properties" tags={["feature", "bugfix", "security"]}>
+  ## Arrange several panels at once
+
+  - **Stacking order for the whole selection.** Bring to Front / Forward /
+    Backward / Send to Back apply to every selected panel and keep their relative
+    order. [Stacking order and matching sizes](/cms/editor/canvas#stacking-order-and-matching-sizes).
+  - **Match Size.** Match Width, Height, or both copies the primary panel's size
+    onto the other selected panels and keeps them on the page.
+  - **Work Properties use full locale codes.** The Localization tab lists
+    `en-US`, `de-DE` and so on by name, like the rest of the CMS. Values saved
+    under bare `en`/`de` were converted automatically.
+    [Localization](/cms/works#localization).
+  - **Themed tooltips everywhere**, including Localization, Characters, Products
+    and all shared dialogs.
+  - **Security clean-up:** two old development endpoints that could hand out
+    upload links into asset storage without signing in are removed. The app never
+    used them; uploads only go through the signed-in upload flow.
+</Update>
+
+<Update label="2026-09-23" description="CMS · Beta tag" tags={["feature"]}>
+  ## PanelWave CMS is marked as a gated beta
+
+  - A small **beta** tag now sits next to the PanelWave CMS wordmark in the
+    editor, Backstage and sign-in screens. [Editor Layout](/cms/editor/layout#header-bar).
+</Update>
+
 <Update label="2026-09-16" description="CMS · Localization workshop: story order, sortable columns, source-language fixes" tags={["feature", "bugfix"]}>
   ## Translate in the order the story is read — from the language it was written in
 

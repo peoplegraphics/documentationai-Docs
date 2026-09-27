@@ -1,26 +1,38 @@
 ---
 title: Player Embedding Issues
-description: Fix the most common problems when integrating the PanelWave Player into an Angular app — blank screens, load errors, fonts, audio, and paywalls.
+description: Fix the most common problems when integrating the PanelWave Player into an Angular app — blank screens, load errors, untranslated labels, fonts, audio, and paywalls.
 ---
 
-Work through the symptom that matches what you see. The full integration guide is [Quickstart: Embed](/player/quickstart-embed).
+Work through the symptom that matches what you see. The full integration guide is [Quickstart: Embed](/player/quickstart-embed); to rule out your manifest, open it in the [live demo](https://panelwave.github.io/player/) first (**Open file…** or `?manifest=<url>`) — if it reads fine there, the problem is in the embed.
 
 ## The player renders nothing (or just placeholder text)
 
 - **You embedded `pw-player`.** That selector belongs to a legacy stub component that renders static text. The real embed target is **`pw-player-shell`** (`PlayerShellComponent`). See [Inputs &amp; Outputs](/player/inputs-outputs).
-- **You passed only `manifestUrl`.** URL loading is not implemented in the shell yet and produces an error. Fetch the manifest JSON yourself and bind the parsed object to `[manifest]`.
-- **The manifest fails the shell's load-time checks.** The shell validates `panelwave.version`, `meta.id/title/locales/default_locale`, and each chapter's `panels` + `graph.entry`/`edges` before rendering. Subscribe to the `error` output to see what was rejected, and run the manifest through the [CLI](/schema/cli) first.
+- **The manifest URL doesn't load.** Subscribe to the `error` output: a message starting with `Manifest load failed:` means the request failed (wrong path, 404, or a cross-origin URL without CORS headers) or the response was not a valid manifest. Open the URL in the browser to check, and serve cross-origin manifests with `Access-Control-Allow-Origin`.
+- **The manifest fails the shell's load-time checks.** The shell validates `panelwave.version`, `meta.id/title/locales/default_locale`, and each chapter's `panels` + `graph.entry`/`edges` before rendering. The `error` output tells you what was rejected; run the manifest through the [CLI](/schema/cli) first.
+- **The host element has no height.** The player fills its container. Give the element (or its parent) a height, e.g. `:host { display: block; height: 100dvh; }`.
 
 ## Build or injection errors on startup
 
 - **Missing `HttpClient`:** the player needs `provideHttpClient()` in your application config.
 - **Missing translations setup:** provide `TranslateModule.forRoot` with a loader serving `assets/i18n/<lang>.json` — the player's UI strings come from `@ngx-translate`. See [Installation](/player/installation).
-- **npm can't find `@panelwave/player`:** the package is not published to the npm registry yet. Build it from the player repository (`ng build player --configuration production`) and consume `dist/player`. See [Installation](/player/installation).
-- **Peer dependency warnings about Angular ^17.3:** the library's declared peer range is stale; it is developed and tested against Angular 20.3. Angular 20 is the supported target.
+- **Peer dependency conflicts on `npm install`:** `@panelwave/player` requires **Angular 20** (`@angular/core` / `@angular/common` `^20`), `@ngx-translate/core` `^17` and `rxjs` `^7.8`. Upgrade the app, or install a matching ngx-translate version, rather than forcing the install.
+
+## Labels show as keys (`toolbar.like`, `paywall.sign_in`, …)
+
+The UI translation files are missing or outdated. Copy them from the package into your build output — `node_modules/@panelwave/player/src/assets/i18n` → `assets/i18n` via the `assets` entry in `angular.json` — instead of keeping your own copy, which misses keys added in newer releases. See [Installation](/player/installation#application-setup).
+
+## The table of contents or thumbnail strip is empty
+
+Known limitation in 1.0.x: both read the chapter list from the `manifest` input, so they stay empty when the work is loaded with `manifestUrl` alone. Load the JSON yourself and bind `[manifest]` instead ([option B](/player/quickstart-embed#option-b-pass-the-manifest-object)).
+
+## Changing an input doesn't do anything
+
+The shell reads its inputs once, at initialization. To open another work, switch the language from the outside, or apply a new start position, re-create the component (e.g. clear it with `@if` and render it again). For entitlements, call `refreshEntitlements()` on the component instead.
 
 ## Speech balloons use the wrong font
 
-Include the bundled balloon font CSS once in your application styles (`assets/fonts/balloon/balloon-fonts.css`). Ames Pro is a commercial font and is **not** bundled — without a license, balloons fall back to Comic Neue. See [Balloon Renderer](/player/balloon-renderer).
+Include the bundled balloon font CSS once in your application styles (`node_modules/@panelwave/player/src/assets/fonts/balloon/balloon-fonts.css`). Ames Pro is a commercial font and is **not** bundled — without a license, balloons fall back to Comic Neue. See [Installation](/player/installation#application-setup).
 
 ## Audio or video won't start
 
@@ -29,13 +41,19 @@ Browsers block audible playback before a user gesture (hover doesn't count):
 - On-view videos start **muted** with an unmute affordance until the reader interacts.
 - Start audible audio from the first real interaction — `UserGestureService` signals it, and `AudioEngineService.resumeContext()` resumes the WebAudio context.
 - Only one unmuted video plays at a time; starting another preempts the first.
+- With reduced motion on (OS setting, the reader's Settings switch, or the `reducedMotion` input), on-view videos wait for a click by design.
 
 See [Audio](/player/audio).
 
-## All gated content is locked (or nothing is)
+## Gated content is locked (or nothing is)
 
-Without an adapter the player uses `NullEntitlementAdapter`, which **denies everything**. For development, use the exported `MockEntitlementAdapter` (grants everything); for production, implement an adapter against your account system and pass it via the `[entitlementAdapter]` input. See [Paywall &amp; Entitlement](/player/paywall-entitlement).
+- **Everything past the preview is locked:** the player treats the reader as anonymous until you tell it otherwise. Pass what they own via `[entitlementSnapshot]`, or let the player fetch it with `entitlementEndpoint` + `readerToken`. If the endpoint request fails, the reader stays anonymous on purpose.
+- **Nothing is locked:** check that the manifest has `paywall.rules`, and that you haven't set `[entitlementAdapter]` — an adapter replaces the manifest rules with its own `hasAccess()` answer. Rules scoped to a `chapter` are not enforced in 1.0.x; use a panel rule listing the chapter's panels, or a work rule with a preview length.
+- **The age gate keeps appearing / never appears:** a passed age gate is remembered per device (`pw-age-verified` in `localStorage`); private browsing forgets it. To skip the prompt for readers you have verified, pass `ageVerified: true` and `age` in the snapshot.
+- **`NullEntitlementAdapter` denies everything:** that only concerns the standalone `EntitlementService`, not the embedded shell.
+
+See [Paywall &amp; Entitlement](/player/paywall-entitlement).
 
 ## Reader progress isn't saved
 
-That's by design: only persistent-scope variables are auto-persisted (localStorage key `pw-variables-persistent`). Reading position is the host's job — record `panelChange` events and restore via `initialChapterId`/`initialPanelId`. A complete resume example is on [Saving Progress](/player/saving-progress).
+Persistent-scope variables are saved automatically (`pw-variables-persistent`), and a **bookmark** the reader sets from the toolbar is resumed on the next visit — unless you pass `initialChapterId`/`initialPanelId`, which always win. Automatic "continue where you stopped" is the host's job: record `panelChange` events and restore via the initial-position inputs. A complete example is on [Saving Progress](/player/saving-progress).

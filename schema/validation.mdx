@@ -13,6 +13,8 @@ npm install -g @panelwave/cli
 panelwave validate ./my-comic/panelwave.json
 ```
 
+The CLI is published on npm as [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) and validates against a bundled copy of the schema, so it works offline. The bundled copy is guaranteed to match the published format version (currently 1.5.0) — see [CLI → Bundled schema](/schema/cli#bundled-schema).
+
 Options:
 
 | Option | Default | Description |
@@ -48,6 +50,8 @@ The schema uses JSON Schema **2020-12**, so import AJV's 2020 build (`ajv/dist/2
 ```bash
 npm install ajv ajv-formats
 ```
+
+Get the schema file itself from the [panelwave/schema](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) repository (or reuse the copy shipped inside `@panelwave/cli` at `node_modules/@panelwave/cli/schema/1.0/panelwave.schema.json`). Load it from disk: the `$id` URL `https://panelwave.org/schema/1.0/panelwave.schema.json` identifies the schema but is not publicly served yet, so don't fetch it at runtime.
 
 ```javascript
 const Ajv = require('ajv/dist/2020');

@@ -81,7 +81,7 @@ There is currently no duplicate-work action on the works list. To copy a work, [
 
 ## Work Properties — work-level settings and defaults
 
-Open **Properties** from the card menu, or press <kbd>Ctrl</kbd>+<kbd>,</kbd> inside the editor. The **Work Properties** dialog has six tabs:
+Open **Properties** from the card menu, from the work node's context menu in the editor's [structure tree](/cms/editor/pages-panels#context-menus), or press <kbd>Ctrl</kbd>+<kbd>,</kbd> inside the editor. The **Work Properties** dialog has six tabs:
 
 ### Metadata
 Localized **Name** and **Description**, **Series Name** and **Issue / Episode Number**, a **Cover Image** picker (choose from the work's uploaded image assets), **Creators**, and publishing fields: **Publisher**, **Release Date**, **Age Rating**, **Tags / Genres**, **Copyright**, and **License**.
@@ -94,7 +94,11 @@ Work-wide visual defaults:
 - **Panel Border Style** (color, thickness, solid/dashed/none) and the **Gutter Width** between panels.
 
 ### Localization
-The **Default Locale**, the set of **Supported Locales**, and the **Reading Direction**. These are the same locales managed in the [Localization Workshop](/cms/localization).
+The **Default Locale**, the set of **Supported Locales**, and the **Reading Direction**. These are the same locales managed in the [Localization Workshop](/cms/localization) — a change in either place shows up in the other.
+
+Locales are full BCP-47 codes shown with their names — *English (US) (en-US)*, *German (de-DE)* — the same codes the workshop, the editor, and the published manifest use. The list offers the work's own locales (default first) plus the shared locale catalogue. The localized **Name** and **Description** on the Metadata tab are stored under these codes too. Works that were saved with bare language codes (`en`, `de`) before 2026-09-25 have been converted to the work's matching locale (or the catalogue default for that language), so nothing needs re-entering.
+
+The number of supported locales is capped by your [plan](/cms/plans); the default locale must be one of the supported ones.
 
 ### Audio/Visual
 Default **Ambient**, **SFX**, and **Voice** volume levels, and the default panel **Transition Effect** and **Transition Duration**.
@@ -114,4 +118,4 @@ Works created before supported formats existed have no stored selection — they
 ### Video Defaults
 Defaults applied to new video layers (view mode, start mode, **Muted by default**) unless overridden per layer — see [Video Panels](/cms/editor/video-panels).
 
-Click **Save Properties** to apply.
+Click **Save Properties** to apply. Values outside their allowed range (for example a font size outside 8–72, a gutter above 50, or a transition longer than 5 seconds) are rejected with a list of what to correct. On a [read-only work](/cms/plans#read-only-works) the dialog can be opened but not saved.

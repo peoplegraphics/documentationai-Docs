@@ -37,7 +37,7 @@ Issues are grouped into eight categories:
 | **Flow** | Panels unreachable from the chapter's entry point in the [graph](/cms/editor/graph) |
 | **Performance** | Oversized assets that will slow readers down |
 | **Audio** | Speech bubbles without voice audio |
-| **Integrity** | Broken references (edges or layers pointing at missing panels/assets), duplicate IDs |
+| **Integrity** | Broken references (edges or layers pointing at missing panels/assets), pages still listing deleted panels, canvas placements for missing panels |
 | **Metadata** | Missing work title, description, or cover |
 
 ## Working through issues
@@ -56,10 +56,19 @@ Each category header also has a re-run button so you can re-check just that cate
 
 ## Auto-fixes
 
-Issues that can be fixed automatically show a **Fix** button — for example removing a dangling reference. You can also:
+Issues that can be fixed automatically show a **Fix** button:
+
+| Code | What **Fix** does |
+|---|---|
+| [`BROKEN_LINK`](/cms/validation-codes#broken-link) | Removes the graph edge that points at a missing panel |
+| [`EMPTY_PANEL`](/cms/validation-codes#empty-panel) | Deletes the empty panel (and its canvas placement) |
+| [`DANGLING_PAGE_REF`](/cms/validation-codes#dangling-page-ref) | Removes deleted panels from that page's reading order and layout |
+| [`OVERSIZED_ASSET`](/cms/validation-codes#oversized-asset) (images) | **Optimize** — see [below](#optimizing-oversized-images) |
+
+You can also:
 
 - Tick multiple fixable issues (or select a whole category) and click **Apply fixes to selected**.
-- **Undo** the most recent applied fixes — removed content is restored from a snapshot.
+- **Undo** the most recent applied fixes — removed content is restored from a snapshot taken just before the fix, so undoing a page clean-up puts back exactly that page.
 
 ### Optimizing oversized images
 
@@ -85,6 +94,7 @@ The [Validation Code Reference](/cms/validation-codes) covers every code individ
 | Oversized asset | Images: click **Optimize** on the issue (see [above](#optimizing-oversized-images)). Audio/video, or when you want manual control: re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
 | Missing title/description/cover | Fill them in under [Work Properties](/cms/works) → Metadata |
 | Empty panel | Add content, or delete the panel in the Tree |
+| Page lists panels that no longer exist | Click **Fix** on the `DANGLING_PAGE_REF` issue |
 
 ## Exporting a report
 

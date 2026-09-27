@@ -12,15 +12,12 @@ Pick the path that matches what you want to do. Each one takes a few minutes and
 
     <Steps>
       <Step title="Install the CLI">
-        The CLI is not on npm yet — build and link it from the `panelwave-packages` repository:
+        Install the CLI from npm (it bundles the format schema, currently 1.5.0):
 
         ```bash
-        npm install
-        npm run build:cli
-        cd packages/cli
-        npm link
+        npm install -g @panelwave/cli
         ```
-        Details: [CLI reference](/schema/cli).
+        Or run it without installing: `npx @panelwave/cli validate ./panelwave.json`. Details: [CLI reference](/schema/cli).
       </Step>
       <Step title="Create a minimal manifest">
         Save this as `panelwave.json`. It is the smallest useful work: two panels connected by one edge.
@@ -92,46 +89,34 @@ Pick the path that matches what you want to do. Each one takes a few minutes and
 
     <Steps>
       <Step title="Install the library">
-        The player targets Angular 20+. It is not published to npm yet — build it from the player repository and consume the built package (see [Installation](/player/installation) for the exact steps and required providers).
+        The player targets Angular 20 and is published on npm:
 
         ```bash
-        ng build player --configuration production
+        npm install @panelwave/player @ngx-translate/core
         ```
+        Then add `provideHttpClient()`, an ngx-translate loader, the package's UI translation files and the balloon font CSS to your app — [Installation](/player/installation) has the copy-paste snippets.
       </Step>
       <Step title="Add a manifest to your app">
-        Place a `panelwave.json` (for example the one from the CLI tab, or a sample) under `src/assets/my-story/`.
+        Place a `panelwave.json` (for example the one from the CLI tab, or one of the [demo works](https://github.com/panelwave/player/tree/master/projects/demo/src/assets)) under `src/assets/my-story/`.
       </Step>
       <Step title="Drop in the player component">
-        The embeddable component is `PlayerShellComponent` (selector `pw-player-shell`). It takes the manifest as an **object** — fetch the JSON yourself and bind it:
+        The embeddable component is `PlayerShellComponent` (selector `pw-player-shell`). Point it at the manifest:
 
         ```typescript
-        import { Component, inject } from '@angular/core';
-        import { HttpClient } from '@angular/common/http';
-        import { PlayerShellComponent, PanelWaveManifest } from '@panelwave/player';
+        import { Component } from '@angular/core';
+        import { PlayerShellComponent } from '@panelwave/player';
 
         @Component({
           selector: 'app-root',
-          standalone: true,
           imports: [PlayerShellComponent],
-          template: `
-            @if (manifest) {
-              <pw-player-shell [manifest]="manifest"></pw-player-shell>
-            }
-          `
+          template: `<pw-player-shell manifestUrl="assets/my-story/panelwave.json" [showToolbar]="true" />`,
+          styles: `:host { display: block; height: 100dvh; }`,
         })
-        export class AppComponent {
-          manifest?: PanelWaveManifest;
-
-          constructor() {
-            inject(HttpClient)
-              .get<PanelWaveManifest>('assets/my-story/panelwave.json')
-              .subscribe((m) => (this.manifest = m));
-          }
-        }
+        export class AppComponent {}
         ```
 
         <Callout kind="info">
-          A `manifestUrl` input exists on the shell but URL loading is not implemented yet — always bind the parsed object via `[manifest]`.
+          You can also fetch the JSON yourself and bind the parsed object via `[manifest]` — see [Quickstart: Embed](/player/quickstart-embed).
         </Callout>
       </Step>
       <Step title="Configure the player">
@@ -139,13 +124,14 @@ Pick the path that matches what you want to do. Each one takes a few minutes and
 
         ```html
         <pw-player-shell
-          [manifest]="manifest"
-          locale="en-US"
-          [autoplay]="false"
-          [showToolbar]="true">
+          manifestUrl="assets/my-story/panelwave.json"
+          locale="de-DE"
+          [showToolbar]="true"
+          [entitlementSnapshot]="snapshot"
+          (panelChange)="onPanel($event)">
         </pw-player-shell>
         ```
-        All inputs and defaults: [Configuration](/player/configuration).
+        All inputs and defaults: [Configuration](/player/configuration). To try a manifest before writing any code, open it in the [live demo](https://panelwave.github.io/player/).
       </Step>
       <Step title="Go deeper">
         Wire up events and inputs on [Inputs &amp; outputs](/player/inputs-outputs), save reader progress with [Saving progress](/player/saving-progress), and follow the full [embedding guide](/player/quickstart-embed).

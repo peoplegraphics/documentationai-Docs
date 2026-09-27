@@ -3,7 +3,7 @@ title: Saving Progress
 description: How the PanelWave Player persists state — variable scopes and lifetimes, localStorage keys, and how integrators implement resume.
 ---
 
-Two kinds of state matter across a reading session: **story variables** (what happened in the narrative) and **reading position** (where the reader is). The player persists the first automatically; the second is a small integrator task built on the shell's inputs and outputs.
+Two kinds of state matter across a reading session: **story variables** (what happened in the narrative) and **reading position** (where the reader is). The player persists variables automatically and keeps a reader-set bookmark on the device; a full "continue where I stopped" resume, or anything that syncs across devices, is a small integrator task built on the shell's inputs and outputs.
 
 ## Variable scopes and lifetimes
 
@@ -41,12 +41,18 @@ Resetting: `VariableStoreService.resetScope('persistent')` clears the stored val
 
 ## Reading position and resume
 
-The current build does **not** automatically save or restore the reading position — the shell exposes the building blocks and the host application (or the platform embedding the player, such as the CMS) owns the policy:
+### The reader's bookmark
+
+Readers can set a **bookmark** from the toolbar. It is stored on the device per work (`localStorage` key `pw-social`) and, the next time the work opens, reading resumes there — as long as the host passes **no** `initialChapterId` / `initialPanelId`. A bookmark pointing at a panel that no longer exists in the manifest is ignored. Every change is emitted as `bookmarkChange` (`{ workId, chapterId, panelId, bookmarked }`), so you can store it server-side as well. See [Like and bookmark](/player/reader-interface#like-and-bookmark).
+
+### Automatic resume
+
+The player does **not** save the last-read position on its own — only the bookmark the reader sets deliberately. For "continue where you stopped", the host application (or the platform embedding the player, such as the CMS) owns the policy:
 
 - **Track position** with the `panelChange` output (fires on every navigation with `{ panel, chapter }`).
 - **Restore position** with the `initialChapterId` / `initialPanelId` inputs.
 
-A complete localStorage-based resume implementation:
+Passing an initial position takes precedence over the reader's bookmark. A complete localStorage-based resume implementation:
 
 ```typescript
 import { Component, OnInit } from '@angular/core';
@@ -109,7 +115,7 @@ export class ReaderComponent implements OnInit {
 ```
 
 <Callout kind="tip">
-If a saved panel sits behind a paywall or was removed in a newer manifest version, `navigateToPanel` fails and the shell emits `error`. Validate the saved id against the loaded manifest (or catch the error and fall back to the chapter start) before resuming.
+If a saved panel was removed in a newer manifest version, `navigateToPanel` fails and the shell emits `error` — validate the saved id against the loaded manifest (or fall back to the chapter start) before resuming. A saved panel that is now behind a paywall the reader hasn't unlocked raises the paywall (or age gate) instead of opening.
 </Callout>
 
 ## Helper types for richer progress models
@@ -117,7 +123,7 @@ If a saved panel sits behind a paywall or was removed in a newer manifest versio
 The public API exports two types you can use as the shape of your own progress store — they are data contracts, not built-in persistence:
 
 - **`ReadingProgress`** — `workId`, `lastChapterId`, `lastPanelId`, `panelsViewed: string[]`, `percentComplete`, `lastUpdated`.
-- **`Bookmark`** — `workId`, `chapterId`, `panelId`, `timestamp`, optional `note`.
+- **`Bookmark`** — `workId`, `chapterId`, `panelId`, `timestamp`, optional `note`. (The built-in toolbar bookmark stores its own, smaller record — see below.)
 
 Server-side progress (sync across devices, accounts) follows the same pattern: post the `panelChange` payload to your backend and feed the stored position back into the initial-position inputs.
 
@@ -128,5 +134,8 @@ The complete list of `localStorage` keys in the current library build:
 | Key | Written by | Content |
 |---|---|---|
 | `pw-variables-persistent` | `VariableStoreService` | JSON of all persistent-scope variables |
+| `pw-preferences` | `PlayerStateService` | Reader preferences the reader set explicitly (speech/audio/SFX toggles, autoplay, seconds per panel, reduced motion, …); untouched preferences keep following the work's defaults |
+| `pw-social` | `PlayerShellComponent` | Per work (`meta.id`): `{ liked?, bookmark?: { chapterId, panelId, savedAt } }` |
+| `pw-age-verified` | `PlayerShellComponent` | `{ age, verifiedAt }` after the reader passed an [age gate](/player/paywall-entitlement#age-gates) on this device |
 
-Reader preferences (speech/audio/autoplay etc.) and tracking consent are currently held in memory per session; a richer state service with `pw-preferences` / `pw-tracking-consent` persistence exists in the codebase but is not yet active in the shell.
+Tracking consent is held in memory per session. Every read and write is wrapped so that unavailable storage (private mode, quota, SSR) degrades to in-memory behavior — the reader is simply asked again or starts fresh next time.

@@ -127,7 +127,15 @@ Two more warnings protect the reading experience:
 - **Low resolution for the zoom** — the camera zooms into panels, so artwork
   narrower than twice the placement width looks soft on high-DPI screens.
 
-Deleting a panel removes its placement from the canvas automatically.
+Deleting a panel — in the editor, or with the **Fix** button on an
+[empty-panel](/cms/validation-codes#empty-panel) issue — removes its placement
+from the canvas automatically, so a stale placement can no longer block
+publishing. If that leaves the canvas with no placements and no decorations,
+the canvas layout itself is removed; one that still has decorations is kept,
+and preflight asks you to place a panel on it.
+
+Every canvas check has its own entry in the
+[Validation Code Reference](/cms/validation-codes#all-codes-at-a-glance).
 
 <Columns cols={3}>
   <Card title="Schema: Infinite Canvas" icon="map" href="/schema/canvas">

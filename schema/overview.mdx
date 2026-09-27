@@ -10,10 +10,11 @@ The **PanelWave manifest** is a single JSON document (`panelwave.json`) that des
 | | |
 |---|---|
 | **Schema draft** | [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/schema) |
-| **Schema `$id`** | `https://panelwave.org/schema/1.0/panelwave.schema.json` |
+| **Schema `$id`** | `https://panelwave.org/schema/1.0/panelwave.schema.json` (identifier only — not publicly served yet; get the file from the repository below) |
 | **Current format version** | `1.5.0` (published in-place in the `1.0/` major-version directory) |
 | **License** | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free to share and adapt with attribution |
-| **File** | `schema/1.0/panelwave.schema.json` |
+| **File** | [`1.0/panelwave.schema.json`](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) in [panelwave/schema](https://github.com/panelwave/schema) on GitHub |
+| **Feedback** | [github.com/panelwave/schema/issues](https://github.com/panelwave/schema/issues) |
 
 <Callout kind="info">
 The schema license covers the format definition itself. It does not restrict content you create in the PanelWave format (your work remains yours) or software that reads or writes manifests.
@@ -60,10 +61,17 @@ graph TD
     M -->|embeds for preview| P
 ```
 
-- **`@panelwave/types`** mirrors every schema `$defs` entry as a TypeScript interface (`PanelwaveManifest`, `Meta`, `Chapter`, `Panel`, `Layer`, …) with the same names used throughout this reference.
-- **`@panelwave/cli`** validates manifests against the bundled schema (see [Validation](/schema/validation) and [CLI](/schema/cli)), bundles manifest directories, diffs two manifests, and upgrades older manifests.
-- **The player** (`@panelwave/player`) renders a validated manifest in the browser. See [Player Overview](/player/overview).
+- **[`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types)** mirrors every schema `$defs` entry as a TypeScript interface (`PanelwaveManifest`, `Meta`, `Chapter`, `Panel`, `Layer`, …) with the same names used throughout this reference.
+- **[`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli)** validates manifests against its bundled copy of the schema (see [Validation](/schema/validation) and [CLI](/schema/cli)), bundles manifest directories, diffs two manifests, and upgrades older manifests.
+- **The player** ([`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player)) renders a validated manifest in the browser. See [Player Overview](/player/overview).
 - **The CMS** authors manifests visually and exports them; it embeds the open-source player for preview so rendering behavior is never duplicated. See [CMS Overview](/cms/overview).
+
+The types and the CLI are developed in the [panelwave/packages](https://github.com/panelwave/packages) monorepo and install from npm:
+
+```bash
+npm install @panelwave/types        # TypeScript interfaces (type-only)
+npm install -g @panelwave/cli       # the `panelwave` command
+```
 
 <Callout kind="tip">
 When the format evolves, the schema changes first — types, CLI, player, and CMS follow. If a tool and this reference ever disagree, the schema file is authoritative.

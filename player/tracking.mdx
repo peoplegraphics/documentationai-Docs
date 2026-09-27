@@ -132,7 +132,11 @@ Beyond video events, the shell instruments the reading session automatically —
 | `session_start` | Once, when tracking is configured | `deviceType`, `locale`, `totalPanels` (reading-order count) |
 | `panel_view` | Each panel the reader lands on (deduplicated) | `panelId`, `chapterId`, `panelOrder` |
 | `work_complete` | Once, when the reader reaches an end panel | `panelId`, `chapterId` |
-| `hotspot_click` | Every click/tap on panel content | see below |
+| `hotspot_click` | Every click/tap on panel content (panel, page and canvas view) | see below |
+| `branch_choice` | The reader picked a path in the branch chooser | `chapterId`, `from`, `to`, `index` (position in the edge list) |
+| `like` | Like toggled | `workId`, `liked` |
+| `bookmark` | Bookmark set or cleared | `workId`, `chapterId`, `panelId`, `bookmarked` |
+| `speech_toggle` / `audio_toggle` / `sfx_toggle` | A sound toggle changed (toolbar or Settings) | `enabled` |
 | `session_end` | On page hide / destroy, followed by a synchronous flush (`sendBeacon`) | — |
 
 ### `hotspot_click`
@@ -179,11 +183,14 @@ import type { Panel, Chapter } from '@panelwave/player';
       (panelChange)="onPanel($event)"
       (navigationAttempt)="analytics.event('pw_nav', $event)"
       (localeChange)="analytics.event('pw_locale', { locale: $event })"
+      (likeChange)="analytics.event('pw_like', $event)"
+      (bookmarkChange)="analytics.event('pw_bookmark', $event)"
       (error)="analytics.event('pw_error', { message: $event.message })">
     </pw-player-shell>
   `,
 })
 export class ReaderComponent {
+  // panelChange fires exactly once per navigation — no de-duplication needed.
   onPanel(e: { panel: Panel; chapter: Chapter }): void {
     this.analytics.event('pw_panel_view', { chapterId: e.chapter.id });
   }

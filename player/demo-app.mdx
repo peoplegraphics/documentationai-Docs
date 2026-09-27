@@ -1,0 +1,80 @@
+---
+title: Demo App
+description: The PanelWave Player demo — try bundled works or your own manifest, preview phone/tablet/desktop frames, and inspect variables, events and performance in the dev-tools drawer.
+---
+
+The player repository ships a small Angular application, `projects/demo`, that embeds `pw-player-shell`. It is the reference integration, the host of the end-to-end test suite, and a handy tool for checking a manifest before you publish it.
+
+<Card title="Open the live demo" icon="play-circle" href="https://panelwave.github.io/player/" horizontal={true} cta="panelwave.github.io/player" target="_blank">
+  Rebuilt and redeployed from the repository on every push, so it always runs the latest player.
+</Card>
+
+To run it locally, see [Development & Contributing](/player/development#setup).
+
+## Loading a work
+
+The header offers three ways to pick what to read:
+
+- **Bundled demos** — *Sample Comic* (panel and page view, hotspots, extras), *Video Sequencing* (video panels that play one after another in page view) and *Infinite Canvas* (a format 1.4 canvas chapter). Their manifests live in [`projects/demo/src/assets`](https://github.com/panelwave/player/tree/master/projects/demo/src/assets) and make good starting points for your own.
+- **Manifest URL or path** — type any URL and press **Load**. Cross-origin URLs need CORS headers on the server (CMS preview links send them).
+- **Open file…** — pick a local `panelwave.json`. It is read in the browser and never uploaded; a file that isn't valid JSON shows an error banner.
+
+The player is re-created on every switch, so each work starts cleanly.
+
+## Responsive preview frames
+
+The **Preview** selector renders the player inside a fixed-size frame, so you can check layouts and lettering without resizing the window:
+
+| Frame | Size (CSS px) | `?device=` |
+|---|---|---|
+| Fill window | the whole window | `fill` |
+| Phone | 390 × 844 | `phone` |
+| Phone landscape | 844 × 390 | `phone-landscape` |
+| Tablet | 820 × 1180 | `tablet` |
+| Desktop | 1440 × 900 | `desktop` |
+
+The frame contains everything the player renders — its toolbar and dialogs position themselves inside it, just as they would in a host app's container of that size.
+
+## Dev tools
+
+**Dev tools** (or `?devtools=1`) opens a drawer next to the player with three tabs:
+
+- **Variables** — a live inspector over all five variable scopes (global, chapter, page, session, persistent). Watch hotspots, edge actions and branch choices change story state as you read.
+- **Events** — a log of the shell's outputs (`ready`, `panelChange`, `chapterChange`, `variableChange`, `localeChange`, `navigationAttempt`, `error`) with their payloads, newest first. Each navigation logs exactly one `panelChange`.
+- **Performance** — frames per second, JS heap size (Chromium browsers), manifest load time, and the number of panel changes.
+
+The dev tools are not available in embed mode. The **Debug overlay** switch outlines every layer, hotspot and speech bubble the player renders — useful for spotting a hotspot that sits in the wrong place or a layer that doesn't cover its panel.
+
+## URL parameters
+
+Everything the header does can be preset in the URL, which makes demo links easy to share:
+
+| Parameter | Effect |
+|---|---|
+| `?manifest=<url>` | Load this manifest instead of the sample (e.g. a CMS [preview link](/cms/publishing)) |
+| `?device=<id>` | Start in a preview frame (see the table above) |
+| `?devtools=1` | Open the dev-tools drawer on load |
+| `?vars=<url-encoded JSON>` | Seed story variables, e.g. `?vars={"user.age":12}` — passed as `initialVariables`, so read-only variables can be set too |
+| `?deny=<panelId>[,<panelId>…]` | Install an entitlement adapter that refuses these panels, to try the paywall path without a backend |
+| `?embed=1` | Embed mode (see below) |
+
+Example: `https://panelwave.github.io/player/?device=phone&devtools=1&vars={"user.age":16}`
+
+## Embed mode
+
+With `?embed=1`, or automatically when the demo runs inside an iframe, the header is hidden and the demo waits for its host to send the work via `postMessage`:
+
+```typescript
+iframe.contentWindow.postMessage({
+  type: 'config',
+  data: {
+    manifest,                 // PanelWaveManifest object
+    locale: 'de-DE',          // optional
+    autoplay: false,          // optional
+    viewMode: 'canvas',       // optional: 'auto' | 'panel' | 'canvas'
+    variables: { 'user.age': 21 },  // optional initial variables
+  },
+}, '*');
+```
+
+Each `config` message re-creates the player with the new work. This is how the PanelWave CMS runs its [preview](/cms/preview) — the preview is the real player, not a copy of it.

@@ -24,7 +24,8 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `VisibilityService` | IntersectionObserver wrapper (50% threshold) |
 | `UserGestureService` | Autoplay-policy gesture tracking |
 | `TrackingService` | Consent-gated, batched analytics events |
-| `EntitlementService` | Paywall/entitlement checks via adapter |
+| `PaywallService` | Evaluates the manifest's `paywall.rules` against the reader's entitlement snapshot; drives the shell's paywall overlay and age gate |
+| `EntitlementService` | Standalone entitlement checks via the full adapter (signed URLs, custom flows) |
 | `PluginHostService` | Plugin lifecycle, sandboxing, messaging |
 | `ExportService` | EDL/JSON/CSV timing exports |
 | `TranslationService` | GUI string translation (ngx-translate wrapper) |
@@ -143,9 +144,13 @@ Four services cooperate to implement video panels (see [Video](/schema/video) fo
 
 The shell wires the manifest's `tracking` section into this service on startup (consent requirement, whitelist, endpoint, `consent.defaultOptIn`). See [Tracking](/player/tracking).
 
+## PaywallService
+
+`services/paywall.service.ts` — the shell's gatekeeper. `setManifest(manifest)` loads the rules (via the pure functions in `entitlement/paywall-evaluator.ts`) and the reading order used for free-preview counting; `setSnapshot(snapshot)` / `getSnapshot()` hold what the reader owns (anonymous by default). `canAccess(panelId)`, `evaluate(panelId)` (an `AccessDecision` with the lock reason), `gateFor(panelId)` (a `PaywallGate` for the overlay) and `ruleFor(panelId)` answer per panel. A work without rules reports every panel accessible. See [Paywall & Entitlement](/player/paywall-entitlement).
+
 ## EntitlementService
 
-`services/entitlement.service.ts` — access control behind a pluggable **adapter** (`EntitlementAdapter` from `types/entitlement.types.ts`; the default is a `NullEntitlementAdapter` that allows everything):
+`services/entitlement.service.ts` — standalone access control behind a pluggable **adapter** (`EntitlementAdapter` from `types/entitlement.types.ts`; the default is a `NullEntitlementAdapter` that **denies** everything). The embedded shell does not use it for gating:
 
 - `setAdapter(adapter)` / `getAdapter()`.
 - `checkEntitlement(context): Promise<EntitlementStatus>` — resolves through the adapter with a 5-minute result cache keyed by `workId:chapterId:panelId`.
@@ -153,12 +158,12 @@ The shell wires the manifest's `tracking` section into this service on startup (
 - `getSignedUrl(assetId, purpose)`, `showPaywall(gate)`, `verifyAge(minimumAge)`, `isAuthenticated()`, `getCurrentUser()` / `getCurrentUser$()`, `getEntitlementStatus$()`, `clearCache()`.
 
 <Callout kind="alert">
-`PlayerShellComponent` additionally declares its own, simpler `EntitlementAdapter` interface (`hasAccess(panelId)`, `getContext()`, optional `purchase(productId)`) as an `@Input`. That input drives navigation gating and seeds entitlement context variables; the richer `EntitlementService` adapter drives the paywall overlay and signed URLs. See [Paywall & Entitlement](/player/paywall-entitlement).
+`PlayerShellComponent` additionally declares its own, simpler `EntitlementAdapter` interface (`hasAccess(panelId)`, `getContext()`, optional `purchase(productId)`) as an `@Input`. When set, it replaces the `PaywallService` check for navigation and seeds entitlement context variables. The exported `EntitlementAdapter` type is the richer one used by `EntitlementService` (and implemented by `HttpEntitlementAdapter`). See [Paywall & Entitlement](/player/paywall-entitlement#custom-access-checks).
 </Callout>
 
 ## PluginHostService, ExportService, TranslationService
 
-- **`PluginHostService`** (`plugin-host.service.ts`) — registers plugins (max 10 by default), sandboxes them in iframes (`allow-scripts`, `allow-same-origin`), routes `postMessage` traffic, and manages capability grants (auto-granted: `read-manifest`, `read-state`). See [Plugins](/player/plugins).
+- **`PluginHostService`** (`plugin-host.service.ts`) — registers plugins (max 10 by default), sandboxes them in iframes (`allow-scripts`, plus `allow-same-origin` for cross-origin plugins only), routes `postMessage` traffic — accepting messages only from each plugin's own frame and origin — and manages capability grants (auto-granted: `read-manifest`, `read-state`). See [Plugins](/player/plugins#security-model).
 - **`ExportService`** (`export.service.ts`) — converts chapters into timing exports: EDL documents, JSON, and timing/layer CSV rows (default framerate 24). Used by production tooling rather than the reading experience.
 - **`TranslationService`** (`translation.service.ts`) — wraps `@ngx-translate/core` for player GUI strings (buttons, labels). Maps content locales (`en-US`) to GUI language codes (`en`). Content localization is separate — see [Localization](/player/localization).
 

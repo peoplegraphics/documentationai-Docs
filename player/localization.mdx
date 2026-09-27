@@ -12,7 +12,9 @@ PanelWave works are multilingual by design: every user-facing string in a manife
 | **Content locale** | Manifest content: titles, speech-bubble text, localized assets | `LocalizedString` resolution + `pickLocalizedAsset` |
 | **UI language** | Player chrome: toolbar labels, modals, loading/error text | `@ngx-translate` with JSON files the host app serves (`assets/i18n/<lang>.json`) |
 
-Both follow the same selection: setting the content locale also switches the UI language to the locale's **base language** (`de-DE` → `de`). The host app must provide the UI translation files — see [Installation](/player/installation); English and German files ship with the demo app.
+Both follow the same selection: setting the content locale also switches the UI language to the locale's **base language** (`de-DE` → `de`). **English and German** UI files ship inside the npm package (`node_modules/@panelwave/player/src/assets/i18n/`); the host app copies them into its build and serves them — see [Installation](/player/installation#application-setup). They cover the toolbar (labels and tooltips), dialogs, the comments drawer's timestamps and the paywall overlay. A few newer surfaces — the age gate, the branch chooser's title and the paywall's reason sentence — are still English-only in 1.0.x.
+
+To add a UI language, create `<lang>.json` with the same keys (start from `en.json`) and serve it next to the others.
 
 ## Setting and switching the locale
 

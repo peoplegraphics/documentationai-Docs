@@ -28,7 +28,7 @@ const manifest: PluginManifest = {
   url: 'https://plugins.example.com/reading-stats/index.html',
   capabilities: ['read-manifest', 'read-state'],       // required
   optionalCapabilities: ['storage'],                    // user may deny
-  allowedOrigins: ['https://plugins.example.com'],
+  allowedOrigins: ['https://plugins.example.com'],   // extra origins accepted for incoming messages
 };
 ```
 
@@ -90,9 +90,9 @@ export class PluginPanelComponent {
 
 | Method | Purpose |
 |---|---|
-| `configure(config)` | Set `enabled`, `maxPlugins` (default 10), `loadTimeout` (default 10 000 ms), `sandboxAttributes` (default `allow-scripts allow-same-origin`), `autoGrantCapabilities` |
-| `loadPlugin(manifest)` | Validate and register; resolves capabilities → state `loaded` |
-| `mountPlugin(id, container)` | Create the sandboxed iframe in `container`, wait for `plugin:ready`, send `plugin:mount`, wait for `plugin:mounted` → state `mounted` |
+| `configure(config)` | Set `enabled`, `maxPlugins` (default 10), `loadTimeout` (default 10 000 ms), `sandboxAttributes` (default `allow-scripts allow-same-origin`; see [Security model](#security-model)), `autoGrantCapabilities`, `allowedOrigins` (extra origins accepted for every plugin) |
+| `loadPlugin(manifest)` | Validate and register; resolves capabilities → state `loaded`. A plugin that failed to load can simply be loaded again |
+| `mountPlugin(id, container)` | Create the sandboxed iframe in `container`, wait for `plugin:ready`, send `plugin:mount`, wait for `plugin:mounted` → state `mounted`. Each plugin has its own wait and timeout, so several plugins can mount concurrently |
 | `updatePlugin(id, data)` | Push new data (`plugin:update`) |
 | `unmountPlugin(id)` | Send `plugin:unmount`, remove the iframe, clean event subscriptions |
 | `disposePlugin(id)` | Unmount if needed, send `plugin:dispose`, deregister |
@@ -130,7 +130,7 @@ All traffic uses one envelope (`PluginMessage`): `{ type, pluginId, requestId?, 
 - **API calls:** `api:call` (payload `{ method, params }`), answered with `api:response` (`{ result }`) or `api:error`
 - **Events:** `event:subscribe`, `event:unsubscribe`, `event:emit`
 
-The host answers `api:call` messages through handlers registered with `registerAPIHandler`. Three placeholder handlers exist out of the box (`getManifest`, `getPlayerState`, `getCurrentPanel` — currently returning empty data); register your own implementations to expose real functionality. The intended method surface is defined by the exported `PluginAPI` interface (manifest/state/variable access, navigation, notifications, toolbar buttons, events, storage).
+The host answers `api:call` messages through handlers registered with `registerAPIHandler` — only for plugins that are currently **mounted**; a failed reply is caught and never surfaces as an unhandled rejection. Three placeholder handlers exist out of the box (`getManifest`, `getPlayerState`, `getCurrentPanel` — currently returning empty data); register your own implementations to expose real functionality. The intended method surface is defined by the exported `PluginAPI` interface (manifest/state/variable access, navigation, notifications, toolbar buttons, events, storage).
 
 ## Writing a plugin
 
@@ -178,15 +178,18 @@ A plugin is a plain HTML page. Minimum viable handshake:
 </html>
 ```
 
-A complete runnable example ships in the player repository as `SAMPLE_PLUGIN.html`.
+The plugin posts to `window.parent` from its own document — the host only accepts messages from the iframe it created for that plugin (see below). A complete runnable example ships in the player repository as [`SAMPLE_PLUGIN.html`](https://github.com/panelwave/player/blob/master/SAMPLE_PLUGIN.html).
 
 ## Security model
 
-- Plugins run in iframes with a **sandbox** (`allow-scripts allow-same-origin` by default; `allow-same-origin` is required for postMessage) and are visually confined to the container you mount them into.
-- Capabilities gate what a plugin may do; required capabilities are checked at load time.
-- Timeouts (`loadTimeout`, default 10 s) fail plugins that never report `plugin:ready` / `plugin:mounted`.
+- **Sandboxed iframes.** Plugins run in iframes with `sandbox="allow-scripts allow-same-origin"` by default and are visually confined to the container you mount them into. For a plugin served from the **host's own origin**, the player drops `allow-same-origin` automatically — with both tokens, a same-origin document could remove its own sandbox. Such plugins run in an opaque origin; postMessage works without it. Cross-origin plugins keep their real origin (storage, credentialed fetch).
+- **Trusted channel per plugin.** A message is accepted only when it comes from **that plugin's own iframe window** and from an origin accepted for it: the origin of its `url` (`null` for sandboxed/opaque documents), plus the manifest's `allowedOrigins` and the host-wide `allowedOrigins` from `configure()`. Knowing a plugin id is no longer enough to spoof lifecycle messages, API calls or event subscriptions from another window.
+- **Targeted replies.** The host posts to the plugin's own origin instead of `*` (only opaque-origin plugins, which cannot be addressed by origin, receive `*` — their identity is guaranteed by the window check).
+- **Capabilities** gate what a plugin may do; required capabilities are checked at load time.
+- **Timeouts** (`loadTimeout`, default 10 s) fail plugins that never report `plugin:ready` / `plugin:mounted`, and clean up after themselves.
+- **Cleanup.** `disposePlugin()` removes the plugin's event subscriptions in every state, including after a failed load.
 - `maxPlugins` (default 10) caps the number of simultaneously registered plugins.
 
 <Callout kind="tip">
-Treat plugin URLs like any third-party embed: serve them from an origin you trust, pin `allowedOrigins`, and grant the minimum capability set.
+Treat plugin URLs like any third-party embed: serve them from an origin you trust, list only the origins you expect in `allowedOrigins`, and grant the minimum capability set.
 </Callout>

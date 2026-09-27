@@ -26,7 +26,7 @@ Exports run as **background jobs**: you queue them, keep working, and download t
 
 ## Queueing exports from the works list
 
-The quickest way to export today is from **My Works**:
+The quickest way to export several works at once is from **My Works**:
 
 <Steps>
   <Step title="Select works">
@@ -42,11 +42,7 @@ The quickest way to export today is from **My Works**:
 
 ## The Exports screen
 
-The full **Exports** screen ("Export your works to PDF, PowerPoint, or Video") adds per-format options, presets, and job management.
-
-<Callout kind="alert">
-  The Exports screen is built but not yet linked from the main navigation in the current release — the works-list bulk export above is the reachable path today. The options below describe the full screen.
-</Callout>
+The full **Exports** screen ("Export your works to PDF, PowerPoint, or Video") adds per-format options, presets, and job management. Open it from the **user menu** (your avatar in the top-right corner) → **Exports**; it lists the jobs you queued from the works list, too.
 
 ### Creating an export
 
@@ -74,7 +70,7 @@ Under **Create New Export**, pick a work from the **Select Work** dropdown (or e
 |---|---|---|
 | **Video Resolution** | 720p HD / 1080p Full HD / 4K Ultra HD | 1080p is roughly twice the size of 720p; 4K is much larger and slowest to render |
 | **Frame Rate** | 24 fps (Cinematic) / 30 fps (Standard) / 60 fps (Smooth, ~2× size) | |
-| **Include audio narration** | on/off | |
+| **Include audio narration** | on/off | Lays the work's first audio asset under the whole video as a background track; without an audio asset the video is silent |
 
 Before you start, the dialog shows an **estimated size** ("~ a few MB" up to "~ several hundred MB+") and warns when a combination — such as 4K at 60 fps — will be very large and slow. Click **Start Export** to queue the job.
 
@@ -95,11 +91,12 @@ The **Archive (.zip)** format is different from the presentation formats above: 
 - The work's manifest covering **all page formats** — chapters, pages, panels, speech bubbles, hotspots, characters, extras, variables, and settings
 - **Every asset file** — originals plus all generated variants (responsive sizes, optimized versions, video renditions, posters); nothing is re-transcoded on import
 - Your [asset library folders](/cms/assets) and all [translations](/cms/localization)
+- Every [paywall rule](/cms/monetization#paywall-rules) — live rules and inactive drafts alike, with prices, tiers, age limit, and preview count. On import they arrive **disabled**, so nothing is sold on the target before you have reviewed it (see [Importing a work archive](/cms/import#importing-a-work-archive)).
 
 Archives are queued from the works-list bulk export like any other format and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
 
 <Callout kind="info">
-  Deliberately **not** included: paywall configuration, publish history and preview links, analytics, and community data (comments, likes). Reconfigure and republish on the target system.
+  Deliberately **not** included: products and reader entitlements, publish history and preview links, analytics, and community data (comments, likes). Review the paywall rules, then republish on the target system.
 </Callout>
 
 ## Tracking jobs and downloading
@@ -117,9 +114,30 @@ Each job card shows the work title, format, when it was created, a status badge,
   Download links are temporary: completed jobs show an **"Expires …"** date. Download your file before it expires, or simply run the export again.
 </Callout>
 
+### Export limits
+
+You can run up to **5 exports at the same time** and **50 per day**; a job beyond that is refused with a message saying which limit was hit. Works that became **read-only** because your team is over its plan limit can still be exported (and archived) — only editing is blocked.
+
 ## What gets exported
 
-Exports render the work's pages, panels, layers, and speech bubbles at the time the job runs. Content that is hidden from readers stays hidden in exports too — for example, [extras](/cms/extras) marked **Draft (hidden from readers)** are excluded, exactly as they are from the published manifest.
+Exports render the work's current state at the time the job runs; hidden layers are skipped. Content that is hidden from readers stays hidden in exports too — for example, [extras](/cms/extras) marked **Draft (hidden from readers)** are excluded, exactly as they are from the published manifest.
+
+### PDF and PowerPoint
+
+Every panel gets its own PDF page or slide, drawn from its visible layers bottom to top:
+
+- **Artwork** — every visible image layer, whether it was uploaded, placed from the library, or created by [Page Import](/cms/page-import). In PowerPoint the images are embedded in the deck, so it opens offline.
+- **Text layers** — in the work's default language.
+- **Speech bubbles** — as simple text boxes at the bubble's position, in the default language and prefixed with the speaking [character's](/cms/characters) name (*"Mara: Run!"*). Balloon shapes and tails are not drawn.
+
+### Video
+
+The video export plays the work panel by panel:
+
+- A panel with a visible **video layer** contributes that clip (the topmost one, if there are several); any other panel contributes its topmost visible image as a still. See [Video Panels](/cms/editor/video-panels).
+- Each panel is on screen for its **Display Duration** (see [Panel duration and video length](/cms/editor/video-panels#panel-duration-and-video-length)); without one, a video panel runs for its clip's length and a still for 5 seconds (always between 0.5 and 120 seconds). A clip shorter than its panel loops, a longer one is cut.
+- Every segment is fitted into the chosen resolution without distortion (letterboxed where the aspect ratios differ).
+- The clips' own sound is not carried over; with **Include audio narration** on, the work's first audio asset plays underneath the whole video instead.
 
 The interactive **manifest** itself (the `panelwave.json` file that drives the [PanelWave Player](/player/overview)) is not produced here — it is built and deployed by the [publish flow](/cms/publishing), where each release's manifest can also be downloaded as JSON from the release history.
 

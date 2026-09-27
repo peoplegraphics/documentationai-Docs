@@ -20,6 +20,10 @@ Every issue that [Preflight Validation](/cms/validation) reports carries a stabl
 | [`VIDEO_LOOP_FROM_WITHOUT_MODE`](#video-loop-from-without-mode) | Error | Content |
 | [`VIDEO_LOOP_FROM_BEFORE_START`](#video-loop-from-before-start) | Error | Content |
 | [`VIDEO_LOOP_FROM_BEYOND_DURATION`](#video-loop-from-beyond-duration) | Error | Content |
+| [`CANVAS_UNKNOWN_PANEL`](#canvas-unknown-panel) | Error | Integrity |
+| [`CANVAS_NO_PLACEMENTS`](#canvas-no-placements) | Error | Integrity |
+| [`VARIANT_NO_CONDITION`](#variant-no-condition) | Error | Logic |
+| [`VARIANT_DUPLICATE_ID`](#variant-duplicate-id) | Error | Logic |
 | [`MISSING_ALT_TEXT`](#missing-alt-text) | Warning | Accessibility |
 | [`MISSING_DESCRIPTION`](#missing-description) | Warning | Metadata |
 | [`MISSING_COVER`](#missing-cover) | Warning | Metadata |
@@ -27,6 +31,14 @@ Every issue that [Preflight Validation](/cms/validation) reports carries a stabl
 | [`UNKNOWN_TEXT_STYLE_REF`](#unknown-text-style-ref) | Warning | Content |
 | [`UNKNOWN_BALLOON_PRESET_REF`](#unknown-balloon-preset-ref) | Warning | Content |
 | [`VIDEO_HOVER_START_MODE`](#video-hover-start-mode) | Warning | Content |
+| [`DANGLING_PAGE_REF`](#dangling-page-ref) | Warning | Integrity |
+| [`CANVAS_UNPLACED_PANELS`](#canvas-unplaced-panels) | Warning | Content |
+| [`CANVAS_TOO_LARGE`](#canvas-too-large) | Warning | Performance |
+| [`CANVAS_PAYWALL_REVEALED`](#canvas-paywall-revealed) | Warning | Content |
+| [`CANVAS_LOW_RESOLUTION`](#canvas-low-resolution) | Warning | Performance |
+| [`VARIANT_UNKNOWN_VARIABLE`](#variant-unknown-variable) | Warning | Logic |
+| [`VARIANT_UNKNOWN_OVERRIDE_KEY`](#variant-unknown-override-key) | Warning | Logic |
+| [`VARIANT_EMPTY_OVERRIDES`](#variant-empty-overrides) | Warning | Logic |
 
 ---
 
@@ -132,7 +144,7 @@ The work has no cover image. Covers represent the work in libraries, embeds, and
 
 A panel contains neither layers nor speech bubbles — readers would see a blank frame.
 
-**How to fix:** add artwork or dialogue to the panel, or remove it. The **Fix** button deletes the empty panel (recent fixes can be undone from the validation page).
+**How to fix:** add artwork or dialogue to the panel, or remove it. The **Fix** button deletes the empty panel (recent fixes can be undone from the validation page). Deleting it also removes the panel from the chapter's [canvas layout](/cms/editor/canvas-layout#publish-checks), if it had a placement there.
 
 ## Unknown text style ref
 
@@ -157,6 +169,102 @@ A speech bubble references a **balloon preset** (`styleRef`) that is not defined
 A video layer starts **on hover**. Hover only exists in page view on devices with a pointer — in panel view and on touch devices the player falls back to on-click. The warning asks you to confirm that behavior is intended.
 
 **How to fix:** if the work is read in page view with a mouse, this is fine — ignore the warning. Otherwise switch the layer's start mode to **on-click** (explicit) or **on-view** (autoplay, muted). See [Video Panels](/cms/editor/video-panels) and the [video format reference](/schema/video).
+
+## Dangling page ref
+
+**Code:** `DANGLING_PAGE_REF` · **Severity:** Warning · **Category:** Integrity · **Auto-fixable**
+
+A page's reading order or layout still lists one or more panels that no longer exist. Deleting a panel cleans up its page references today, but pages edited before that clean-up existed can carry these leftovers — the editor's timeline then warns *Panel not found*, and the page's reading sequence contains a gap. The message names the page and chapter (*"Page 3 of chapter 1 lists 2 panel(s) that no longer exist"*). Panels are matched by their internal id and their friendly id, the same way the published manifest resolves them, so a panel that still exists is never reported.
+
+**How to fix:** click **Fix**. It removes the stale entries from that one page's reading order and layout and nothing else; **Undo** restores the page exactly as it was. See [Pages & Panels](/cms/editor/pages-panels#reordering-by-drag-and-drop).
+
+## Canvas unknown panel
+
+**Code:** `CANVAS_UNKNOWN_PANEL` · **Severity:** Error · **Category:** Integrity
+
+A chapter's [canvas layout](/cms/editor/canvas-layout) has a placement for a panel that does not exist in the chapter. Deleting a panel removes its placement automatically, so this usually comes from older data or an import.
+
+**How to fix:** remove the stale placement on the Canvas Layout board, or restore the panel.
+
+## Canvas no placements
+
+**Code:** `CANVAS_NO_PLACEMENTS` · **Severity:** Error · **Category:** Integrity
+
+The chapter has a canvas layout without a single panel placement — typically one that still holds decorations after its last panel was removed.
+
+**How to fix:** place at least one panel on the [Canvas Layout board](/cms/editor/canvas-layout#starting-a-layout), or remove the canvas layout.
+
+## Canvas unplaced panels
+
+**Code:** `CANVAS_UNPLACED_PANELS` · **Severity:** Warning · **Category:** Content
+
+Some panels of the chapter have no position on its canvas (the message lists up to five). Players lay out stray panels on their own, which rarely matches your intended composition.
+
+**How to fix:** place the remaining panels on the [Canvas Layout board](/cms/editor/canvas-layout).
+
+## Canvas too large
+
+**Code:** `CANVAS_TOO_LARGE` · **Severity:** Warning · **Category:** Performance
+
+The canvas has more than 150 placed panels — beyond the tested budget; very large canvases slow down low-end devices.
+
+**How to fix:** consider splitting the chapter.
+
+## Canvas paywall revealed
+
+**Code:** `CANVAS_PAYWALL_REVEALED` · **Severity:** Warning · **Category:** Content
+
+Panels behind an active [paywall rule](/cms/monetization) are visible when readers zoom out over the canvas, because their reveal mode is not *On visit* — the overview would show paid artwork for free.
+
+**How to fix:** set those panels' reveal mode to **On visit** on the Canvas Layout board. See [Reveal modes](/cms/editor/canvas-layout#reveal-modes).
+
+## Canvas low resolution
+
+**Code:** `CANVAS_LOW_RESOLUTION` · **Severity:** Warning · **Category:** Performance
+
+Placed panels have artwork narrower than twice their width on the canvas. The camera zooms into panels, so on high-DPI screens this artwork looks soft.
+
+**How to fix:** upload higher-resolution artwork, or make the placements smaller.
+
+## Variant no condition
+
+**Code:** `VARIANT_NO_CONDITION` · **Severity:** Error · **Category:** Logic
+
+A [panel variant](/cms/editor/pages-panels#variants) has no JSON Logic condition, so it can never apply and is skipped at publish.
+
+**How to fix:** open the variant in the panel inspector and define its condition.
+
+## Variant duplicate id
+
+**Code:** `VARIANT_DUPLICATE_ID` · **Severity:** Error · **Category:** Logic
+
+Two variants of the same panel share an id.
+
+**How to fix:** give each variant of the panel a unique id.
+
+## Variant unknown variable
+
+**Code:** `VARIANT_UNKNOWN_VARIABLE` · **Severity:** Warning · **Category:** Logic
+
+A variant's condition reads a variable that is neither defined in the [Variables designer](/cms/editor/variables) nor set by any hotspot action, so the condition can never become true as intended.
+
+**How to fix:** define the variable, or correct the name in the condition — the variant editor's variable dropdown lists the defined ones.
+
+## Variant unknown override key
+
+**Code:** `VARIANT_UNKNOWN_OVERRIDE_KEY` · **Severity:** Warning · **Category:** Logic
+
+A variant overrides a field that variants are not allowed to change; that override is dropped from the published work.
+
+**How to fix:** override only panel fields a variant may replace — title, description, duration, layers, speech bubbles, hotspots, and similar — as offered by the variant editor's **Field** list.
+
+## Variant empty overrides
+
+**Code:** `VARIANT_EMPTY_OVERRIDES` · **Severity:** Warning · **Category:** Logic
+
+The variant changes nothing publishable, so it is skipped at publish.
+
+**How to fix:** add at least one override, or remove the variant.
 
 ---
 

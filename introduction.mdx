@@ -15,7 +15,7 @@ PanelWave is open-core. The format and the player are open; the authoring tool i
 | **PanelWave Player** | `@panelwave/player`, an Angular 20 library that loads a manifest and renders the full reading experience: graph navigation, layers, speech bubbles, hotspots, audio, video, localization, paywalls. | MIT |
 | **PanelWave CMS** | A SaaS application for authoring and publishing works: a visual editor, asset pipeline, localization workflow, monetization, analytics, and export. It **embeds the open-source player** for preview, so what you see while authoring is what readers get. | Proprietary |
 
-The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. Tooling for developers lives in two npm packages: `@panelwave/types` (TypeScript interfaces generated from the format) and `@panelwave/cli` (validate, bundle, diff, and upgrade manifests).
+The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. Tooling for developers lives in two npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format) and [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests).
 
 ```mermaid
 graph LR
@@ -51,6 +51,18 @@ graph LR
     FAQs, troubleshooting for common validation and embedding problems, and step-by-step guides.
   </Card>
 </Columns>
+
+## Open source
+
+The open layers are developed in public on GitHub under [github.com/panelwave](https://github.com/panelwave), and the libraries install from npm:
+
+| Repository | Contents | npm | License |
+|---|---|---|---|
+| [panelwave/schema](https://github.com/panelwave/schema) | The JSON Schema (`1.0/panelwave.schema.json`) | — | CC BY 4.0 |
+| [panelwave/player](https://github.com/panelwave/player) | The Angular player library and demo app ([live demo](https://panelwave.github.io/player/)) | [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) | MIT |
+| [panelwave/packages](https://github.com/panelwave/packages) | The SDK: TypeScript types and the CLI | [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types), [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) | MIT |
+
+Bug reports and contributions go to the issue tracker of the matching repository.
 
 ## Where to start
 

@@ -21,7 +21,7 @@ The optional `variables` section declares the state that drives everything condi
 | `readOnly` | boolean | — | `false` | Story content cannot mutate this variable; its value comes from the environment |
 
 <Callout kind="info">
-Note the stricter ID pattern: unlike a general [`Identifier`](/schema/manifest-structure#identifier), variable IDs are dot-separated segments (`prefs.hints` is valid, `prefs..hints` or a leading dot is not). Plugin state variables use the reserved `plugin.` prefix — see [Panels](/schema/panels#plugins).
+Note the stricter ID pattern: unlike a general [`Identifier`](/schema/manifest-structure#identifier), variable IDs are dot-separated segments (`prefs.hints` is valid, `prefs..hints` or a leading dot is not). Plugin state variables use the reserved `plugin.` prefix — see [Panels](/schema/panels#plugininstance).
 </Callout>
 
 ## The five scopes

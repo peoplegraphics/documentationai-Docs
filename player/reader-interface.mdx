@@ -9,9 +9,9 @@ This page describes the player from the reader's point of view: every visible co
 
 The player fills its host container with three UI layers:
 
-1. **Viewport** (`pw-viewport`) — renders the current panel (panel view) or the current page with all its placed panels (page view), including image/video/text layers and speech bubbles.
+1. **Viewport** (`pw-viewport`) — renders the current panel (panel view) or the current page with all its placed panels (page view), including image/video/text layers and speech bubbles. Works with an infinite-canvas chapter render on the [canvas stage](/player/canvas-view) instead.
 2. **Toolbar** (`pw-toolbar`) — a bottom bar with all reader controls. Hidden by default unless the integrator sets `[showToolbar]="true"`.
-3. **Modals and overlays** — table of contents, settings, language picker, character roster, extras viewer, share modal, comments drawer, and a thumbnail strip.
+3. **Modals and overlays** — table of contents, settings, language picker, character roster, extras viewer, branch chooser, share modal, comments drawer, paywall and age gate, and a thumbnail strip.
 
 While the toolbar is hidden, a **floating menu button** (hamburger icon, bottom of the viewport) lets readers bring it back. Clicking anywhere on the viewport also shows the toolbar temporarily — it auto-hides again after 5 seconds.
 
@@ -43,7 +43,15 @@ Panels can carry [hotspots](/schema/hotspots) — clickable regions the creator 
 - **Open modal** — shows a small dialog with localized title and text.
 - **Plugin event** — hands the interaction to an embedded plugin.
 
-Hotspots are keyboard-accessible: `Tab` moves between them, `Enter`/`Space` activates, and each announces its localized label (or `ariaLabel`) to screen readers. Clicks on a hotspot never double as tap-to-advance. In canvas view hotspot regions are shown but tapping a panel keeps its navigation meaning.
+Hotspots are keyboard-accessible: `Tab` moves between them, `Enter`/`Space` activates, and each announces its localized label (or `ariaLabel`) to screen readers. Clicks on a hotspot never double as tap-to-advance.
+
+In [canvas view](/player/canvas-view) the hotspots of the **current** panel are interactive in the same way (click, tap and keyboard, tracked like in panel view); hotspots on the other panels visible on the canvas are drawn but inert, so tapping a neighbouring panel keeps its navigation meaning.
+
+### Branch choices
+
+When the current panel has **more than one outgoing edge**, the toolbar shows a **Choices** button. It opens the branch chooser, which lists the paths whose conditions pass right now — labelled with the edge's `label`, else the target panel's title, else "Option 1, 2, …". Picking one follows that edge exactly as a normal navigation would: its transition (or camera move in canvas view) plays and its `action` mutations are applied. The choice is tracked as `branch_choice`.
+
+**Next** still resolves the graph on its own (highest-priority valid edge), so the chooser is an *additional* way to pick a path, not a required step.
 
 ### Input methods
 
@@ -52,12 +60,14 @@ Hotspots are keyboard-accessible: `Tab` moves between them, `Enter`/`Space` acti
 | `→` (Arrow Right) | Next panel (or next page in page view) |
 | `←` (Arrow Left) | Previous panel (or previous page in page view) |
 | `T` | Toggle toolbar |
-| `Esc` | Hide toolbar / close the settings modal |
+| `Esc` | Close the open dialog; with no dialog open, hide the toolbar |
 | Click / tap viewport | Show toolbar temporarily (5 s) |
 | Swipe left | Navigate forward |
 | Swipe right | Navigate backward |
 
-Keyboard shortcuts are ignored while typing in an input field. `Enter`/`Space` activate the focused viewport element for keyboard users.
+Keyboard shortcuts are ignored while typing in an input field. `Enter`/`Space` activate the focused viewport element for keyboard users. Canvas view adds `O` (overview) and `+`/`-` (zoom) — see [Canvas View](/player/canvas-view#input-model).
+
+While a dialog is open (table of contents, settings, language, characters, extras, branch chooser, share, comments, or a hotspot's modal), the story behind it does not react: **Escape** closes the topmost dialog, and arrow keys and `T` are ignored until it is closed. The paywall and age gate handle Escape themselves while they have focus (it dismisses them like their close button), and a dismissed gate leaves the reader on the last panel they were allowed to see.
 
 ## Toolbar controls
 
@@ -76,16 +86,25 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 | **Settings** | Open the settings modal. |
 | **Characters** | Open the character roster built from `meta.characters` in the manifest. |
 | **Alt** | Cycle alternative panels — only shown when alternatives exist. |
-| **Choices** | Preview upcoming branch choices — only shown when branches lie ahead. |
+| **Choices** | Open the [branch chooser](#branch-choices) — only shown when the current panel has more than one outgoing edge. |
 | **Extras** | Open the extras viewer (covers, character sheets, bonus art — see [Extras](/schema/extras)). |
-| **Like / Bookmark / Share / Comments** | Social cluster; Share opens the share modal, Comments opens the comments drawer. |
+| **Like** | Like / unlike the work (see [below](#like-and-bookmark)). Highlighted while liked. |
+| **Bookmark** | Set a bookmark on the current panel, or clear it when you're on the bookmarked panel. Highlighted on the bookmarked panel. |
+| **Share / Comments** | Share opens the share modal (native share sheet where available, else copy link); Comments opens the comments drawer. |
 | **✕** | Close the toolbar. |
 
 The three sound toggles (Speech, Audio, SFX) share one rule for their initial state: a preference the reader set explicitly — from the toolbar or the settings modal, in this or an earlier session (persisted in `localStorage` under `pw-preferences`) — wins; otherwise the work's `settings.ui.speechDefault` / `audioDefault` / `sfxDefault` applies (default: on). Mutes and volumes are independent in the engine, so toggling never loses a stored level. Each toggle emits an `audio_toggle` / `sfx_toggle` / `speech_toggle` tracking event with `{ enabled }`. What the toggles act on — the panel's manifest audio, started and stopped by the shell — is described in [Audio](/player/audio#what-the-shell-plays-automatically).
 
-<Callout kind="alert">
-**Work in progress:** in the current build, three toolbar actions are still visual placeholders that log to the console instead of acting — Like, Bookmark, and Choices. Also, the shell currently always reports "no branches" to the toolbar, so the Choices button does not appear yet. View toggle, language, speech/audio/SFX toggles, autoplay, thumbnails, ToC, settings, characters, Alt (cycle [panel variants](/schema/variants)), extras, share, and comments are functional.
-</Callout>
+All toolbar labels, tooltips and the comments drawer's timestamps are translated; English and German ship with the package.
+
+## Like and bookmark
+
+Both are stored **on the reader's device**, per work (`localStorage` key `pw-social`, keyed by the manifest's `meta.id`), so they work without accounts:
+
+- **Like** toggles; the state is restored the next time the work opens.
+- **Bookmark** marks the current panel. Pressing it again on the same panel clears it; pressing it on another panel moves it there. The next time the work opens **without** an explicit start position from the host, reading resumes at the bookmark.
+
+Each toggle is tracked (`like`, `bookmark` events, subject to consent and the manifest's whitelist) and emitted to the host as `likeChange` / `bookmarkChange`, so a platform with accounts can mirror them server-side. See [Inputs & Outputs](/player/inputs-outputs#outputs).
 
 ## Autoplay
 
@@ -100,25 +119,29 @@ Autoplay is **video-aware**: when the current panel contains videos that start o
 
 The settings modal (`pw-settings-modal`) has two tabs:
 
-- **Preferences** — speech bubbles, audio, SFX, autoplay and seconds-per-panel, manga mode (right-to-left reading), reduced motion, high contrast. Includes a reset-to-defaults action. Speech, audio, SFX, autoplay and seconds-per-panel go through the same code paths as the toolbar controls (and are persisted like them); manga mode, reduced motion and high contrast are persisted in the reader's preferences but the shell does not act on them yet — reduced motion is honoured from the OS setting and the shell's `reducedMotion` input instead.
+- **Preferences** — speech bubbles, audio, SFX, autoplay and seconds-per-panel, manga mode (right-to-left reading), reduced motion, high contrast. Includes a reset-to-defaults action. Speech, audio, SFX, autoplay and seconds-per-panel go through the same code paths as the toolbar controls (and are persisted like them). **Reduced motion** takes effect immediately (see [Accessibility](#accessibility)). Manga mode and high contrast are persisted but not applied yet.
 - **Variables** — shows the work's variables whose definition has `visibility: "public"`, with type-appropriate editors (checkbox for booleans, number input with min/max, select for enums, text otherwise) and per-variable reset. This lets readers change story-affecting switches the creator exposed.
 
-Changes apply on **Save**; **Cancel** (or clicking the backdrop, or `Esc`) restores the previous values.
+The modal edits a working copy: changes apply on **Save**; **Cancel**, a backdrop click or `Esc` discards them, and reopening the modal always starts from the saved values.
 
 ## Modals and overlays
 
 - **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation.
 - **Language modal** (`pw-language-modal`) — pick from the work's `meta.locales`; switching updates content and player UI immediately ([Localization](/player/localization)).
 - **Character roster** (`pw-character-roster`) — characters with portrait and description from the manifest.
-- **Extras viewer** (`pw-extras-viewer`) — bonus content; an `openExtras` hotspot opens it directly at the targeted item.
+- **Extras viewer** (`pw-extras-viewer`) — the work's [extras](/schema/extras) with their real media: image galleries (with thumbnails), videos (with their poster), audio tracks, and PDFs or text documents (opened with an *Open document* link); text-only extras render as text. A filter by type (including *Other*) narrows the list. An `openExtras` hotspot opens it directly at the targeted item.
 - **Action modal** (`pw-action-modal`) — the small localized dialog an `openModal` hotspot shows.
-- **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation.
+- **Branch chooser** (`pw-branch-chooser`) — the paths open from the current panel; see [Branch choices](#branch-choices).
+- **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation; it scrolls to the current panel when shown and follows along as you read.
 - **Share modal** and **comments drawer** — social features (surface only; persistence is up to the host application).
-- **Paywall overlay** and **age gate** — shown for gated or age-restricted content when the integrator wires an entitlement adapter; see [Paywall & Entitlement](/player/paywall-entitlement).
+- **Paywall overlay** and **age gate** — shown when the reader reaches content the work's paywall rules lock for them. The paywall offers *Sign in* / *Maybe later* and hands off to the host app; the age gate asks for a birth date and, once passed, continues where the reader was going and doesn't ask again on that device. See [Paywall & Entitlement](/player/paywall-entitlement).
 - **Loading & error states** — the shell shows a spinner while the manifest loads and an error screen with a retry button if loading or validation fails.
 
 ## Accessibility
 
 - Every toolbar button carries a translated `aria-label`; toggles expose `aria-pressed`.
 - The viewport is a labelled `region` with keyboard activation (`Enter`/`Space`); page-view panels are focusable buttons with visible focus indicators.
-- The reduced-motion preference (input `[reducedMotion]` or the OS-level `prefers-reduced-motion`) disables transition animations and degrades on-view video autostart to click-to-play.
+- **Reduced motion** is on when any of three sources asks for it: the operating system (`prefers-reduced-motion`, followed live while reading), the reader's **Reduced motion** switch in Settings, or the host's `[reducedMotion]` input. It makes panel/page transitions and canvas camera glides instant, stops the hotspot pulse, and degrades on-view video autostart to click-to-play.
+- Every dialog closes with `Esc` and a backdrop click, and keeps keyboard input away from the story behind it.
+- The current panel's artwork loads first, at high priority, so the page is readable as early as possible (see [Performance](/player/performance)).
+- An automated accessibility sweep (axe) runs over every dialog, overlay and view mode in the player's test suite.

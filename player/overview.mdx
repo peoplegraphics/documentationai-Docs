@@ -5,6 +5,18 @@ description: What the PanelWave Player is — an MIT-licensed Angular 20 library
 
 `@panelwave/player` is the **open-source player** of the PanelWave ecosystem: an MIT-licensed **Angular 20 library** that renders interactive graphic novels from a [PanelWave manifest](/concepts/manifest) (`panelwave.json`). You embed it in your own Angular application; it takes care of rendering, navigation, localization, and reader controls.
 
+<Columns cols={3}>
+  <Card title="npm" icon="package" href="https://www.npmjs.com/package/@panelwave/player" target="_blank">
+    `npm install @panelwave/player`
+  </Card>
+  <Card title="Live demo" icon="play-circle" href="https://panelwave.github.io/player/" target="_blank">
+    The current build, with the bundled sample works.
+  </Card>
+  <Card title="Source" icon="github" href="https://github.com/panelwave/player" target="_blank">
+    MIT-licensed, issues and pull requests welcome.
+  </Card>
+</Columns>
+
 <Callout kind="info">
 The player renders whatever a valid manifest describes — it contains no authoring features. Works are created with the [PanelWave CMS](/cms/overview) or any tool that produces a manifest conforming to the [PanelWave Schema](/schema/overview).
 </Callout>
@@ -26,15 +38,15 @@ All of the following is implemented in the library source (`projects/player/src/
 
 | Area | What you get |
 |---|---|
-| Navigation | Graph traversal with conditional edges and edge priorities (`FlowEngineService`), panel and page view, keyboard and swipe input, autoplay with per-panel durations and video-aware advance |
+| Navigation | Graph traversal with conditional edges and edge priorities (`FlowEngineService`), panel, page and [canvas](/player/canvas-view) view, a branch chooser for panels with several outgoing paths, keyboard and swipe input, autoplay with per-panel durations and video-aware advance |
 | Localization | `LocalizedString` resolution with fallback chains, per-locale asset variants, runtime language switching, translated player UI via `@ngx-translate` |
 | Variables | Five scopes (`global`, `chapter`, `page`, `session`, `persistent`), typed definitions, mutations, JSON Logic context building; `persistent` scope survives reloads via `localStorage` |
 | Media | WebAudio mixer with four buses (`ambient`, `music`, `voiceover`, `sfx`), video controller with a single-active-video policy and stall watchdogs, LRU image cache, lookahead preloading |
-| Monetization | `EntitlementAdapter` interface for plugging in your own subscription/purchase backend, paywall overlay, age gate, preview modes |
+| Monetization | Manifest paywall rules evaluated against an entitlement snapshot you supply (or fetch from your endpoint), paywall overlay, in-player age gate, free-preview panels — checkout stays in your app |
 | Analytics | Consent-aware `TrackingService` with event whitelisting, batching, and a configurable endpoint — driven by the manifest's `tracking` section |
 | Extensibility | Plugin system: sandboxed iframe plugins with a capability model and a postMessage protocol, plus `plugin` layers inside panels |
-| Accessibility | Keyboard navigation, ARIA labels and roles throughout the UI, `prefers-reduced-motion` support (degrades video autostart), focus management in modals |
-| UI chrome | Toolbar, table of contents, settings modal, language modal, character roster, extras viewer, thumbnail strip, share modal, comments drawer — all icons are inlined Lucide SVGs (`pw-icon`), so the player adds **no icon-library dependency** |
+| Accessibility | Keyboard navigation (Escape closes the open dialog), ARIA labels and roles throughout the UI, reduced motion from the OS setting, the reader's own setting or the host input, focus management in modals; an automated axe sweep covers every dialog, overlay and view |
+| UI chrome | Toolbar (incl. like and bookmark), table of contents, settings modal, language modal, character roster, extras viewer, thumbnail strip, share modal, comments drawer, branch chooser — UI text in English and German; all icons are inlined Lucide SVGs (`pw-icon`), so the player adds **no icon-library dependency** |
 
 ## The main component
 
@@ -42,8 +54,9 @@ The component you embed is **`PlayerShellComponent`** (selector `pw-player-shell
 
 ```html
 <pw-player-shell
-  [manifest]="manifest"
-  [locale]="'en-US'"
+  manifestUrl="/stories/my-story/panelwave.json"
+  locale="en-US"
+  [showToolbar]="true"
   (ready)="onReady()"
   (panelChange)="onPanelChange($event)">
 </pw-player-shell>
@@ -58,12 +71,14 @@ The public API also exports a `PlayerComponent` with selector `pw-player` — it
 ## Where it's used
 
 - **Standalone reader sites** — any Angular 20 application that loads a published manifest and embeds `pw-player-shell`.
-- **The demo application** — ships in the same repository (`projects/demo`) and is the reference integration; run it with `npm start`.
+- **The demo application** — ships in the same repository (`projects/demo`), is the reference integration, and runs live at [panelwave.github.io/player](https://panelwave.github.io/player/). See [Demo App](/player/demo-app).
 - **PanelWave CMS preview** — the CMS uses the player for its [preview environment](/cms/preview) so that what creators see is exactly what readers get. Rendering behavior lives in the player, not in a CMS fork.
 
 ## Project status
 
-The library has completed its core feature phases (foundation, services, rendering, UI, media, advanced features) and is currently in **testing/QA**. A few toolbar actions (like, bookmark, branch choices) are present in the UI but not yet wired to behavior — pages in this section call these out explicitly where relevant. The package is not yet published to the public npm registry; see [Installation](/player/installation).
+The library is **released**: version 1.0 is on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player), and new versions are published from the public [GitHub repository](https://github.com/panelwave/player) by its release workflow. It supports the format through 1.5. Every change runs through lint, the unit suite, a Playwright end-to-end suite (desktop and mobile) and a bundle-size budget of 180 KB gzipped — see [Development & Contributing](/player/development).
+
+A few surfaces are still deliberately thin, and the pages in this section say so where it matters: the comments drawer and share modal are UI only (persistence is the host's job), the manga-mode and high-contrast settings are stored but not yet applied, and the paywall overlay offers *Sign in* rather than a product list.
 
 ## Explore this section
 
@@ -81,10 +96,13 @@ The library has completed its core feature phases (foundation, services, renderi
     The complete `pw-player-shell` API reference.
   </Card>
   <Card title="Paywall & Entitlement" icon="lock" href="/player/paywall-entitlement">
-    Implement the entitlement adapter for gated content.
+    Tell the player what the reader owns; handle checkout in your app.
   </Card>
   <Card title="Plugins" icon="puzzle" href="/player/plugins">
     Extend the player with sandboxed iframe plugins.
+  </Card>
+  <Card title="Demo App" icon="monitor-play" href="/player/demo-app">
+    Try manifests, device frames and dev tools in the browser.
   </Card>
 </Columns>
 

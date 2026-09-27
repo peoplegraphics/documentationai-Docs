@@ -1,6 +1,6 @@
 ---
 title: CMS Upload & Media Issues
-description: Fix asset upload and media processing problems in the PanelWave CMS — stuck processing states, missing posters, disabled video options, and import limits.
+description: Fix asset upload and media processing problems in the PanelWave CMS — stuck processing states, rejected or failed uploads, archive and import limits, and "too many requests" errors.
 ---
 
 How the pipeline works is described on [Assets](/cms/assets); this page is for when something looks wrong.
@@ -21,7 +21,23 @@ Forward–backward (ping-pong) playback needs a downloadable video rendition so 
 
 ## Large uploads fail midway
 
-Large files upload in resumable chunks — an interrupted upload continues where it stopped when you retry with the same file. If uploads consistently fail, check for aggressive proxy/VPN timeouts on long-running requests.
+Files of 10 MB and more upload in 5 MB parts, and each part is retried automatically up to three times — a short network hiccup doesn't cost you the upload. If a part still fails, or you close the tab, the upload stops and has to be started again from the beginning. If large uploads consistently fail, check for proxies, VPNs, or firewalls that cut off long-running transfers or block direct uploads to the storage host. See [Large files](/cms/assets#large-files).
+
+<Callout kind="info">
+Before 26 September 2026, uploads of 10 MB and more never reached the library at all. If a large video or audio file seemed to upload back then but is missing now, simply upload it again.
+</Callout>
+
+## An upload is rejected with "File content does not match the declared type"
+
+The CMS looks at what's actually inside each uploaded file. This message means the content doesn't fit the file's type — typically a file that was renamed (a `.pdf` saved as `.png`) or exported in a format the library doesn't recognise. Re-export the file from your image, audio, or video tool in a standard format and upload that. SVG files are also rejected when they are larger than 2 MB or contain scripts or embedded HTML. See [Upload checks](/cms/assets#upload-checks).
+
+## Re-uploading an old file after "Replace File"
+
+Uploading the file you replaced earlier creates a new, separate asset next to the replaced one — the replaced asset keeps its ID and the new content. (Until September 2026 this failed with a server error.)
+
+## A work archive won't upload
+
+The [Import Archive](/cms/import#importing-a-work-archive) dialog accepts `.zip` archives up to **50 GiB**. Above 1 GiB the zip is sent in parts; closing or cancelling the dialog stops the upload and discards the parts already sent, so keep the dialog open until the import has started. A failed import can be retried from the dialog for 7 days — after that, upload the zip again.
 
 ## Import is rejected
 
@@ -35,3 +51,16 @@ The importer validates before importing and shows a preview of what will be crea
 ## A replaced asset still shows the old image
 
 Variants are cached aggressively. After replacing an asset, give processing a moment to regenerate variants, then hard-reload the editor (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>R</kbd>). If a published work still serves the old file, re-publish so the CDN cache is invalidated — see [Publishing](/cms/publishing).
+
+## "Too many requests. Please try again in N seconds."
+
+The CMS limits how many requests a single account or address may send in a short time, to keep the service responsive for everybody. Ordinary editing stays far below these limits — you would typically only meet them with scripts, many browser tabs polling at once, or repeated sign-in attempts. Wait the number of seconds shown and try again.
+
+Sign-in related actions have tighter limits of their own, per account:
+
+| Action | Limit |
+|---|---|
+| Signing in | 5 attempts per 15 minutes (successful or not) |
+| Requesting a password-reset email | 3 per hour |
+
+A burst of failed sign-ins therefore blocks further attempts on that account for up to 15 minutes; use **Forgot password?** on the sign-in page if you're unsure of the password rather than retrying.
