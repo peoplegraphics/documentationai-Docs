@@ -52,11 +52,13 @@ Every row has a right-click context menu (also available via the **⋮** button 
 | Node | Menu items |
 |---|---|
 | **Work** | New Chapter · Properties ([Work Properties](/cms/works)) · Settings (placeholder — not available yet) |
-| **Chapter** | New Page · Duplicate · Rename · Move Up · Move Down · Delete |
-| **Page** | New Panel · Page Properties · Duplicate · Rename · Move Up · Move Down · Delete |
-| **Panel** | Edit Panel · Duplicate · Move to... · Set Paywall · Content Warning · Copy as JSON · Delete Panel |
+| **Chapter** | New Page · Duplicate · Rename · Move Up · Move Down · Move to... · Delete |
+| **Page** | New Panel · Page Properties · Duplicate · Rename · Move Up · Move Down · Move to... · Delete |
+| **Panel** | Edit Panel · Duplicate · Rename · Move to... · Set Paywall · Content Warning · Copy as JSON · Delete Panel |
 
-Destructive actions ask for confirmation, and every structural change supports [undo/redo](/cms/editor/layout#header-bar) (`Ctrl+Z` / `Ctrl+Shift+Z`).
+Destructive actions ask for confirmation, and every structural change supports [undo/redo](/cms/editor/layout#header-bar) (`Ctrl+Z` / `Ctrl+Shift+Z`). **Rename** opens the same dialog for chapters, pages and panels (a panel's title can also be edited in the [inspector](#basic-properties)).
+
+Chapters you **collapse** stay collapsed: the tree remembers them per work for the browser session, so a rename, a new panel or a page reload no longer re-expands what you folded away. Expanding a chapter again, or selecting a panel inside it (which reveals it), lifts that.
 
 ### Reordering by drag and drop
 
@@ -66,15 +68,30 @@ Each draggable row shows a grip handle (⋮⋮). Drag it to reorder:
 - **Pages** within a chapter
 - **Panels** within a page
 
-A "Drop here" placeholder shows where the item will land — and the item really lands **at that position**, including panels dragged in from another page or from **Unassigned**; the canvas renumbers immediately. Moving a page or panel to a **different** chapter or page is possible too, but asks for confirmation first — moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders, and a panel's **Move to...** opens a dialog listing every chapter and page of the work (the top level expanded) as a destination.
+A "Drop here" placeholder shows where the item will land — and the item really lands **at that position**, including panels dragged in from another page or from **Unassigned**; the canvas renumbers immediately. Moving a page to a **different chapter** by drag asks for confirmation first. Dragging a panel onto a page of another chapter moves it the same way **Move to...** does (below), attached at the drop position; dropping it on that chapter's **Unassigned** bucket moves it into the chapter without placing it on a page. Moving a panel can affect the navigation flow defined in the [graph](/cms/editor/graph). If you prefer clicks over dragging, **Move Up** / **Move Down** in the context menu do single-step reorders.
 
 You can also drag a panel from the tree **onto the canvas** (in page view) to place it on the current page.
 
-<Callout kind="info">
-A panel can appear on pages of several [page formats](/cms/works#output) at once. **Delete Panel** on a panel that other pages still use only **detaches** it from the current page — the other formats' pages keep it. Only deleting its last page reference removes the panel itself.
+### Move to...
 
-Deleting a panel also removes it from every page's reading order and layout. Pages edited before that clean-up existed can still list panels that are gone (the timeline then warns *Panel not found*); [Preflight](/cms/validation-codes#dangling-page-ref) finds them and its **Fix** button removes the stale entries.
-</Callout>
+**Move to...** in the context menu opens a dialog that offers only destinations that make sense for the item:
+
+| Item | Destinations |
+|---|---|
+| **Chapter** | A position among the chapters — **Before "…"** for each other chapter, or **At the end** (positions that would leave the order unchanged are left out) |
+| **Page** | Another chapter. The page's panels move with it |
+| **Panel** | A page of any chapter other than the one it is on (chapters are shown expanded; Unassigned is never a target) |
+
+The dialog shows *Will move to:* with the chosen destination before you confirm. Because a panel's row is shared by every [page format's](/cms/works#output) pages of its chapter, moving a page or a panel to another chapter also takes the moved panels **off the source chapter's other pages** (every format), off its [canvas layout](/cms/editor/canvas-layout), and out of the source chapter's [graph](/cms/editor/graph) — edges to panels that stay behind are dropped, edges among the moved panels travel along, and a moved entry panel is replaced. All of that comes back with **Undo**: the panels return to their pages at their old positions, with their placements, edges and entry status.
+
+### Deleting panels
+
+A panel can be placed on pages of several [page formats](/cms/works#output) at once (a mobile page and an A4 page of the same chapter, say). The two delete paths differ:
+
+- **On the canvas** (page view, `Delete` or the toolbar), deleting a panel that another page — of any format, including ones not loaded in the editor — still places only **removes it from the open page**. A toast says where it is still used (*"Removed from this page, still used in Mobile portrait"*) and points you to the tree; the artwork and the panel itself survive. Undo re-attaches it.
+- **Delete Panel** in the structure tree deletes the panel **everywhere**. When it is placed on more than one page, the confirmation says so — *"placed on 2 pages (Tablet portrait, Mobile portrait) and will be removed from all of them"* — so you can cancel and use the canvas instead to take it off one page only.
+
+Both paths are one undo step. Deleting a panel also removes it from every page's reading order and layout. Pages edited before that clean-up existed can still list panels that are gone (the timeline then warns *Panel not found*); [Preflight](/cms/validation-codes#dangling-page-ref) finds them and its **Fix** button removes the stale entries.
 
 ## Page layouts
 

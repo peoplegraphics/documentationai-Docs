@@ -90,13 +90,13 @@ The **Layer**, **Hotspot**, and **Speech** tabs are grayed out until you select 
 
 ### The Performance tab
 
-The **Perf** tab estimates the reader's cost of what you are editing. It is read-only — it changes nothing — and updates live as you add, hide, or swap layers.
+The **Perf** tab estimates the reader's cost of what you are editing. It changes nothing on the canvas and updates live as you add, hide, or swap layers; the one thing you can edit here is the work's **preload** setting (below).
 
 - **Scope.** In panel view it covers the open panel, including unsaved edits. In page view it covers every panel placed on the current page (*"This page (4 panels)"*).
 - **Download, requests, and decoded memory.** The totals for all visible image, video, and audio layers. Pick a **Screen density** — **1×** (desktop), **2×** (most phones, the default), or **3×** (high-end phones) — and the estimate uses the same file the reader would load: for images the smallest [responsive variant](/cms/assets) wide enough for the layer at that density, for videos the H.264 variant when there is one, otherwise the original. Decoded memory is the size of the unpacked bitmap (width × height × 4 bytes), which is what actually fills a phone's memory.
 - **Load time per network.** A small table for **Slow 3G**, **4G**, and **Wi-Fi** — the panel (or page) on its own, and **With preload**, i.e. including the panels the player fetches ahead of the reader.
 - **Files.** Each media layer with the file it resolves to (a variant such as `w1280` or `optimized`, `h264`, or `original`) and its size. Sizes marked **≈** are approximated from the image area because the variant's exact size isn't recorded.
-- **Preload.** How many panels ahead the player fetches after this one, following the chapter's [graph](/cms/editor/graph) edges, and how much that adds. This follows the work's preload setting (*lookahead*, two panels ahead, unless the work says otherwise); with preloading off the tab says so.
+- **Preload.** The work's preload setting as a small form — **Strategy** (**None**, **Lookahead**, or **Aggressive (5+ ahead)**), **Panels ahead** (0–20) and **Parallel downloads** (1–16) — followed by how many panels the player fetches after this one along the chapter's [graph](/cms/editor/graph) edges and how much that adds. A change applies to the estimates at once (the *With preload* column follows) and is saved to the work; it ships in the published manifest as `settings.preload` (see [Settings](/schema/settings#settingspreload)), so it is what the player really does. Without a setting the work uses *lookahead*, two panels ahead; with **None** the tab says the player does not preload for this work. On a [read-only work](#read-only-works) the form is disabled.
 - **Suggestions.** Concrete fixes, as warnings or hints:
   - an image that loads a heavy original (over 2 MB) because it has neither an optimized nor a responsive variant — run **Optimize** or the responsive backfill in the [Assets library](/cms/assets);
   - images without responsive variants (phones download the full-size file), or far wider than they are ever shown;
@@ -151,7 +151,17 @@ You can also save **manually at any time with `Ctrl+S`** — useful right before
 
 A work can become **read-only** — when it is above your plan's publication limit, or when its team is suspended. You can still open it in the editor, read it, preview it, and [export](/cms/export) it; you just can't change it.
 
-A **Read-only** banner under the header explains why and what to do (for a plan limit: upgrade, buy a Work Pass, or archive a work you no longer edit). While it shows, the editor **does not auto-save** — any edits you make stay in the browser and are not sent — so you won't see a stream of permission errors. The [Localization Workshop](/cms/localization) likewise opens without its automatic string extraction. See [Plans & Limits](/cms/plans#read-only-works) for how the CMS decides which works stay editable.
+A **Read-only** banner under the header explains why and what to do (for a plan limit: upgrade, buy a Work Pass, or archive a work you no longer edit). While it shows, the editor **does not auto-save** — any edits you make stay in the browser and are not sent — so you won't see a stream of permission errors. See [Plans & Limits](/cms/plans#read-only-works) for how the CMS decides which works stay editable.
+
+The write actions are hidden or disabled rather than failing:
+
+- **Structure tree** — no **New Chapter** button; the create, rename, duplicate, move and delete menu items are disabled, drag reordering is off, and the `Delete` key is ignored.
+- **Canvas** — panels can't be added, deleted or dropped as files; moving a panel on the page changes only your view and is not saved.
+- **Assets tab** — upload (button, drop zone and picker), replace, metadata, variants, delete and every folder action are hidden; copy, download and details stay.
+- **Perf tab** — the preload form is disabled.
+- **Backstage tools** — the same banner appears above [Characters](/cms/characters), [Extras](/cms/extras), the [Localization Workshop](/cms/localization) (which also opens without its automatic string extraction), Audio and [Paywall](/cms/monetization), and their add / edit / delete / reorder actions are hidden; everything stays readable.
+
+Should an edit still reach the server, it is refused with a single *Read-only* toast rather than an error per keystroke. Export, archive, trash / restore and comments are not affected by the read-only state.
 
 ## Next steps
 

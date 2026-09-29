@@ -11,7 +11,7 @@ Starting from a **screenplay** instead of a manifest? The [Script Import](/cms/s
 
 ## Importing a work archive
 
-A **work archive** is the `.zip` produced by the [Archive export](/cms/export#archive-export). Unlike a JSON manifest, it carries the complete work: the manifest for all page formats **plus every media file** (originals and generated variants), your asset folders, and all translations — so the imported copy is immediately editable and publishable, with nothing pointing back at the source system.
+A **work archive** is the `.zip` produced by the [Archive export](/cms/export#archive-export). Unlike a JSON manifest, it carries the complete work: the manifest for all page formats **plus every media file** (originals and generated variants), your asset folders, all translations, and the **speech-bubble audio** (uploaded voice lines and TTS output per language) — so the imported copy is immediately editable and publishable, with nothing pointing back at the source system.
 
 <Steps>
   <Step title="Open the archive import">
@@ -29,6 +29,8 @@ A **work archive** is the `.zip` produced by the [Archive export](/cms/export#ar
 </Steps>
 
 Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by format versions 1.0–1.6 are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
+
+Bubble audio is re-attached to the same bubbles in the copy. A track whose bubble or file is missing from the archive is skipped (the import's statistics count them); archives made before 28 September 2026 carry no bubble audio, so those bubbles arrive silent — regenerate or re-upload their lines.
 
 ### Paywall rules arrive disabled
 
@@ -73,7 +75,7 @@ Imports preserve the content of the manifest:
 - Pages and their layouts, and **infinite-canvas layouts** (format 1.4)
 - Panels with all layers, speech bubbles, hotspots, panel variants and interactive elements
 - [Extras](/cms/extras) (typed extras buckets; unknown `x-*` buckets are skipped) and [variables](/cms/editor/variables)
-- **Settings** — typography and style presets, output presets and the video UI defaults
+- **Settings** — typography and style presets, output presets, the video UI defaults and the **preload** setting (`settings.preload`; a value outside the CMS's ranges is dropped rather than failing the import — see the [Perf tab](/cms/editor/layout#the-performance-tab))
 - The **localization** block (format 1.5): translations and glossary
 
 References between them — panels, assets, characters, hotspot targets, canvas placements — are remapped to the new ids. Re-importing a CMS export gives an equal copy (hotspot-derived graph edges are no longer duplicated).

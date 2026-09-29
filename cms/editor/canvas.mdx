@@ -46,9 +46,9 @@ Selected elements show a bounding box with handles; the [inspector](/cms/editor/
 ## Moving and resizing
 
 - **Drag** a selected element to move it. With multiple panels selected, they all move together, keeping their relative positions.
-- **Arrow keys** nudge the selection by 1 pixel; **Shift+Arrow** nudges by 10 pixels.
+- **Arrow keys** nudge the selection by 1 pixel; **Shift+Arrow** nudges by 10 pixels. This works for layers, speech bubbles, and hotspots alike in panel view — whichever kind you selected last is what the arrows (and `Delete`) act on. Every nudge is one undo step; holding a key coalesces into one.
 - **Resize handles** — 8 handles around the selection (corners and edges) resize it; the cursor shows the direction. A **rotation handle** sits above the selection.
-- **`Ctrl/Cmd+D`** duplicates the selection; **`Delete`/`Backspace`** removes it.
+- **`Ctrl/Cmd+D`** duplicates the selection (one copy); **`Delete`/`Backspace`** removes it. Deleting a panel that another page or format still uses only removes it from the open page — see [Deleting panels](/cms/editor/pages-panels#deleting-panels).
 - In page view you can also **copy, cut, and paste panels** with `Ctrl/Cmd+C`, `Ctrl/Cmd+X`, and `Ctrl/Cmd+V`.
 
 <Callout kind="info">

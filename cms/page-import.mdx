@@ -42,11 +42,11 @@ The AI detection is a **suggestion**; the review step is the final authority. No
     The heart of the wizard (details below): check every page's rectangles and reading order, fix what the AI got wrong, then click **Import**.
   </Step>
   <Step title="Open the work">
-    Crops are saved as assets, pages and panels are created, and the finished work opens straight in the [editor](/cms/editor/layout).
+    The **Importing…** step shows the current stage and a progress bar that advances page by page while crops are saved as assets and pages and panels are created. The finished work then opens straight in the [editor](/cms/editor/layout).
   </Step>
 </Steps>
 
-Imports are **resumable** — leave the wizard at any point and continue from the *Open imports* list.
+Imports are **resumable** — leave the wizard at any point and continue from the *Open imports* list. **Cancel import** stops a running detection or import: a cancel during the import step stops the cropping and upscaling where it is, and when the import was creating a **new** work that has no pages yet, that empty work is removed again instead of lingering as an empty draft. **Discard** on the *Open imports* list drops a session you don't want to finish.
 
 ## The review step in detail
 
@@ -85,7 +85,7 @@ Only panels **below** the target are upscaled; large crops are never touched (an
 **Credits** are PanelWave's prepaid wallet for metered AI features (upscaling sends your images to a third-party AI service with real per-image cost — the settings step notes this):
 
 - Paid plans include a **monthly credit allowance**; it is applied automatically.
-- The **exact cost is reserved up-front** and only actually spent per successfully upscaled panel. If a panel can't be upscaled (or the service is unavailable), it imports at its original resolution and the reserved credits **return to your wallet automatically** — a partial failure never fails the import and never costs you the failed panels.
+- The **exact cost is reserved up-front** and only actually spent per successfully upscaled panel. If a panel can't be upscaled (or the service is unavailable), it imports at its original resolution and the reserved credits **return to your wallet automatically** — a partial failure never fails the import and never costs you the failed panels. The reservation is also released when you **cancel** or **discard** the session, and when an idle session expires (see [Limits and quotas](#limits-and-quotas)).
 - Short on credits? The wizard says exactly how many are needed versus available; the import stays blocked until you lower the quality target, disable upscaling, or top up.
 
 ## Limits and quotas
@@ -101,7 +101,7 @@ Only panels **below** the target are upscaled; large crops are never touched (an
 
 A completed import counts once against the monthly allowance; retrying failed steps inside a session does not.
 
-**Unfinished sessions don't keep their uploads forever.** The page images of a session are held in temporary storage until the import creates the panel assets. Once a session's most recent upload is **30 days** old, a daily cleanup removes its page images — finish or discard older sessions before then. Completed imports are unaffected: their crops (and any kept pages) already live in the work's [asset library](/cms/assets).
+**Unfinished sessions don't keep their uploads forever.** The page images of a session are held in temporary storage until the import creates the panel assets. Once a session has been idle for **30 days**, a daily cleanup discards it: its page images are removed, any reserved upscale credits go back to your wallet, and an empty new work it had created is removed — finish or discard older sessions before then. Completed imports are unaffected: their crops (and any kept pages) already live in the work's [asset library](/cms/assets).
 
 **Appending needs edit rights at import time.** When you add pages to an existing work, your Owner, Admin, or Editor role on that work is checked when the session starts *and again* when you click **Import**. If you were removed from the team or given a lower role while the session sat in review, the import is refused and nothing is added.
 

@@ -20,6 +20,12 @@ the workspace navigation (**Canvas Layout**).
 - **Panels** render with their real artwork, positioned at their world
   coordinates. Drag to move, drag the corner handle to resize (16-unit snap),
   shift-click for multi-select.
+- **Rotate**: a selected panel shows a round knob above its top edge (it
+  travels with the rotation). Drag it to rotate the panel around its origin;
+  hold **Shift** to snap to 15° steps. The inspector's **Rotation (°)** field
+  (−180 to 180) sets an exact angle and **Reset rotation** clears it. Rotation
+  is saved with the placement and rendered by the player; a rotated panel
+  can't be resized until you reset it.
 - **Graph edges** overlay as arrows: dashed for conditional edges, highlighted
   when an edge carries a custom camera move. The trail and the space are
   visible together — that's the point of the board.
@@ -27,7 +33,7 @@ the workspace navigation (**Canvas Layout**).
   everything.
 - **Minimap** (bottom right): an overview of every placement with the visible
   area outlined in yellow. Click or drag in it to move the view.
-- Undo/redo covers every board operation (moves, resizes, framing,
+- Undo/redo covers every board operation (moves, resizes, rotations, framing,
   decorations) with the editor's standard history.
 
 Changes save automatically (debounced) to the chapter; the save state is
@@ -87,6 +93,28 @@ dressing on the plane — arrows, scenery, trail markers. Decorations render
 beneath panels and are purely presentational. Select one to edit opacity,
 **parallax depth** (higher values trail the camera and read as depth),
 rotation, stacking, or to delete it.
+
+## Phone ribbon — will it read on a phone?
+
+A canvas that flows in one column works on a portrait phone; one that spreads
+sideways makes phone readers pan. The **Phone ribbon** toggle in the toolbar
+overlays the column a phone reads: a band one panel wide (the median placement
+width — what the camera fits to a 390 px wide phone), centred on the panels,
+with a dashed tick for every phone screen of height. It is view-only, never
+saved, and remembered per browser.
+
+While the ribbon shows, the board judges the layout as **column-friendly** or
+not, live as you move things (undo included):
+
+- a panel is flagged when its bounds (rotation included) leave the band —
+  outlined red when mostly outside, amber when partly;
+- a step of the trail is flagged when it reads **upward** (dashed red) — the
+  graph edges, or the panel order when the chapter has no edges yet.
+
+A verdict chip next to the toggle sums it up — *Column-friendly · 6 phone
+screens* or *Not column-friendly · …*. The verdict is advice: it does not
+switch the **Mobile portrait** canvas-view toggle in Work Properties on or
+off (see [Enabling canvas view for readers](#enabling-canvas-view-for-readers)).
 
 ## Camera policy
 
