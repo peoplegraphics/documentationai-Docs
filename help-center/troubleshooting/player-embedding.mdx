@@ -15,8 +15,9 @@ Work through the symptom that matches what you see. The full integration guide i
 ## Build or injection errors on startup
 
 - **Missing `HttpClient`:** the player needs `provideHttpClient()` in your application config.
-- **Missing translations setup:** provide `TranslateModule.forRoot` with a loader serving `assets/i18n/<lang>.json` — the player's UI strings come from `@ngx-translate`. See [Installation](/player/installation).
-- **Peer dependency conflicts on `npm install`:** `@panelwave/player` requires **Angular 20** (`@angular/core` / `@angular/common` `^20`), `@ngx-translate/core` `^17` and `rxjs` `^7.8`. Upgrade the app, or install a matching ngx-translate version, rather than forcing the install.
+- **Missing translations setup:** register ngx-translate with `provideTranslateService({ loader: { provide: TranslateLoader, useClass: YourLoader } })` and serve `assets/i18n/<lang>.json` — the player's UI strings come from `@ngx-translate`. See [Installation](/player/installation).
+- **"Class constructor … cannot be invoked without 'new'" in a production build:** you registered the loader with ngx-translate 18's `provideTranslateLoader(SomeClass)`. Its class detection fails on minified code — pass the loader as an explicit `{ provide: TranslateLoader, useClass }` provider instead.
+- **Peer dependency conflicts on `npm install`:** `@panelwave/player` **1.1.0** (the current npm release) declares `@angular/core` / `@angular/common` `^20`, `@ngx-translate/core` `^17` and `rxjs` `^7.8`; player **1.2.0** (unreleased at the time of writing) widens that to Angular `^20 || ^21 || ^22` and ngx-translate `^17 || ^18`. Match those versions, or build 1.2.0 from source, rather than forcing the install.
 
 ## Labels show as keys (`toolbar.like`, `paywall.sign_in`, …)
 

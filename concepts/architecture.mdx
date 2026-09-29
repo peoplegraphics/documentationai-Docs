@@ -13,7 +13,7 @@ graph TD
         SCHEMA["PanelWave Schema<br/>JSON Schema 2020-12<br/>CC BY 4.0"]
         TYPES["@panelwave/types<br/>TypeScript interfaces"]
         CLI["@panelwave/cli<br/>validate · bundle · diff · upgrade"]
-        PLAYER["@panelwave/player<br/>Angular 20 library · MIT"]
+        PLAYER["@panelwave/player<br/>Angular library · MIT"]
     end
     subgraph Proprietary["Proprietary SaaS"]
         CMS["PanelWave CMS<br/>editor · assets · localization<br/>publishing · monetization"]
@@ -44,7 +44,7 @@ Because the schema is the single source of truth, a format change ripples outwar
 
 ### Player — the renderer
 
-[`@panelwave/player`](/player/overview) is an MIT-licensed Angular 20 library, published on [npm](https://www.npmjs.com/package/@panelwave/player) and developed in [panelwave/player](https://github.com/panelwave/player). It loads a manifest URL and provides the complete reading experience: graph-based navigation with conditional edges, layered panels, SVG speech bubbles, hotspots, WebAudio mixing, video playback, localization with fallback chains, accessibility features, and paywall gates via a pluggable [entitlement adapter](/player/paywall-entitlement).
+[`@panelwave/player`](/player/overview) is an MIT-licensed Angular library (Angular 20; 21 and 22 from player 1.2.0), published on [npm](https://www.npmjs.com/package/@panelwave/player) and developed in [panelwave/player](https://github.com/panelwave/player). It loads a manifest URL and provides the complete reading experience: graph-based navigation with conditional edges, layered panels, SVG speech bubbles, hotspots, WebAudio mixing, video playback, localization with fallback chains, accessibility features, and paywall gates via a pluggable [entitlement adapter](/player/paywall-entitlement).
 
 The player deliberately contains **all rendering logic**. Anything a reader sees is implemented once, in the player.
 

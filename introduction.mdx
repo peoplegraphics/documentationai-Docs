@@ -12,7 +12,7 @@ PanelWave is open-core. The format and the player are open; the authoring tool i
 | Layer | What it is | License |
 |-------|-----------|---------|
 | **PanelWave Schema** | A JSON Schema (2020-12) that defines the manifest format — the single source of truth for the whole ecosystem. Current format version: **1.6**. | CC BY 4.0 |
-| **PanelWave Player** | `@panelwave/player`, an Angular 20 library that loads a manifest and renders the full reading experience: graph navigation, layers, speech bubbles, hotspots, audio, video, localization, paywalls. | MIT |
+| **PanelWave Player** | `@panelwave/player`, an Angular library that loads a manifest and renders the full reading experience: graph navigation, layers, speech bubbles, hotspots, audio, video, localization, paywalls. | MIT |
 | **PanelWave CMS** | A SaaS application for authoring and publishing works: a visual editor, asset pipeline, localization workflow, monetization, analytics, and export. It **embeds the open-source player** for preview, so what you see while authoring is what readers get. | Proprietary |
 
 The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. Tooling for developers lives in two npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format) and [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests).

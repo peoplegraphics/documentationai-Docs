@@ -1,9 +1,9 @@
 ---
 title: Player Overview
-description: What the PanelWave Player is — an MIT-licensed Angular 20 library that renders interactive graphic novels from PanelWave manifests.
+description: What the PanelWave Player is — an MIT-licensed Angular library that renders interactive graphic novels from PanelWave manifests.
 ---
 
-`@panelwave/player` is the **open-source player** of the PanelWave ecosystem: an MIT-licensed **Angular 20 library** that renders interactive graphic novels from a [PanelWave manifest](/concepts/manifest) (`panelwave.json`). You embed it in your own Angular application; it takes care of rendering, navigation, localization, and reader controls.
+`@panelwave/player` is the **open-source player** of the PanelWave ecosystem: an MIT-licensed **Angular library** (Angular 20; 21 and 22 from player 1.2.0 — see [Installation](/player/installation#requirements)) that renders interactive graphic novels from a [PanelWave manifest](/concepts/manifest) (`panelwave.json`). You embed it in your own Angular application; it takes care of rendering, navigation, localization, and reader controls.
 
 <Columns cols={3}>
   <Card title="npm" icon="package" href="https://www.npmjs.com/package/@panelwave/player" target="_blank">
@@ -70,7 +70,7 @@ The public API also exports a `PlayerComponent` with selector `pw-player` — it
 
 ## Where it's used
 
-- **Standalone reader sites** — any Angular 20 application that loads a published manifest and embeds `pw-player-shell`.
+- **Standalone reader sites** — any Angular application on a supported version that loads a published manifest and embeds `pw-player-shell`.
 - **The demo application** — ships in the same repository (`projects/demo`), is the reference integration, and runs live at [panelwave.github.io/player](https://panelwave.github.io/player/). See [Demo App](/player/demo-app).
 - **PanelWave CMS preview** — the CMS uses the player for its [preview environment](/cms/preview) so that what creators see is exactly what readers get. Rendering behavior lives in the player, not in a CMS fork.
 

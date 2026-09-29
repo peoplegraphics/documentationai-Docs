@@ -32,7 +32,7 @@ Questions developers ask most often. For step-by-step fixes see the [troubleshoo
     `npm install @panelwave/player @ngx-translate/core`. The package is on npm, built and published from [github.com/panelwave/player](https://github.com/panelwave/player) with provenance. You also need `provideHttpClient()`, an ngx-translate loader, the package's UI translation files and the balloon font CSS — see [Installation](/player/installation).
   </Expandable>
   <Expandable title="Which Angular version do I need for @panelwave/player?">
-    Angular 20. The package's peer dependencies are `@angular/common`/`@angular/core` `^20`, `@ngx-translate/core` `^17` and `rxjs` `^7.8`; it is developed and tested against Angular 20.3 with TypeScript 5.8. See [Installation](/player/installation).
+    Angular 20 today; Angular 21 and 22 as well from player **1.2.0** (unreleased at the time of writing). Player 1.1.0's peer dependencies are `@angular/common`/`@angular/core` `^20`, `@ngx-translate/core` `^17` and `rxjs` `^7.8`; 1.2.0 widens them to `^20 || ^21 || ^22` and `^17 || ^18`. The library is built with Angular 20 and TypeScript 5.8 and verified against fresh Angular 20, 21 and 22 apps, zone.js and zoneless. See [Installation](/player/installation).
   </Expandable>
   <Expandable title="Should I use manifestUrl or manifest?">
     `manifestUrl` is the shortest path — the shell fetches and validates the JSON itself. Bind a parsed `[manifest]` object when you need to fetch with your own auth or transform the JSON first. Both paths give the same reader: the table of contents and thumbnail strip work either way, and assigning a new URL or object later loads the new work. See [Quickstart: Embed](/player/quickstart-embed).

@@ -8,7 +8,7 @@ description: Complete API reference for pw-player-shell — every @Input and @Ou
 ```typescript
 import { PlayerShellComponent } from '@panelwave/player';
 import type {
-  PanelWaveManifest, Panel, Chapter, LocaleCode,
+  PanelWaveManifest, Panel, Chapter, LocaleCode, PlayerPanelChangeEvent,
   EntitlementSnapshot, PaywallAction, PaywallGate, AgeVerificationResult, CameraState,
 } from '@panelwave/player';
 ```
@@ -97,8 +97,15 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
   Fires once the manifest is loaded, validated, tracking is configured, and the initial panel is set.
 </ResponseField>
 
-<ResponseField name="panelChange" field-type="EventEmitter<{ panel: Panel; chapter: Chapter }>">
-  Fires **once** per panel navigation with the new panel (variants already resolved) and its chapter. Use it for progress tracking, deep links, or analytics forwarding.
+<ResponseField name="panelChange" field-type="EventEmitter<PlayerPanelChangeEvent>">
+  Fires **once** per panel navigation — not for a navigation the paywall or age gate blocks. Use it for progress tracking, deep links, or analytics forwarding. The payload is `{ panel: Panel; chapter: Chapter; panelId: string; previousPanelId?: string }`:
+
+  - `panel` is the panel **as it is in the manifest** — variants are *not* resolved in this object. `Panel.id` is optional in the format and usually absent, so don't read the id from `panel`.
+  - `chapter` is the chapter the panel belongs to.
+  - `panelId` is the panel's id: its key in `chapter.panels`.
+  - `previousPanelId` is the panel that was current before this change (it may belong to the previous chapter); unset for the first panel after a load or `reload()`.
+
+  `panelId` and `previousPanelId` are new in player **1.2.0** (unreleased at the time of writing); `panel` and `chapter` are unchanged, so existing handlers keep working. On 1.1.0 and earlier, resolve the id yourself by looking the emitted `panel` object up in `chapter.panels`.
 </ResponseField>
 
 <ResponseField name="chapterChange" field-type="EventEmitter<Chapter>">
@@ -218,7 +225,7 @@ These standalone components are part of the public API and can be used on their 
 | `VideoLayerComponent` | `pw-video-layer` | `src`, `poster`, `playMode`, `startMode`, `muted`, `startAtMs`, `loopFromMs`, … → `videoPlay`, `videoPause`, `videoEnd`, `videoLoop`, `passComplete`, `videoError` |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | `manifest: PluginManifest` → `loaded`, `failed` |
 
-Helper types exported alongside them: `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `PaywallGate` and `PurchaseInfo` (see [Paywall & Entitlement](/player/paywall-entitlement#paywall-ui-components)), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `BranchChoice` (`{ edge, index, label }`), `LayerViewMode` (`'panel' | 'page'`), `EntitlementSnapshot`.
+Helper types exported alongside them: `PlayerPanelChangeEvent` (the `panelChange` payload, from 1.2.0), `PaywallAction` (`'purchase' | 'subscribe' | 'login' | 'dismiss'`), `PaywallGate` and `PurchaseInfo` (see [Paywall & Entitlement](/player/paywall-entitlement#paywall-ui-components)), `AgeVerificationResult` (`{ verified: boolean; age?: number; birthDate?: Date }`), `BranchChoice` (`{ edge, index, label }`), `LayerViewMode` (`'panel' | 'page'`), `EntitlementSnapshot`.
 
 <Callout kind="alert">
 `PlayerComponent` (selector `pw-player`) is also exported but is a **legacy placeholder** that renders static text. Do not embed it.

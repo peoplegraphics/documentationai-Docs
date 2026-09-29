@@ -7,7 +7,7 @@ This page shows the smallest useful integration: point `pw-player-shell` at a ma
 
 ## Prerequisites
 
-- [Installation](/player/installation) completed (`provideHttpClient()` + `TranslateModule.forRoot(...)` configured, UI translation files and balloon fonts added).
+- [Installation](/player/installation) completed (`provideHttpClient()` + `provideTranslateService(...)` configured, UI translation files and balloon fonts added).
 - A valid manifest file, e.g. `src/assets/my-story/panelwave.json`. You can export one from the [CMS](/cms/export), start from the minimal example below, or take one of the demo works from the player repository ([`projects/demo/src/assets`](https://github.com/panelwave/player/tree/master/projects/demo/src/assets): `sample-manifest.json`, `canvas-manifest.json`, `video-sequencing-manifest.json`).
 
 ## Option A: load by URL
@@ -18,7 +18,7 @@ The shortest embed: give the shell the manifest's URL. It fetches the JSON with 
 // reader.component.ts
 import { Component } from '@angular/core';
 import { PlayerShellComponent } from '@panelwave/player';
-import type { Panel, Chapter } from '@panelwave/player';
+import type { PlayerPanelChangeEvent } from '@panelwave/player';
 
 @Component({
   selector: 'app-reader',
@@ -39,8 +39,10 @@ export class ReaderComponent {
     console.log('Player is ready');
   }
 
-  onPanelChange(event: { panel: Panel; chapter: Chapter }): void {
-    console.log('Now showing panel in chapter', event.chapter.id);
+  onPanelChange(event: PlayerPanelChangeEvent): void {
+    // panelId is the panel's key in chapter.panels (from player 1.2.0);
+    // Panel.id is optional in the format, so don't read it from event.panel.
+    console.log('Now showing panel', event.panelId, 'in chapter', event.chapter.id);
   }
 
   onError(error: Error): void {

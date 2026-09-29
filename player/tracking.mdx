@@ -170,7 +170,7 @@ If you already have an analytics stack, subscribe to the shell's outputs and for
 ```typescript
 import { Component } from '@angular/core';
 import { PlayerShellComponent } from '@panelwave/player';
-import type { Panel, Chapter } from '@panelwave/player';
+import type { PlayerPanelChangeEvent } from '@panelwave/player';
 
 @Component({
   selector: 'app-reader',
@@ -191,8 +191,13 @@ import type { Panel, Chapter } from '@panelwave/player';
 })
 export class ReaderComponent {
   // panelChange fires exactly once per navigation — no de-duplication needed.
-  onPanel(e: { panel: Panel; chapter: Chapter }): void {
-    this.analytics.event('pw_panel_view', { chapterId: e.chapter.id });
+  // panelId / previousPanelId are part of the payload from player 1.2.0.
+  onPanel(e: PlayerPanelChangeEvent): void {
+    this.analytics.event('pw_panel_view', {
+      chapterId: e.chapter.id,
+      panelId: e.panelId,
+      from: e.previousPanelId,
+    });
   }
 }
 ```

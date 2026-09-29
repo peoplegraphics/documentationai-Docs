@@ -1,6 +1,6 @@
 ---
 title: Installation
-description: Install @panelwave/player from npm into an Angular 20 application — peer dependencies, required providers, UI translation files, and balloon fonts.
+description: Install @panelwave/player from npm into an Angular application — supported Angular and ngx-translate versions, peer dependencies, required providers, UI translation files, and balloon fonts.
 ---
 
 The player is published on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) (MIT). This page covers getting it into your application and the one-time app setup it needs.
@@ -11,7 +11,7 @@ Want to see it before you install anything? The [live demo](https://panelwave.gi
 
 ## Requirements
 
-- An **Angular 20** application (standalone components or NgModules both work)
+- An **Angular 20, 21 or 22** application (standalone components or NgModules both work; zone.js and zoneless change detection both work)
 - `@angular/common/http` available — the player loads manifests and its UI translation files over HTTP
 - A browser from the supported set: Chrome / Edge 120+, Firefox 120+, Safari 17+ (desktop and iOS), Android Chrome 120+
 
@@ -22,9 +22,9 @@ The package declares:
 ```json
 {
   "peerDependencies": {
-    "@angular/common": "^20.0.0",
-    "@angular/core": "^20.0.0",
-    "@ngx-translate/core": "^17.0.0",
+    "@angular/common": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@angular/core": "^20.0.0 || ^21.0.0 || ^22.0.0",
+    "@ngx-translate/core": "^17.0.0 || ^18.0.0",
     "rxjs": "^7.8.0"
   },
   "dependencies": {
@@ -35,6 +35,10 @@ The package declares:
 ```
 
 `json-logic-js` (condition evaluation) is installed automatically; the Angular packages, RxJS and ngx-translate come from your app.
+
+<Callout kind="info">
+The Angular 21 / 22 and ngx-translate 18 ranges are new in player **1.2.0** (unreleased at the time of writing). Player **1.1.0**, the current npm release, declares `^20.0.0` and `^17.0.0`, so npm refuses a strict-peer install on a newer app — build 1.2.0 from source (below) or wait for the release. The package is compiled with Angular 20 in partial-compilation mode and linked by your app's Angular version; every supported major is verified in CI by installing the packed library into a fresh app, building it for production and rendering a sample work.
+</Callout>
 
 ## Install
 
@@ -57,18 +61,18 @@ The player ships as **standalone components** — there is no NgModule to import
 Two application-level providers are required:
 
 1. **`provideHttpClient()`** — used by `ManifestService` (for `manifestUrl`) and the translation loader.
-2. **`TranslateModule.forRoot(...)`** — the player's UI chrome (toolbar labels, dialogs, paywall text, loading/error text) is translated with `@ngx-translate/core`. The host application configures the loader.
+2. **`provideTranslateService(...)`** — the player's UI chrome (toolbar labels, dialogs, paywall text, loading/error text) is translated with `@ngx-translate/core`. The host application configures the loader.
 
 ```typescript
 // app.config.ts
-import { ApplicationConfig, importProvidersFrom } from '@angular/core';
+import { ApplicationConfig, inject } from '@angular/core';
 import { HttpClient, provideHttpClient } from '@angular/common/http';
-import { TranslateLoader, TranslateModule, TranslationObject } from '@ngx-translate/core';
+import { TranslateLoader, TranslationObject, provideTranslateService } from '@ngx-translate/core';
 import { Observable } from 'rxjs';
 
 /** Loads the player UI translations from your app's assets. */
 class PlayerTranslateLoader implements TranslateLoader {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
   getTranslation(lang: string): Observable<TranslationObject> {
     return this.http.get<TranslationObject>(`./assets/i18n/${lang}.json`);
   }
@@ -77,14 +81,20 @@ class PlayerTranslateLoader implements TranslateLoader {
 export const appConfig: ApplicationConfig = {
   providers: [
     provideHttpClient(),
-    importProvidersFrom(
-      TranslateModule.forRoot({
-        loader: { provide: TranslateLoader, useClass: PlayerTranslateLoader, deps: [HttpClient] },
-      }),
-    ),
+    provideTranslateService({
+      loader: { provide: TranslateLoader, useClass: PlayerTranslateLoader },
+    }),
   ],
 };
 ```
+
+This form works with ngx-translate **17 and 18**. `TranslateModule.forRoot()` still works on 17 but no longer exists in 18.
+
+<Callout kind="alert">
+Pass the loader as an explicit `{ provide: TranslateLoader, useClass: ... }` provider, as shown. On ngx-translate 18, `provideTranslateLoader(PlayerTranslateLoader)` fails in **production builds** for a plain (non-`@Injectable`) class: 18 tells classes from factory functions by their source text, and the minified class no longer looks like one ("Class constructor … cannot be invoked without 'new'").
+</Callout>
+
+The player depends on `json-logic-js`, a CommonJS module. To silence the build warning about it, add `"allowedCommonJsDependencies": ["json-logic-js"]` to your build options in `angular.json`.
 
 ### 2. UI translation files
 

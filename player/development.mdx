@@ -33,7 +33,9 @@ The `docs/` folder holds background notes per feature — useful, but **the sour
 
 ## Setup
 
-You need **Node.js 24** (CI uses 24) with **npm 11** — the lockfile is written by npm 11, and npm 10 rejects it in `npm ci`. The library targets Angular 20 with TypeScript ~5.8 and RxJS 7.8; runtime dependencies are deliberately small (`json-logic-js` for conditions, `@ngx-translate/core` as a peer for UI strings).
+You need **Node.js 24** (CI uses 24) with **npm 11** — the lockfile is written by npm 11, and npm 10 rejects it in `npm ci`. The library is built with Angular 20 (partial compilation) with TypeScript ~5.8 and RxJS 7.8, and is consumed by Angular 20, 21 and 22 apps; runtime dependencies are deliberately small (`json-logic-js` for conditions, `@ngx-translate/core` 17 or 18 as a peer for UI strings — the repo builds and tests against 17).
+
+To prove a host Angular version, run the **consumer smoke test** after a production build: `npm run smoke:consumer -- --angular 22` (or `20` / `21`; add `--zone` for a zone.js app instead of zoneless, `--ngx-translate 17` to pin the translate major). It packs `dist/player`, generates a fresh app with that major's CLI, installs the tarball with strict peer resolution, wires it up as the package README describes, builds for production and renders the demo manifest in headless Chromium. CI runs it for every major in the peer range; when you change the range, change the `consumer-smoke` matrix in `.github/workflows/ci.yml` with it.
 
 <Steps>
   <Step title="Clone and install">

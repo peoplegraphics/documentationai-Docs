@@ -49,7 +49,7 @@ Readers can set a **bookmark** from the toolbar. It is stored on the device per 
 
 The player does **not** save the last-read position on its own — only the bookmark the reader sets deliberately. For "continue where you stopped", the host application (or the platform embedding the player, such as the CMS) owns the policy:
 
-- **Track position** with the `panelChange` output (fires on every navigation with `{ panel, chapter }`).
+- **Track position** with the `panelChange` output (fires on every navigation with `{ panel, chapter, panelId, previousPanelId? }` — see [Inputs & Outputs](/player/inputs-outputs#outputs)).
 - **Restore position** with the `initialChapterId` / `initialPanelId` inputs.
 
 Passing an initial position takes precedence over the reader's bookmark. A complete localStorage-based resume implementation:
@@ -58,7 +58,7 @@ Passing an initial position takes precedence over the reader's bookmark. A compl
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { PlayerShellComponent } from '@panelwave/player';
-import type { PanelWaveManifest, Panel, Chapter } from '@panelwave/player';
+import type { PanelWaveManifest, PlayerPanelChangeEvent } from '@panelwave/player';
 
 interface SavedPosition {
   chapterId: string;
@@ -97,22 +97,20 @@ export class ReaderComponent implements OnInit {
       .subscribe((m) => (this.manifest = m));
   }
 
-  savePosition(event: { panel: Panel; chapter: Chapter }): void {
-    // Panel ids are the keys of chapter.panels — resolve the id of the emitted panel.
-    const panelId = Object.entries(event.chapter.panels).find(
-      ([, p]) => p === event.panel
-    )?.[0];
-    if (!panelId) return;
-
+  savePosition(event: PlayerPanelChangeEvent): void {
     const position: SavedPosition = {
       chapterId: event.chapter.id,
-      panelId,
+      panelId: event.panelId, // the panel's key in chapter.panels
       updatedAt: Date.now(),
     };
     localStorage.setItem(`progress:${this.workId}`, JSON.stringify(position));
   }
 }
 ```
+
+<Callout kind="info">
+`panelId` is part of the payload from player **1.2.0** (unreleased at the time of writing). On 1.1.0 and earlier the event carries only `{ panel, chapter }`, and `Panel.id` is usually absent — resolve the id by identity instead: `Object.entries(event.chapter.panels).find(([, p]) => p === event.panel)?.[0]`.
+</Callout>
 
 <Callout kind="tip">
 If a saved panel was removed in a newer manifest version, `navigateToPanel` fails and the shell emits `error` — validate the saved id against the loaded manifest (or fall back to the chapter start) before resuming. A saved panel that is now behind a paywall the reader hasn't unlocked raises the paywall (or age gate) instead of opening.
