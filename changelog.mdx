@@ -5,6 +5,132 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-29" description="Player · Unreleased (1.2.0) — Angular 21/22, ngx-translate 18, panel ids on panelChange" tags={["feature"]}>
+  ## The player installs on Angular 21 and 22 and ngx-translate 18, and `panelChange` tells you which panel
+
+  These changes are merged on `master` but **not yet released** to npm at the
+  time of writing; they will ship as `@panelwave/player` **1.2.0**. The current
+  npm release is 1.1.0.
+
+  - **Angular 21 and 22.** The `@angular/core` / `@angular/common` peer range is
+    now `^20.0.0 || ^21.0.0 || ^22.0.0` (1.1.0 declares `^20.0.0`, which makes
+    npm refuse the install on newer apps). The package is still compiled with
+    Angular 20 in partial mode; fresh Angular 20.3, 21.2 and 22.2 apps are
+    verified in CI — strict-peer install, production build, headless render,
+    zone.js and zoneless. No library code changed.
+    [Installation](/player/installation#requirements).
+  - **ngx-translate 18.** `@ngx-translate/core` is `^17.0.0 || ^18.0.0`. Register
+    it with `provideTranslateService({ loader: { provide: TranslateLoader,
+    useClass: YourLoader } })` — this form works on 17 and 18, while
+    `TranslateModule.forRoot()` no longer exists in 18 and 18's
+    `provideTranslateLoader(Class)` breaks minified production builds for a
+    plain class. [Application setup](/player/installation#application-setup),
+    [troubleshooting](/help-center/troubleshooting/player-embedding#build-or-injection-errors-on-startup).
+  - **`panelChange` carries the panel id.** The payload is the new exported
+    `PlayerPanelChangeEvent` — `{ panel, chapter, panelId, previousPanelId? }`.
+    `panelId` is the panel's key in `chapter.panels` (`Panel.id` is optional
+    in the format and usually absent, so hosts no longer look it up by object
+    identity); `previousPanelId` is unset for the first panel after a load or
+    reload. Additive: `panel` and `chapter` are unchanged. `panel` is the
+    manifest panel as written — variants are not resolved in it (the previous
+    docs said otherwise). [Inputs & Outputs](/player/inputs-outputs#outputs),
+    [Saving Progress](/player/saving-progress#automatic-resume).
+  - **Consumer smoke test.** `npm run smoke:consumer -- --angular <major>`
+    packs the library into a fresh app of that major and renders the demo
+    work; CI runs it for 20, 21 and 22.
+    [Development & Contributing](/player/development).
+  - **Docs.** The `Panel` example in the package README read `$event.panel.id`,
+    which did not compile; it now reads `$event.panelId`. The setup notes
+    mention `allowedCommonJsDependencies` for `json-logic-js`.
+</Update>
+
+<Update label="2026-09-29" description="CMS · Move to…, cross-format panel deletion, canvas rotate and phone ribbon, nudging fixes" tags={["feature", "bugfix"]}>
+  ## Move chapters, pages and panels for real, delete panels without losing them elsewhere, rotate on the canvas board, and see whether a canvas reads on a phone
+
+  - **"Move to…" works** for chapters, pages and panels in the structure tree
+    (it used to say *coming soon*). The dialog offers only valid destinations:
+    a position among the chapters, another chapter for a page, a page of
+    another chapter for a panel. A page takes its panels along; a page or
+    panel moved to another chapter is taken off the source chapter's other
+    formats' pages, its canvas layout and its graph — and **Undo** puts all
+    of that back. Dragging a panel onto another chapter's page now goes
+    through the same path (it used to leave the panel's chapter, other pages
+    and edges dangling). [Move to…](/cms/editor/pages-panels#move-to).
+  - **Rename** in the panel context menu; **collapsed chapters stay
+    collapsed** across renames, new panels and page reloads (per work, for
+    the browser session). [Context menus](/cms/editor/pages-panels#context-menus).
+  - **Canvas delete keeps panels other formats still place.** Deleting a
+    panel on the page canvas that another page or format still uses only
+    removes it from the open page, with a toast saying where it is still
+    used; the tree's **Delete Panel** deletes everywhere and its confirmation
+    lists the affected pages and formats. Both are one undo step; the legacy
+    page references of older works are cleaned and restored too.
+    [Deleting panels](/cms/editor/pages-panels#deleting-panels).
+  - **Rotate handle on the Canvas Layout Board.** A knob above the selected
+    panel rotates it around its origin, **Shift** snaps to 15°; the inspector
+    gets a **Rotation (°)** field and **Reset rotation**. Saved with the
+    placement and rendered by the player.
+    [Canvas Layout Board](/cms/editor/canvas-layout#the-board).
+  - **Phone ribbon.** A toolbar toggle overlays the column a portrait phone
+    reads and judges the layout **column-friendly** or not, live: panels that
+    leave the band and trail steps that read upward are outlined, and a
+    verdict chip counts the phone screens. View-only, remembered per browser.
+    [Phone ribbon](/cms/editor/canvas-layout#phone-ribbon-will-it-read-on-a-phone).
+  - **Nudging fixed.** Arrow keys moved a layer 3 px and Shift+Arrow 30 px
+    because the key reached the editor three times; it is 1 px and 10 px
+    again, and **speech bubbles and hotspots** nudge too (each an undo step).
+    The same fix stops Ctrl+Z / Ctrl+Shift+Z from undoing twice, and
+    **Ctrl+D** makes one copy instead of two.
+    [Moving and resizing](/cms/editor/canvas#moving-and-resizing),
+    [Keyboard Shortcuts](/cms/editor/shortcuts#moving-elements).
+  - **Preview explains empty works.** A work with no chapters, or none with
+    panels, shows *Nothing to preview yet* and what to add instead of a raw
+    player error; chapters without panels are left out of the preview and
+    counted under the device frame. [Preview](/cms/preview#opening-the-preview).
+  - **Accessibility and speed.** Higher-contrast text on the editor header's
+    yellow accent, a proper tab list for the editor tabs, accessible names on
+    editor, timeline, canvas, team and export controls; the Characters page
+    serves thumbnails instead of the original portraits, work cards reserve
+    their 16:9 cover space, and the profile lists the 10 newest sessions with
+    **Show all**. [Characters](/cms/characters), [Works](/cms/works),
+    [Active sessions](/cms/account#active-sessions).
+</Update>
+
+<Update label="2026-09-29" description="CMS · Read-only works everywhere, editable preload, bubble audio in archives, page-import fixes" tags={["feature", "bugfix"]}>
+  ## Read-only works hide their write actions, the preload setting is yours to edit, archives carry bubble audio, and page imports settle their credits
+
+  - **Read-only works, everywhere.** A work above the plan limit or of a
+    suspended team now shows the **Read-only** banner in the Backstage tools
+    as well as the editor, and hides or disables every write action instead
+    of failing it: no uploads, folder actions, new chapters, drag reorders or
+    panel adds in the editor; no add / edit / delete / reorder in Characters,
+    Extras, Localization, Audio and Paywall. Any write that still slips
+    through is refused with one *Read-only* toast. Export, archive, trash and
+    comments are unaffected.
+    [Read-only works](/cms/editor/layout#read-only-works), [Plans & Limits](/cms/plans#read-only-works).
+  - **Editable preload settings.** The inspector's **Perf** tab's preload block
+    is a form — strategy (None / Lookahead / Aggressive), panels ahead (0–20),
+    parallel downloads (1–16). Changes update the estimates at once, are
+    saved to the work and exported as `settings.preload`; JSON and archive
+    imports restore them (out-of-range values are dropped).
+    [The Performance tab](/cms/editor/layout#the-performance-tab), [Import](/cms/import#what-gets-imported).
+  - **Work archives carry speech-bubble audio.** Uploaded voice lines and TTS
+    output per language travel in the archive with their files and are
+    re-attached to the same bubbles on import; tracks whose bubble or file is
+    missing are skipped and counted. Archives made before 28 September 2026
+    carry none. [Archive export](/cms/export#archive-export),
+    [Importing a work archive](/cms/import#importing-a-work-archive).
+  - **Page Import.** The import step's progress bar now moves (it sat at 2 %
+    until done); the upscale credit reservation is settled after every import,
+    including when upscaling could not run; **Cancel import** during the
+    import step really stops it and removes the empty new work it had
+    created; **Discard** releases the reservation; and sessions idle for 30
+    days are discarded by the daily cleanup with their credits released and
+    an empty new work removed. Upscales also run in parallel now.
+    [Running an import](/cms/page-import#running-an-import),
+    [Upscaling and credits](/cms/page-import#upscaling-and-credits).
+</Update>
+
 <Update label="2026-09-27" description="Format · 1.6.0 — paywall product lists and product catalogue" tags={["feature"]}>
   ## A paywall rule can name every product that unlocks it, and readers see each product's name and price
 
