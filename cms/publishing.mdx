@@ -78,6 +78,15 @@ A publish produces a complete, self-contained package on the CDN:
 - the work's **manifest** (`panelwave.json`) — the [open-format](/schema/overview) description of your chapters, panels, graph, and settings,
 - all referenced **assets** (artwork, video) and **audio files**.
 
+The published manifest is the lean **player version** of your work:
+
+- panels are keyed by their short **friendly ids** (`ch1-p022`), never by internal database ids;
+- editor-only state (layer names and sizes, lock/visibility toggles, balloon tail geometry, grid helpers), the translation-workflow data, asset-library folders, and assets that no panel uses are left out;
+- strings in languages the work does not offer are dropped;
+- images ship as the full-size WebP rendition (or the optimized version) and videos as the H.264 rendition, with the responsive sizes alongside.
+
+Asset links in the published manifest stay signed, so paywalled artwork cannot be fetched without the manifest. The full-fidelity version with everything the editor needs is what the [work archive](/cms/export#archive-export) contains.
+
 Any site embedding the [PanelWave Player](/player/overview) can then render the work from its manifest URL. Content you keep in draft inside the CMS — for example extras marked **Draft (hidden from readers)** — is excluded from the published manifest (see [Extras](/cms/extras)).
 
 ## Release history and rollback

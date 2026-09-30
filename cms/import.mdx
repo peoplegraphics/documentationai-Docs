@@ -30,6 +30,8 @@ A **work archive** is the `.zip` produced by the [Archive export](/cms/export#ar
 
 Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by format versions 1.0–1.6 are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
 
+Panels keep their **friendly ids** (`ch1-p022`) in the copy, so exporting the imported work again yields the same ids, and [translations](/cms/localization) attached to panels, pages and chapters are re-pointed at the new copies — nothing is left orphaned. The same applies to a JSON manifest exported from PanelWave.
+
 Bubble audio is re-attached to the same bubbles in the copy. A track whose bubble or file is missing from the archive is skipped (the import's statistics count them); archives made before 28 September 2026 carry no bubble audio, so those bubbles arrive silent — regenerate or re-upload their lines.
 
 ### Paywall rules arrive disabled

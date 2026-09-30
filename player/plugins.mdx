@@ -8,7 +8,7 @@ The plugin system lets third parties extend the player without touching its code
 ## Two ways plugin content appears
 
 1. **Hosted plugins** — loaded and managed by `PluginHostService` (lifecycle, capabilities, API calls, events). This is the full plugin system described on this page.
-2. **Plugin layers** — a panel layer of `kind: "plugin"` rendered by `pw-plugin-layer` (inputs `src`, `baseUrl`, `sandbox` — default `allow-scripts` —, `allowFullscreen`; outputs `pluginReady`, `pluginMessage`, `pluginError`). Use this for per-panel interactive content such as a 360° viewer; see [Layers](/schema/layers).
+2. **Plugin layers** — a panel layer of `kind: "plugin"` rendered by `pw-plugin-layer` (inputs `src` — a relative `src` is resolved like every asset URL, see [Resolving relative URLs](/schema/assets#resolving-relative-urls) —, `sandbox` — default `allow-scripts` —, `allowFullscreen`; outputs `pluginReady`, `pluginMessage`, `pluginError`). Use this for per-panel interactive content such as a 360° viewer; see [Layers](/schema/layers).
 
 There is also a standalone `pw-plugin-sandbox` component (`PluginSandboxComponent`, input `manifest: PluginManifest`, outputs `loaded`/`failed`) for embedding one managed plugin in your own UI.
 

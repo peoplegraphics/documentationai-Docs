@@ -24,6 +24,16 @@ Variant `src` values may then be relative paths resolved against the matching ba
 }
 ```
 
+### Resolving relative URLs
+
+`src`, `poster.src`, character `images.*`, extras `url` / `thumbnail` and every other asset reference may be absolute or relative. Consumers resolve a **relative** reference in this order:
+
+1. `assets.base.<category>Base` for the asset's category (`imageBase`, `audioBase`, `videoBase`, `pluginsBase`; vector assets use `imageBase`),
+2. `assets.base.mediaBase`,
+3. the URL the manifest document itself was loaded from — the same rule a browser applies to relative links in an HTML page.
+
+Absolute URLs (including `data:` and `blob:`) are used as-is. A directory holding the manifest next to its asset files is therefore a complete, playable bundle without any `assets.base` — this is exactly what a PanelWave [work archive](/cms/export#archive-export) unzips to. Presigned or otherwise per-object URLs cannot share a base and stay absolute.
+
 ## Catalog items
 
 `catalog` is an array of typed items discriminated by `category`. All items share the `AssetCommon` base and add a `variants` array (always `minItems: 1`). Unknown properties are rejected.

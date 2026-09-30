@@ -94,6 +94,8 @@ The **Archive (.zip)** format is different from the presentation formats above: 
 - Your [asset library folders](/cms/assets) and all [translations](/cms/localization)
 - Every [paywall rule](/cms/monetization#paywall-rules) — live rules and inactive drafts alike, with prices, tiers, age limit, and preview count. On import they arrive **disabled**, so nothing is sold on the target before you have reviewed it (see [Importing a work archive](/cms/import#importing-a-work-archive)).
 
+The archive's `manifest.json` uses the short **friendly panel ids** (`ch1-p022`) instead of the CMS's internal database ids, and every asset reference points at its file inside the zip (`assets/<asset-id>/w1280.webp`). An unzipped archive is therefore a complete, playable bundle: put the folder on any static web server and load `manifest.json` in the [PanelWave Player](/player/quickstart-embed) by URL.
+
 Archives are queued from the works-list bulk export or from the **Archive (.zip)** card on the Exports screen — without an options dialog, for one work or in batch mode — and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
 
 <Callout kind="info">

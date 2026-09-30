@@ -5,6 +5,41 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-01" description="CMS · Player — lean published manifests, playable work archives, friendly panel ids" tags={["feature", "bugfix"]}>
+  ## Published manifests are lean; archives play from disk
+
+  - **Two manifest versions.** What you [publish](/cms/publishing#what-readers-get)
+    (and what a preview link serves) is now the lean player version: no
+    editor-only state, no translation-workflow data, no asset-library folders,
+    no assets that no panel uses, no strings in languages the work does not
+    offer. For a typical work that halves the manifest. Asset links stay signed.
+    The [work archive](/cms/export#archive-export) keeps the full-fidelity version.
+  - **Friendly panel ids everywhere outside the editor.** Published manifests,
+    archives and exported JSON key panels by their short
+    [friendly id](/cms/editor/pages-panels#basic-properties) (`ch1-p022`)
+    instead of internal database ids. New panels get one automatically; older
+    panels receive theirs on the next publish or export.
+  - **Playable archives.** The archive's `manifest.json` points at its files
+    inside the zip, so an unzipped archive plays from any static web server.
+    [Importing it](/cms/import#importing-a-work-archive) keeps the friendly
+    ids and re-points translations at the new copies.
+  - **Smaller media.** Images ship as their full-size WebP rendition and
+    videos as the H.264 rendition instead of the original uploads; video
+    posters are signed like every other asset.
+  - **New check:** [`UNREACHABLE_PANELS`](/cms/validation-codes#unreachable-panels)
+    warns when panels cannot be reached from a chapter's entry panel.
+  - **Fixes:** page layouts written by the script importer now reference the
+    right panels in exports; character names saved as the literal text
+    "undefined" by an older editor are ignored.
+  - **Player:** relative asset URLs resolve against `assets.base` and then the
+    manifest's own URL ([rule](/schema/assets#resolving-relative-urls)) for
+    images, video, posters, thumbnails, portraits, extras and plugins — via the
+    new `AssetUrlService`. The per-component `baseUrl` inputs are gone. Ships
+    with the next player release.
+  - **Profile:** name, location, website and bio are always editable; Save and
+    Cancel appear once something changed ([Account](/cms/account#profile-information)).
+</Update>
+
 <Update label="2026-09-30" description="CMS · MCP gateway — AI assistants build, letter, translate and publish works with you" tags={["feature", "security"]}>
   ## Claude, ChatGPT, Cursor and other AI assistants can now work in PanelWave
 

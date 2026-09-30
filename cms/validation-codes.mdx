@@ -41,6 +41,7 @@ Every issue that [Preflight Validation](/cms/validation) reports carries a stabl
 | [`VARIANT_UNKNOWN_VARIABLE`](#variant-unknown-variable) | Warning | Logic |
 | [`VARIANT_UNKNOWN_OVERRIDE_KEY`](#variant-unknown-override-key) | Warning | Logic |
 | [`VARIANT_EMPTY_OVERRIDES`](#variant-empty-overrides) | Warning | Logic |
+| [`UNREACHABLE_PANELS`](#unreachable-panels) | Warning | Logic |
 
 ---
 
@@ -284,9 +285,17 @@ The variant changes nothing publishable, so it is skipped at publish.
 
 **How to fix:** add at least one override, or remove the variant.
 
+## Unreachable panels
+
+**Code:** `UNREACHABLE_PANELS` · **Severity:** Warning · **Category:** Logic
+
+Some panels of a chapter cannot be reached from its entry panel by following the connections in the [graph](/cms/editor/graph), so readers paging through the work never see them. The message names the chapter and the count (*"Chapter 1: 32 of 38 panel(s) cannot be reached from the entry panel…"*), and the issue lists the affected panels by title. Typical cause: panels added after the chain was built, with no connection leading into them. Only chapters that have at least one connection are checked — a chapter read purely page by page, without a graph, is never reported.
+
+**How to fix:** open the [Graph Editor](/cms/editor/graph) and connect the panels where they belong in the story — from the last reachable panel to the first unreachable one, or by inserting them into the chain. Delete panels that are leftovers.
+
 ---
 
 ## Codes reserved for upcoming checks
 
-Some categories shown in the validation UI (localization completeness, flow reachability, per-bubble audio, duplicate IDs) do not emit issues yet — their checks are planned but depend on data models still being built. Their codes will be documented here when they ship.
+Some categories shown in the validation UI (localization completeness, per-bubble audio, duplicate IDs) do not emit issues yet — their checks are planned but depend on data models still being built. Their codes will be documented here when they ship.
 
