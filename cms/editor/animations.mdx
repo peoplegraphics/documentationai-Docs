@@ -1,14 +1,17 @@
 ---
 title: Animations & Timeline
-description: Animate panel layers with keyframes, choose easing curves, preview motion in the Timeline panel, and control panel timing and transitions in PanelWave.
+description: Animate panel layers with keyframes, choose easing curves, watch the result in the preview, and control panel timing and transitions in PanelWave.
 ---
 
 Animations bring individual panels to life: a character slides into frame, a background fades in, a clue zooms toward the reader. In PanelWave you build these effects from **keyframes** — snapshots of a layer property at a point in time — and the editor fills in the motion between them.
 
-Two parts of the editor work together:
+Three places work together:
 
 - The **Animations section** of the Inspector (right sidebar, with a panel selected) is where you create and edit a panel's animation.
-- The **Timeline panel** (bottom of the editor) is where you preview and fine-tune it, and where you see your whole story's autoplay timing at a glance.
+- **Backstage → Preview** is where you watch it: the preview runs the real reader, so the animation plays exactly as your readers will see it. See [Preview](/cms/preview).
+- The **Timeline panel** (bottom of the editor) shows your whole story's autoplay timing at a glance.
+
+Animations are saved with the panel and published in the manifest (see [Animations in the format](/schema/animations)); the reader plays them when the panel comes into view.
 
 <Callout kind="info">
   Each panel has **one animation** (with as many keyframes as you like). This keeps motion design per panel simple and predictable — if you need several effects, put multiple keyframes on multiple layers inside the same animation.
@@ -18,17 +21,19 @@ Two parts of the editor work together:
 
 Keyframes always target a **layer** of the current panel (see [Layers](/cms/editor/layers)). Nine properties are animatable:
 
-| Property | What it does | Typical range |
+| Property | What it does | Range |
 |---|---|---|
-| Opacity | Transparency, from invisible to fully opaque | 0 – 1 |
-| Transform X | Horizontal position offset in pixels | −1000 – 1000 |
-| Transform Y | Vertical position offset in pixels | −1000 – 1000 |
-| Scale | Uniform size multiplier (1 = 100%) | 0 – 5 |
-| Rotation | Rotation angle in degrees | −360 – 360 |
-| Blur | Gaussian blur radius in pixels | 0 – 50 |
-| Brightness | Brightness multiplier (1 = normal) | 0 – 2 |
-| Contrast | Contrast multiplier (1 = normal) | 0 – 2 |
-| Saturation | Color saturation (0 = grayscale, 1 = normal) | 0 – 2 |
+| Opacity | Transparency, from invisible (0) to fully visible (1) | 0 – 1 |
+| Move X | Horizontal offset as a **fraction of the panel width** — 0.1 moves the layer 10% to the right, negative values to the left | −2 – 2 |
+| Move Y | Vertical offset as a **fraction of the panel height** — 0.1 moves the layer 10% down, negative values up | −2 – 2 |
+| Scale | Uniform size multiplier (1 = original size) | 0 – 10 |
+| Rotation | Rotation in degrees, clockwise | −1080 – 1080 |
+| Blur | Blur radius in pixels, measured at a 1024 px wide panel (0 = sharp) | 0 – 100 |
+| Brightness | Brightness multiplier (1 = unchanged, 0 = black) | 0 – 5 |
+| Contrast | Contrast multiplier (1 = unchanged, 0 = grey) | 0 – 5 |
+| Saturation | Color saturation (1 = unchanged, 0 = greyscale) | 0 – 5 |
+
+Movement is measured against the panel, not in screen pixels, so the same animation looks right on a phone and on a big screen. The value field shows the unit of the property you picked.
 
 <Callout kind="tip">
   Position, opacity, and scale animate smoothly on every device. The filter properties (Blur, Brightness, Contrast, Saturation) are more demanding — use them for short accents rather than long-running loops.
@@ -60,12 +65,20 @@ Keyframes always target a **layer** of the current panel (see [Layers](/cms/edit
 
 Keyframes are listed sorted by time. Click a keyframe in the list to expand it and change its time, value, or easing inline; the trash button deletes it. To remove the whole animation, use the trash button on the animation card in the Inspector.
 
+If you delete a layer that has keyframes, those keyframes no longer play. The Animation Editor marks them, and [Preflight](/cms/validation-codes#animation-unknown-layer) warns about them before you publish.
+
+### How an animation plays for readers
+
+- It starts when the panel is shown and runs for its duration; with **Loop Animation** it repeats, otherwise the layers stay in their end state.
+- Before its first keyframe a layer holds the first value, after its last keyframe the last value. A fade-in therefore needs a keyframe with opacity `0` at 0 ms.
+- Readers who have asked their device for reduced motion see the end state without the movement.
+
 ### Example: fade in and settle
 
 A simple two-property entrance over 1.5 seconds:
 
 - Opacity: `0` at 0 ms (Ease In) → `1` at 1000 ms
-- Transform Y: `-300` at 0 ms (Ease Out) → `0` at 1200 ms
+- Move Y: `-0.3` at 0 ms (Ease Out) → `0` at 1200 ms
 
 The layer drops in from above while fading in, and the Ease Out curve makes it decelerate naturally as it lands.
 
@@ -106,7 +119,7 @@ During playback the canvas automatically switches to the panel under the playhea
 ### Tracks
 
 - **Panel track** — one bar per panel, in reading order. Click a bar to select that panel (the structure tree and Inspector follow along). Drag the handle at a bar's right edge to change the panel's display duration directly.
-- **Layer tracks** — keyframes of the selected panel's animation appear as diamond markers. Each track has visibility and lock toggles.
+- **Layer tracks** — rows for timeline keyframe markers, each with visibility and lock toggles. They are a pacing aid in the timeline; the panel's saved animation is edited in the Inspector and watched in the preview.
 - **Audio tracks** — panel audio and chapter-wide sequence audio, with mute buttons and volume/fade indicators. See [Audio](/cms/editor/audio).
 - **Markers** — comments and bookmarks you can place as notes along the timeline.
 

@@ -12,13 +12,17 @@ Defined as `$defs/Extras`. All properties are optional; single blocks vs. arrays
 | Property | Type | Description |
 |---|---|---|
 | `cover` | `ExtraBlock` | The work's cover presentation. |
-| `alt_cover` | `ExtraBlock` | An alternate cover. |
-| `character_sheets` | `ExtraCharacterSheet[]` | Character sheets, each linked to a character. |
+| `alt_cover` | `ExtraBlock` or `ExtraBlock[]` | One alternate cover, or a non-empty array of them (array form added within 1.6.0). |
+| `character_sheets` | `ExtraCharacterSheet[]` | Character sheets, each linked to one or more characters. |
 | `author_info` | `ExtraBlock` | About the author(s). |
 | `author_interviews` | `ExtraBlock[]` | Interview blocks. |
 | `bonus_art` | `ExtraBlock[]` | Bonus artwork. |
 | `fan_art` | `ExtraBlock[]` | Fan artwork. |
 | `behind_the_scenes` | `ExtraBlock[]` | Making-of material. |
+
+<Callout kind="info">
+Read `alt_cover` as "one or many": exporters write the single-object form when there is exactly one alternate cover and an array when there are several. `@panelwave/player` accepts both from version 1.2.0; earlier versions show only the single-object form.
+</Callout>
 
 ## `ExtraBlock`
 
@@ -62,9 +66,12 @@ Defined as `$defs/ExtraCharacterSheet` — an `ExtraBlock` plus a required chara
 | Property | Type | Required | Description |
 |---|---|---|---|
 | *(all `ExtraBlock` properties)* | — | — | Inherited via `allOf`. |
-| `characterId` | `Identifier` | Yes | The character from `meta.characters` this sheet belongs to. |
+| `characterId` | `Identifier` | One of the two | The character from `meta.characters` this sheet belongs to. |
+| `characterIds` | `Identifier[]` (unique, at least one) | One of the two | All characters on an **ensemble sheet**, in display order (added within 1.6.0). |
 
-Unlike the base block, no properties beyond `ExtraBlock` + `characterId` are allowed.
+At least one of `characterId` and `characterIds` is required. When `characterIds` is present it is the authoritative list; exporters also keep `characterId` set to its first entry, so consumers that only read the single id still find a character.
+
+Unlike the base block, no properties beyond `ExtraBlock` + `characterId` / `characterIds` are allowed.
 
 ## Example
 
@@ -117,5 +124,5 @@ Unlike the base block, no properties beyond `ExtraBlock` + `characterId` are all
 
 - [Paywall](/schema/paywall) — gating extras with `scope: "extras"` rules
 - [Hotspots](/schema/hotspots) — the `openExtras` action
-- [Meta](/schema/meta) — characters referenced by `characterId`
+- [Meta](/schema/meta) — characters referenced by `characterId` / `characterIds`
 - [CMS Extras](/cms/extras) — authoring extras in the CMS

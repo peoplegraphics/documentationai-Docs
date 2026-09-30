@@ -70,6 +70,8 @@ One more variant is created **on demand**: when preflight flags an image as too 
 
 Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage — you get the existing asset back instead of a copy.
 
+Every asset gets an **ID** that the manifest uses to reference it. New uploads get a readable ID derived from the file name — `Wiesn Übersicht FINAL_01.png` becomes `wiesn-uebersicht-final-01`; a second file with the same name gets `-2`. Assets uploaded before September 2026 keep their existing (hash-based) IDs, and imported works keep the IDs from their manifest, so nothing that references an asset breaks.
+
 <Callout kind="info">
 Readers automatically get the best variant their device supports — you never have to export "web versions" yourself. Published manifests list the size ladder alongside the full-quality primary file, and the [player picks by actual display size](/player/performance#asset-variant-selection). See [Assets in the format](/concepts/assets) for how variants appear in the manifest.
 </Callout>

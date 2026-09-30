@@ -192,7 +192,8 @@ All cross-references are by `Identifier` string:
 | Panel `contentWarnings[]` | `meta.content_warnings[].id` |
 | Panel `preloadHints[]` | Asset catalog IDs to prefetch |
 | `paywall.rules[].refId` | Chapter, panel, or extras ID depending on rule `scope` |
-| `extras.character_sheets[].characterId` | `meta.characters[].id` |
+| `extras.character_sheets[].characterId` / `characterIds[]` | `meta.characters[].id` |
+| `panels.<id>.animations.keyframes[].layerId` | `layers[].id` of the same panel |
 | Mutation / condition `var` | `variables.definitions[].id` |
 
 <Callout kind="alert">

@@ -5,6 +5,109 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-30" description="Format 1.6.0 additions · Player (unreleased 1.2.0) · CMS — layer keyframe animations, several alt covers, ensemble character sheets" tags={["feature"]}>
+  ## Panels animate their layers, works can carry several alternate covers, and a character sheet can show a whole cast
+
+  **Format (merged into 1.6.0 — the version number does not change, existing
+  manifests stay valid):**
+
+  - **Layer keyframe animations.** `Panel.animations` gains `keyframes`
+    (`layerId`, `property`, `timeMs`, `value`, optional `easing` / `id`),
+    `loop` and `name`. Nine properties: opacity, position, scale, rotation,
+    blur, brightness, contrast, saturation. Offsets are fractions of the panel
+    size, blur is measured at a 1024 px wide panel — animations look the same
+    on every screen. [Animations](/schema/animations#layer-keyframes-animationkeyframe).
+  - **Several alternate covers.** `extras.alt_cover` is one block or an array.
+    [Extras](/schema/extras).
+  - **Ensemble character sheets.** A sheet lists its characters in
+    `characterIds`; `characterId` stays for single sheets and as the first
+    entry. [Extras](/schema/extras#extracharactersheet).
+
+  **Player** (merged, **not yet released** — ships with `@panelwave/player`
+  1.2.0):
+
+  - Plays layer keyframes in panel view, page view and canvas view: start when
+    the panel comes into view, hold / interpolate / loop as the format defines,
+    end state for readers who prefer reduced motion.
+  - Shows every alternate cover and the names of all characters of an ensemble
+    sheet in the extras viewer.
+  - **Small screens crop around the focus rect.** In panel view a panel larger
+    than the screen still fills it, but the crop is centred on the panel's
+    `minimalFocusRect` (of the format closest to the screen's shape) instead of
+    the panel centre. [Panels](/schema/panels).
+  - Viewport moves (`startViewportRect` / `endViewportRect`) are still not
+    rendered.
+
+  **CMS:**
+
+  - **Animations are saved, published and playable.** The Animation Editor's
+    keyframes used to be lost on reload and never reached the manifest. They
+    now persist, export and play in Backstage → Preview. Movement is entered as
+    a fraction of the panel size (it was labelled pixels).
+    [Animations & Timeline](/cms/editor/animations).
+  - New preflight warning
+    [`ANIMATION_UNKNOWN_LAYER`](/cms/validation-codes#animation-unknown-layer)
+    for keyframes whose layer was deleted.
+  - **All alt covers are exported** (only the first one was), and a character
+    sheet can link **several characters**. [Extras](/cms/extras).
+  - **Readable asset IDs.** New uploads get an ID from their file name
+    (`wiesn-uebersicht-final-01`) instead of a hash; existing assets keep
+    theirs. [Assets](/cms/assets).
+  - **Page ids keep their letter.** Every format has a permanent letter
+    (`pg-A1` A4 portrait, `pg-D1` desktop, `pg-M1` mobile, …), so reordering
+    pages no longer re-letters another format's pages. Works published earlier
+    get new page ids once, with their next publish.
+    [Pages & Panels](/cms/editor/pages-panels).
+  - The panel's **Minimal Focus Rect** can be cleared per format.
+
+  `@panelwave/types` and `@panelwave/cli` carry the additions on their main
+  branches; until their next npm release, the published CLI validates against
+  the earlier 1.6.0 schema and rejects the new fields.
+</Update>
+
+<Update label="2026-09-30" description="CMS · Launch test pass — fixes across editor, characters, speech bubbles, localization, extras, work properties and publishing" tags={["bugfix"]}>
+  ## An end-to-end pass through the whole authoring flow, and what it fixed
+
+  One work was built from an empty account to a published preview, and every
+  defect found on the way was fixed. The ones authors would have noticed:
+
+  - **Editor.** Panel position and size typed in the Inspector are saved (they
+    were lost on reload); **Lock Aspect Ratio** works; a new work opens in its
+    own default format; context menus close on Escape and follow the arrow
+    keys; the header no longer overlaps at medium widths; ruler labels stay
+    readable at low zoom; panels created in the **New Panel** dialog keep their
+    id and land in a free slot; the **Unassigned** list follows story order.
+  - **Panel settings that did nothing now work:** Allow Page View / Allow Panel
+    View and Minimal Focus Rect are saved per format, and content warnings and
+    the memory hint reach the manifest. Reading Order is shown read-only (it
+    follows the panel order).
+  - **Speech bubbles.** Bubbles are no longer lost when their panel is clicked
+    again; Visible / Locked, Audio, Generate TTS and Visible If are wired up; a
+    locked bubble stays selectable but cannot be moved; the editor warns when
+    balloon text is cut off; bubbles sit on the artwork in portrait formats.
+  - **Variants.** A condition typed in JSON mode is applied without the extra
+    **Apply JSON** click, and variants with such conditions can be created.
+  - **Characters.** The balloon style chosen while creating a character is
+    saved; names and bios use the work's own locales.
+  - **Localization.** Editing in German writes `de-DE` (the work's locale), not
+    `de`; renaming a chapter in the tree keeps its translations; untranslated
+    cells no longer show "undefined".
+  - **Extras.** An extra's default-language title survives translation; the
+    translation locales are the work's locales; the Reader Preview's bar is
+    clickable.
+  - **Work Properties.** Works created with the wizard can be saved; the
+    dialog is readable in the light theme; name and description offer the
+    work's locales; the cover chooser shows file names.
+  - **Assets.** The library shows images that have no previews yet (for
+    example after an upload while processing was down) and regenerates them
+    with one click; the asset picker opens above side panels.
+  - **Publishing.** The work cover and publishing metadata (series, issue,
+    publisher, release date, copyright, license) are in the manifest; attributed
+    speech bubbles no longer fail schema validation; the publish summary counts
+    images at their shipped size; preflight names the file in alt-text and
+    size issues.
+</Update>
+
 <Update label="2026-09-29" description="Player · Unreleased (1.2.0) — Angular 21/22, ngx-translate 18, panel ids on panelChange" tags={["feature"]}>
   ## The player installs on Angular 21 and 22 and ngx-translate 18, and `panelChange` tells you which panel
 

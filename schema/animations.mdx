@@ -1,22 +1,85 @@
 ---
 title: Animations & Transitions
-description: Reference for PanelAnimations viewport moves and the Transition object — the seven transition types, directions, timing, and easing.
+description: Reference for PanelAnimations (layer keyframes and viewport moves) and the Transition object — the seven transition types, directions, timing, and easing.
 ---
 
-The format describes motion in two places: **within a panel** (`PanelAnimations` — a camera move across the artwork) and **between panels or pages** (`Transition` — the visual effect while navigating). Both are declarative; the [player](/player/overview) interpolates them.
+The format describes motion in two places: **within a panel** (`PanelAnimations` — layer keyframes and a camera move across the artwork) and **between panels or pages** (`Transition` — the visual effect while navigating). Both are declarative.
 
 ## `PanelAnimations`
 
-Defined as `$defs/PanelAnimations`, set per panel at `chapters[].panels.<panelId>.animations` (also overridable via [variants](/schema/variants)). It describes a viewport interpolation — a Ken-Burns-style pan/zoom from a start rectangle to an end rectangle over the panel artwork.
+Defined as `$defs/PanelAnimations`, set per panel at `chapters[].panels.<panelId>.animations` (also overridable via [variants](/schema/variants)). A panel has one animation. It can hold **layer keyframes** (layers move, fade or change their filters), a **viewport move** (a Ken-Burns-style pan/zoom over the artwork), or both.
 
 | Property | Type | Required | Constraints | Description |
 |---|---|---|---|---|
+| `name` | string | No | — | Author-facing label. Not shown to readers. |
+| `durationMs` | integer | No | 0–120000 | Animation duration in milliseconds. |
+| `loop` | boolean | No | default `false` | Restart the animation when it ends. |
+| `keyframes` | `AnimationKeyframe[]` | No | up to 2000 items | Layer keyframes — see below. |
 | `startViewportRect` | `NormalizedRect` | No | `x`,`y`,`w`,`h` each 0–1 | Viewport at animation start, normalized to the panel. |
 | `endViewportRect` | `NormalizedRect` | No | `x`,`y`,`w`,`h` each 0–1 | Viewport at animation end. |
-| `durationMs` | integer | No | 0–120000 | Animation duration in milliseconds. |
-| `easing` | enum | No | `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` | Easing function. |
+| `easing` | enum | No | `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` | Easing of the viewport move. |
 
-A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1.
+### Layer keyframes (`AnimationKeyframe`)
+
+Added within format 1.6.0. Each keyframe sets one property of one layer at one point in time:
+
+| Property | Type | Required | Constraints | Description |
+|---|---|---|---|---|
+| `layerId` | `Identifier` | Yes | — | The layer of this panel to animate (`layers[].id`). |
+| `property` | enum | Yes | see the table below | What to animate. |
+| `timeMs` | integer | Yes | 0–120000 | Position on the panel's timeline in milliseconds. |
+| `value` | number | Yes | — | Value at that time, in the unit of the property. |
+| `easing` | enum | No | `linear`, `ease`, `ease-in`, `ease-out`, `ease-in-out` | Curve from this keyframe to the next one of the same track. Default `linear`. |
+| `id` | `Identifier` | No | — | Stable id for authoring tools. |
+
+No other properties are allowed on a keyframe.
+
+| `property` | Value |
+|---|---|
+| `opacity` | 0–1; replaces the layer's opacity. |
+| `transform.x`, `transform.y` | Offset from the layer's resting position as a **fraction of the panel's width / height** (`0.1` = 10% right / down, negative = left / up). |
+| `transform.scale` | Scale factor around the layer's center (`1` = unchanged). |
+| `transform.rotation` | Degrees clockwise around the layer's center. |
+| `blur` | Blur radius in px **at a panel width of 1024 px**; scaled with the rendered panel. |
+| `brightness`, `contrast`, `saturate` | Multiplier (`1` = unchanged). |
+
+Offsets and blur are relative to the panel, not device pixels, so an animation looks the same on every screen.
+
+**How keyframes play:**
+
+- Keyframes with the same `layerId` and `property` form a **track**, ordered by `timeMs`.
+- Before a track's first keyframe the layer holds the first value; after the last it holds the last value.
+- Between two keyframes the value is interpolated with the `easing` of the **earlier** keyframe.
+- Properties without keyframes are left as the layer defines them.
+- The animation starts when the panel is shown and runs for `durationMs` (or until the last keyframe, when that is later). With `loop: true` it restarts; otherwise it keeps its end state.
+- Players that honour a reduced-motion preference skip the motion and show the end state.
+- A keyframe whose `layerId` does not exist in the panel is ignored.
+
+```json
+{
+  "animations": {
+    "name": "Robot rolls in",
+    "durationMs": 4000,
+    "loop": false,
+    "keyframes": [
+      { "layerId": "character", "property": "transform.x", "timeMs": 0, "value": -0.4, "easing": "ease-out" },
+      { "layerId": "character", "property": "transform.x", "timeMs": 3000, "value": 0 },
+      { "layerId": "character", "property": "opacity", "timeMs": 0, "value": 0 },
+      { "layerId": "character", "property": "opacity", "timeMs": 800, "value": 1 }
+    ]
+  }
+}
+```
+
+The character starts 40% of the panel width to the left, invisible, fades in over 0.8 s and rolls to its resting position over 3 s.
+
+<Callout kind="info">
+**Player support.** `@panelwave/player` plays layer keyframes from version 1.2.0 (not yet released at the time of writing). Consumers that do not know keyframes ignore them and show the static panel.
+</Callout>
+
+### Viewport moves
+
+`startViewportRect` and `endViewportRect` describe a camera move from one rectangle of the panel to another. A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1.
 
 ```json
 {
@@ -30,6 +93,10 @@ A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1
 ```
 
 This starts on the full panel and slowly zooms into the region at (0.3, 0.2) sized 40% × 40% — a classic dramatic push-in.
+
+<Callout kind="alert">
+Viewport moves are part of the format, but `@panelwave/player` does not render them yet — it shows the panel without the camera move. Layer keyframes are rendered.
+</Callout>
 
 <Callout kind="tip">
 Layers can add depth to these moves with `parallaxDepth` — see [Layers](/schema/layers).
@@ -88,7 +155,8 @@ The most common placement is on a graph edge, so different paths through the sto
 
 | Mechanism | Where | What it does |
 |---|---|---|
-| `PanelAnimations` | `panels.<id>.animations` | Viewport pan/zoom across the panel artwork. |
+| `PanelAnimations` keyframes | `panels.<id>.animations.keyframes` | Layers move, fade, scale, rotate or change filters over time. |
+| `PanelAnimations` viewport move | `panels.<id>.animations` | Viewport pan/zoom across the panel artwork. |
 | `Transition` | edges, hotspot actions, pages, output presets | Effect between panels/pages during navigation. |
 | `parallaxDepth` | layer property | Per-layer depth offset during viewport motion — see [Layers](/schema/layers). |
 | Video layers | `panels.<id>.layers[]` / `panels.<id>.video[]` | Real motion content — see [Video](/schema/video). |

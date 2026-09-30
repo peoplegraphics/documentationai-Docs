@@ -17,7 +17,7 @@ All `Panel` properties are optional at the schema level — the panel's identity
 | `durationMs` | number ≥ 100 | — | Autoplay dwell time in ms; overrides the global `settings.ui.secondsPerPanel` for this panel |
 | `formatViews` | object (format → `PanelFormatView`) | — | Per-output-format view behavior — see below |
 | `layers` | [`Layer[]`](/schema/layers) | — | Visual/audio content stack |
-| `animations` | `PanelAnimations` | — | Viewport (Ken Burns-style) animation — see [Animations](/schema/animations) |
+| `animations` | `PanelAnimations` | — | Layer keyframes and/or a viewport (Ken Burns-style) move — see [Animations](/schema/animations) |
 | `speechBubbles` | `SpeechBubble[]` (unique) | — | Dialogue balloons — see [Speech Bubbles](/schema/speech-bubbles) |
 | `hotspots` | `Hotspot[]` (unique) | — | Interactive regions — see [Hotspots](/schema/hotspots) |
 | `audio` | `AudioTrack[]` | — | Panel-scoped audio — see [Audio](/schema/audio) |
@@ -38,7 +38,7 @@ All `Panel` properties are optional at the schema level — the panel's identity
 
 | Property | Type | Description |
 |----------|------|-------------|
-| `minimalFocusRect` | [`NormalizedRect`](/schema/manifest-structure#normalizednumber-normalizedpoint-normalizedrect) | The region that must stay visible when the format crops the panel (e.g. mobile portrait showing a landscape panel) |
+| `minimalFocusRect` | [`NormalizedRect`](/schema/manifest-structure#normalizednumber-normalizedpoint-normalizedrect) | The region that must stay visible when the format crops the panel (e.g. mobile portrait showing a landscape panel). `@panelwave/player` 1.2.0 centres the crop on it in panel view |
 | `allowPageView` | boolean | Whether this panel may appear in page view for this format |
 | `allowPanelView` | boolean | Whether this panel may appear in panel view for this format |
 
@@ -131,7 +131,7 @@ A choice panel combining most features (adapted from the bundled branching sampl
     Shapes and the five action types.
   </Card>
   <Card title="Animations" icon="play-circle" href="/schema/animations">
-    Viewport animations (`PanelAnimations`).
+    Layer keyframes and viewport moves (`PanelAnimations`).
   </Card>
   <Card title="Variants" icon="git-fork" href="/schema/variants">
     Conditional panel overrides (`PanelVariant`).

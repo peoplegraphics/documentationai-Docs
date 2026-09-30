@@ -31,6 +31,7 @@ Every issue that [Preflight Validation](/cms/validation) reports carries a stabl
 | [`UNKNOWN_TEXT_STYLE_REF`](#unknown-text-style-ref) | Warning | Content |
 | [`UNKNOWN_BALLOON_PRESET_REF`](#unknown-balloon-preset-ref) | Warning | Content |
 | [`VIDEO_HOVER_START_MODE`](#video-hover-start-mode) | Warning | Content |
+| [`ANIMATION_UNKNOWN_LAYER`](#animation-unknown-layer) | Warning | Content |
 | [`DANGLING_PAGE_REF`](#dangling-page-ref) | Warning | Integrity |
 | [`CANVAS_UNPLACED_PANELS`](#canvas-unplaced-panels) | Warning | Content |
 | [`CANVAS_TOO_LARGE`](#canvas-too-large) | Warning | Performance |
@@ -154,6 +155,14 @@ A panel contains neither layers nor speech bubbles — readers would see a blank
 A text layer references a typography **text style preset** (`styleRef`) that is not defined in the work's settings. Rendering does not break — consumers ignore the unknown reference — but the intended styling is silently lost.
 
 **How to fix:** define the preset under **Work Properties → Typography → Text Styles**, or point the layer at an existing preset. See [Settings](/schema/settings) for how presets live in the manifest.
+
+## Animation unknown layer
+
+**Code:** `ANIMATION_UNKNOWN_LAYER` · **Severity:** Warning · **Category:** Content
+
+Keyframes of a panel's [animation](/cms/editor/animations) target a layer the panel no longer has — typically because the layer was deleted or replaced after the animation was built. The reader ignores such keyframes, so that part of the animation (or all of it) silently does not play. One warning per panel, with the number of affected keyframes.
+
+**How to fix:** open the panel's animation in the Inspector. The affected keyframes are marked; re-create them on a current layer, or remove the animation.
 
 ## Unknown balloon preset ref
 

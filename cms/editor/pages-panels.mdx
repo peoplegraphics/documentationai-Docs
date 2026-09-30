@@ -99,7 +99,7 @@ Pages position their panels with **percentages of the page**, not fixed pixels �
 
 Pages also belong to a **page format**: each format the work supports (see [Work Properties → Output](/cms/works#output)) keeps its **own set of pages**, so the phone-shaped and the A4 layout of the same scene are separate pages you design independently. The [format selector](/cms/editor/canvas#canvas-toolbar) above the canvas chooses which format's pages you see and edit.
 
-In the manifest and in exports, pages get **format-scoped ids**: each format has its own letter and counter, so the first format's pages are `pg-A1`, `pg-A2`, …, the second format's `pg-B1`, `pg-B2`, … — every format's page numbering starts at 1.
+In the manifest and in exports, pages get **format-scoped ids**: each format has its own permanent letter and its own counter, so A4 portrait pages are `pg-A1`, `pg-A2`, …, desktop pages `pg-D1`, `pg-D2`, …, mobile pages `pg-M1`, … — every format's page numbering starts at 1. The letters are fixed per format (A4 portrait **A**, A4 landscape **L**, US portrait **U**, US landscape **W**, mobile **M**, tablet **T**, desktop **D**, big screen **B**, square **S**, video 16:9 **V**, flex landscape **F**), so adding a format or reordering pages never changes the ids of another format's pages.
 
 To edit page-level settings, right-click a page and choose **Page Properties**. The panel looks and behaves like the panel inspector — the same collapsible sections, which remember their open/closed state — and **saves automatically** as you edit:
 
@@ -140,7 +140,7 @@ The numeric twin of dragging on the canvas:
 Controls how the panel behaves across reading formats:
 
 - **Allow Page View** / **Allow Panel View** — whether the panel may appear in each view mode.
-- **Minimal Focus Rect** — the important region of the panel (X, Y, width, height). Panel-by-panel readers zoom to this region, and the editor previews it as the bright area in panel view.
+- **Minimal Focus Rect** — the important region of the panel (X, Y, width, height, in % of the panel), set per format. When a reader's screen is smaller than the panel — a landscape panel on a phone, for example — the panel still fills the screen, and the crop is centred on this region instead of the middle of the panel. The editor previews it as the bright area in panel view. **Clear** removes the region for the current format; the crop is then centred on the panel again.
 - **Display Duration (ms)** — how long the panel is shown during autoplay. Leave it empty to use the work's default seconds-per-panel setting. Panels with a video layer lock the duration to the video length automatically; a toggle switches between **Locked to video** and manual duration, with a **Reset to video length** button. See [Video Panels](/cms/editor/video-panels).
 
 ### Layers

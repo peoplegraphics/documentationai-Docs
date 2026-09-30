@@ -61,6 +61,14 @@ Additive; existing manifests remain valid unchanged. A purchase paywall rule can
 
 Details: [Paywall → Product lists](/schema/paywall#product-lists-requiredproductids), [Paywall → Products](/schema/paywall#products-paywallproduct).
 
+Three more additions were merged into 1.6.0 on 2026-09-30 — the version number did not change, and every manifest that was valid before is still valid:
+
+- **Layer keyframe animations.** `PanelAnimations` gains `keyframes` (`AnimationKeyframe[]`: required `layerId`, `property`, `timeMs`, `value`; optional `id`, `easing`), `loop` and `name`. Nine animatable properties; offsets are fractions of the panel size. The viewport-move fields are unchanged. [Animations](/schema/animations#layer-keyframes-animationkeyframe).
+- **Several alternate covers.** `extras.alt_cover` accepts one `ExtraBlock` (as before) or a non-empty array. [Extras](/schema/extras).
+- **Ensemble character sheets.** `ExtraCharacterSheet` accepts `characterIds` next to `characterId`; at least one of the two is required. [Extras](/schema/extras#extracharactersheet).
+
+A validator that bundles an earlier copy of the 1.6.0 schema rejects manifests using these fields — update `@panelwave/cli` once the release that bundles the current schema is out.
+
 ### What changed in 1.5.0
 
 All additive; existing manifests remain valid unchanged. 1.5 adds **authoring metadata** blocks so a work can round-trip between authoring systems (they power the CMS's [work archive transfer](/cms/export#archive-export)) — rendering consumers may ignore all of them:
