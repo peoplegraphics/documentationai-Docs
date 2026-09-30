@@ -92,7 +92,7 @@ The **Publish Releases** view keeps a complete history of every publish:
 
 ### Rolling back
 
-If a release goes wrong, choose **Rollback to this version** on any earlier successful release. A **Rollback preview** dialog first shows exactly what will change — how many releases and days you are going back, the file-count and size difference, and an estimated duration — before you confirm with **Rollback now**. Rolling back restores content, assets, and configuration from that release's backup; newer releases stay in the history, so you can roll forward again later.
+If a release goes wrong, choose **Rollback to this version** on any earlier successful release. A **Rollback preview** dialog first shows exactly what will change — how many releases and days you are going back, the file-count and size difference, and an estimated duration — before you confirm with **Rollback now**. Rolling back restores content, assets, and configuration from that release's backup; newer releases stay in the history, so you can roll forward again later. The dialog confirms a successful rollback (before 2026-09-30 it could report a failure although the rollback had worked).
 
 <Callout kind="info">
   Rolling back to a very old release (more than 30 days or 10 releases behind) requires an extra acknowledgment, because readers will lose everything published since that point.

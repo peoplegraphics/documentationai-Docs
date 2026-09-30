@@ -37,7 +37,7 @@ The package declares:
 `json-logic-js` (condition evaluation) is installed automatically; the Angular packages, RxJS and ngx-translate come from your app.
 
 <Callout kind="info">
-The Angular 21 / 22 and ngx-translate 18 ranges are new in player **1.2.0** (unreleased at the time of writing). Player **1.1.0**, the current npm release, declares `^20.0.0` and `^17.0.0`, so npm refuses a strict-peer install on a newer app — build 1.2.0 from source (below) or wait for the release. The package is compiled with Angular 20 in partial-compilation mode and linked by your app's Angular version; every supported major is verified in CI by installing the packed library into a fresh app, building it for production and rendering a sample work.
+The Angular 21 / 22 and ngx-translate 18 ranges are new in player **1.2.0**, released on npm on 2026-09-29. Player **1.1.0** and earlier declare `^20.0.0` and `^17.0.0`, so npm refuses a strict-peer install of those on a newer app — install `@panelwave/player@latest`. The package is compiled with Angular 20 in partial-compilation mode and linked by your app's Angular version; every supported major is verified in CI by installing the packed library into a fresh app, building it for production and rendering a sample work.
 </Callout>
 
 ## Install

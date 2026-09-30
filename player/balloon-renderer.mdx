@@ -31,7 +31,7 @@ const result = balloon.render('HELLO WORLD!', { position: 180, length: 45 });
 5. **Integrate the tail into the outline** (except for thought balloons, which get a chain of three shrinking bubble circles instead). Tails can be `straight` or curved `left`/`right` using quadratic Béziers scaled by `curveAmount` (an explicit `0` draws a straight tail).
 6. **Emit SVG**: a `<path>` for the balloon (split into separate fill and stroke paths when needed), an optional `<clipPath>` for the hide-border effect, and a `<foreignObject>` containing the text `<div>` centered in the balloon.
 
-The returned `BalloonRenderResult` exposes `update()`, `updateTail()`, and `updateText()` for cheap re-renders, plus the final `width`/`height` and the `SVGSVGElement`.
+The returned `BalloonRenderResult` exposes `update()`, `updateTail()`, and `updateText()` for cheap re-renders, plus the final `width`/`height` and the `SVGSVGElement`. From the release after 1.2.0 it also reports `textOverflows`: `true` when the text needs more height than a non-zero `maxHeight` allows, so the text is cut off (the CMS uses it to warn about overflowing balloons).
 
 ## The ten balloon types
 

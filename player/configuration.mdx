@@ -25,7 +25,7 @@ These are all the `@Input()`s the shell accepts (verified in `PlayerShellCompone
 | `showToolbar` | `boolean` | `false` | Show the toolbar. Readers can always toggle it (`T`, floating button, viewport click). |
 | `viewModeOverride` | `'auto' \| 'panel' \| 'canvas'` | `'auto'` | Force panel or [canvas](/player/canvas-view) view. |
 | `reducedMotion` | `boolean` | `false` | Force reduced motion. The OS `prefers-reduced-motion` setting and the reader's Settings switch also turn it on. |
-| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs`. Reader-adjustable in the toolbar (0.5–120 s). |
+| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs`. Reader-adjustable in the toolbar (0.5–120 s). From the release after 1.2.0, autoplay in panel and canvas view waits for a non-looping panel animation to finish. |
 | `autoplay` | `boolean` | `false` | Start in autoplay once the work is ready; the reader's toolbar toggle takes over afterwards. |
 | `entitlementSnapshot` | `EntitlementSnapshot` | anonymous | What the reader owns; evaluated against the manifest's `paywall.rules`. See [Paywall & Entitlement](/player/paywall-entitlement). |
 | `entitlementEndpoint` / `readerToken` | `string` | — | Let the player fetch the snapshot itself (`{workId}` is substituted; token sent as a Bearer header). |

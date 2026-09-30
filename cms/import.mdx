@@ -62,7 +62,7 @@ Not carried over (by design): products and reader entitlements, publish history 
 The import validates the file before accepting it:
 
 - It must be valid JSON with the required top-level sections `panelwave`, `meta`, and `chapters` (see [Manifest structure](/schema/manifest-structure)).
-- The declared format version (`panelwave.version`) must be a format from **1.0 to 1.6** — the range up to the version the CMS itself exports (1.6.0), so a CMS export can always be imported back. Patch and pre-release versions of a supported format are fine (`1.5.1`, `1.3.0-rc.1`). Newer formats (`1.6.0`, `2.0.0`) and missing or malformed versions are rejected before anything is imported.
+- The declared format version (`panelwave.version`) must be a format from **1.0 to 1.6** — the range up to the version the CMS itself exports (1.6.0), so a CMS export can always be imported back. Patch and pre-release versions of a supported format are fine (`1.5.1`, `1.3.0-rc.1`). Newer formats (`1.7.0`, `2.0.0`) and missing or malformed versions are rejected before anything is imported.
 - Maximum file size: **10 MB**. The manifest references assets by URL; large media files are not embedded in the JSON.
 
 ## What gets imported

@@ -109,7 +109,7 @@ export class ReaderComponent implements OnInit {
 ```
 
 <Callout kind="info">
-`panelId` is part of the payload from player **1.2.0** (unreleased at the time of writing). On 1.1.0 and earlier the event carries only `{ panel, chapter }`, and `Panel.id` is usually absent — resolve the id by identity instead: `Object.entries(event.chapter.panels).find(([, p]) => p === event.panel)?.[0]`.
+`panelId` is part of the payload from player **1.2.0**. On 1.1.0 and earlier the event carries only `{ panel, chapter }`, and `Panel.id` is usually absent — resolve the id by identity instead: `Object.entries(event.chapter.panels).find(([, p]) => p === event.panel)?.[0]`.
 </Callout>
 
 <Callout kind="tip">

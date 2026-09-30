@@ -72,6 +72,48 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
   before the sign-in.
 </Update>
 
+<Update label="2026-09-30" description="CMS · Panel switches keep panels apart, Exports screen archives and named downloads, asset and export safeguards" tags={["bugfix", "feature", "security"]}>
+  ## Clicking through panels no longer mixes them up, and exports are easier to find, name and trust
+
+  - **Panel switches keep panels apart.** Clicking from panel to panel could
+    save one panel's layers, speech bubbles or placement into the next one.
+    Opening a panel no longer counts as an edit, and only the panel you are
+    working on is saved. Clicking a panel of another page in the structure tree
+    or the timeline opens that page and the panel, and a reload restores it.
+    [Pages & Panels](/cms/editor/pages-panels).
+  - **Exports screen.** **Select Work** lists all your works (it showed two
+    placeholders), job cards show the work name again, and a new
+    **Archive (.zip)** card queues a full-work archive — one work or in batch.
+    Downloads are named after the work and the time, e.g.
+    `TARMAC-Pilot_2026-09-30_18-45.zip`, instead of `export.zip`. When the
+    export service is unavailable, a job fails right away with the reason and a
+    **Retry** button instead of hanging in *Queued* and blocking your five
+    export slots; expiry reads "in 6d". Exports and Import pages have a
+    **← Works** link. [Export](/cms/export).
+  - **Only your team's works can be exported** — any signed-in account could
+    start an export of any work before.
+  - **Assets.** **Replace File** regenerates every variant from the new file.
+    Deleting an asset that is still in use asks a second time and names where it
+    is used. [Assets](/cms/assets).
+  - **Languages:** adding a language beyond your plan's allowance is refused
+    with a message naming the limit (the workshop skipped that check).
+    [Localization](/cms/localization).
+  - **Work properties:** the localized **Name** is the work title — renaming it
+    changes the published title; the fields offer only the work's languages.
+    [Works](/cms/works).
+  - **Tools panel:** the Text tool uses the font, size and colour set there; the
+    Speech Bubble tool explains that balloon typography comes from the work,
+    character and bubble styles. [Editor layout](/cms/editor/layout).
+  - **Smaller fixes:** the Backstage breadcrumb shows the work title instead of
+    "Untitled Work"; Preview shows the work ID again and copied player links
+    carry it; panels created by dropping an image are titled with the file name
+    (without extension) in the work's default language, so the Graph Editor
+    labels them properly; a tag still typed in the new-work wizard is kept on
+    **Create Work**; `Esc` closes the Track Editor; the Track, Variant and
+    Animation dialogs and the Performance tab follow the light/dark theme;
+    rollback reports success again.
+</Update>
+
 <Update label="2026-09-30" description="Format 1.6.0 additions · Player (unreleased) · CMS — layer keyframe animations, several alt covers, ensemble character sheets" tags={["feature"]}>
   ## Panels animate their layers, works can carry several alternate covers, and a character sheet can show a whole cast
 
@@ -187,12 +229,11 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     size issues.
 </Update>
 
-<Update label="2026-09-29" description="Player · Unreleased (1.2.0) — Angular 21/22, ngx-translate 18, panel ids on panelChange" tags={["feature"]}>
+<Update label="2026-09-29" description="Player 1.2.0 · Angular 21/22, ngx-translate 18, panel ids on panelChange" tags={["feature"]}>
   ## The player installs on Angular 21 and 22 and ngx-translate 18, and `panelChange` tells you which panel
 
-  These changes are merged on `master` but **not yet released** to npm at the
-  time of writing; they will ship as `@panelwave/player` **1.2.0**. The current
-  npm release is 1.1.0.
+  Released on npm as `@panelwave/player` **1.2.0** on 2026-09-29
+  (`npm install @panelwave/player@latest`).
 
   - **Angular 21 and 22.** The `@angular/core` / `@angular/common` peer range is
     now `^20.0.0 || ^21.0.0 || ^22.0.0` (1.1.0 declares `^20.0.0`, which makes
@@ -275,7 +316,15 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     serves thumbnails instead of the original portraits, work cards reserve
     their 16:9 cover space, and the profile lists the 10 newest sessions with
     **Show all**. [Characters](/cms/characters), [Works](/cms/works),
-    [Active sessions](/cms/account#active-sessions).
+    [Active sessions](/cms/account#active-sessions). Node ids and the selected
+    item in the structure tree and clip titles on the timeline are readable in
+    every theme, and a video panel's play / pause / stop bar keeps its size at
+    any canvas zoom instead of shrinking to tiny buttons.
+    [Video panels](/cms/editor/video-panels).
+  - **Shortcuts after reopening the editor.** After you left the editor and
+    opened it again — for example to switch works — keyboard shortcuts could
+    still act on the editor you had opened first. Each visit now has its own
+    shortcuts, and the editor no longer slows down over a long session.
 </Update>
 
 <Update label="2026-09-29" description="CMS · Read-only works everywhere, editable preload, bubble audio in archives, page-import fixes" tags={["feature", "bugfix"]}>
@@ -540,6 +589,9 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     page again (it was always empty).
   - **Code reference** now covers every canvas and variant check.
     [All codes](/cms/validation-codes#all-codes-at-a-glance).
+  - **Publish status and release history** show their data again. The publish
+    wizard's progress and the release history list had shown blanks.
+    [Publishing](/cms/publishing).
 </Update>
 
 <Update label="2026-09-27" description="CMS · Exports screen in the user menu, request limits" tags={["feature", "bugfix", "security"]}>

@@ -115,6 +115,8 @@ Autoplay advances automatically using, in order of precedence:
 1. the current panel's own `durationMs` from the manifest,
 2. otherwise the reader-adjustable *seconds per panel* (default 5 s).
 
+From the player release after 1.2.0, autoplay also waits for a panel's **animation** in panel and canvas view: the panel stays at least as long as a non-looping layer or viewport animation runs, so a shorter dwell time no longer cuts it off. Looping animations, reduced motion and page view keep the plain dwell time.
+
 Autoplay is **video-aware**: when the current panel contains videos that start on view, the player waits for each video to complete one full pass (media-event driven) instead of running a wall-clock timer — buffering can never cut a video short. A stall watchdog force-advances if a video source never finishes (and emits a `videoEnded` tracking event with reason `stall-skip`). In page view with on-view videos, the page advances when the whole video sequence completes.
 
 ## Settings modal
@@ -143,7 +145,8 @@ The modal edits a working copy: changes apply on **Save**; **Cancel**, a backdro
 
 - Every toolbar button carries a translated `aria-label`; toggles expose `aria-pressed`.
 - The viewport is a labelled `region` with keyboard activation (`Enter`/`Space`); page-view panels are focusable buttons with visible focus indicators.
-- **Reduced motion** is on when any of three sources asks for it: the operating system (`prefers-reduced-motion`, followed live while reading), the reader's **Reduced motion** switch in Settings, or the host's `[reducedMotion]` input. It makes panel/page transitions and canvas camera glides instant, stops the hotspot pulse, and degrades on-view video autostart to click-to-play.
+- **Reduced motion** is on when any of three sources asks for it: the operating system (`prefers-reduced-motion`, followed live while reading), the reader's **Reduced motion** switch in Settings, or the host's `[reducedMotion]` input. It makes panel/page transitions and canvas camera glides instant, stops the hotspot pulse, and degrades on-view video autostart to click-to-play. From the release after 1.2.0 it also shows [layer keyframe animations and viewport moves](/schema/animations) at their end state instead of playing them.
+- **Small screens** (from the release after 1.2.0): in panel view a panel larger than the screen is cropped around its `minimalFocusRect` (of the format closest to the screen's shape) rather than around its centre, so the important part of the artwork stays visible. See [Panels](/schema/panels).
 - Every dialog closes with `Esc` and a backdrop click, and keeps keyboard input away from the story behind it.
 - The current panel's artwork loads first, at high priority, so the page is readable as early as possible (see [Performance](/player/performance)).
 - An automated accessibility sweep (axe) runs over every dialog, overlay and view mode in the player's test suite.

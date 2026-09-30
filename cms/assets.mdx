@@ -118,12 +118,12 @@ Right-click an asset (or use the **⋮** button) for the context menu:
 | Action | What it does |
 |---|---|
 | **Copy ID** / **Copy URL** | Copy the asset's ID or delivery URL to the clipboard |
-| **Replace File** | Upload a new file in place — every panel using the asset updates automatically |
+| **Replace File** | Upload a new file in place — every panel using the asset updates automatically, and all variants (thumbnails, responsive sizes, optimized versions) are generated again from the new file |
 | **Edit Metadata** | Edit the title, alt text, description, and tags |
 | **Download** | Download the original file |
 | **View Details** | Open the details panel |
 | **Generate Variants** | Re-run variant generation (images) |
-| **Delete** | Remove the asset from the library, including all its generated variants (responsive sizes, thumbnails, posters, video renditions) |
+| **Delete** | Remove the asset from the library, including all its generated variants (responsive sizes, thumbnails, posters, video renditions). If the asset is still in use, a second confirmation names where (for example *2 panels, 1 extra, the cover*); confirming deletes it anyway, and those places then show missing artwork |
 
 <Callout kind="tip">
 **Replace File** is the safe way to swap artwork after revisions: the asset keeps its ID, so layers, covers, and extras that reference it don't break.

@@ -184,9 +184,9 @@ A video layer starts **on hover**. Hover only exists in page view on devices wit
 
 **Code:** `DANGLING_PAGE_REF` · **Severity:** Warning · **Category:** Integrity · **Auto-fixable**
 
-A page's reading order or layout still lists one or more panels that no longer exist. Deleting a panel cleans up its page references today, but pages edited before that clean-up existed can carry these leftovers — the editor's timeline then warns *Panel not found*, and the page's reading sequence contains a gap. The message names the page and chapter (*"Page 3 of chapter 1 lists 2 panel(s) that no longer exist"*). Panels are matched by their internal id and their friendly id, the same way the published manifest resolves them, so a panel that still exists is never reported.
+A page's reading order or layout still lists one or more panels that no longer exist. Deleting a panel cleans up its page references today, but pages edited before that clean-up existed can carry these leftovers — the editor's timeline then warns *Panel not found*, and the page's reading sequence contains a gap. The message names the page and chapter (*"Page 3 of chapter 1 lists 2 panel(s) that no longer exist"*). Panels are matched by their internal id and their friendly id, the same way the published manifest resolves them, so a panel that still exists is never reported. Older works can also list panels in a page's legacy panel list; the check finds deleted panels there too.
 
-**How to fix:** click **Fix**. It removes the stale entries from that one page's reading order and layout and nothing else; **Undo** restores the page exactly as it was. See [Pages & Panels](/cms/editor/pages-panels#reordering-by-drag-and-drop).
+**How to fix:** click **Fix**. It removes the stale entries from that one page's reading order, layout and legacy panel list and nothing else; **Undo** restores the page exactly as it was. See [Pages & Panels](/cms/editor/pages-panels#reordering-by-drag-and-drop).
 
 ## Canvas unknown panel
 

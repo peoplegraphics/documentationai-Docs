@@ -105,7 +105,7 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
   - `panelId` is the panel's id: its key in `chapter.panels`.
   - `previousPanelId` is the panel that was current before this change (it may belong to the previous chapter); unset for the first panel after a load or `reload()`.
 
-  `panelId` and `previousPanelId` are new in player **1.2.0** (unreleased at the time of writing); `panel` and `chapter` are unchanged, so existing handlers keep working. On 1.1.0 and earlier, resolve the id yourself by looking the emitted `panel` object up in `chapter.panels`.
+  `panelId` and `previousPanelId` are new in player **1.2.0**; `panel` and `chapter` are unchanged, so existing handlers keep working. On 1.1.0 and earlier, resolve the id yourself by looking the emitted `panel` object up in `chapter.panels`.
 </ResponseField>
 
 <ResponseField name="chapterChange" field-type="EventEmitter<Chapter>">

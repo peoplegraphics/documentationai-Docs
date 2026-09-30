@@ -124,6 +124,13 @@ Say your folder `comics/rooftop` holds `script.md` and a `panels` folder with `p
 | "… is outside the folders this bridge may read" | Add the folder to `PANELWAVE_ALLOWED_DIRS` and restart the client. |
 | Only the local tools work | PanelWave is unreachable, for example while you are offline. The bridge keeps retrying and adds the PanelWave tools once it connects. |
 
+## For developers
+
+- **Errors** come back as tool results with `isError: true` and `{ code, message }`. The bridge's own codes are `UNAUTHENTICATED` (token rejected), `UPSTREAM_UNAVAILABLE` (PanelWave or storage unreachable), `INVALID_INPUT` (for example a path outside the allowed folders), `NOT_FOUND` and `PRECONDITION_FAILED` (for example a binary file for `pw_local_read_text`). Codes of the hosted tools, such as `QUOTA_EXCEEDED` or `PERMISSION_DENIED`, pass through unchanged, also inside upload rows.
+- **Options:** `pw_local_read_text` cuts files at 1 MiB and flags them `truncated` (`maxBytes` up to 5 MiB). `pw_local_upload_files` takes `folderName`, `tags`, `concurrency` (3 by default, up to 6) and `skipDuplicates: false` to get a `CONFLICT` row instead of reusing an existing asset.
+- **Security:** `PANELWAVE_MCP_URL` must use https (plain http only for localhost). Paths are checked as text before the file system is touched, and network paths such as `\\server\share` are refused. The token is sent only to the PanelWave server, never to the storage upload URLs, and uploads go only to https storage.
+- `panelwave-mcp --version` prints the version and `--help` a short usage. Diagnostics go to stderr, which your client shows in its MCP log.
+
 ## Related pages
 
 <Columns cols={3}>

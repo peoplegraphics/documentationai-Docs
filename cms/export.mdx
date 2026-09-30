@@ -42,11 +42,11 @@ The quickest way to export several works at once is from **My Works**:
 
 ## The Exports screen
 
-The full **Exports** screen ("Export your works to PDF, PowerPoint, or Video") adds per-format options, presets, and job management. Open it from the **user menu** (your avatar in the top-right corner) → **Exports**; it lists the jobs you queued from the works list, too.
+The full **Exports** screen ("Export your works to PDF, PowerPoint, Video, or an Archive (.zip)") adds per-format options, presets, and job management. Open it from the **user menu** (your avatar in the top-right corner) → **Exports**; it lists the jobs you queued from the works list, too. The **← Works** link left of the title takes you back to your works list (the Import pages have the same link).
 
 ### Creating an export
 
-Under **Create New Export**, pick a work from the **Select Work** dropdown (or enable **"Batch export (queue one job per selected work)"** and tick several works), then choose a format. A dialog opens with format-specific options:
+Under **Create New Export**, pick a work from the **Select Work** dropdown, which lists all your works by title (or enable **"Batch export (queue one job per selected work)"** and tick several works), then choose a format. A dialog opens with format-specific options:
 
 #### PDF options
 
@@ -94,7 +94,7 @@ The **Archive (.zip)** format is different from the presentation formats above: 
 - Your [asset library folders](/cms/assets) and all [translations](/cms/localization)
 - Every [paywall rule](/cms/monetization#paywall-rules) — live rules and inactive drafts alike, with prices, tiers, age limit, and preview count. On import they arrive **disabled**, so nothing is sold on the target before you have reviewed it (see [Importing a work archive](/cms/import#importing-a-work-archive)).
 
-Archives are queued from the works-list bulk export like any other format and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
+Archives are queued from the works-list bulk export or from the **Archive (.zip)** card on the Exports screen — without an options dialog, for one work or in batch mode — and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
 
 <Callout kind="info">
   Deliberately **not** included: products and reader entitlements, publish history and preview links, analytics, and community data (comments, likes). Review the paywall rules, then republish on the target system.
@@ -102,12 +102,12 @@ Archives are queued from the works-list bulk export like any other format and ap
 
 ## Tracking jobs and downloading
 
-The **Export Jobs** list shows every job with filters for **status** (Queued, Processing, Completed, Failed) and **type** (PDF, PowerPoint, Video). While one or more jobs are running, a floating **Active Exports** panel stays in the corner of the screen and updates progress live.
+The **Export Jobs** list shows every job with filters for **status** (Queued, Processing, Completed, Failed) and **type** (PDF, PowerPoint, Video, Archive). While one or more jobs are running, a floating **Active Exports** panel stays in the corner of the screen and updates progress live.
 
 Each job card shows the work title, format, when it was created, a status badge, and — while processing — a progress bar with the current step. Depending on status you can:
 
-- **Download** — completed jobs show the file size and a green **Download** button.
-- **Retry** — failed jobs show the error message; **Retry** re-queues after a short cancellable countdown, and **"Retry with options…"** reopens the export dialog prefilled with that job's settings so you can adjust before retrying.
+- **Download** — completed jobs show the file size and a green **Download** button. The file is named after the work and the export time, for example `TARMAC-Pilot_2026-09-30_18-45.zip` (letters, digits and hyphens only; the time is Central European time). Jobs created before 2026-09-30 keep the name `export.<ext>`.
+- **Retry** — failed jobs show the error message. If the export service is unavailable when you start an export, the job fails right away with that reason — it no longer waits in **Queued** or counts against your limit of 5 running exports. A bulk export from the works list then shows one summary message; **Retry** re-queues after a short cancellable countdown, and **"Retry with options…"** reopens the export dialog prefilled with that job's settings so you can adjust before retrying.
 - **Cancel** — stop a queued or processing job.
 - **Details** — expand the card for the job ID, timestamps, and processing time.
 
