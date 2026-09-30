@@ -148,3 +148,4 @@ A typical interactive beat — the reader clicks a hotspot that represents a cho
 2. The host navigates: `createContext(chapterId)` flattens state, `getNextPanel()` finds the edge whose condition `{ "==": [{ "var": "doorChoice" }, "left"] }` now passes.
 3. The next panel renders; if it defines variants, the shell re-resolves them against the same variables and renders the effective panel.
 4. State that should outlive the session (achievements, unlocked endings) lives in the `persistent` scope and survives reloads.
+

@@ -305,3 +305,4 @@ Both overlays are exported and can be used on their own:
 - Your backend can answer "what does this reader own?" per work → **`entitlementEndpoint`** + `readerToken`.
 - You need a per-panel yes/no from your own service, or entitlement flags as story variables → the shell's **`[entitlementAdapter]`** (note it bypasses manifest rules and the age gate), or `initialVariables` for the flags alone.
 - You're building screens outside the player (library, store, signed downloads) → the **full adapter** with `EntitlementService`, or the exported evaluator functions.
+
