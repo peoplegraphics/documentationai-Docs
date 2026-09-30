@@ -5,6 +5,73 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-09-30" description="CMS · MCP gateway — AI assistants build, letter, translate and publish works with you" tags={["feature", "security"]}>
+  ## Claude, ChatGPT, Cursor and other AI assistants can now work in PanelWave
+
+  PanelWave has an MCP server at `https://mcp.panelwave.org/mcp`. MCP, the
+  open [Model Context Protocol](https://modelcontextprotocol.io), is how AI
+  assistants work with other applications. Connect an assistant once and ask
+  it, in plain language, to do what you would otherwise do by hand in the
+  editor. Start with [AI Assistants (MCP)](/cms/integrations/mcp-overview).
+
+  **What an assistant can do** — 81 tools, listed in the
+  [tool reference](/cms/integrations/tool-reference):
+
+  - **Script to work in one step.** A work (or more chapters) from an outline:
+    chapters, pages per format, panels with titles and descriptions, characters,
+    speech balloons, optional choices and variables. A dry run shows the plan
+    first; the story graph is linked so every chapter is playable.
+  - **Artwork.** Upload images, video and audio (large files in parts, files
+    already in the library are reused), organise folders, and attach artwork to
+    many panels at once by file name — each panel fits itself to its image on
+    every page format.
+  - **Editing.** Works, chapters, pages and panels (create, update, reorder,
+    move, duplicate, delete), layers, speech balloons (also many panels at
+    once), hotspots, characters, variables and the story graph.
+  - **Languages.** Add languages, extract texts, machine-translate (drafts stay
+    marked for review) and write translations back.
+  - **Checks and release.** Preflight validation with extra lints, automatic
+    fixes with undo, a preview link to read in the player, publishing and
+    rollback; background jobs such as transcoding and image optimisation can be
+    followed.
+  - **Answers.** Outlines of a work, missing artwork, plan limits and usage,
+    reader analytics.
+
+  **How to connect:** add the server as a connector in
+  [Claude](/cms/integrations/connect-claude) (claude.ai, Desktop, Cowork) or
+  [ChatGPT](/cms/integrations/connect-chatgpt), or in
+  [Claude Code, Cursor, VS Code and other clients](/cms/integrations/connect-cursor-and-code).
+  Sign in to PanelWave and choose the permissions on the new consent screen.
+  Scripts and clients with static headers use a personal access token instead.
+  The open-source [local bridge](/cms/integrations/local-bridge)
+  (`@panelwave/mcp`, being published to npm) lets desktop assistants read
+  scripts and upload whole folders of artwork from your computer.
+
+  **You stay in control:**
+
+  - The assistant works **as you** — with your team role, your plan limits and
+    only the permissions you granted; it does not even see other tools.
+  - Deleting chapters, pages, panels, characters, assets or folders, moving a
+    work to the trash, publishing to production and rolling back need your
+    confirmation, asked in the assistant's own dialog where it supports that.
+  - **Profile → Connected apps & access tokens** lists every connected app and
+    token, with its permissions and last use. Disconnect or revoke at any time;
+    a password change or password reset ends all connections.
+  - Every tool call is logged with the app, the work and the outcome — never
+    the text you sent.
+
+  **For developers:** stateless Streamable HTTP, MCP revision 2026-07-28 with
+  support for 2025-06-18 and 2025-11-25 clients; OAuth 2.1 with PKCE, dynamic
+  client registration and client ID metadata documents; tools declare output
+  schemas and return structured content. Tokens issued for the MCP server are
+  accepted only through it, not by the CMS REST API directly.
+  See the [developer FAQ](/help-center/faq/developers).
+
+  MCP access is included in every plan during the beta. While PanelWave is in
+  closed beta, connecting asks for the beta access password in the browser
+  before the sign-in.
+</Update>
+
 <Update label="2026-09-30" description="Format 1.6.0 additions · Player (unreleased) · CMS — layer keyframe animations, several alt covers, ensemble character sheets" tags={["feature"]}>
   ## Panels animate their layers, works can carry several alternate covers, and a character sheet can show a whole cast
 

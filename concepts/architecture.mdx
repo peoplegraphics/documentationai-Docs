@@ -1,6 +1,6 @@
 ---
 title: Architecture
-description: How the PanelWave ecosystem fits together — the schema as contract, the player as renderer, the CMS as authoring tool, and open-core licensing.
+description: How the PanelWave ecosystem fits together — the schema as contract, the player as renderer, the CMS as authoring tool, the MCP gateway for AI assistants, and open-core licensing.
 ---
 
 PanelWave is built around one central idea: **the format is the contract**. Everything else — the player, the CMS, the SDK packages — either produces or consumes manifests that conform to the PanelWave JSON Schema.
@@ -17,8 +17,13 @@ graph TD
     end
     subgraph Proprietary["Proprietary SaaS"]
         CMS["PanelWave CMS<br/>editor · assets · localization<br/>publishing · monetization"]
+        MCP["MCP gateway<br/>mcp.panelwave.org<br/>81 tools for AI assistants"]
     end
+    AI["AI assistants<br/>Claude · ChatGPT · Cursor · …"]
     MANIFEST(("panelwave.json<br/>manifest"))
+
+    AI -->|Model Context Protocol| MCP
+    MCP -->|CMS API, as the signed-in user| CMS
 
     SCHEMA -->|defines| MANIFEST
     SCHEMA -->|generates| TYPES
@@ -53,6 +58,18 @@ The player deliberately contains **all rendering logic**. Anything a reader sees
 The [PanelWave CMS](/cms/overview) is a proprietary SaaS for creators. Its visual editor produces manifest content; its pipeline manages [assets](/cms/assets) (generating the variants the format expects), [localization](/cms/localization), [validation](/cms/validation), [publishing](/cms/publishing), [export](/cms/export), and [monetization](/cms/monetization).
 
 Crucially, the CMS **embeds the open-source player** for preview rather than reimplementing rendering. This guarantees that what a creator sees in [Preview](/cms/preview) is exactly what readers get, and it keeps a single rendering codebase.
+
+### MCP gateway — the interface for AI assistants
+
+The [MCP gateway](/cms/integrations/mcp-overview) at `https://mcp.panelwave.org/mcp` is part of the CMS. It speaks the open [Model Context Protocol](https://modelcontextprotocol.io), so any MCP client — Claude, ChatGPT, Cursor, Claude Code, VS Code — can create and manage works: from a script to a complete work in one call, bulk uploads and artwork attachment, lettering, the story graph, translation, validation and publishing. The [tool reference](/cms/integrations/tool-reference) lists all 81 tools.
+
+The gateway adds no second set of rules. Every tool calls the CMS API **with the user's own sign-in**, so team roles, plan limits and validation apply exactly as in the editor. On top of that:
+
+- **Permissions** — assistants connect through OAuth sign-in with a consent screen (or a personal access token for scripts) and only see the tools the granted permissions allow.
+- **Confirmation** — anything destructive, such as deleting panels or publishing to production, needs the user's confirmation in the assistant's own dialog.
+- **Audit and control** — every tool call is logged without its text, connections can be disconnected at any time, and the operators can pause the gateway platform-wide.
+
+For files on the creator's computer, the open-source local bridge `@panelwave/mcp` connects desktop assistants and uploads whole folders of artwork straight to storage. See [Local bridge](/cms/integrations/local-bridge).
 
 ### SDK packages
 

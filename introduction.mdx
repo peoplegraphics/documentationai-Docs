@@ -1,6 +1,6 @@
 ---
 title: Introduction
-description: PanelWave is an open format, player, and CMS for interactive graphic novels built as directed graphs of panels. Start here to find your path.
+description: PanelWave is an open format, player, and CMS for interactive graphic novels built as directed graphs of panels — and AI assistants can author them with you. Start here to find your path.
 ---
 
 PanelWave is an ecosystem for building and publishing **interactive graphic novels**. Instead of a fixed sequence of pages, a PanelWave work is a **directed graph**: panels are nodes, and readers move between them along edges that can carry transitions and conditions. Panels themselves are composed of layered artwork, speech bubbles, hotspots, audio, and video — all described in a single JSON manifest.
@@ -15,12 +15,14 @@ PanelWave is open-core. The format and the player are open; the authoring tool i
 | **PanelWave Player** | `@panelwave/player`, an Angular library that loads a manifest and renders the full reading experience: graph navigation, layers, speech bubbles, hotspots, audio, video, localization, paywalls. | MIT |
 | **PanelWave CMS** | A SaaS application for authoring and publishing works: a visual editor, asset pipeline, localization workflow, monetization, analytics, and export. It **embeds the open-source player** for preview, so what you see while authoring is what readers get. | Proprietary |
 
-The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. Tooling for developers lives in two npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format) and [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests).
+The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. On top of the CMS sits the **MCP gateway**, which lets AI assistants do the authoring work with you (see [below](#working-with-ai-assistants)). Tooling for developers lives in two npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format) and [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests).
 
 ```mermaid
 graph LR
+    A["AI assistant<br/>Claude · ChatGPT · Cursor"] -->|MCP| G["MCP gateway<br/>mcp.panelwave.org"]
+    G -->|acts as you| C["CMS<br/>(authoring)"]
     S["Schema<br/>(JSON format)"] -->|validates| M["Manifest<br/>panelwave.json"]
-    C["CMS<br/>(authoring)"] -->|writes| M
+    C -->|writes| M
     M -->|rendered by| P["Player<br/>@panelwave/player"]
     C -.->|embeds for preview| P
 ```
@@ -35,6 +37,17 @@ graph LR
 - **Variables** — typed state in [five scopes](/concepts/variables) that drives conditions, panel variants, and mutations.
 - **Monetization** — [paywall rules](/concepts/monetization) that gate the work, chapters, panels, or extras behind entitlements.
 
+## Working with AI assistants
+
+Creating an interactive graphic novel involves a lot of structured work around the art: breaking a script into chapters and panels, lettering hundreds of balloons, attaching artwork, wiring the story graph, translating, checking and publishing. PanelWave exposes all of it to AI assistants through the open [Model Context Protocol](https://modelcontextprotocol.io) (MCP), so you can hand that work to Claude, ChatGPT, Cursor or any other MCP client and keep your time for the creative decisions.
+
+- **From script to work in one step.** The assistant reads your screenplay or outline and creates the chapters, pages, panels, characters and speech balloons. It shows you a dry run first.
+- **Bulk work on a finished draft.** Upload a folder of panel art, attach each file to the right panel, rename a character everywhere, or letter many panels at once.
+- **Languages and release.** Add languages, machine-translate and review, run the preflight checks with their automatic fixes, publish a preview link, then publish.
+- **Answers about your works.** "Which panels still have no artwork?" or "How did chapter 2 perform?"
+
+The assistant always works **as you**: with your team role, your plan limits and only the permissions you granted when connecting. It asks before anything destructive, every action is logged, and you can disconnect it at any time. Start with [AI Assistants (MCP)](/cms/integrations/mcp-overview).
+
 ## Who this documentation is for
 
 <Columns cols={2}>
@@ -46,6 +59,9 @@ graph LR
   </Card>
   <Card title="CMS" icon="pen-tool" href="/cms/overview">
     For graphic novel creators using the PanelWave CMS: the editor, assets, localization, publishing, monetization, and analytics — no coding required.
+  </Card>
+  <Card title="AI Assistants (MCP)" icon="bot" href="/cms/integrations/mcp-overview">
+    For creators and teams who want Claude, ChatGPT, Cursor or another assistant to build, letter, translate and publish works with them — setup, permissions and every available tool.
   </Card>
   <Card title="Help Center" icon="life-buoy" href="/help-center">
     FAQs, troubleshooting for common validation and embedding problems, and step-by-step guides.
@@ -68,3 +84,4 @@ Bug reports and contributions go to the issue tracker of the matching repository
 
 - New to PanelWave? Read the [architecture overview](/concepts/architecture), then the [manifest at a glance](/concepts/manifest).
 - Want to try it right now? Follow the [quickstart](/quickstart) — validate a manifest, embed the player, or create a work in the CMS in a few minutes each.
+- Have a script and finished artwork? [Connect an AI assistant](/cms/integrations/mcp-overview) and let it build the work with you.

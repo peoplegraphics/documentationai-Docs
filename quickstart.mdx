@@ -1,6 +1,6 @@
 ---
 title: Quickstart
-description: Three fast paths into PanelWave — validate a manifest with the CLI, embed the player in an Angular app, or create your first work in the CMS.
+description: Fast paths into PanelWave — validate a manifest with the CLI, embed the player in an Angular app, create your first work in the CMS, or let an AI assistant build it with you.
 ---
 
 Pick the path that matches what you want to do. Each one takes a few minutes and links into the deeper documentation for that layer.
@@ -162,11 +162,34 @@ Pick the path that matches what you want to do. Each one takes a few minutes and
     </Steps>
 
   </Tab>
+  <Tab title="Build it with an AI assistant" icon="bot">
+
+    Have a script and your artwork ready? Let an assistant such as Claude, ChatGPT or Cursor do the structural work with you.
+
+    <Steps>
+      <Step title="Connect the assistant">
+        Add `https://mcp.panelwave.org/mcp` as a connector in your assistant, sign in to PanelWave and choose what it may do. See [Connect Claude](/cms/integrations/connect-claude), [Connect ChatGPT](/cms/integrations/connect-chatgpt) or [Claude Code, Cursor &amp; others](/cms/integrations/connect-cursor-and-code).
+      </Step>
+      <Step title="Turn the script into a work">
+        Paste or attach your script and ask: "Create a PanelWave work from this, one panel per shot, with mobile and A4 pages." The assistant shows a dry run, then creates chapters, panels, characters and speech balloons.
+      </Step>
+      <Step title="Add the artwork">
+        Upload the images in the [asset library](/cms/assets) — or, with the [local bridge](/cms/integrations/local-bridge), let the assistant upload a whole folder — and ask it to attach each image to its panel.
+      </Step>
+      <Step title="Check, review, publish">
+        Ask the assistant to validate the work and apply the safe fixes. Review the result in the editor and [Preview](/cms/preview); publishing to production needs your confirmation.
+      </Step>
+    </Steps>
+
+  </Tab>
 </Tabs>
 
 ## Next steps
 
-<Columns cols={3}>
+<Columns cols={2}>
+  <Card title="AI assistants" icon="bot" href="/cms/integrations/mcp-overview">
+    What assistants can do in PanelWave and how you stay in control.
+  </Card>
   <Card title="Core concepts" icon="lightbulb" href="/concepts/architecture">
     How the schema, player, and CMS fit together.
   </Card>

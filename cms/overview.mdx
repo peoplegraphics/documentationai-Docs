@@ -57,7 +57,14 @@ The user menu (top right, on every screen) leads to **Profile**, **Exports** (yo
 
 ### AI assistants
 
-Claude, ChatGPT, Cursor and other AI assistants can work in PanelWave for you through its MCP server: create a work from a script, letter panels, translate, validate and publish. You connect them and control their access under **Profile → Connected apps & access tokens**. See [AI Assistants (MCP)](/cms/integrations/mcp-overview).
+Everything above can also be done by an AI assistant working with you. Claude, ChatGPT, Cursor and other assistants connect to PanelWave's MCP server at `https://mcp.panelwave.org/mcp` and can:
+
+- create a complete work from a script or outline — chapters, pages, panels, characters and speech balloons;
+- upload artwork, attach it to the right panels and fit each panel to its image on every page format;
+- letter panels, edit layers, hotspots, variables and the story graph, rename characters, reorder structure;
+- add languages, machine-translate and review, run Preflight with its automatic fixes, publish a preview or a release.
+
+The assistant works as you, with your team role, plan limits and the permissions you grant. It asks before destructive steps, and you connect, review and disconnect assistants under **Profile → Connected apps & access tokens**. See [AI Assistants (MCP)](/cms/integrations/mcp-overview) and the [tool reference](/cms/integrations/tool-reference).
 
 Most screens also carry a small **help icon** at the top right of their title — click it to open the page of this documentation that describes the screen you are on, in a new tab.
 
@@ -88,12 +95,17 @@ graph LR
 New to PanelWave? Follow the step-by-step tutorial: [Your First Graphic Novel](/help-center/guides/first-graphic-novel).
 </Callout>
 
+<Callout kind="info">
+Every step of this flow is also available to [AI assistants](/cms/integrations/mcp-overview). A typical split: the assistant turns the script into structure, letters the balloons, attaches the art and runs the checks; you review in the editor and Preview and decide what gets published.
+</Callout>
+
 ## Where your content ends up
 
 Everything you author is stored against the open [PanelWave format](/schema/overview). Publishing produces a `panelwave.json` manifest plus your processed assets; you can also [export](/cms/export) works and later [import](/cms/import) them again — there is no lock-in to the CMS.
 
-<Columns cols={3}>
+<Columns cols={2}>
   <Card title="Works" icon="library" href="/cms/works">Create and manage your projects.</Card>
   <Card title="Editor" icon="square-pen" href="/cms/editor/layout">The four-zone visual editor.</Card>
   <Card title="Publishing" icon="rocket" href="/cms/publishing">Ship your work to readers.</Card>
+  <Card title="AI assistants" icon="bot" href="/cms/integrations/mcp-overview">Let Claude, ChatGPT or Cursor work in PanelWave with you.</Card>
 </Columns>
