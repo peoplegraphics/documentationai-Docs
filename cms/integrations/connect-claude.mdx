@@ -1,0 +1,83 @@
+---
+title: Connect Claude
+description: Add PanelWave as a custom connector in claude.ai, Claude Desktop and Cowork, sign in once, and start working on your graphic novels with Claude.
+---
+
+Claude connects to PanelWave as a **custom connector**. You add the PanelWave address once, sign in to PanelWave, and choose what Claude may do. The connector then works in claude.ai, in the Claude Desktop app and in Cowork.
+
+<Callout kind="info">
+  Custom connectors are available on Claude's paid plans. On Team and Enterprise plans, an owner may need to add the connector for the organization first. Menu names in Claude can change; if a step looks different, search Claude's help center for "custom connectors".
+</Callout>
+
+## Add the connector
+
+<Steps>
+  <Step title="Open the connector settings">
+    In claude.ai or Claude Desktop, open **Settings → Connectors** and choose **Add custom connector**.
+  </Step>
+  <Step title="Enter the PanelWave address">
+    Name it **PanelWave** and enter the server URL:
+
+    ```
+    https://mcp.panelwave.org/mcp
+    ```
+
+    Leave the advanced OAuth fields empty. Claude registers itself with PanelWave automatically.
+  </Step>
+  <Step title="Sign in to PanelWave">
+    Click **Connect**. A PanelWave page opens. Sign in if you are not signed in already, including your two-factor code if you use one.
+  </Step>
+  <Step title="Choose the permissions">
+    The page **Connect an app to PanelWave** shows the app, the address it returns to, and what it would like to do. Untick anything you don't want, such as publishing, and click **Allow**.
+  </Step>
+  <Step title="Check the connection">
+    Back in Claude, open a new chat, make sure the PanelWave connector is switched on in the tools menu, and ask: "Which PanelWave works do I have?"
+  </Step>
+</Steps>
+
+The consent page and the permissions are explained in [Access tokens & connected apps](/cms/integrations/access-tokens).
+
+## Working with Claude
+
+Ask in plain language. Some examples:
+
+- "Create a new work called *Rooftop* from this outline, with mobile and A4 pages." Paste the outline or attach the script.
+- "List the panels in chapter 1 that have no artwork yet."
+- "Rename the character Mara to Mira everywhere."
+- "Add German and French, machine-translate all balloons, and show me what still needs review."
+- "Validate the work, apply the safe fixes, and publish a preview link."
+
+Claude shows each step as a tool call you can expand. Before it deletes something or publishes to production, it asks you to confirm.
+
+<Callout kind="tip">
+  Open the work in the PanelWave editor in another tab. Claude's changes appear there as soon as you reload, so you can check each step.
+</Callout>
+
+## Uploading artwork from your computer
+
+claude.ai can't read folders on your computer, and chat attachments are not uploaded to your asset library. To upload a folder of panel artwork, you have two options:
+
+- **Upload in the editor**, then ask Claude to attach the images: "Attach panel-01 to panel 1, panel-02 to panel 2, and so on."
+- **Use the local bridge** in Claude Desktop or Cowork. It reads the folders you allow and uploads files directly. See [Local bridge](/cms/integrations/local-bridge).
+
+## Cowork
+
+Cowork uses the connectors of your Claude account, so the PanelWave connector is available there once you added it. For file work, set up the [local bridge](/cms/integrations/local-bridge) and give it the same folder you give Cowork.
+
+## Disconnecting
+
+Open **Profile → Connected apps & access tokens** in PanelWave and click **Disconnect** next to Claude. Claude loses access within a minute. Removing the connector in Claude's settings only removes it on Claude's side. To be sure the access ends, disconnect it in PanelWave too.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="AI assistants overview" icon="bot" href="/cms/integrations/mcp-overview">
+    What assistants can do in PanelWave.
+  </Card>
+  <Card title="Local bridge" icon="folder-up" href="/cms/integrations/local-bridge">
+    Upload artwork from your computer.
+  </Card>
+  <Card title="Tool reference" icon="list" href="/cms/integrations/tool-reference">
+    Everything Claude can do.
+  </Card>
+</Columns>

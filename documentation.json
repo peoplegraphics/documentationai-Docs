@@ -579,6 +579,47 @@
                 "icon": "users"
               }
             ]
+          },
+          {
+            "group": "Integrations",
+            "icon": "plug",
+            "pages": [
+              {
+                "title": "AI Assistants (MCP)",
+                "path": "cms/integrations/mcp-overview",
+                "icon": "bot"
+              },
+              {
+                "title": "Connect Claude",
+                "path": "cms/integrations/connect-claude",
+                "icon": "message-circle"
+              },
+              {
+                "title": "Connect ChatGPT",
+                "path": "cms/integrations/connect-chatgpt",
+                "icon": "message-square"
+              },
+              {
+                "title": "Claude Code, Cursor & Others",
+                "path": "cms/integrations/connect-cursor-and-code",
+                "icon": "terminal"
+              },
+              {
+                "title": "Local Bridge",
+                "path": "cms/integrations/local-bridge",
+                "icon": "folder-up"
+              },
+              {
+                "title": "Access Tokens & Connected Apps",
+                "path": "cms/integrations/access-tokens",
+                "icon": "key-round"
+              },
+              {
+                "title": "Tool Reference",
+                "path": "cms/integrations/tool-reference",
+                "icon": "list"
+              }
+            ]
           }
         ]
       },

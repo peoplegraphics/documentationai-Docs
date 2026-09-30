@@ -66,6 +66,8 @@ After upload, a background pipeline optimizes every asset. You keep working whil
 
 **Dimensions and duration are measured right in your browser at upload time** and stored with the asset immediately — so a freshly uploaded image or video can be placed on the canvas with the correct aspect ratio before background processing even starts (the server verifies dimensions independently as a fallback).
 
+If background processing is unavailable at the moment you upload, nothing is lost: the upload succeeds, its processing job is kept, and the variants are generated as soon as processing is back — you don't have to do anything. The library's **Generate** action (shown when images have no previews) remains for older assets.
+
 One more variant is created **on demand**: when preflight flags an image as too large to publish, its **Optimize** fix produces an `optimized` WebP derivative that the published work ships instead of the original — see [Validation](/cms/validation#auto-fixes). The full-quality original always stays in your library.
 
 Duplicate files are detected by content hash, so re-uploading the same file doesn't waste storage — you get the existing asset back instead of a copy.

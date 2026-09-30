@@ -73,3 +73,17 @@ Questions developers ask most often. For step-by-step fixes see the [troubleshoo
     The manifest declares the rules; your app supplies the reader's entitlements; the player evaluates them locally, stops at a gate, and emits `paywallAction` — with the Buy / Subscribe option the reader picked (`productId`) — so your app runs checkout; the player never talks to a payment provider. Client-side gating is a reading-experience layer, not a security boundary: truly protected content must also be withheld server-side (e.g. signed URLs) until the reader is authorized. See [Monetization](/concepts/monetization).
   </Expandable>
 </ExpandableGroup>
+
+## AI assistants and MCP
+
+<ExpandableGroup>
+  <Expandable title="Which MCP transport and protocol versions does PanelWave support?">
+    The server at `https://mcp.panelwave.org/mcp` speaks stateless Streamable HTTP. It supports the 2026-07-28 protocol revision and serves 2025-06-18 and 2025-11-25 clients as well. There is no SSE-only transport. For stdio clients, use the [local bridge](/cms/integrations/local-bridge) (`npx -y @panelwave/mcp`).
+  </Expandable>
+  <Expandable title="How do scripts authenticate against the MCP server?">
+    Send a personal access token as `Authorization: Bearer pw_pat_…`. Interactive clients should use OAuth instead: the server publishes protected resource metadata, and the authorization server supports dynamic client registration, client ID metadata documents and PKCE. See [Claude Code, Cursor & Others](/cms/integrations/connect-cursor-and-code).
+  </Expandable>
+  <Expandable title="Why does a destructive tool return CONFIRMATION_REQUIRED?">
+    Destructive tools never run on the first call. Clients that support elicitation get a yes/no form instead. Other clients should show the message to the user and call the tool again with `confirm: true` once the user agreed. See the [tool reference](/cms/integrations/tool-reference).
+  </Expandable>
+</ExpandableGroup>

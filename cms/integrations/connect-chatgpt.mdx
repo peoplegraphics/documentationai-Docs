@@ -1,0 +1,61 @@
+---
+title: Connect ChatGPT
+description: Add PanelWave as a custom MCP connector in ChatGPT, sign in to PanelWave, and let ChatGPT read and edit your works.
+---
+
+ChatGPT connects to remote MCP servers through **custom connectors**, which you create in **developer mode**. You add the PanelWave address, sign in to PanelWave, and choose what ChatGPT may do.
+
+<Callout kind="alert">
+  ChatGPT's developer mode is meant for trusted, advanced use and is only available on some ChatGPT plans. OpenAI changes its menus often; if a step looks different, search OpenAI's help center for "developer mode" and "MCP connectors".
+</Callout>
+
+## Add the connector
+
+<Steps>
+  <Step title="Turn on developer mode">
+    In ChatGPT, open **Settings → Apps & Connectors → Advanced settings** and switch on **Developer mode**.
+  </Step>
+  <Step title="Create the connector">
+    Back in **Apps & Connectors**, choose **Create**. Name it **PanelWave**, enter the MCP server URL and choose **OAuth** as the authentication:
+
+    ```
+    https://mcp.panelwave.org/mcp
+    ```
+  </Step>
+  <Step title="Sign in to PanelWave">
+    ChatGPT opens a PanelWave page. Sign in, check the requested permissions on **Connect an app to PanelWave**, untick anything you don't want, and click **Allow**.
+  </Step>
+  <Step title="Use it in a chat">
+    In a new chat, choose developer mode from the tools menu and switch on the PanelWave connector. Then ask: "Which PanelWave works do I have?"
+  </Step>
+</Steps>
+
+## Working with ChatGPT
+
+ChatGPT sees the same tools as any other assistant. Ask for one step at a time, and check the result in the PanelWave editor before you continue. ChatGPT asks you to confirm before it runs a tool that writes data; PanelWave additionally asks before anything destructive, such as deleting a panel or publishing to production.
+
+Examples:
+
+- "Show me the outline of my work *Rooftop*."
+- "Add three speech balloons to panel 4: Mira says 'Look up.', Tom answers 'At what?', and a caption reads 'Midnight.'"
+- "Which balloons are not translated into German yet?"
+
+ChatGPT can't upload files from your computer into PanelWave. Upload artwork in the editor, or use an assistant with the [local bridge](/cms/integrations/local-bridge).
+
+## Disconnecting
+
+Open **Profile → Connected apps & access tokens** in PanelWave and click **Disconnect** next to ChatGPT. Deleting the connector in ChatGPT only removes it on ChatGPT's side.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="AI assistants overview" icon="bot" href="/cms/integrations/mcp-overview">
+    What assistants can do in PanelWave.
+  </Card>
+  <Card title="Access tokens & connected apps" icon="key-round" href="/cms/integrations/access-tokens">
+    Permissions and disconnecting apps.
+  </Card>
+  <Card title="Tool reference" icon="list" href="/cms/integrations/tool-reference">
+    Everything ChatGPT can do.
+  </Card>
+</Columns>

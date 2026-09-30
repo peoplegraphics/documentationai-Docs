@@ -35,8 +35,15 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     than the screen still fills it, but the crop is centred on the panel's
     `minimalFocusRect` (of the format closest to the screen's shape) instead of
     the panel centre. [Panels](/schema/panels).
-  - Viewport moves (`startViewportRect` / `endViewportRect`) are still not
-    rendered.
+  - **Viewport moves render.** `startViewportRect` / `endViewportRect` were in
+    the format since 1.0 but the player ignored them. The artwork — layers,
+    hotspots and speech bubbles together — now pans and zooms inside the panel
+    box, on the same timeline as the keyframes.
+    [Animations](/schema/animations#viewport-moves).
+  - Panel animations are clipped by the panel box (a layer sliding in from
+    outside used to be drawn over the panel's surroundings in panel view), a
+    layer keeps its own opacity while its other properties are animated, and
+    autoplay waits for a non-looping animation to finish before it advances.
 
   **CMS:**
 
@@ -59,6 +66,11 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     get new page ids once, with their next publish.
     [Pages & Panels](/cms/editor/pages-panels).
   - The panel's **Minimal Focus Rect** can be cleared per format.
+  - **Uploads during a processing outage catch up on their own.** A file
+    uploaded while background processing was unavailable used to stay without
+    thumbnail and size variants until someone pressed **Generate**. Its job is
+    now kept and processed as soon as processing is back.
+    [Assets](/cms/assets#automatic-processing).
 
   `@panelwave/types` and `@panelwave/cli` carry the additions on their main
   branches; until their next npm release, the published CLI validates against

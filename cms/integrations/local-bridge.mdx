@@ -1,0 +1,135 @@
+---
+title: Local Bridge
+description: Use the PanelWave local bridge so desktop assistants can read your scripts and upload whole folders of panel artwork from your computer into a work.
+---
+
+Hosted assistants can't see the files on your computer. The **local bridge** closes that gap. It is a small open-source program (`@panelwave/mcp`, MIT license) that your desktop assistant starts in the background. It passes every PanelWave tool through unchanged and adds three tools that work on folders you allow:
+
+| Tool | What it does |
+|------|--------------|
+| `pw_local_list_files` | Lists files in a folder, with size, type and image dimensions. Supports patterns such as `*.png`, and sorts `panel-2` before `panel-10`. |
+| `pw_local_read_text` | Reads a script, screenplay (`.fountain`) or outline so the assistant can turn it into a work. |
+| `pw_local_upload_files` | Uploads images, videos, audio and fonts into a work's asset library, optionally into a folder. |
+
+The files go straight from your computer to PanelWave's storage. They never pass through the AI model, so large videos are no problem.
+
+<Callout kind="info">
+  The bridge only reads inside the folders you list in `PANELWAVE_ALLOWED_DIRS`. Anything outside, including through shortcuts or symbolic links, is refused, and so are hidden files such as `.ssh` or `.env`. It never changes or deletes files on your computer.
+</Callout>
+
+## Set it up
+
+<Steps>
+  <Step title="Install Node.js">
+    Install [Node.js](https://nodejs.org) 20 or newer. The bridge runs with `npx`, which comes with Node.js.
+  </Step>
+  <Step title="Create an access token">
+    In PanelWave, open **Profile → Connected apps & access tokens**, click **New access token**, and tick at least `works:read`, `works:write`, `assets:read` and `assets:write`. Copy the token; it starts with `pw_pat_` and is shown only once. See [Access tokens](/cms/integrations/access-tokens).
+  </Step>
+  <Step title="Add the bridge to your assistant">
+    Use the configuration for your client below. Set `PANELWAVE_ALLOWED_DIRS` to the folder with your scripts and artwork.
+  </Step>
+  <Step title="Restart and test">
+    Restart the client and ask: "List the files in my comics folder."
+  </Step>
+</Steps>
+
+<Tabs>
+  <Tab title="Claude Desktop">
+    Open **Settings → Developer → Edit Config** and add:
+
+    ```json
+    {
+      "mcpServers": {
+        "panelwave": {
+          "command": "npx",
+          "args": ["-y", "@panelwave/mcp"],
+          "env": {
+            "PANELWAVE_TOKEN": "pw_pat_…",
+            "PANELWAVE_ALLOWED_DIRS": "/Users/me/comics"
+          }
+        }
+      }
+    }
+    ```
+
+    On Windows, write the folder as `"C:\\Users\\me\\comics"`. If Claude Desktop can't find `npx`, use `"command": "cmd"` with `"args": ["/c", "npx", "-y", "@panelwave/mcp"]`. Restart Claude Desktop afterwards.
+
+    Cowork uses the same configuration. Point `PANELWAVE_ALLOWED_DIRS` at the folder you give Cowork to work in.
+  </Tab>
+  <Tab title="Claude Code">
+    ```bash
+    claude mcp add panelwave \
+      --env PANELWAVE_TOKEN=pw_pat_… \
+      --env PANELWAVE_ALLOWED_DIRS="$HOME/comics" \
+      -- npx -y @panelwave/mcp
+    ```
+
+    Run `/mcp` in Claude Code to check that `panelwave` is connected.
+  </Tab>
+  <Tab title="Cursor">
+    Add to `~/.cursor/mcp.json`, or to `.cursor/mcp.json` in a project:
+
+    ```json
+    {
+      "mcpServers": {
+        "panelwave": {
+          "command": "npx",
+          "args": ["-y", "@panelwave/mcp"],
+          "env": { "PANELWAVE_TOKEN": "pw_pat_…", "PANELWAVE_ALLOWED_DIRS": "/Users/me/comics" }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+If you use the bridge, you don't need the remote PanelWave connector in the same client as well. The bridge already includes all its tools.
+
+### Settings
+
+| Variable | Default | Meaning |
+|----------|---------|---------|
+| `PANELWAVE_TOKEN` | required | Your personal access token. |
+| `PANELWAVE_ALLOWED_DIRS` | none | Folders the bridge may read. Separate several with `;` on Windows and `:` on macOS and Linux. Without it the local tools are off. A drive root or your whole home folder is refused. |
+| `PANELWAVE_MCP_URL` | `https://mcp.panelwave.org/mcp` | The PanelWave server. Only change it if PanelWave support asks you to. |
+
+## From a script and a folder to a work
+
+Say your folder `comics/rooftop` holds `script.md` and a `panels` folder with `panel-01.png` to `panel-12.png`. Ask the assistant step by step:
+
+1. **"Read rooftop/script.md and turn it into a PanelWave work, one panel per shot, with mobile and A4 pages."** It reads the script, drafts an outline, shows you a dry run, and creates the work.
+2. **"Upload rooftop/panels into that work, into a folder called Panels."** Files already in your library are reused, so repeating this after an interruption only uploads what is missing.
+3. **"Attach panel-01 to the first panel, panel-02 to the second, and so on."** Each panel fits itself to its image on every page format.
+4. **"Check the work."** The validation lists anything still missing. Open the work in the editor to review it.
+
+## How uploads behave
+
+- **No duplicates.** Each file is fingerprinted first. Files already in the library, or twice in one batch, are not uploaded again.
+- **Resumable.** If an upload fails, run it again. Finished files are recognised and skipped.
+- **Large files in parts.** Files of 10 MB or more upload in parts, and each part is retried on failure.
+- **Folders.** Name a folder such as `Chapter 1/Panels`; missing folders are created.
+- **Warnings.** The result lists each file with its status and warnings, for example an image over 5 MB that needs optimizing before publishing. [Validation](/cms/validation) can fix that for you.
+
+## Troubleshooting
+
+| Problem | What to do |
+|---------|-----------|
+| The client shows no PanelWave tools | Check that Node.js 20 or newer is installed and that the configuration is valid JSON. The client's MCP log shows the bridge's messages. |
+| "PanelWave rejected PANELWAVE_TOKEN" | The token expired, was revoked or was mistyped. Create a new one and update the configuration. |
+| "… is outside the folders this bridge may read" | Add the folder to `PANELWAVE_ALLOWED_DIRS` and restart the client. |
+| Only the local tools work | PanelWave is unreachable, for example while you are offline. The bridge keeps retrying and adds the PanelWave tools once it connects. |
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Access tokens" icon="key-round" href="/cms/integrations/access-tokens">
+    Create the token the bridge needs.
+  </Card>
+  <Card title="Assets" icon="image" href="/cms/assets">
+    Where uploaded files end up.
+  </Card>
+  <Card title="Tool reference" icon="list" href="/cms/integrations/tool-reference">
+    All tools the bridge passes through.
+  </Card>
+</Columns>

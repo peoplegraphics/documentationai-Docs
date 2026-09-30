@@ -121,3 +121,20 @@ Questions creators ask most often, grouped by topic. Every answer links to the p
     Every upload is processed automatically in the background: images get AVIF/WebP variants and thumbnails, audio gets loudness-normalized AAC/Opus variants plus waveform data, and video gets a web-friendly H.264 rendition with a poster frame. Readers are served the best variant their device supports. See [Assets](/cms/assets).
   </Expandable>
 </ExpandableGroup>
+
+## AI assistants
+
+<ExpandableGroup>
+  <Expandable title="Can I use Claude or ChatGPT to build my graphic novel?">
+    Yes. PanelWave has an MCP server that AI assistants such as Claude, ChatGPT, Claude Code and Cursor connect to. Once connected, you can ask them to turn a script into a work, letter panels, rename characters, translate, validate and publish. The assistant works as you, with your team role and plan limits. See [AI Assistants (MCP)](/cms/integrations/mcp-overview).
+  </Expandable>
+  <Expandable title="Can an assistant delete my work by mistake?">
+    It asks first. Deleting pages, panels, chapters, characters or assets, moving a work to the trash, publishing to production and rolling back all need your confirmation before they run. You can also leave out the `works:write` or `publish` permission when you connect. See [Access Tokens & Connected Apps](/cms/integrations/access-tokens#permissions).
+  </Expandable>
+  <Expandable title="How do I upload a folder of panel artwork through an assistant?">
+    Hosted chats can't read files on your computer. Use the [local bridge](/cms/integrations/local-bridge) in Claude Desktop, Cowork, Claude Code or Cursor: it uploads the folders you allow straight into your asset library and skips files that are already there. Or upload in the editor and ask the assistant to attach the images to the panels.
+  </Expandable>
+  <Expandable title="How do I stop an assistant from accessing my account?">
+    Open **Profile → Connected apps & access tokens** and click **Disconnect** next to the app, or **Revoke** next to the token. Access ends within a minute. Changing your password ends all connections at once.
+  </Expandable>
+</ExpandableGroup>

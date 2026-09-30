@@ -1,0 +1,75 @@
+---
+title: AI Assistants (MCP)
+description: Connect Claude, ChatGPT, Cursor and other AI assistants to PanelWave through the Model Context Protocol, and let them build, edit, translate and publish your works for you.
+---
+
+PanelWave runs an MCP server. MCP, the [Model Context Protocol](https://modelcontextprotocol.io), is the open standard AI assistants use to work with other applications. Once you connect an assistant, you can ask it in plain language to do what you would otherwise do by hand in the editor.
+
+<Callout kind="info">
+  MCP access is included in every plan during the beta. The assistant works as **you**: it can only open works your teams can open, and your team role and plan limits apply exactly as in the editor.
+</Callout>
+
+## What an assistant can do
+
+- **Turn a script into a work.** Give it a screenplay or outline, and it creates the chapters, pages, panels and speech balloons in one step. It shows you a dry run first.
+- **Bring in artwork.** With the [local bridge](/cms/integrations/local-bridge), it uploads a folder of panel images, skips files already in your library, and attaches each image to the right panel.
+- **Edit in bulk.** Rename characters, retitle chapters, reorder pages, letter many panels at once, or fix every panel that is missing artwork.
+- **Translate.** Add languages, run machine translation, and write translations back. Machine translations stay flagged for your review.
+- **Check and publish.** Run the preflight validation, apply the automatic fixes, publish a preview link, publish to production, or roll back.
+- **Answer questions.** "Which panels still have no artwork?", "How many locales does my plan allow?", "How did chapter 2 perform last week?"
+
+The [tool reference](/cms/integrations/tool-reference) lists every action the assistant can take.
+
+## Ways to connect
+
+<Columns cols={2}>
+  <Card title="Claude" icon="message-circle" href="/cms/integrations/connect-claude">
+    claude.ai, Claude Desktop and Cowork. Add PanelWave as a connector and sign in.
+  </Card>
+  <Card title="ChatGPT" icon="message-square" href="/cms/integrations/connect-chatgpt">
+    Add PanelWave as a custom connector in developer mode.
+  </Card>
+  <Card title="Claude Code, Cursor and others" icon="terminal" href="/cms/integrations/connect-cursor-and-code">
+    Coding tools and any other MCP client, with sign-in or an access token.
+  </Card>
+  <Card title="Local bridge" icon="folder-up" href="/cms/integrations/local-bridge">
+    Lets a desktop assistant read scripts and upload artwork from folders on your computer.
+  </Card>
+</Columns>
+
+Hosted assistants such as claude.ai and ChatGPT connect to this address:
+
+```
+https://mcp.panelwave.org/mcp
+```
+
+The first time, the assistant opens a PanelWave page where you sign in and choose what it may do. You can also connect with a [personal access token](/cms/integrations/access-tokens) instead, for example in scripts.
+
+## Staying in control
+
+- **You choose the permissions.** When you connect an app, you see what it asks for and can untick anything, such as publishing. See [Access tokens & connected apps](/cms/integrations/access-tokens#permissions).
+- **The assistant asks before destructive steps.** Deleting pages, panels, chapters or assets, moving a work to the trash, publishing to production and rolling back all need your confirmation first. Depending on the app, it shows a confirmation dialog or asks you in the chat.
+- **You can disconnect at any time.** Open **Profile → Connected apps & access tokens** and click **Disconnect** or **Revoke**. The app loses access within a minute.
+- **Every action is recorded.** PanelWave keeps a log of each tool call with the app, the work and the outcome, without the text you sent.
+
+<Callout kind="tip">
+  Start with a small request, such as "List my works", to check the connection. Then work step by step and look at the result in the editor before you ask for the next step.
+</Callout>
+
+## Limits
+
+Your plan limits apply as usual, for example the number of works, panels per work or languages. Machine translation and AI features draw on the same quota and credits as in the editor. To keep the service fast for everyone, each account can make a limited number of calls per minute. If an assistant hits a limit, it gets a message saying when it can continue.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Access tokens & connected apps" icon="key-round" href="/cms/integrations/access-tokens">
+    Permissions, tokens and disconnecting apps.
+  </Card>
+  <Card title="Tool reference" icon="list" href="/cms/integrations/tool-reference">
+    Everything an assistant can do.
+  </Card>
+  <Card title="Validation" icon="shield-check" href="/cms/validation">
+    The checks the assistant runs before publishing.
+  </Card>
+</Columns>

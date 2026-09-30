@@ -74,12 +74,12 @@ Offsets and blur are relative to the panel, not device pixels, so an animation l
 The character starts 40% of the panel width to the left, invisible, fades in over 0.8 s and rolls to its resting position over 3 s.
 
 <Callout kind="info">
-**Player support.** `@panelwave/player` plays layer keyframes from the release after 1.2.0 (merged, not yet published at the time of writing). Version 1.2.0 and earlier ignore keyframes and show the static panel, as does any consumer that does not know them.
+**Player support.** `@panelwave/player` plays layer keyframes and viewport moves from the release after 1.2.0 (merged, not yet published at the time of writing). Version 1.2.0 and earlier ignore both and show the static panel, as does any consumer that does not know them.
 </Callout>
 
 ### Viewport moves
 
-`startViewportRect` and `endViewportRect` describe a camera move from one rectangle of the panel to another. A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1.
+`startViewportRect` and `endViewportRect` describe a camera move from one rectangle of the panel to another: the part of the panel the reader sees at the start and at the end of the animation. A `NormalizedRect` requires all four of `x`, `y`, `w`, `h`, each between 0 and 1.
 
 ```json
 {
@@ -94,9 +94,14 @@ The character starts 40% of the panel width to the left, invisible, fades in ove
 
 This starts on the full panel and slowly zooms into the region at (0.3, 0.2) sized 40% × 40% — a classic dramatic push-in.
 
-<Callout kind="alert">
-Viewport moves are part of the format, but `@panelwave/player` does not render them yet — it shows the panel without the camera move. Layer keyframes are rendered.
-</Callout>
+**How a viewport move plays:**
+
+- The move runs from the start rect to the end rect over `durationMs`, eased by `easing`, on the same timeline as the layer keyframes; `loop` restarts both.
+- A missing rect is the whole panel: an end rect alone is a push-in, a start rect alone a pull-back.
+- The rect is fitted into the panel box with a **uniform scale** — the artwork is never stretched — and centred. Near an edge the rect sits off-centre rather than showing empty space.
+- Everything anchored to the artwork moves together: layers, hotspots and speech bubbles. The panel box clips the result.
+- Without `durationMs` there is no travel: the end rect is shown as a static framing.
+- Reduced motion shows the end rect at once.
 
 <Callout kind="tip">
 Layers can add depth to these moves with `parallaxDepth` — see [Layers](/schema/layers).

@@ -1,0 +1,103 @@
+---
+title: Access Tokens & Connected Apps
+description: Control which AI assistants and scripts can work with your PanelWave account — approve connections, choose permissions, create personal access tokens, and disconnect apps.
+---
+
+Every AI assistant or script that works with your PanelWave account shows up in **Profile → Connected apps & access tokens**. From there you can see what has access, create tokens, and take access away again.
+
+There are two kinds of access:
+
+| | Connected app | Personal access token |
+|---|---|---|
+| **How it is created** | You sign in from the app and click **Allow** | You create it in PanelWave and paste it into the app |
+| **Typical use** | claude.ai, ChatGPT, Claude Code, Cursor | The [local bridge](/cms/integrations/local-bridge), scripts, CI jobs |
+| **Lifetime** | Until you disconnect it | 30 to 365 days, then it expires |
+| **How it ends** | **Disconnect** | **Revoke**, or expiry |
+
+Both act as **you**. They can only reach works your teams can reach, and your team role and plan limits apply as in the editor. Permissions narrow this further.
+
+## Permissions
+
+A connection or token only gets the permissions you choose. An assistant doesn't even see tools outside them.
+
+| Permission | Lets the assistant |
+|------------|--------------------|
+| `works:read` | Read your works: structure, panels, characters, variables, graph, validation reports and translations. |
+| `works:write` | Create, change, reorder and delete works, chapters, pages, panels, balloons, hotspots, characters, variables and graph edges. |
+| `assets:read` | List your uploaded images, videos and audio and view their thumbnails. |
+| `assets:write` | Upload, replace, organise and delete assets and attach artwork to panels. |
+| `localization:write` | Add languages, edit translations and start machine translation or text-to-speech. |
+| `publish` | Run validation fixes, publish previews and releases, and roll back. |
+| `team:read` | See your teams, plan limits and credit balance. |
+| `analytics:read` | Read reader analytics of your works. Not selected by default. |
+
+<Callout kind="tip">
+  For an assistant that should only look and advise, grant `works:read` and `assets:read`. Add `publish` only if you want the assistant to publish for you.
+</Callout>
+
+If an assistant later needs a permission you didn't grant, it tells you which one. Some apps then offer to sign in again with the wider set.
+
+## Approving a connection
+
+When an app connects with sign-in, PanelWave opens the page **Connect an app to PanelWave**. Sign in first if needed, including your two-factor code.
+
+<Steps>
+  <Step title="Check who is asking">
+    The page shows the app's name and the address it **sends you back to**. A yellow note appears when the app runs on your own computer, or when PanelWave hasn't verified the app. Only continue if you started this connection yourself.
+  </Step>
+  <Step title="Choose the permissions">
+    Under **… would like to:** each requested permission has a checkbox. Untick anything you don't want the app to have.
+  </Step>
+  <Step title="Allow or deny">
+    Click **Allow** to connect, or **Deny** to send the app away without access.
+  </Step>
+</Steps>
+
+The app then appears under **Connected apps** with its permissions, when it was connected and when it was last used.
+
+## Creating a personal access token
+
+<Steps>
+  <Step title="Start a new token">
+    Open **Profile → Connected apps & access tokens** and click **New access token**.
+  </Step>
+  <Step title="Name it and choose permissions">
+    Give it a **Name** you will recognise later, such as "Claude Code on my laptop". Under **What may the token do?**, the usual permissions are pre-selected; untick what the tool doesn't need.
+  </Step>
+  <Step title="Choose when it expires">
+    Under **Expires after**, pick 30, 90, 180 or 365 days. The default is 90 days.
+  </Step>
+  <Step title="Copy the token">
+    Click **Create token**. The token starts with `pw_pat_` and is shown **only once**. Copy it, along with the ready-made setup lines for Claude Code and the local bridge, then click **Done**.
+  </Step>
+</Steps>
+
+You can have up to 25 active tokens. The list shows each token's first characters, when it was created, when it expires, and when it was last used.
+
+<Callout kind="alert">
+  Treat a token like a password. Don't paste it into chats, share it, or commit it to a code repository. If a token may have leaked, revoke it right away.
+</Callout>
+
+## Disconnecting apps and revoking tokens
+
+- **Connected app:** click **Disconnect** next to it and confirm.
+- **Token:** click **Revoke** next to it and confirm.
+
+The app or token loses access within a minute. Signing out of PanelWave doesn't end these connections. Some events end them automatically:
+
+- **Changing your password** revokes all your tokens and disconnects all apps.
+- **Account suspension** by PanelWave, or when a platform operator signs out all your sessions, does the same.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="AI assistants overview" icon="bot" href="/cms/integrations/mcp-overview">
+    What assistants can do in PanelWave.
+  </Card>
+  <Card title="Account & Team" icon="user" href="/cms/account">
+    Profile, password and sessions.
+  </Card>
+  <Card title="Local bridge" icon="folder-up" href="/cms/integrations/local-bridge">
+    Use a token with the bridge.
+  </Card>
+</Columns>

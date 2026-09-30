@@ -1,0 +1,118 @@
+---
+title: Claude Code, Cursor & other clients
+description: Connect Claude Code, Cursor, VS Code and any other MCP client to PanelWave, with browser sign-in or a personal access token.
+---
+
+Coding tools and other MCP clients connect to the same address as the hosted assistants:
+
+```
+https://mcp.panelwave.org/mcp
+```
+
+You can authenticate in two ways:
+
+- **Browser sign-in (OAuth).** The client opens a PanelWave page, you sign in and choose the permissions. Nothing to copy or store. Use this whenever the client supports it.
+- **Personal access token.** You create a token in PanelWave and put it in the client's configuration as an `Authorization` header. Use this for scripts, CI jobs and clients without sign-in support. See [Access tokens & connected apps](/cms/integrations/access-tokens).
+
+To work with files on your computer, such as uploading a folder of artwork, use the [local bridge](/cms/integrations/local-bridge) instead of the remote address.
+
+## Claude Code
+
+<Tabs>
+  <Tab title="Browser sign-in">
+    Add the server:
+
+    ```bash
+    claude mcp add --transport http panelwave https://mcp.panelwave.org/mcp
+    ```
+
+    Start Claude Code, run `/mcp`, select **panelwave** and choose **Authenticate**. Your browser opens the PanelWave consent page. After you click **Allow**, Claude Code shows the server as connected.
+  </Tab>
+  <Tab title="Access token">
+    Create a token under **Profile → Connected apps & access tokens**, then:
+
+    ```bash
+    claude mcp add --transport http panelwave https://mcp.panelwave.org/mcp \
+      --header "Authorization: Bearer pw_pat_…"
+    ```
+
+    When you create a token, PanelWave shows this command with your token already filled in.
+  </Tab>
+</Tabs>
+
+Add `--scope project` to share the server with your team through the project's `.mcp.json`. Never commit a token; use sign-in for shared configurations.
+
+## Cursor
+
+Add PanelWave to `~/.cursor/mcp.json`, or to `.cursor/mcp.json` in a project.
+
+<Tabs>
+  <Tab title="Browser sign-in">
+    ```json
+    {
+      "mcpServers": {
+        "panelwave": { "url": "https://mcp.panelwave.org/mcp" }
+      }
+    }
+    ```
+
+    Cursor shows a **Needs login** button next to the server in its MCP settings. Click it to open the PanelWave consent page.
+  </Tab>
+  <Tab title="Access token">
+    ```json
+    {
+      "mcpServers": {
+        "panelwave": {
+          "url": "https://mcp.panelwave.org/mcp",
+          "headers": { "Authorization": "Bearer pw_pat_…" }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+## VS Code
+
+Add PanelWave to `.vscode/mcp.json` in your workspace, or run **MCP: Add Server** from the command palette and choose **HTTP**:
+
+```json
+{
+  "servers": {
+    "panelwave": { "type": "http", "url": "https://mcp.panelwave.org/mcp" }
+  }
+}
+```
+
+VS Code asks you to sign in to PanelWave the first time a tool is used.
+
+## Other clients
+
+Any client that supports remote MCP servers over **Streamable HTTP** works. PanelWave supports current and older protocol versions, so clients from 2025 on connect too.
+
+- **Sign-in:** the client finds PanelWave's sign-in automatically. It can register itself, so leave client id and secret fields empty.
+- **Token:** send the header `Authorization: Bearer pw_pat_…` with every request.
+
+To explore the tools by hand, run the MCP Inspector and connect it to the address above:
+
+```bash
+npx @modelcontextprotocol/inspector
+```
+
+<Callout kind="tip">
+  Clients only show the tools your permissions allow. If a tool seems to be missing, check which permissions you granted, or ask the assistant to run `pw_meta_explain_permissions` for it.
+</Callout>
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Local bridge" icon="folder-up" href="/cms/integrations/local-bridge">
+    Work with files on your computer.
+  </Card>
+  <Card title="Access tokens & connected apps" icon="key-round" href="/cms/integrations/access-tokens">
+    Create and revoke tokens.
+  </Card>
+  <Card title="Tool reference" icon="list" href="/cms/integrations/tool-reference">
+    Every tool with its permission.
+  </Card>
+</Columns>

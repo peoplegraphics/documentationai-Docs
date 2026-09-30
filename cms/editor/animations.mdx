@@ -72,6 +72,8 @@ If you delete a layer that has keyframes, those keyframes no longer play. The An
 - It starts when the panel is shown and runs for its duration; with **Loop Animation** it repeats, otherwise the layers stay in their end state.
 - Before its first keyframe a layer holds the first value, after its last keyframe the last value. A fade-in therefore needs a keyframe with opacity `0` at 0 ms.
 - Readers who have asked their device for reduced motion see the end state without the movement.
+- The panel frame clips the animation: a layer that slides in from outside the panel is invisible until it enters.
+- In autoplay the panel stays until the animation has finished, even when its display duration is shorter (looping animations don't hold the panel).
 
 ### Example: fade in and settle
 
