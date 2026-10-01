@@ -31,6 +31,7 @@ Lifecycle rules:
 - **One-shots restart** on every panel enter that references them; a one-shot that finished releases its element on `ended`.
 - **Autoplay policy:** a track the browser refuses before the first user gesture is remembered and retried on that gesture (the `AudioContext` is resumed at the same time), so audio starts as early as the browser allows without any host code.
 - **Same panel, variables changed:** nothing restarts; only `visibleIf` results and gains are re-applied.
+- **Locked panels stay silent** (from the player release after 1.2.0): while the current panel is [locked](/player/paywall-entitlement#locked-panels-on-screen) for the reader — by a paywall rule or as an `x-locked` stub — its tracks don't play, so an age-gated or paid entry panel no longer plays its music behind the age gate or paywall. The audio starts once the lock lifts (age confirmed, purchase completed). The same holds while the work's [cover](/player/reader-interface#cover) is shown.
 - Missing or non-audio assets are skipped with a single console warning per asset.
 
 Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`) are **not** started by the shell — they need a playback clock the panel-based shell does not run; see [Sequence tracks](#sequence-tracks) for driving them from a host.

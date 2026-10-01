@@ -63,6 +63,12 @@ in panel view. Hotspots on the other visible panels are drawn but inert.
 - `on-visit` — a dark veil replaces the artwork until the trail reaches the
   panel, so an overview zoom never spoils secret branches or gated content.
 
+Whatever its reveal mode, a panel the paywall locks for the reader (or an
+`x-locked` stub) renders as the
+[locked placeholder](/player/paywall-entitlement#locked-panels-on-screen)
+from the player release after 1.2.0, and turns into its artwork in place once
+the lock lifts. In 1.2.0, a revealed gated panel showed its content.
+
 ## Performance
 
 The plane is unbounded, but the working set is not:

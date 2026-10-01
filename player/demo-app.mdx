@@ -16,7 +16,7 @@ To run it locally, see [Development & Contributing](/player/development#setup).
 The header offers three ways to pick what to read:
 
 - **Bundled demos** — *Sample Comic* (panel and page view, hotspots, extras), *Video Sequencing* (video panels that play one after another in page view) and *Infinite Canvas* (a format 1.4 canvas chapter). Their manifests live in [`projects/demo/src/assets`](https://github.com/panelwave/player/tree/master/projects/demo/src/assets) and make good starting points for your own.
-- **Manifest URL or path** — type any URL and press **Load**. Cross-origin URLs need CORS headers on the server (CMS preview links send them).
+- **Manifest URL or path** — type any URL and press **Load**. Cross-origin URLs need CORS headers on the server. The manifest of a [published work](/guides/publishing) sends them: `https://read.panelwave.org/api/public/read/{team}/{work}/manifest` (the public, anonymous view — paid panels arrive as [`x-locked` stubs](/player/paywall-entitlement#server-stripped-panels)) or `https://read.panelwave.org/api/public/review/{token}/manifest` for a review link.
 - **Open file…** — pick a local `panelwave.json`. It is read in the browser and never uploaded; a file that isn't valid JSON shows an error banner.
 
 The player is re-created on every switch, so each work starts cleanly.
@@ -51,15 +51,29 @@ Everything the header does can be preset in the URL, which makes demo links easy
 
 | Parameter | Effect |
 |---|---|
-| `?manifest=<url>` | Load this manifest instead of the sample (e.g. a CMS [preview link](/cms/publishing)) |
+| `?manifest=<url>` | Load this manifest instead of the sample (e.g. a [published work's](/guides/publishing) manifest URL, see above) |
 | `?device=<id>` | Start in a preview frame (see the table above) |
 | `?devtools=1` | Open the dev-tools drawer on load |
 | `?vars=<url-encoded JSON>` | Seed story variables, e.g. `?vars={"user.age":12}` — passed as `initialVariables`, so read-only variables can be set too |
 | `?byUrl=1` | Hand the player the manifest **URL** (its `manifestUrl` input) instead of the parsed object, so the shell loads the work itself — use it to check the `manifestUrl` path, e.g. `?manifest=<url>&byUrl=1` |
-| `?deny=<panelId>[,<panelId>…]` | Install an entitlement adapter that refuses these panels, to try the paywall path without a backend |
+| `?entitlements=<tokens>` | Read as a reader who owns something, e.g. `?entitlements=premium,purchased:ch-3,age-verified` — passed as the shell's [`entitlementSnapshot`](/player/paywall-entitlement#the-entitlement-snapshot), see [Simulated entitlements](#simulated-entitlements) |
+| `?deny=<panelId>[,<panelId>…]` | Install an entitlement adapter that refuses these panels, to try the paywall path without a backend (an adapter gates navigation only — refused panels still render, see [Custom access checks](/player/paywall-entitlement#custom-access-checks)) |
 | `?embed=1` | Embed mode (see below) |
 
 Example: `https://panelwave.github.io/player/?device=phone&devtools=1&vars={"user.age":16}`
+
+## Simulated entitlements
+
+`?entitlements=` takes a comma-separated list of tokens — the syntax of the CMS preview's entitlement simulator — and turns it into the `entitlementSnapshot` the demo passes to the shell, so you can read your own paid and age-gated panels without a backend:
+
+| Token | Snapshot |
+|---|---|
+| `basic`, `premium`, `pro` | `subscriptionTier` set to that tier (with several, the highest wins) |
+| `purchased:<productId>` | `<productId>` added to `purchasedProductIds` |
+| `age-verified` | `ageVerified: true` with an age that passes any minimum |
+| `free`, anything else | Nothing |
+
+Without the parameter the shell keeps its anonymous reader: paid and age-gated panels show the locked placeholder and the gate. The same tokens can arrive as the `entitlements` array of an [embed config](#embed-mode).
 
 ## Embed mode
 
@@ -74,6 +88,7 @@ iframe.contentWindow.postMessage({
     autoplay: false,          // optional
     viewMode: 'canvas',       // optional: 'auto' | 'panel' | 'canvas'
     variables: { 'user.age': 21 },  // optional initial variables
+    entitlements: ['premium', 'purchased:ch-3', 'age-verified'],  // optional, see Simulated entitlements
   },
 }, '*');
 ```

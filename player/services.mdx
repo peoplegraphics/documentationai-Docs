@@ -16,6 +16,7 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `FlowEngineService` | Graph traversal and edge condition evaluation |
 | `HotspotActionService` | Executes hotspot actions (mutations, plugin events) and returns UI effects |
 | `variant-utils` (pure functions) | Panel variant selection & override application |
+| `page-format-utils`, `thumbnail-utils` (pure functions) | Page sequence per screen, navigation thumbnails and the cover image |
 | `ImageCacheService` | LRU image cache with memory budget |
 | `PreloadService` | Priority-based, network-aware asset preloading |
 | `AudioEngineService` | Web Audio playback with per-role buses |
@@ -24,7 +25,7 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `VisibilityService` | IntersectionObserver wrapper (50% threshold) |
 | `UserGestureService` | Autoplay-policy gesture tracking |
 | `TrackingService` | Consent-gated, batched analytics events |
-| `PaywallService` | Evaluates the manifest's `paywall.rules` against the reader's entitlement snapshot; drives the shell's paywall overlay and age gate |
+| `PaywallService` | Evaluates the manifest's `paywall.rules` (and `x-locked` stubs) against the reader's entitlement snapshot; drives the shell's paywall overlay and age gate and tells renderers which panels to lock |
 | `EntitlementService` | Standalone entitlement checks via the full adapter (signed URLs, custom flows) |
 | `PluginHostService` | Plugin lifecycle, sandboxing, messaging |
 | `ExportService` | EDL/JSON/CSV timing exports |
@@ -61,6 +62,7 @@ A second, extended implementation exists at `src/lib/state/player-state.service.
 
 - `syncPanel(panelId, panel, variableContext)` — resolves the panel's `audio[]` tracks and `kind: "audio"` layers against the asset catalog and makes the engine's playing set match: starts new tracks (honouring `startAtMs`, `gain`, `loop`, `visibleIf`), stops tracks the panel no longer wants (loops with a 250 ms fade), keeps a looping track shared with the previous panel running, and re-evaluates `visibleIf` without restarting anything when only variables changed. Idempotent for an unchanged panel.
 - `stopAll()` — shell teardown; `getDesiredTrackIds()` for diagnostics.
+- From the release after 1.2.0 the shell syncs **no panel** while the current one is locked for the reader (paywall rule or `x-locked` stub) or the cover is shown, so a gated panel's audio starts only once the lock lifts.
 - `busForRole(role)` (exported function) — manifest role → engine bus (`ui` → `sfx`, `none` → `music`).
 - Tracks refused by the browser's autoplay policy are retried, and the `AudioContext` resumed, on the first gesture reported by `UserGestureService`.
 
@@ -84,6 +86,7 @@ See [Audio](/player/audio#what-the-shell-plays-automatically).
 
 - `getNextPanel(graph, currentPanelId, context): NavigationResult` — filters outgoing edges by JSON Logic `condition`, sorts by numeric `priority` (highest value wins), and returns `{ nextPanelId, transition, action }`.
 - `getPreviousPanels(graph, panelId)` — reverse lookup over incoming edges.
+- `getNextInChapter(chapter, currentPanelId, context, defaultTransition?, defaultCameraMove?)` / `getPreviousInChapter(chapter, currentPanelId)` (from the release after 1.2.0) — what the shell calls: a chapter **with** edges uses `getNextPanel` / `getPreviousPanels`; a chapter **without any edges** (allowed since format 1.7) follows its reading order — the entry panel, then the remaining panels in `chapter.panels` key order — with the default transition and camera move passed in; `{ nextPanelId: null }` / `[]` past either end.
 - Analysis helpers: `getPossibleNextPanels`, `getEdgesToPanel`, `hasOutgoingEdges`, `isEndpoint`, `isEntry`, `getEntry`, `findEndpoints`, `hasPath` (BFS, bounded depth), `findPath` (BFS shortest path), `hasCycles` (DFS), `getReachablePanels`.
 - Entitlement bridges: `checkPanelEntitlement`, `checkChapterEntitlement`, `checkWorkEntitlement` delegate to `EntitlementService`.
 
@@ -104,13 +107,26 @@ After every activation the shell rebuilds the variable context, so `visibleIf`-g
 
 Panel variants are resolved by the pure helpers in `utils/variant-utils.ts` (`selectVariant`, `applyVariantOverrides`, `resolvePanelVariant`, `resolvePanels`) — first matching JSON Logic `when` in manifest order wins, overrides replace fields wholesale. The shell owns the wiring (effective panel, manual Alt-button overrides, `.variant-active` indicator). Details in [State & Conditions](/player/state-and-conditions#variants).
 
+## Page formats and thumbnails (page-format-utils, thumbnail-utils)
+
+From the release after 1.2.0, the pure helpers the shell uses for page view, the thumbnail strip and the table of contents are exported, so a host can build its own chapter list or page picker with the same results:
+
+- `pickPageFormat(available, width, height, dpr?, preferred?)` — the output format page view shows for a box of that size (CSS px) and device pixel ratio, or `null` when the pages carry no format; `preferred` wins when pages exist for it. Built on `screenClassFor(width, height, dpr?)` (`'phone' | 'tablet' | 'desktop' | 'bigscreen'` — a 4K panel at 150 % or 200 % scaling still counts as a big screen) and `rankPageFormats(available, screen, aspect?)` (the screen class's preference list, then unknown formats by closest aspect ratio).
+- `pageFormatOf(page)` / `pageFormatsOf(pages)` — a page's `layout.format` / the distinct formats of a page list.
+- `pagesForFormat(pages, format)` — one format's page sequence; pages without a format belong to every sequence.
+- `pageAspectRatio(page)` — width / height of a page's frame: its canvas size, else its format's aspect, else 16:9.
+- `panelThumbnailSrc(panel, lookup, width = THUMBNAIL_WIDTH)` — a panel's thumbnail: an explicit `thumbnail`, else the catalog rendition (for `THUMBNAIL_WIDTH` = 320 px) of its bottom-most visible image layer, else the poster of its first video layer; empty when it has no artwork. `lookup` maps an asset id to its catalog item.
+- `coverImageSrc(manifest, lookup, width?)` — the work's cover: `meta.cover`, else the `extras.cover` block's image, link or thumbnail (a gated cover block is skipped); empty when there is none.
+
+The returned sources are unresolved; pass them through `AssetUrlService.resolve(src, 'image')` before rendering.
+
 ## ImageCacheService
 
-`services/image-cache.service.ts` — LRU cache for decoded images (`ImageBitmap` where supported, `HTMLImageElement` fallback) with a 100 MB memory budget and in-flight request deduplication. Key methods: `load(url)`, `preload(url)`, `preloadBatch(urls)`, `has(url)`, `remove(url)`, `clear()`, `getStats()`, `setMemoryBudget(bytes)`. See [Performance](/player/performance#image-caching).
+`services/image-cache.service.ts` — LRU cache for decoded images (`ImageBitmap` where supported, `HTMLImageElement` fallback) with a 100 MB memory budget and in-flight request deduplication. Key methods: `load(url)`, `preload(url)`, `preloadBatch(urls)`, `has(url)`, `remove(url)`, `clear()`, `getStats()`, `setMemoryBudget(bytes)`. From the release after 1.2.0, `preload(url)` warms an image for an upcoming `<img>` instead: it loads and decodes it through an `Image` element (the same request an `<img>` makes, no CORS request) and keeps the last 48 warmed elements referenced. See [Performance](/player/performance#image-caching).
 
 ## PreloadService
 
-`services/preload.service.ts` — priority queue (`high`/`medium`/`low`) that preloads images (through `ImageCacheService`), audio, and video metadata, with network-aware concurrency and `requestIdleCallback` scheduling for low-priority items. Key methods: `add(item)`, `addBatch(items)`, `preloadNext(...)`, `predictAndPreload(...)`, `setMaxConcurrent(max)`, `setNetworkAware(enabled)`, `getQueueStatus()`, plus a `status$` stream. See [Performance](/player/performance#preloading).
+`services/preload.service.ts` — priority queue (`high`/`medium`/`low`) that preloads images (through `ImageCacheService`), audio, and video metadata, with network-aware concurrency and `requestIdleCallback` scheduling for low-priority items. Key methods: `add(item)`, `addBatch(items)`, `preloadNext(...)`, `predictAndPreload(...)`, `setMaxConcurrent(max)`, `setNetworkAware(enabled)`, `getQueueStatus()`, plus a `status$` stream. From the release after 1.2.0, `add()` skips items whose `panelId` the paywall locks for the reader (`PaywallService.isPanelLocked`), so gated artwork is not fetched ahead of the gate; a later call after the lock lifts loads them. Items without a panel id, or with one the paywall doesn't know, load as before. See [Performance](/player/performance#preloading).
 
 ## AudioEngineService
 
@@ -148,6 +164,14 @@ The shell wires the manifest's `tracking` section into this service on startup (
 
 `services/paywall.service.ts` — the shell's gatekeeper. `setManifest(manifest)` loads the rules (via the pure functions in `entitlement/paywall-evaluator.ts`) and the reading order used for free-preview counting (work-wide for work rules, within the chapter for chapter rules); `setSnapshot(snapshot)` / `getSnapshot()` hold what the reader owns (anonymous by default). `canAccess(panelId)`, `evaluate(panelId)` (an `AccessDecision` with the lock reason), `gateFor(panelId)` (a `PaywallGate` for the overlay, including the rule's Buy / Subscribe `options`) and `ruleFor(panelId)` answer per panel; `isExtraLocked(extraId)` answers for an extras block, and the static `PaywallService.purchaseOptions(rule)` derives a rule's options. A work without rules reports every panel accessible. See [Paywall & Entitlement](/player/paywall-entitlement).
 
+From the release after 1.2.0:
+
+- `isPanelLocked(panelId)` — should renderers show the locked placeholder for this panel? `evaluate()` is memoized per rules + snapshot, so it is cheap to call from templates; viewport, canvas stage, thumbnail strip, table of contents and `PreloadService` all ask it.
+- `changes$: Observable<void>` — fires whenever a lock can flip (new manifest, new snapshot, enforcement change, `clear()`); renderers re-check `isPanelLocked` on it.
+- `setEnforced(enforced)` — the shell turns enforcement off while a host `entitlementAdapter` decides access; the rules then still describe gates but no longer lock rendering.
+- Panels marked `"x-locked": true` are locked whatever the rules say: `evaluate()` reports them locked (keeping the applying rule's lock reason while it locks, else `subscription_required` / `purchase_required`, never the age), and the renderers check `isLockedPanel(panel)` themselves, so stubs stay locked with enforcement off too. `isFreeWork` is `false` when the manifest has such panels. See [Server-stripped panels](/player/paywall-entitlement#server-stripped-panels).
+- Age requirements combine across every rule that applies to a panel (see [How rules are evaluated](/player/paywall-entitlement#how-rules-are-evaluated)).
+
 ## EntitlementService
 
 `services/entitlement.service.ts` — standalone access control behind a pluggable **adapter** (`EntitlementAdapter` from `types/entitlement.types.ts`; the default is a `NullEntitlementAdapter` that **denies** everything). The embedded shell does not use it for gating:
@@ -158,7 +182,7 @@ The shell wires the manifest's `tracking` section into this service on startup (
 - `getSignedUrl(assetId, purpose)`, `showPaywall(gate)`, `verifyAge(minimumAge)`, `isAuthenticated()`, `getCurrentUser()` / `getCurrentUser$()`, `getEntitlementStatus$()`, `clearCache()`.
 
 <Callout kind="alert">
-`PlayerShellComponent` additionally declares its own, simpler `EntitlementAdapter` interface (`hasAccess(panelId)`, `getContext()`, optional `purchase(productId)`) as an `@Input`. When set, it replaces the `PaywallService` check for navigation and seeds entitlement context variables. The exported `EntitlementAdapter` type is the richer one used by `EntitlementService` (and implemented by `HttpEntitlementAdapter`). See [Paywall & Entitlement](/player/paywall-entitlement#custom-access-checks).
+`PlayerShellComponent` additionally declares its own, simpler `EntitlementAdapter` interface (`hasAccess(panelId)`, `getContext()`, optional `purchase(productId)`) as an `@Input`. When set, it replaces the `PaywallService` check for navigation and seeds entitlement context variables; it does not lock rendering (the shell calls `PaywallService.setEnforced(false)`), so don't rely on it to hide content. The exported `EntitlementAdapter` type is the richer one used by `EntitlementService` (and implemented by `HttpEntitlementAdapter`). See [Paywall & Entitlement](/player/paywall-entitlement#custom-access-checks).
 </Callout>
 
 ## PluginHostService, ExportService, TranslationService
@@ -186,9 +210,11 @@ graph LR
     VL --> UG[UserGestureService]
     VL --> TR
     PRE[PreloadService] --> IC[ImageCacheService]
+    SHELL --> PW[PaywallService]
+    PRE --> PW
 ```
 
-Reading the arrows: the shell orchestrates navigation and configuration; `FlowEngineService` consumes the flattened variable context from `VariableStoreService` and consults `EntitlementService`; the video trio (`VideoControllerService`, `VideoSequencerService`, `VisibilityService`) is driven by `VideoLayerComponent` instances registering themselves; `PreloadService` delegates image work to `ImageCacheService`.
+Reading the arrows: the shell orchestrates navigation and configuration; `FlowEngineService` consumes the flattened variable context from `VariableStoreService` and consults `EntitlementService`; the video trio (`VideoControllerService`, `VideoSequencerService`, `VisibilityService`) is driven by `VideoLayerComponent` instances registering themselves; `PreloadService` delegates image work to `ImageCacheService` and skips panels `PaywallService` locks.
 
 ## Related pages
 
