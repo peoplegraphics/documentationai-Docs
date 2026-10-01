@@ -28,7 +28,7 @@ A **work archive** is the `.zip` produced by the [Archive export](/cms/export#ar
   </Step>
 </Steps>
 
-Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by format versions 1.0–1.6 are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
+Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by format versions 1.0–1.7 are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
 
 Panels keep their **friendly ids** (`ch1-p022`) in the copy, so exporting the imported work again yields the same ids, and [translations](/cms/localization) attached to panels, pages and chapters are re-pointed at the new copies — nothing is left orphaned. The same applies to a JSON manifest exported from PanelWave.
 
@@ -64,7 +64,7 @@ Not carried over (by design): products and reader entitlements, publish history 
 The import validates the file before accepting it:
 
 - It must be valid JSON with the required top-level sections `panelwave`, `meta`, and `chapters` (see [Manifest structure](/schema/manifest-structure)).
-- The declared format version (`panelwave.version`) must be a format from **1.0 to 1.6** — the range up to the version the CMS itself exports (1.6.0), so a CMS export can always be imported back. Patch and pre-release versions of a supported format are fine (`1.5.1`, `1.3.0-rc.1`). Newer formats (`1.7.0`, `2.0.0`) and missing or malformed versions are rejected before anything is imported.
+- The declared format version (`panelwave.version`) must be a format from **1.0 to 1.7** — the range up to the version the CMS itself exports (1.7.0), so a CMS export can always be imported back. Patch and pre-release versions of a supported format are fine (`1.5.1`, `1.3.0-rc.1`). Newer formats (`1.8.0`, `2.0.0`) and missing or malformed versions are rejected before anything is imported.
 - Maximum file size: **10 MB**. The manifest references assets by URL; large media files are not embedded in the JSON.
 
 ## What gets imported
@@ -98,8 +98,8 @@ Asset entries are imported as catalog references (URLs). If the manifest points 
 | *File too large. Maximum size is 10MB.* | Strip embedded data or split the work |
 | *Invalid JSON file. Please check the file format.* | The file isn't parseable JSON — validate it with the [CLI](/schema/cli) |
 | *Invalid PanelWave graphic novel file. Missing required fields.* | `panelwave`, `meta`, or `chapters` is missing |
-| *This manifest uses format X; this CMS supports 1.0–1.6.* | The manifest declares a newer format (a minor above 1.6, or 2.x). Use a manifest in format 1.0–1.6 |
-| *This manifest has no valid format version (…); this CMS supports 1.0–1.6.* | `panelwave.version` is missing or not a version like `1.6.0` |
+| *This manifest uses format X; this CMS supports 1.0–1.7.* | The manifest declares a newer format (a minor above 1.7, or 2.x). Use a manifest in format 1.0–1.7 |
+| *This manifest has no valid format version (…); this CMS supports 1.0–1.7.* | `panelwave.version` is missing or not a version like `1.7.0` |
 
 ## Other imports in the CMS
 
