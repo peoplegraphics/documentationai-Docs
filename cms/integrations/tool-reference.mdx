@@ -179,9 +179,9 @@ The PanelWave MCP server offers **81 tools**. An assistant only sees the tools y
 |------|--------------|------------|--------|
 | `pw_publish_status` | Show whether and when the work was published, the published manifest URL and the progress of a running publish. | `works:read` | Reads |
 | `pw_publish_history` | List recent publishes (environment, status, time, manifest URL, backupId — the snapshot pw_publish_rollback can go back to, rollback flag). | `works:read` | Reads |
-| `pw_publish_preview` | Publish a review link: replaces the current staging release and returns a reader link that anyone with the link can read (no login). The link is stable across republishes and the work owner can revoke it. | `publish` | Changes |
+| `pw_publish_preview` | Publish a shareable preview of the work: returns a public manifest URL (anyone with the link can read it — no login) and a player link that opens it in the PanelWave player. | `publish` | Changes |
 | `pw_publish_run` | Publish the work to dev, staging or production (synchronous; returns the release record with its backupId — the snapshot pw_publish_rollback can go back to). | `publish` | Changes (asks first when risky) |
-| `pw_publish_rollback` | Make an earlier publish's frozen release live again for that publish's environment (production, staging or preview). The editor content is not changed; versions without a stored release can't be restored. | `publish` | Asks first |
+| `pw_publish_rollback` | Record a production rollback to an earlier release snapshot (backupId from pw_publish_history or pw_publish_run). | `publish` | Asks first |
 
 ## Background jobs
 

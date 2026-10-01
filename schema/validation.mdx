@@ -13,7 +13,7 @@ npm install -g @panelwave/cli
 panelwave validate ./my-comic/panelwave.json
 ```
 
-The CLI is published on npm as [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) and validates against a bundled copy of the schema, so it works offline. The bundled copy is guaranteed to match the format version the CLI release was built against (1.6.0 in CLI 1.1.0, the current npm release; the current format is 1.7.0; 1.5.0 in CLI 1.0.0) — see [CLI → Bundled schema](/schema/cli#bundled-schema).
+The CLI is published on npm as [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) and validates against a bundled copy of the schema, so it works offline. The bundled copy is guaranteed to match the format version the CLI release was built against (1.6.0, the current format, in CLI 1.1.0; 1.5.0 in CLI 1.0.0) — see [CLI → Bundled schema](/schema/cli#bundled-schema).
 
 Options:
 
@@ -91,7 +91,7 @@ Each AJV error has an `instancePath` (where in the manifest), a `keyword` (which
     The most frequent error. Almost every object in the schema sets `additionalProperties: false` (or `unevaluatedProperties: false`). Causes:
     - A **typo** in a property name (`asetId` instead of `assetId`).
     - A property placed at the **wrong level** (e.g. `condition` on a panel instead of an edge).
-    - Custom data without the `x-` prefix. Only the manifest root, panels and extras blocks (the last two since 1.7) allow `x-` extension properties — see [Extensions](/schema/extensions).
+    - Custom data without the `x-` prefix. Only the manifest root explicitly allows `x-` extension properties — see [Extensions](/schema/extensions).
   </Expandable>
   <Expandable title="must have required property 'kind' / must match exactly one schema in oneOf">
     Layers are a discriminated union on `kind` (`image`, `audio`, `video`, `text`, `vector`, `plugin`). A missing or misspelled `kind`, or a property that belongs to a different layer kind, makes the layer match none of the `oneOf` branches — AJV then reports errors against **every** branch. Fix the `kind` first, then re-validate. See [Layers](/schema/layers).
@@ -107,7 +107,7 @@ Each AJV error has an `instancePath` (where in the manifest), a `keyword` (which
     `meta` requires `id`, `title`, `locales`, and `default_locale`. `title` must be a `LocalizedString` object (`{ "en-US": "..." }`), not a plain string. See [Meta](/schema/meta).
   </Expandable>
   <Expandable title="must NOT have fewer than 1 items (graph.edges, chapters, variants)">
-    Several arrays have `minItems: 1`: `chapters`, every asset's `variants`, and `layout.placements`. (`graph.edges` was on this list until 1.7.0; since then it may be empty, so a single-panel chapter can use `"edges": []` — against an older schema copy this message still appears for `graph.edges`.) Each chapter's `panels` map also needs at least one entry.
+    Several arrays have `minItems: 1`: `chapters`, `graph.edges`, every asset's `variants`, and `layout.placements`. A chapter graph needs at least one edge — a single-panel chapter can't have an empty `edges` array. Each chapter's `panels` map also needs at least one entry.
   </Expandable>
   <Expandable title="must be equal to one of the allowed values (enum)">
     Enumerated fields reject unknown values: `transition.type`, `variable.scope`, `asset.category`, `paywall.scope`, `tracking.eventWhitelist` entries, and others. Check the reference page of the object in question for the exact allowed values.

@@ -12,16 +12,16 @@ Questions developers ask most often. For step-by-step fixes see the [troubleshoo
     The schema uses JSON Schema draft 2020-12. Import AJV's 2020 build (`require('ajv/dist/2020')`), add `ajv-formats`, and construct it with `strict: false` — the default draft-07 AJV build cannot compile it. See [Validation](/schema/validation).
   </Expandable>
   <Expandable title="Why does my manifest fail with 'must NOT have additional properties'?">
-    Nearly every object in the schema sets `additionalProperties: false`, so a typo in a property name, a field at the wrong nesting level, or custom data without the `x-` prefix is rejected. Check the property name against the reference page for that object, and note that `x-` extension fields are only allowed at the manifest root, on panels and on extras blocks (the last two since format 1.7). See [Extensions](/schema/extensions) and [Validation Errors](/help-center/troubleshooting/validation-errors).
+    Nearly every object in the schema sets `additionalProperties: false`, so a typo in a property name, a field at the wrong nesting level, or custom data without the `x-` prefix is rejected. Check the property name against the reference page for that object, and note that `x-` extension fields are only allowed at the manifest root. See [Extensions](/schema/extensions) and [Validation Errors](/help-center/troubleshooting/validation-errors).
   </Expandable>
-  <Expandable title="My manifest says version 1.7.0 but points at the 1.0 schema URL — is that wrong?">
-    No. The schema directory is named after the **major** version; minor releases are additive and ship in place. Formats 1.1 through 1.7 all validate against `https://panelwave.org/schema/1.0/panelwave.schema.json`, and every valid 1.0 manifest stays valid. See [Versioning](/schema/versioning).
+  <Expandable title="My manifest says version 1.6.0 but points at the 1.0 schema URL — is that wrong?">
+    No. The schema directory is named after the **major** version; minor releases are additive and ship in place. Formats 1.1 through 1.6 all validate against `https://panelwave.org/schema/1.0/panelwave.schema.json`, and every valid 1.0 manifest stays valid. See [Versioning](/schema/versioning).
   </Expandable>
   <Expandable title="Does schema validation check that my assetId and panel references exist?">
     No — JSON Schema validation is structural only. Dangling `assetId`s, unknown `characterId`s, or graph edges to missing panels pass validation but break at runtime. Run reference and reachability checks in your pipeline: the [CLI](/schema/cli) adds some warnings, and the CMS runs full [preflight checks](/cms/validation).
   </Expandable>
   <Expandable title="Where can I put custom data in a manifest without breaking validation?">
-    At the manifest root, on a `Panel` and on an extras block (`ExtraBlock`) you can add any property starting with `x-` (e.g. `x-mytool-state`); the last two since format 1.7. Deeper in the tree most objects are closed, so other nested `x-` keys fail strict validation — use `PluginInstance.props` (any JSON) or `pluginPayload` catalog assets instead. See [Extensions &amp; Plugins](/schema/extensions).
+    At the manifest root you can add any property starting with `x-` (e.g. `x-mytool-state`). Deeper in the tree most objects are closed, so nested `x-` keys fail strict validation — use `PluginInstance.props` (any JSON), `pluginPayload` catalog assets, or the intentionally open `ExtraBlock` object instead. See [Extensions &amp; Plugins](/schema/extensions).
   </Expandable>
 </ExpandableGroup>
 

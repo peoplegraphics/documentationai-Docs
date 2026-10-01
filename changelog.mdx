@@ -5,23 +5,6 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
-<Update label="2026-10-01" description="Format 1.7.0 — empty graph edges, x- extensions on panels and extras" tags={["feature"]}>
-  ## Single-panel chapters are valid, and panels can carry `x-` fields
-
-  **Format 1.7.0** (relaxing, backward-compatible with 1.6.0 — existing
-  manifests stay valid unchanged):
-
-  - **`Graph.edges` may be empty.** A chapter without edges, such as a
-    single-panel chapter, is valid and follows its reading order. The property
-    stays required. [Graph](/schema/graph).
-  - **`x-` extension fields on panels and extras blocks**, in addition to the
-    manifest root — for example a server-side paywall view marks stripped
-    panels `"x-locked": true`. [Extensions](/schema/extensions).
-
-  Details: [Versioning](/schema/versioning). The CMS import accepts formats
-  1.0–1.7. `@panelwave/cli` bundles 1.7.0 from its next release.
-</Update>
-
 <Update label="2026-10-01" description="SDK · @panelwave/mcp 0.1.0 on npm — the local bridge for AI assistants" tags={["feature"]}>
   ## The local MCP bridge is on npm
 

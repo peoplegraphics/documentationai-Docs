@@ -7,13 +7,13 @@ PanelWave is designed to be extended without breaking the format: **`x-` extensi
 
 ## `x-` extension fields
 
-Custom properties whose names start with `x-` are reserved for extensions. The manifest root, `Panel` and `ExtraBlock` (the last two since format 1.7) each declare:
+Custom properties whose names start with `x-` are reserved for extensions. The root manifest schema declares:
 
 ```json
 "patternProperties": { "^x-": {} }
 ```
 
-so any `x-`-prefixed property with **any value** is valid at the **top level** of a manifest — and, since 1.7, on a panel or an extras block (for example a server-side paywall view marks stripped panels `"x-locked": true`):
+so any `x-`-prefixed property with **any value** is valid at the **top level** of a manifest:
 
 ```json
 {
@@ -26,7 +26,7 @@ so any `x-`-prefixed property with **any value** is valid at the **top level** o
 ```
 
 <Callout kind="alert">
-**Strict-validation caveat:** the `^x-` pattern is declared on the **manifest root**, on `Panel` and on `ExtraBlock` (including `ExtraCharacterSheet`) — the latter two since 1.7. Other nested objects (`Meta`, `Layer` types, `Hotspot`, …) are closed with `additionalProperties: false` / `unevaluatedProperties: false`, so an `x-` field inside them fails strict AJV validation. If you need structured custom data elsewhere in the tree, use `x-` fields at those three places, `PluginInstance.props` or plugin payload assets rather than ad-hoc nested `x-` keys.
+**Strict-validation caveat:** in schema 1.1, the `^x-` pattern is declared only on the **manifest root**. Most nested objects (`Meta`, `Panel`, `Layer` types, `Hotspot`, …) are closed with `additionalProperties: false` / `unevaluatedProperties: false`, so an `x-` field inside them fails strict AJV validation. If you need structured custom data deeper in the tree, use the places the schema leaves open — root-level `x-` fields, `PluginInstance.props`, plugin payload assets, or the open `ExtraBlock` object — rather than ad-hoc nested `x-` keys.
 </Callout>
 
 Naming convention: `x-` followed by a vendor/tool identifier, e.g. `x-panelwave-cms-…`, `x-mytool-…`. Consumers must ignore extension fields they do not understand.

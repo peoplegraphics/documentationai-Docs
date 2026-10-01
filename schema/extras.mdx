@@ -49,7 +49,7 @@ Defined as `$defs/ExtraBlock` — the generic bonus-content unit. All properties
 | `requiredTier` | string | — | Subscription tier required to view (used with `gated`). |
 
 <Callout kind="info">
-`ExtraBlock` is intentionally an **open object** — the schema does not set `additionalProperties: false` here, so tools may attach additional fields. `ExtraCharacterSheet`, by contrast, is closed (`unevaluatedProperties: false`), but since format 1.7 both accept `x-` [extension fields](/schema/extensions) (`^x-` pattern properties).
+`ExtraBlock` is intentionally an **open object** — the schema does not set `additionalProperties: false` here, so tools may attach additional fields. `ExtraCharacterSheet`, by contrast, is closed (`unevaluatedProperties: false`).
 </Callout>
 
 ### Gating semantics
