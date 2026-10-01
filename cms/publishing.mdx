@@ -1,19 +1,15 @@
 ---
 title: Publishing
-description: Move a work from draft to published — work statuses, the guided publish flow, release history, rollback, and what published readers receive.
+description: Move a work from draft to published — work statuses, the guided publish flow, the three publish targets, and what readers receive.
 ---
 
 Publishing is how your work leaves the workshop and reaches readers. PanelWave separates two ideas:
 
 1. **Work status** — a label (*Draft*, *Review*, *Published*, *Archived*) that organizes your library and signals where each work is in its lifecycle.
-2. **The publish pipeline** — a guided flow that validates the work, packages it into a [manifest](/concepts/manifest), and deploys it (with assets and audio) so the PanelWave Player can serve it to readers.
+2. **The publish pipeline** — a guided flow that validates the work, packages it into a [manifest](/concepts/manifest), and freezes it as a snapshot that the PanelWave reader serves to readers.
 
 <Callout kind="tip">
-  Looking for public links, review links, embedding or QR codes? See the [Publishing and Sharing guide](/guides/publishing). The delivery details on this page (CDN, manifest URL) are superseded by it.
-</Callout>
-
-<Callout kind="info">
-  The guided **Publish** flow is now active end-to-end: preflight validation, environment selection, manifest build, and release history/rollback all work as described below. Production delivery still targets the CDN configured for your instance; the **Preview** environment additionally produces a shareable player link (see the environment step).
+  Public links, review links, public addresses, embedding and QR codes are covered in the [Publishing and Sharing guide](/guides/publishing).
 </Callout>
 
 ## Work statuses
@@ -34,7 +30,7 @@ To change a status:
 
 You can also filter the works list by status (**Status: All / Draft / Review / Published / Archived**) to keep an overview of what is live and what isn't.
 
-Setting a work back to **Draft** or **Archived** is how you mark it as no longer published in your library.
+Setting a work back to **Draft** or **Archived** only changes the label in your library; use **Unpublish** (see the guide) to take a public link offline.
 
 ## The guided publish flow
 
@@ -45,29 +41,27 @@ When you publish, the CMS walks you through a four-step wizard titled **Publish 
     Validation runs automatically. The wizard summarizes errors, warnings, and info notes. **Errors block publishing** — each is listed with a suggestion for fixing it (see [Validation](/cms/validation)). Warnings don't block you: the wizard shows "Warnings (you can proceed)". Oversized-image errors offer **Optimize** / **Optimize all** right in the wizard — the fix runs in the background and the check re-polls until the errors clear (see [Optimizing oversized images](/cms/validation#optimizing-oversized-images)). Use **Re-validate** after fixing other issues. When everything passes you'll see **"Ready to Publish"**.
   </Step>
   <Step title="Select Environment">
-    Choose where the work goes:
-    - **Production** — "Live for all users"
-    - **Staging** — "Testing environment"
-    - **Preview** — "Share with team"
+    Choose the target:
+    - **Public** — anyone with the link can read it at read.panelwave.org.
+    - **Review link** — anyone with the link; stable across republishes, and you can revoke it.
+    - **Internal preview** — only your team, inside the CMS.
 
-    Each environment has its own content delivery network, so you can rehearse a release on staging before going live.
-
-    A **Preview** publish additionally mints an unguessable, revocable **preview manifest link**. Anyone with the link can load the work in a PanelWave Player **without a CMS login** — hand it to teammates, testers, or an external reviewer. Because the link is public-by-URL, treat it like a shared secret.
+    Details for each target, and how to share them, are in the [Publishing and Sharing guide](/guides/publishing). To publish **Public** your team and work need a public address; the wizard tells you if one is missing.
   </Step>
   <Step title="Publishing Options">
     - **Version Tag (optional)** — a label such as `v1.0.0`, `beta`, or `final` to identify this release later.
-    - **Create Backup** — save a snapshot before publishing (recommended, on by default). Backups are what make [rollback](#release-history-and-rollback) possible.
-    - **Invalidate CDN Cache** — clear cached copies so readers see the update immediately (on by default).
+    - **Create Backup** — save a snapshot before publishing (recommended, on by default). A backup is what lets you restore an earlier publish.
     - **Send Notifications** — notify your team members about the publish (on by default).
+    - **Invalidate cache** — a technical option (on by default) that clears cached copies of the work; leave it on unless support asks otherwise.
   </Step>
   <Step title="Confirm & Publish">
-    Review the summary (work, environment, tag, options) and click **Publish Now**. A progress screen tracks the stages — validating content, building the manifest, uploading assets and audio files, invalidating the cache, finalizing.
+    Review the summary (work, target, tag, options) and click **Publish Now**. A progress screen tracks the stages.
   </Step>
 </Steps>
 
-On success you'll see **"Published Successfully! Your work is now live and accessible"** together with the **Manifest URL** (with copy and open buttons), the environment, files uploaded, the **total size with its breakdown** ("manifest *x* + *N* assets *y*"), duration, and the backup ID.
+On success the heading tells you what happened. For **Public** and **Review link** you get the reader link (copy and open), the embed code, a QR code and sharing buttons; the raw manifest URL is tucked away under **Technical details**. For **Internal preview** you get **Open internal preview**.
 
-The same size figures are available any time without publishing: the **Metadata** tab of Work Properties has a read-only **Size &amp; Content** section showing the manifest size, the asset count and payload, and the total — useful for keeping an eye on a work's weight as it grows.
+The size figures are available any time without publishing: the **Metadata** tab of Work Properties has a read-only **Size &amp; Content** section showing the manifest size, the asset count and payload, and the total — useful for keeping an eye on a work's weight as it grows.
 
 <Callout kind="tip">
   Publishing keeps running on the server even if you close the wizard mid-way. Reopening the wizard for the same work within a few minutes reattaches to the running publish and continues showing its progress.
@@ -77,10 +71,7 @@ If publishing fails, the wizard shows the error with a **Try Again** button and 
 
 ## What readers get
 
-A publish produces a complete, self-contained package on the CDN:
-
-- the work's **manifest** (`panelwave.json`) — the [open-format](/schema/overview) description of your chapters, panels, graph, and settings,
-- all referenced **assets** (artwork, video) and **audio files**.
+A publish freezes the work's **manifest** (`panelwave.json`) — the [open-format](/schema/overview) description of your chapters, panels, graph, and settings — as a snapshot. Your artwork and audio stay in PanelWave storage and are linked from the manifest with short-lived signed URLs that are issued each time the work is opened. Later edits stay private until you publish again.
 
 The published manifest is the lean **player version** of your work:
 
@@ -89,38 +80,24 @@ The published manifest is the lean **player version** of your work:
 - strings in languages the work does not offer are dropped;
 - images ship as the full-size WebP rendition (or the optimized version) and videos as the H.264 rendition, with the responsive sizes alongside.
 
-Asset links in the published manifest stay signed, so paywalled artwork cannot be fetched without the manifest. The full-fidelity version with everything the editor needs is what the [work archive](/cms/export#archive-export) contains.
+Paywalled parts are removed from the public version on the server, so they cannot be fetched without a matching entitlement. The full-fidelity version with everything the editor needs is what the [work archive](/cms/export#archive-export) contains.
 
-Any site embedding the [PanelWave Player](/player/overview) can then render the work from its manifest URL. Content you keep in draft inside the CMS — for example extras marked **Draft (hidden from readers)** — is excluded from the published manifest (see [Extras](/cms/extras)).
+Content you keep in draft inside the CMS — for example extras marked **Draft (hidden from readers)** — is excluded from the published manifest (see [Extras](/cms/extras)).
 
-## Release history and rollback
+## History and restore
 
-The **Publish Releases** view keeps a complete history of every publish:
-
-- A **Current Published Version** card shows the live release (marked **LIVE**) with its environment, publish time, and manifest URL.
-- Counters for **Total Releases**, **Successful**, and **Failed** publishes.
-- Filters by **Environment** (Production/Staging/Preview) and **Status** (Success/Failed), sorting by date, size, or status, and an **Export CSV** button for the full list.
-- Each release card shows its environment, status, version tag, files uploaded, total size, and duration; you can attach your own **note** to a release, **Download Manifest** as a JSON file, or copy/open its manifest URL.
-- A **Compare** mode lets you pick two releases and see their differences side by side.
-
-### Rolling back
-
-If a release goes wrong, choose **Rollback to this version** on any earlier successful release. A **Rollback preview** dialog first shows exactly what will change — how many releases and days you are going back, the file-count and size difference, and an estimated duration — before you confirm with **Rollback now**. Rolling back restores content, assets, and configuration from that release's backup; newer releases stay in the history, so you can roll forward again later. The dialog confirms a successful rollback (before 2026-09-30 it could report a failure although the rollback had worked).
-
-<Callout kind="info">
-  Rolling back to a very old release (more than 30 days or 10 releases behind) requires an extra acknowledgment, because readers will lose everything published since that point.
-</Callout>
+**Work Properties → Publishing** lists your latest publishes. **Restore** puts an earlier successful publish back. See the [guide](/guides/publishing#unpublish-history-and-rollback).
 
 ## Related pages
 
 <Columns cols={3}>
+  <Card title="Publishing and Sharing" icon="share-2" href="/guides/publishing">
+    Public links, review links, embedding and QR codes.
+  </Card>
   <Card title="Validation" icon="shield-check" href="/cms/validation">
     Fix preflight errors before you publish.
   </Card>
   <Card title="Preview" icon="play" href="/cms/preview">
     Rehearse the reader experience first.
-  </Card>
-  <Card title="Export" icon="download" href="/cms/export">
-    Produce PDF, PowerPoint, or video versions.
   </Card>
 </Columns>
