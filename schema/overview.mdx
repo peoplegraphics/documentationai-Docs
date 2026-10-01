@@ -11,7 +11,7 @@ The **PanelWave manifest** is a single JSON document (`panelwave.json`) that des
 |---|---|
 | **Schema draft** | [JSON Schema 2020-12](https://json-schema.org/draft/2020-12/schema) |
 | **Schema `$id`** | `https://panelwave.org/schema/1.0/panelwave.schema.json` (identifier only — not publicly served yet; get the file from the repository below) |
-| **Current format version** | `1.6.0` (published in-place in the `1.0/` major-version directory) |
+| **Current format version** | `1.7.0` (published in-place in the `1.0/` major-version directory) |
 | **License** | [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) — free to share and adapt with attribution |
 | **File** | [`1.0/panelwave.schema.json`](https://github.com/panelwave/schema/blob/master/1.0/panelwave.schema.json) in [panelwave/schema](https://github.com/panelwave/schema) on GitHub |
 | **Feedback** | [github.com/panelwave/schema/issues](https://github.com/panelwave/schema/issues) |
@@ -26,7 +26,7 @@ The schema license covers the format definition itself. It does not restrict con
 - **Graph-based storytelling.** Panels are nodes in a directed graph; edges carry transitions and [JSON Logic](https://jsonlogic.com/) conditions for branching narratives. See [Graph](/schema/graph).
 - **Localization first.** All user-facing text is a `LocalizedString` keyed by BCP-47 locale; assets can be localized too. See [Manifest Structure](/schema/manifest-structure) for the shared primitives.
 - **Multiple output formats.** One manifest targets web (portrait/landscape), print (A4/US), and video (16:9) via format presets and per-panel format views. See [Settings](/schema/settings).
-- **Extensibility.** Custom properties prefixed with `x-` are allowed at the manifest root (and pattern-allowed throughout the format); a plugin system covers specialized content. See [Extensions](/schema/extensions).
+- **Extensibility.** Custom properties prefixed with `x-` are allowed at the manifest root, on panels and on extras blocks (since 1.7); a plugin system covers specialized content. See [Extensions](/schema/extensions).
 - **Robustness.** Locale fallback chains, conditional content via variables, preload strategies, and memory budget hints support graceful degradation.
 - **Monetization and accessibility built in.** Paywall rules, entitlements, age gates, alt texts, captions, and transcripts are part of the format, not bolted on.
 
