@@ -559,6 +559,11 @@
                 "icon": "send"
               },
               {
+                "title": "Publishing and Sharing",
+                "path": "guides/publishing",
+                "icon": "share-2"
+              },
+              {
                 "title": "Export",
                 "path": "cms/export",
                 "icon": "upload"
