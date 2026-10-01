@@ -15,7 +15,7 @@ PanelWave is open-core. The format and the player are open; the authoring tool i
 | **PanelWave Player** | `@panelwave/player`, an Angular library that loads a manifest and renders the full reading experience: graph navigation, layers, speech bubbles, hotspots, audio, video, localization, paywalls. | MIT |
 | **PanelWave CMS** | A SaaS application for authoring and publishing works: a visual editor, asset pipeline, localization workflow, monetization, analytics, and export. It **embeds the open-source player** for preview, so what you see while authoring is what readers get. | Proprietary |
 
-The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. On top of the CMS sits the **MCP gateway**, which lets AI assistants do the authoring work with you (see [below](#working-with-ai-assistants)). Tooling for developers lives in two npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format) and [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests).
+The layers connect through the manifest: the CMS *writes* manifests, the player *reads* them, and the schema *validates* both. On top of the CMS sits the **MCP gateway**, which lets AI assistants do the authoring work with you (see [below](#working-with-ai-assistants)). Tooling for developers lives in three npm packages: [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) (TypeScript interfaces mirroring the format), [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) (validate, bundle, diff, and upgrade manifests) and [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) (the local bridge that connects desktop AI assistants and uploads artwork folders).
 
 ```mermaid
 graph LR
@@ -76,7 +76,7 @@ The open layers are developed in public on GitHub under [github.com/panelwave](h
 |---|---|---|---|
 | [panelwave/schema](https://github.com/panelwave/schema) | The JSON Schema (`1.0/panelwave.schema.json`) | — | CC BY 4.0 |
 | [panelwave/player](https://github.com/panelwave/player) | The Angular player library and demo app ([live demo](https://panelwave.github.io/player/)) | [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) | MIT |
-| [panelwave/packages](https://github.com/panelwave/packages) | The SDK: TypeScript types and the CLI | [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types), [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) | MIT |
+| [panelwave/packages](https://github.com/panelwave/packages) | The SDK: TypeScript types, the CLI and the local MCP bridge for AI assistants | [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types), [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli), [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) | MIT |
 
 Bug reports and contributions go to the issue tracker of the matching repository.
 

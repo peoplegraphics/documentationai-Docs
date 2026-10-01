@@ -69,14 +69,15 @@ The gateway adds no second set of rules. Every tool calls the CMS API **with the
 - **Confirmation** — anything destructive, such as deleting panels or publishing to production, needs the user's confirmation in the assistant's own dialog.
 - **Audit and control** — every tool call is logged without its text, connections can be disconnected at any time, and the operators can pause the gateway platform-wide.
 
-For files on the creator's computer, the open-source local bridge `@panelwave/mcp` connects desktop assistants and uploads whole folders of artwork straight to storage. See [Local bridge](/cms/integrations/local-bridge).
+For files on the creator's computer, the open-source local bridge [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) connects desktop assistants and uploads whole folders of artwork straight to storage. See [Local bridge](/cms/integrations/local-bridge).
 
 ### SDK packages
 
-Two npm packages, developed together in the [panelwave/packages](https://github.com/panelwave/packages) monorepo, support developers working with the format directly:
+Three npm packages are developed together in the [panelwave/packages](https://github.com/panelwave/packages) monorepo. Two support developers working with the format directly, the third connects AI assistants:
 
 - **[`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types)** — TypeScript interfaces mirroring the schema, for type-safe manifest handling (`npm install @panelwave/types`).
 - **[`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli)** — command-line `validate`, `bundle`, `diff`, and `upgrade` for manifests (`npm install -g @panelwave/cli`). Its bundled schema copy is checked against panelwave/schema on every build. See [CLI](/schema/cli).
+- **[`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp)** — the local MCP bridge for desktop assistants: mirrors the hosted MCP gateway and adds sandboxed tools to read scripts and upload folders of artwork (`npx -y @panelwave/mcp`). See [Local bridge](/cms/integrations/local-bridge).
 
 ## Open-core licensing
 

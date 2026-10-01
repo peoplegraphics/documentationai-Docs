@@ -5,6 +5,20 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-01" description="SDK · @panelwave/mcp 0.1.0 on npm — the local bridge for AI assistants" tags={["feature"]}>
+  ## The local MCP bridge is on npm
+
+  [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) **0.1.0** is published (MIT, source in
+  [panelwave/packages](https://github.com/panelwave/packages/tree/master/packages/mcp)).
+  Desktop assistants — Claude Desktop, Cowork, Claude Code, Cursor and any
+  other stdio MCP client — start it with `npx -y @panelwave/mcp`. It mirrors
+  every tool of the hosted server at `https://mcp.panelwave.org/mcp` and adds
+  three local tools: list files, read a script, and upload a whole folder of
+  artwork straight to storage (deduplicated, resumable, large files in parts).
+  The local tools only work inside the folders you allow in
+  `PANELWAVE_ALLOWED_DIRS`. Setup per client: [Local bridge](/cms/integrations/local-bridge).
+</Update>
+
 <Update label="2026-10-01" description="CMS · Player — lean published manifests, playable work archives, friendly panel ids" tags={["feature", "bugfix"]}>
   ## Published manifests are lean; archives play from disk
 
@@ -79,7 +93,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
   Sign in to PanelWave and choose the permissions on the new consent screen.
   Scripts and clients with static headers use a personal access token instead.
   The open-source [local bridge](/cms/integrations/local-bridge)
-  (`@panelwave/mcp`, being published to npm) lets desktop assistants read
+  ([`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) on npm) lets desktop assistants read
   scripts and upload whole folders of artwork from your computer.
 
   **You stay in control:**

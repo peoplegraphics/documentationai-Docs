@@ -13,9 +13,7 @@ Hosted assistants can't see the files on your computer. The **local bridge** clo
 
 The files go straight from your computer to PanelWave's storage. They never pass through the AI model, so large videos are no problem.
 
-<Callout kind="alert">
-  **Release status:** the `@panelwave/mcp` package is being published to npm right after the gateway launch. Until it is available, the `npx` commands below cannot download it — connect your assistant to `https://mcp.panelwave.org/mcp` directly and upload artwork in the [asset library](/cms/assets).
-</Callout>
+The bridge is published on npm as [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) (MIT license); the source is in [panelwave/packages](https://github.com/panelwave/packages/tree/master/packages/mcp). `npx` downloads it on first use, so there is nothing to install by hand.
 
 <Callout kind="info">
   The bridge only reads inside the folders you list in `PANELWAVE_ALLOWED_DIRS`. Anything outside, including through shortcuts or symbolic links, is refused, and so are hidden files such as `.ssh` or `.env`. It never changes or deletes files on your computer.
