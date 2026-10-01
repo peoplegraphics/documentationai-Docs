@@ -19,10 +19,10 @@ graph LR
 | Property | Type | Required | Description |
 |----------|------|:--:|-------------|
 | `entry` | [`Identifier`](/schema/manifest-structure#identifier) \| `Identifier[]` (min 1, unique) | Yes | The panel where the chapter starts. An array declares multiple possible entry points |
-| `edges` | `Edge[]` (min 1) | Yes | Directed connections between panels |
+| `edges` | `Edge[]` | Yes | Directed connections between panels. May be empty since 1.7 (it was min 1 before) |
 | `nodes` | object (ID → `{ label: LocalizedString }`) | — | Optional per-node metadata (display labels, e.g. for a chapter map) |
 
-All panel references (`entry`, `from`, `to`) are keys of the chapter's `panels` map. A graph needs at least one edge — even a two-panel chapter connects them explicitly.
+All panel references (`entry`, `from`, `to`) are keys of the chapter's `panels` map. Since format 1.7 `edges` may be empty (`"edges": []`): a chapter without edges — for example a single-panel chapter — follows its panels' reading order. The property itself stays required.
 
 ## `Edge`
 
