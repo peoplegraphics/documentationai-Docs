@@ -5,6 +5,71 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-02" description="Reader · Player — links to every page and panel, page colors, fullscreen, video pacing" tags={["feature", "bugfix"]}>
+  ## Pages and panels you can link to, and pages that look like the CMS
+
+  In the PanelWave reader and the CMS [preview](/cms/preview); in
+  `@panelwave/player` from its next release. Details in
+  [Reader Interface](/player/reader-interface).
+
+  - **Cover first, then the page.** A work opens on its cover and continues
+    in page view. A reader returning to a bookmark sees the cover too, with
+    their page behind it.
+  - **A link for every page and panel.** The address bar follows the reader:
+    `?page=pg-D3` in page view, `?panel=ch1-p022` in panel view. Opening such
+    a link starts right there, without the cover. A page link opened on
+    another kind of screen opens the page with the same panels. New player
+    output `locationChange`, inputs `initialPageId` and `initialViewMode`,
+    and the `locationUrl` / `parseLocationSearch` helpers
+    ([inputs and outputs](/player/inputs-outputs)).
+  - **Sharing that works.** The **Share** dialog shows the link to the page or
+    panel on screen (it was empty), and its QR code is drawn in the browser
+    instead of loading as a broken image from a third-party service.
+  - **Language switch for translated works.** The toolbar offers every
+    language the work's text is translated into, not just the languages
+    listed in the work's settings.
+  - **The page's own color.** The page background color fills the gutters in
+    page view and the frame around the panel in panel view, and it switches
+    with the page. The light-gray border around the page is gone; the page
+    runs edge to edge.
+  - **Navigation.** Page view shows the previous/next arrows on hover like
+    panel view. Double-click a panel to open it large, and double-click again
+    to return to the page.
+  - **Video pacing.** Image panels between two videos on a page pause the
+    video sequence for their display duration, so the art gets read before
+    the next video starts. Hovering or clicking a video that is waiting plays
+    it.
+  - **Toolbar.** A solid bar with a clear top line, a **Fullscreen** button,
+    a *Made with PanelWave* credit and a help link to this documentation.
+  - **Fixes.** Balloon text is centered in its balloon (it could sit high
+    when the lettering font loaded late), also in the CMS editor. The browser
+    tab shows the PanelWave icon.
+</Update>
+
+<Update label="2026-10-02" description="CMS — team invitations by email, role changes, full covers, languages from translations" tags={["feature", "bugfix"]}>
+  ## Inviting your team is one click for them
+
+  - **Invitations are emailed.** Invitees get an **Accept invitation** email.
+    People without an account go straight to sign-up with their email filled
+    in, and they join your team with the invited role instead of getting an
+    empty team of their own. **Resend** emails a fresh link
+    ([Teams and roles](/cms/account#inviting-members)).
+  - **Role changes work.** Changing a member's role on the Team page saved
+    nothing before. Only an owner can grant Admin.
+  - **Fixes on the Team page.** Revoking or resending an invitation, removing
+    a member and deleting a shared character no longer fail. Pending
+    invitations show as soon as the page opens, and newly joined teams appear
+    without signing out and in again.
+  - **Whole covers.** The works grid and the cover preview in Work Properties
+    show the complete cover instead of a 16:9 crop
+    ([My Works](/cms/works)).
+  - **Translations add their language.** Text translated into a language the
+    work did not list (in the editor, by import, from the Localization
+    Workshop or through an AI assistant) adds that language to the work,
+    within your plan's limit, so the published work offers it
+    ([Localization](/cms/localization)).
+</Update>
+
 <Update label="2026-10-02" description="Reader · Player — page layout per screen, cover first, the author's autoplay timing" tags={["feature", "bugfix"]}>
   ## Published works read better on every screen
 

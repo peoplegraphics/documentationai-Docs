@@ -9,6 +9,8 @@ On the **Create your account** page (`/register`) enter your **Full Name**, **Em
 
 Already registered? Use the **Sign in** link at the bottom of the card.
 
+A new account gets its own personal team. If you sign up from a [team invitation](#inviting-members), you join the inviting team instead, and no personal team is created.
+
 ## Signing in
 
 The **Sign in to your account** page (`/login`) asks for your email and password.
@@ -103,13 +105,22 @@ Below the name, **Public address** shows the first part of your reader links (`r
 | **Editor** | Can edit content |
 | **Viewer** | Can view content only |
 
-Owners and admins can change a member's role with the role dropdown in the members table, or remove members. The owner role itself cannot be reassigned from this table.
+Owners and admins can change a member's role with the role dropdown in the members table, or remove members. Only an owner can grant the **Admin** role, and the owner's own role cannot be changed from this table. If a change is refused, the page shows the reason.
 
 ### Inviting members
 
 Click **Invite Member**, enter an **Email Address**, and pick a **Role**. Tick **Invite several people at once** for bulk mode — paste addresses (one per line, or comma/semicolon separated) or **Upload CSV**; everyone gets the role you select.
 
-Outstanding invitations appear under **Pending Invitations**, where you can **Copy link**, **Resend** (generates a fresh link and expiry), or **Revoke**. Invitees open the link and accept while signed in.
+PanelWave emails each invitee an **Accept invitation** link. The confirmation says whether the email went out. If it couldn't be sent, copy the link from the pending invitation and pass it on yourself.
+
+Outstanding invitations appear under **Pending Invitations**, where you can **Copy link**, **Resend** (emails a fresh link with a new expiry), or **Revoke**.
+
+What the invitee sees when they open the link:
+
+- **They already have an account:** the sign-in page says *"<team> invited you as <role>"* with their email filled in. After signing in, the invitation is accepted and the team appears in their team list.
+- **They are new to PanelWave:** they go straight to **Create your account**, with the same note and their email filled in. After signing up they are a member of your team right away, with the invited role. No personal team is created for them.
+
+An invitation can only be accepted with the email address it was sent to.
 
 ### Payouts & payments
 
