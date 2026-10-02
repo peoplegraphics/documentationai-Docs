@@ -96,6 +96,20 @@ The merged config is converted for the renderer with `balloonConfigToRenderOptio
 - Balloons are re-rendered on input changes and once more on `document.fonts.ready`, so late-arriving comic fonts cannot leave stale text measurements.
 - Each balloon wrapper gets `role="img"`, an `aria-label` with the text, keyboard activation (Enter/Space), and click handling that emits `bubbleClick` and — when the bubble has an `audioAssetId` — `bubbleAudioPlay`.
 
+## Fonts and Ames Pro
+
+Balloons are lettered with the font family their config names (`fontFamily`); the default is `'Ames Italic', sans-serif`. The open-licensed lettering fonts (SIL OFL 1.1 — Comic Neue, Bangers and others) ship with the package; include their CSS once as described in [Installation](/player/installation#application-setup).
+
+**Ames Pro** (Blambot) is a commercial font, so it is handled differently depending on who runs the player:
+
+| Where the work is read | Ames Pro |
+|---|---|
+| PanelWave's own players — the CMS [preview](/cms/preview) and [read.panelwave.org](/guides/publishing) | Loaded under PanelWave's license, which covers PanelWave's domains only |
+| `@panelwave/player` from npm, and works exported from the CMS | **Not included** |
+| Your own host | Only with your own license from [blambot.com](https://blambot.com) |
+
+To use Ames in a work you host yourself, license it and add your own `@font-face` declarations for the families `'Ames Italic'`, `'Ames Bold Italic'` and `'Ames Regular'`. Without them, balloons fall back to **Comic Neue** (the engine's default font stack is `'Ames Italic', 'Comic Neue', sans-serif`).
+
 ## Why the engine is shared with the CMS
 
 The PanelWave CMS embeds this player for preview, and its **editor** draws and auto-sizes balloons with the very same engine (on a Canvas 2D surface via `Path2D`, using the public path generators `createSquirclePath`, `createThoughtBalloonPath`, `createShoutBalloonPath`, and running the renderer headless for measurement). Any geometry difference between the two would be a WYSIWYG bug: what a creator letters in the editor must be exactly what readers see.

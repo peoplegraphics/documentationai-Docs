@@ -17,7 +17,7 @@ Inputs may change after the shell has initialized:
 
 - A new **`manifest`** or **`manifestUrl`** reloads the work (the same as calling [`reload()`](#public-methods)): the reading position, all non-persistent variables, open overlays, variant overrides and autoplay are reset, and the analytics session of the previous work is closed. `initialChapterId`, `initialPanelId`, `initialVariables` and the entitlement inputs are read again as part of that reload.
 - **`entitlementSnapshot`** re-evaluates the gates, like `refreshEntitlements()`. Removing it (setting it to `undefined`) makes the reader anonymous again.
-- **`locale`**, **`viewModeOverride`**, **`showToolbar`**, **`autoplay`**, **`secondsPerPanel`** and **`reducedMotion`** apply live, without a reload.
+- **`locale`**, **`viewModeOverride`**, **`pageFormat`**, **`showToolbar`**, **`autoplay`**, **`secondsPerPanel`** and **`reducedMotion`** apply live, without a reload. **`showCover`** is read when a work loads.
 
 See [Switching works](/player/quickstart-embed#switching-works).
 
@@ -42,7 +42,19 @@ See [Switching works](/player/quickstart-embed#switching-works).
 </ResponseField>
 
 <ResponseField name="initialPanelId" field-type="string">
-  Panel to open first (used together with `initialChapterId`).
+  Panel to open first. From the release after 1.2.0 `initialChapterId` is optional: the player looks up the chapter that holds the panel. A panel link opens in panel view, without the cover. From the player release after 1.2.0, a gated panel here (or in a resumed bookmark) opens with its age gate or paywall over the [locked placeholder](/player/paywall-entitlement#locked-panels-on-screen), like the initial load of a gated entry panel.
+</ResponseField>
+
+<ResponseField name="initialPageId" field-type="string">
+  From the release after 1.2.0. Page to open first, by its manifest page id (e.g. from a `?page=` link): it opens in page view, without the cover. If that page belongs to another page format than the reader's screen, the page showing the same panels opens. Takes precedence over `initialPanelId`. An unknown id is ignored.
+</ResponseField>
+
+<ResponseField name="initialViewMode" field-type="'page' | 'panel'">
+  From the release after 1.2.0. View to open in. By default the work opens in **page view** when it has pages (behind the cover; a panel link opens in panel view). `'panel'` opens in panel view. Canvas chapters and a forced `viewModeOverride` keep their view.
+</ResponseField>
+
+<ResponseField name="showCover" field-type="boolean">
+  From the player release after 1.2.0. Open on the work's cover — `meta.cover`, else the image of the `extras.cover` block — when reading starts at the beginning (default `true`). From the release after 1.2.0 a resumed bookmark opens on the cover too, with the bookmarked page behind it. The cover is skipped when the host gives an initial position (`initialPageId`, `initialPanelId`, `initialChapterId`) and when the work has no cover. **Next** (or a click on the cover) starts the story; **previous** on the first panel or page goes back to it, and it heads the thumbnail strip and the table of contents. Set `false` to open straight on the first panel; the cover stays reachable from previous, the strip and the TOC. Read when a work loads.
 </ResponseField>
 
 <ResponseField name="initialVariables" field-type="Record<string, unknown>">
@@ -66,7 +78,7 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
 </ResponseField>
 
 <ResponseField name="entitlementAdapter" field-type="{ hasAccess, getContext, purchase? }">
-  Lower-level override: when set, `hasAccess(panelId)` is awaited before every panel navigation **instead of** the manifest rules, and `getContext()` is seeded into variables at startup. Note that this is the shell's own small interface, not the `EntitlementAdapter` type exported from the package — see [Custom access checks](/player/paywall-entitlement#custom-access-checks).
+  Lower-level override: when set, `hasAccess(panelId)` is awaited before every panel navigation **instead of** the manifest rules, and `getContext()` is seeded into variables at startup. It gates **navigation only, not rendering**: a refused entry panel gets the paywall over its rendered content, and page and canvas view show refused panels — don't rely on it to hide content. Note that this is the shell's own small interface, not the `EntitlementAdapter` type exported from the package — see [Custom access checks](/player/paywall-entitlement#custom-access-checks).
 </ResponseField>
 
 ### Reading behavior
@@ -79,22 +91,46 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
   `'auto'` (default) follows the manifest (canvas chapters open in canvas view); `'panel'` forces classic panel view; `'canvas'` enters canvas view whenever the chapter allows it. A changed value applies to the running view. See [Canvas View](/player/canvas-view).
 </ResponseField>
 
+<ResponseField name="pageFormat" field-type="'auto' | OutputFormat">
+  From the player release after 1.2.0. Which page sequence page view shows — a chapter carries one per output format (`Page.layout.format`). `'auto'` (default) picks the authored format that suits the player's box: portrait phones prefer `mobile-portrait`, portrait tablets `tablet-portrait`, landscape screens the wide formats (`desktop-landscape`, …) and 4K screens `bigscreen-landscape`, falling back to the closest available format; it re-picks on resize. A format id (e.g. `'tablet-portrait'`) forces that sequence when the work has pages for it, otherwise `'auto'` applies. Pages without a format belong to every sequence. A changed value applies live and re-opens the page that shows the current panel.
+</ResponseField>
+
 <ResponseField name="reducedMotion" field-type="boolean">
   Force reduced motion (default `false`). Reduced motion is **also** on when the operating system asks for it (`prefers-reduced-motion`, followed live) or when the reader enabled it in Settings — this input can only add it, not turn it off. Under reduced motion, panel/page transitions and canvas camera glides are instant and on-view videos degrade to click-to-play. Changes apply live.
 </ResponseField>
 
 <ResponseField name="secondsPerPanel" field-type="number">
-  Autoplay seconds per panel (default `5`) when a panel defines no `durationMs`. Readers can adjust it from 0.5 to 120 s in the toolbar. A new value re-arms a running autoplay with the new timing.
+  Autoplay seconds per panel (default `5`) for panels without an authored `durationMs` (and, from the player release after 1.2.0, for the cover). Readers can adjust it from 0.5 to 120 s in the toolbar. From the player release after 1.2.0, picking a speed there replaces the author's timing: the reader's seconds then apply to every panel, including those with a `durationMs`, until the reader switches back with the toolbar's **Author** button. A new value re-arms a running autoplay with the new timing.
 </ResponseField>
 
 <ResponseField name="autoplay" field-type="boolean">
   Start in autoplay (default `false`). The shell starts autoplay once the work is ready; after that the reader's toolbar toggle takes over. Changing the input later starts or stops autoplay.
 </ResponseField>
 
+<ResponseField name="shareUrl" field-type="string">
+  From the release after 1.2.0. The link the share dialog offers (copy, social networks, QR code). Default: the current page address with the reading position: `?page=` in page view, `?panel=` in panel view, nothing on the cover. `embed` is removed. The QR code is drawn in the browser; the link is not sent to any service.
+</ResponseField>
+
 ## Outputs
 
 <ResponseField name="ready" field-type="EventEmitter<void>">
   Fires once the manifest is loaded, validated, tracking is configured, and the initial panel is set.
+</ResponseField>
+
+<ResponseField name="locationChange" field-type="EventEmitter<PlayerLocation>">
+  From the release after 1.2.0. The reading position changed: `{ view: 'cover' | 'page' | 'panel' | 'canvas'; chapterId?; panelId?; pageId? }`. Page view reports page changes, not every panel the reader focuses. Hosts use it to keep the position in the address bar, so every page and panel has its own URL:
+
+  ```ts
+  import { locationUrl, parseLocationSearch, type PlayerLocation } from '@panelwave/player';
+
+  start = parseLocationSearch(location.search); // → [initialPageId] / [initialPanelId]
+
+  onLocationChange(position: PlayerLocation) {
+    history.replaceState(history.state, '', locationUrl(location.href, position));
+  }
+  ```
+
+  `locationUrl` sets `?page=<pageId>` (page view) or `?panel=<panelId>` (panel and canvas view), removes both on the cover and keeps every other parameter. The public reader does exactly this.
 </ResponseField>
 
 <ResponseField name="panelChange" field-type="EventEmitter<PlayerPanelChangeEvent>">
@@ -177,11 +213,11 @@ With a template reference (`#player`) or `@ViewChild(PlayerShellComponent)` you 
 
 | Method | Signature | Semantics |
 |---|---|---|
-| `navigateToChapter` | `(chapterId: string) => Promise<void>` | Jump to a chapter's graph entry panel |
-| `navigateToPanel` | `(chapterId: string, panelId: string) => Promise<void>` | Jump to a specific panel (paywall-checked: a gated panel raises the paywall or age gate instead) |
-| `navigateNext` | `() => Promise<void>` | Follow the graph forward (condition + priority resolution) |
-| `navigatePrevious` | `() => Promise<void>` | Follow an incoming edge back |
-| `navigateToNextPage` / `navigateToPreviousPage` | `() => void` | Page-view navigation |
+| `navigateToChapter` | `(chapterId: string) => Promise<void>` | Jump to a chapter's graph entry panel (paywall-checked from the player release after 1.2.0: a gated entry raises the gate and the reader stays put) |
+| `navigateToPanel` | `(chapterId: string, panelId: string) => Promise<void>` | Jump to a specific panel (paywall-checked: a gated panel raises the paywall or age gate instead); in page view the page showing the panel opens |
+| `navigateNext` | `() => Promise<void>` | Follow the graph forward (condition + priority resolution); in a chapter without edges, the next panel in reading order (from the release after 1.2.0) |
+| `navigatePrevious` | `() => Promise<void>` | Follow an incoming edge back (in a chapter without edges, the previous panel in reading order); on the work's first panel, back to the cover when there is one (`showCover`) |
+| `navigateToNextPage` / `navigateToPreviousPage` | `() => void` (`() => Promise<void>` from the release after 1.2.0) | Page-view navigation through the page sequence of the active `pageFormat`; from the release after 1.2.0 it continues into the next / previous chapter, and previous on the work's first page returns to the cover |
 | `changeLocale` | `(locale: LocaleCode) => void` | Switch the content locale |
 | `setVariable` | `(key, value, scope?) => void` | Set a variable (`scope` defaults to `'session'`); emits `variableChange` |
 | `getVariable` | `(key, scope?, scopeId?) => unknown` | Read a variable |

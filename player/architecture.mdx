@@ -7,12 +7,13 @@ This page describes the internal architecture of `@panelwave/player` for contrib
 
 ## Workspace layout
 
-The player lives in an Angular CLI workspace with two projects:
+The player lives in an Angular CLI workspace with three projects:
 
 | Project | Path | Purpose |
 |---|---|---|
 | `player` | `projects/player/` | The publishable library (`ng-packagr`, entry point `src/public-api.ts`) |
 | `demo` | `projects/demo/` | The [demo application](/player/demo-app) — local development (`npm start`), the E2E suite's host, and the live demo at [panelwave.github.io/player](https://panelwave.github.io/player/) |
+| `reader` | `projects/reader/` | The public [reader app](/player/development#reader-app) behind read.panelwave.org — mounts `pw-player-shell` full-window for a manifest the server names |
 
 Inside the library, `projects/player/src/lib/` is organized into four layers:
 
@@ -119,16 +120,16 @@ Step by step:
 1. **Load.** The host passes a `manifestUrl` (fetched with `HttpClient` via `ManifestService.loadManifestFromUrl()`) or a `PanelWaveManifest` object to `PlayerShellComponent`.
 2. **Validate and index.** `ManifestService` performs structural validation (required `panelwave.version`, `meta`, non-empty `chapters`, per-chapter `panels` and `graph.entry`) and builds `Map` indexes for panels, chapters, and assets so all later lookups are O(1).
 3. **Initialize context.** Manifest variable definitions are registered, `initialVariables` are seeded, the paywall is armed (`PaywallService` gets the manifest's rules and the host's entitlement snapshot, topped up with an age verification stored on the device), and an entitlement adapter's context — if one is provided — is seeded on top. The initial locale is applied to both content (`PlayerStateService.setLocale`) and GUI strings (`TranslationService.setLanguage`). The manifest's `tracking` section configures `TrackingService` (consent requirement, event whitelist, endpoint).
-4. **Navigate to the start.** The host's initial position if given, otherwise the reader's stored bookmark for this work, otherwise the first chapter's `graph.entry` (resolved via `FlowEngineService`). Setting the current panel emits `panelChange` once.
+4. **Navigate to the start.** The host's initial position if given, otherwise the reader's stored bookmark for this work, otherwise the first chapter's `graph.entry` (resolved via `FlowEngineService`) — from the player release after 1.2.0 shown behind the work's cover when it has one (`showCover`), and gated like any other move: a locked entry panel opens with the age gate or paywall over its placeholder. Setting the current panel emits `panelChange` once.
 5. **Render.** `ViewportComponent` receives the current panel (or page, in page view) and renders each layer through `LayerRendererComponent`, which delegates to the type-specific layer components. `SpeechBubblesComponent` renders balloons on top using the [ComicBalloon engine](/player/balloon-renderer).
-6. **Navigate onward.** User input (keys, swipes, toolbar, hotspots) triggers graph traversal through `FlowEngineService` with the current [variable context](/player/state-and-conditions).
+6. **Navigate onward.** User input (keys, swipes, toolbar, hotspots) triggers graph traversal through `FlowEngineService` with the current [variable context](/player/state-and-conditions); a chapter without edges follows its reading order.
 
 ## View modes
 
 The player renders in one of three view modes (`'panel' | 'page' | 'canvas'`):
 
 - **Panel view** (default): one panel at a time; navigation follows the chapter graph edge by edge.
-- **Page view**: a whole comic page with its `layout.placements`; navigation moves page by page, and `Page.readingOrder` drives things like video sequencing. Page view is only offered when at least one chapter defines `pages`.
+- **Page view**: a whole comic page with its `layout.placements`; navigation moves page by page, and `Page.readingOrder` drives things like video sequencing. Page view is only offered when at least one chapter defines `pages`. From the player release after 1.2.0 it shows the page sequence of one output format, picked for the screen (`pageFormat`, `utils/page-format-utils.ts`), in that format's aspect ratio, and pages on into the adjacent chapters.
 - **Canvas view**: chapters with an infinite-canvas layout (format 1.4) render on `pw-canvas-stage` with a moving camera — see [Canvas View](/player/canvas-view).
 
 The shell owns the mode switch (`onToggleView()`) and re-arms autoplay and the video sequencer when it changes.

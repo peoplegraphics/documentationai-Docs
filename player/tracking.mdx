@@ -131,7 +131,7 @@ Beyond video events, the shell instruments the reading session automatically —
 |---|---|---|
 | `session_start` | Once, when tracking is configured | `deviceType`, `locale`, `totalPanels` (reading-order count) |
 | `panel_view` | Each panel the reader lands on (deduplicated) | `panelId`, `chapterId`, `panelOrder` |
-| `work_complete` | Once, when the reader reaches an end panel | `panelId`, `chapterId` |
+| `work_complete` | Once, when the reader reaches an end panel of the last chapter (in a chapter without edges: its last panel in reading order) | `panelId`, `chapterId` |
 | `hotspot_click` | Every click/tap on panel content (panel, page and canvas view) | see below |
 | `branch_choice` | The reader picked a path in the branch chooser | `chapterId`, `from`, `to`, `index` (position in the edge list) |
 | `like` | Like toggled | `workId`, `liked` |

@@ -10,14 +10,16 @@ This page describes the player from the reader's point of view: every visible co
 The player fills its host container with three UI layers:
 
 1. **Viewport** (`pw-viewport`) — renders the current panel (panel view) or the current page with all its placed panels (page view), including image/video/text layers and speech bubbles. Works with an infinite-canvas chapter render on the [canvas stage](/player/canvas-view) instead.
-2. **Toolbar** (`pw-toolbar`) — a bottom bar with all reader controls. Hidden by default unless the integrator sets `[showToolbar]="true"`.
+2. **Toolbar** (`pw-toolbar`) — a bottom bar with all reader controls, from the release after 1.2.0 a solid bar with a clear top edge. Hidden by default unless the integrator sets `[showToolbar]="true"`.
 3. **Modals and overlays** — table of contents, settings, language picker, character roster, extras viewer, branch chooser, share modal, comments drawer, paywall and age gate, and a thumbnail strip.
 
-While the toolbar is hidden, a **floating menu button** (hamburger icon, bottom of the viewport) lets readers bring it back. Clicking anywhere on the viewport also shows the toolbar temporarily — it auto-hides again after 5 seconds.
+While the toolbar is hidden, a **floating button** in the bottom-right corner lets readers bring it back — it shows the PanelWave icon from the player release after 1.2.0 (a hamburger icon before). Clicking anywhere on the viewport also shows the toolbar temporarily — it auto-hides again after 5 seconds.
 
-<Callout kind="info">
-The player has no built-in fullscreen button. It fills whatever container the embedding application gives it; fullscreen (e.g. via the Fullscreen API) is the host application's responsibility.
-</Callout>
+The player fills whatever container the embedding application gives it. From the release after 1.2.0 the toolbar's **Fullscreen** button shows it fullscreen (browser Fullscreen API) and returns to the browser view; where the browser has no fullscreen (iPhone Safari) the button is hidden.
+
+### Page background
+
+From the release after 1.2.0 the page's background color — [`visual.background_color`](/schema/chapters-and-pages), else the work's [`default_page_bg_color`](/schema/settings), else dark gray `#1a1a1a` — fills the space between the panels in page view and the space around the page. In panel view it frames the panel: the color of the page the panel belongs to, so when page 1 is white and page 2 black, the frame turns black with the first panel of page 2. The page runs edge to edge, without an inset border.
 
 ## Navigation
 
@@ -27,11 +29,43 @@ Panel view shows one panel at a time and follows the chapter's [graph](/concepts
 
 - **Next** follows the outgoing edge of the current panel. When several edges match, their [JSON Logic](/concepts/variables) conditions are evaluated against the current variables and the highest-priority valid edge wins — this is how branching narratives resolve.
 - **Previous** follows an incoming edge back.
+- A chapter **without any edges** (allowed from format 1.7) is read in its reading order: the entry panel, then the remaining panels in the order the chapter lists them. From the player release after 1.2.0, next and previous follow that order (1.2.0 stopped on the entry panel).
 - Hovering the left/right edge of the viewport reveals **navigation arrow zones** (chevron icons); panels larger than the viewport additionally show **overflow arrows** for panning.
+- From the release after 1.2.0, **double-clicking** the panel returns to page view, on the page that holds it.
 
 ### Page view
 
-If the manifest defines page layouts, the **View** toolbar button toggles between panel view and page view. Page view renders all panels of a page in their placed positions; next/previous then move page by page, and the current panel follows the page's reading order. Video panels on a page play one after another in reading order (see [video sequencing behavior](/schema/video)).
+If the manifest defines page layouts, the **View** toolbar button toggles between panel view and page view. From the release after 1.2.0 a work **opens in page view** (after the cover); hosts can start in panel view with [`initialViewMode`](/player/inputs-outputs#content). Page view renders all panels of a page in their placed positions; next/previous then move page by page, and the current panel follows the page's reading order.
+
+From the release after 1.2.0:
+
+- Hovering the left/right edge shows the same **navigation arrows** as in panel view; they turn the page.
+- **Double-clicking a panel** opens it large in panel view.
+- **Video panels** on a page play one after another in reading order (see [video sequencing behavior](/schema/video)). **Image panels between two videos pause the sequence for their display duration** (the CMS timeline's `durationMs`, else the reader's autoplay seconds), so the art gets read before the next video starts: video A (3 s), image B (2 s), image C (4 s), video D (6 s) plays A, waits 6 s, then plays D. Image panels before the first video delay it; image panels after the last one delay the autoplay page turn.
+- **Hovering a video** that is not playing (waiting for its turn, or finished) plays it while the pointer rests on it. **Clicking** a video that is not playing plays it, in page and panel view.
+
+From the player release after 1.2.0, page view also adapts to the screen:
+
+- **One page sequence per screen.** A work authored for several [output formats](/schema/chapters-and-pages) carries one page sequence per format. The player shows the one that suits the screen — `mobile-portrait` on a phone, `tablet-portrait` on a portrait tablet, a wide format on a desktop, `bigscreen-landscape` on a 4K display — and picks again when the window is resized or the device rotated, re-opening the page that shows the current panel. The host can force a format with the [`pageFormat`](/player/inputs-outputs#reading-behavior) input.
+- **The page fills the screen** in its format's aspect ratio (1.2.0 used a fixed 16:9 box of at most 1400 px for every format).
+- **Paging crosses chapters:** next on a chapter's last page opens the next chapter's first page, previous on its first page the previous chapter's last page.
+- **Thumbnails and table-of-contents entries** open the page that shows the panel.
+
+### Cover
+
+From the player release after 1.2.0, a work that starts from the beginning opens on its **cover** — `meta.cover`, else the image of the work's cover extras block. Clicking the cover, **next**, a swipe or autoplay starts the story; **previous** on the first panel (or page) goes back to it. The cover is the first entry of the thumbnail strip and the table of contents. From the release after 1.2.0 a work always starts on the cover, also when reading resumes at a bookmark (the bookmarked page waits behind it); leaving the cover opens page view. It is skipped when the reader follows a link to a page or panel (see below) or the host opens a specific chapter or panel, and the host can turn it off with the `showCover` input.
+
+### Links to pages and panels
+
+From the release after 1.2.0 every page and every panel has its own address in the [public reader](/guides/publishing#what-readers-see), so readers can bookmark and share exactly what they see:
+
+| Address | Opens |
+|---|---|
+| `…/team/work` | The cover, then page view |
+| `…/team/work?page=pg-D3` | That page in page view |
+| `…/team/work?panel=ch1-p022` | That panel in panel view |
+
+The address bar follows the reader while they read (without adding a browser history entry per panel). A page link opened on a screen with another page format (a desktop link on a phone) opens the page that shows the same panels. The **Share** dialog offers this link; its QR code is drawn in the browser. Embedders get the same behavior with the [`locationChange`](/player/inputs-outputs#outputs) output.
 
 ### Interactive hotspots
 
@@ -62,6 +96,8 @@ When **at least two paths** lead on from the current panel — outgoing edges wh
 | `T` | Toggle toolbar |
 | `Esc` | Close the open dialog; with no dialog open, hide the toolbar |
 | Click / tap viewport | Show toolbar temporarily (5 s) |
+| Double-click a panel (page view) | Open it in panel view (from the release after 1.2.0) |
+| Double-click (panel view) | Back to page view (from the release after 1.2.0) |
 | Swipe left | Navigate forward |
 | Swipe right | Navigate backward |
 
@@ -76,13 +112,14 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 | Control | Behavior |
 |---|---|
 | **View** | Toggle page/panel view. Disabled when the manifest defines no pages. |
-| **Language** (globe) | Opens the language modal. Only shown when the work has more than one locale. |
+| **Language** (globe) | Opens the language modal. Only shown when the work has more than one language: `meta.locales` plus, from the release after 1.2.0, every language the work's speech bubbles and text layers are translated into and the active languages of the `localization` block. |
+| **Fullscreen** | From the release after 1.2.0. Shows the player in fullscreen; in fullscreen the button returns to the browser view (Esc does too). Hidden where the browser has no fullscreen (iPhone Safari). |
 | **Speech** | Toggle speech bubbles on/off. Seeded from `settings.ui.speechDefault`; hides **all** bubbles implicitly (schema 1.3) — no per-bubble `visibleIf` boilerplate involved. Off also mutes the `voiceover` bus (spoken lines belong to the bubbles they voice). |
 | **Audio** | Master mute for the whole player: every audio-engine bus (ambient, music, voiceover, sfx) **and** video sound. Seeded from `settings.ui.audioDefault`. While off, video layers stay muted and show no unmute affordance. |
 | **SFX** | Mute/unmute the `sfx` bus (which also carries `ui` sounds); the rest of the mix is untouched. Seeded from `settings.ui.sfxDefault`. |
-| **Autoplay** | Start/stop automatic advancing. While active, the button shows a progress bar and **−/+** controls to adjust the seconds-per-panel (0.5–120 s in 1-s steps). |
+| **Autoplay** | Start/stop automatic advancing. While active, the button shows a progress bar and **−/+** controls to adjust the seconds-per-panel (0.5–120 s in 1-s steps). From the player release after 1.2.0 the value is tagged **Author** while the creator's timing plays; after the reader picks a speed, an **Author** button switches back to it (see [Autoplay](#autoplay)). |
 | **Thumbs** | Toggle the thumbnail strip (jump to any panel by its thumbnail). |
-| **ToC** | Open the table of contents (chapters and panels; selecting one navigates there). |
+| **ToC** | Open the table of contents (chapters, pages and panels; selecting one navigates there). |
 | **Settings** | Open the settings modal. |
 | **Characters** | Open the character roster built from `meta.characters` in the manifest. |
 | **Alt** | Cycle alternative panels — only shown when alternatives exist. |
@@ -90,7 +127,8 @@ From left to right (labels are translatable UI strings; icons are Lucide glyphs)
 | **Extras** | Open the extras viewer (covers, character sheets, bonus art — see [Extras](/schema/extras)). |
 | **Like** | Like / unlike the work (see [below](#like-and-bookmark)). Highlighted while liked. |
 | **Bookmark** | Set a bookmark on the current panel, or clear it when you're on the bookmarked panel. Highlighted on the bookmarked panel. |
-| **Share / Comments** | Share opens the share modal (native share sheet where available, else copy link); Comments opens the comments drawer. |
+| **Share / Comments** | Share opens the share modal (native share sheet where available, else copy link); Comments opens the comments drawer. From the release after 1.2.0 the shared link points at what the reader sees (`?page=` in page view, `?panel=` in panel view) and the QR code is drawn in the browser. |
+| **Made with PanelWave** / **?** | From the release after 1.2.0. *PanelWave* links to panelwave.org; the help icon opens this documentation. |
 | **✕** | Close the toolbar. |
 
 The three sound toggles (Speech, Audio, SFX) share one rule for their initial state: a preference the reader set explicitly — from the toolbar or the settings modal, in this or an earlier session (persisted in `localStorage` under `pw-preferences`) — wins; otherwise the work's `settings.ui.speechDefault` / `audioDefault` / `sfxDefault` applies (default: on). Mutes and volumes are independent in the engine, so toggling never loses a stored level. Each toggle emits an `audio_toggle` / `sfx_toggle` / `speech_toggle` tracking event with `{ enabled }`. What the toggles act on — the panel's manifest audio, started and stopped by the shell — is described in [Audio](/player/audio#what-the-shell-plays-automatically).
@@ -112,8 +150,16 @@ Readers start and stop autoplay from the toolbar or Settings. The host can also 
 
 Autoplay advances automatically using, in order of precedence:
 
-1. the current panel's own `durationMs` from the manifest,
+1. the current panel's own `durationMs` from the manifest (the timing the creator set on the CMS timeline),
 2. otherwise the reader-adjustable *seconds per panel* (default 5 s).
+
+From the player release after 1.2.0:
+
+- **The reader's speed wins once chosen.** The toolbar marks the creator's timing with an **Author** tag. Picking a speed with **−/+** switches to the reader's seconds per panel for every panel, including those with a `durationMs`; the **Author** button switches back.
+- **Page view** keeps a page up for the sum of its panels' times (1.2.0 used the current panel's time only).
+- **The cover** stays for the seconds per panel, then the story starts.
+- **Autoplay stops at the end of the work** (its last panel, or last page in page view).
+- **Video panels no longer stall autoplay**: in 1.2.0 the panel after a video was sometimes selected but not painted, so it showed late or not at all.
 
 From the player release after 1.2.0, autoplay also waits for a panel's **animation** in panel and canvas view: the panel stays at least as long as a non-looping layer or viewport animation runs, so a shorter dwell time no longer cuts it off. Looping animations, reduced motion and page view keep the plain dwell time.
 
@@ -130,15 +176,15 @@ The modal edits a working copy: changes apply on **Save**; **Cancel**, a backdro
 
 ## Modals and overlays
 
-- **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation.
-- **Language modal** (`pw-language-modal`) — pick from the work's `meta.locales`; switching updates content and player UI immediately ([Localization](/player/localization)).
+- **Table of Contents** (`pw-toc-overlay`) — chapter/panel navigation. From the player release after 1.2.0 it starts with the cover, shows each panel's artwork as a small thumbnail (none for locked panels), and in a work with pages lists only the pages of the format on screen (1.2.0 listed every format's pages).
+- **Language modal** (`pw-language-modal`) — pick from the work's languages (see the toolbar's **Language** control); switching updates content and player UI immediately ([Localization](/player/localization)).
 - **Character roster** (`pw-character-roster`) — characters with portrait and description from the manifest.
-- **Extras viewer** (`pw-extras-viewer`) — the work's [extras](/schema/extras) with their real media: image galleries (with thumbnails), videos (with their poster), audio tracks, and PDFs or text documents (opened with an *Open document* link); text-only extras render as text. A filter by type (including *Other*) narrows the list. An `openExtras` hotspot opens it directly at the targeted item. A block locked by an `extras` paywall rule is shown with a lock and does not open until the reader has the entitlement.
+- **Extras viewer** (`pw-extras-viewer`) — the work's [extras](/schema/extras) with their real media: image galleries (with thumbnails), videos (with their poster), audio tracks, and PDFs or text documents (opened with an *Open document* link); text-only extras render as text. A filter by type (including *Other*) narrows the list. An `openExtras` hotspot opens it directly at the targeted item. A block locked by an `extras` paywall rule is shown with a lock and does not open until the reader has the entitlement. From the player release after 1.2.0, an extra that carries only a direct `url` (as CMS exports do) shows that image as its thumbnail.
 - **Action modal** (`pw-action-modal`) — the small localized dialog an `openModal` hotspot shows.
 - **Branch chooser** (`pw-branch-chooser`) — the paths open from the current panel; see [Branch choices](#branch-choices).
-- **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation; it scrolls to the current panel when shown and follows along as you read.
+- **Thumbnail strip** (`pw-thumbnail-strip`) — quick visual navigation; it scrolls to the current panel when shown and follows along as you read. From the player release after 1.2.0 it shows each panel's artwork (a small rendition from the asset catalog) in reading order, starts with the cover, separates chapters with a title card (clicking one opens the chapter's first panel), and marks locked panels with a lock instead of their artwork. In page view, the current page's panels are highlighted.
 - **Share modal** and **comments drawer** — social features (surface only; persistence is up to the host application).
-- **Paywall overlay** and **age gate** — shown when the reader reaches content the work's paywall rules lock for them. The paywall offers the rule's **Buy** / **Subscribe** options plus *Sign in* and *Maybe later*, and hands the choice to the host app; the age gate asks for a birth date and, once passed, continues where the reader was going and doesn't ask again on that device. See [Paywall & Entitlement](/player/paywall-entitlement).
+- **Paywall overlay** and **age gate** — shown when the reader reaches content the work's paywall rules lock for them. The paywall offers the rule's **Buy** / **Subscribe** options plus *Sign in* and *Maybe later*, and hands the choice to the host app; the age gate asks for a birth date and, once passed, continues where the reader was going and doesn't ask again on that device. From the player release after 1.2.0, a locked panel shows a **lock placeholder** (*"This panel is part of the full edition."*) wherever it would appear — also on a page next to readable panels, and as the first panel when a work or chapter starts behind a gate. In page view the placeholder is a button (*"Unlock this panel"*; click, `Enter` or `Space`) that opens the age gate or the paywall for that panel; a page with age-locked panels asks for the age once when you turn to it. See [Paywall & Entitlement](/player/paywall-entitlement#locked-panels-on-screen).
 - **Loading & error states** — the shell shows a spinner while the manifest loads and an error screen with a retry button if loading or validation fails.
 
 ## Accessibility

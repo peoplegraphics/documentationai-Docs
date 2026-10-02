@@ -117,11 +117,13 @@ Selection rules in `getNextPanel()`:
 
 Backwards navigation (`navigatePrevious` in the shell) uses `getPreviousPanels()` — the `from` ends of edges pointing *to* the current panel — and takes the first one. There is no persistent history stack in the active state service.
 
+**Chapters without edges** (format 1.7 allows an empty `edges` array): from the player release after 1.2.0 the shell navigates through `getNextInChapter()` / `getPreviousInChapter()`, which use the graph as above when the chapter has edges and otherwise follow the chapter's **reading order** — the entry panel, then the remaining panels in `chapter.panels` key order, with the work's default transition. `work_complete` then fires only on the last panel of that order. Chapters with edges keep graph semantics. In 1.2.0 next stopped on the entry panel of such a chapter.
+
 Beyond stepping, the engine offers graph analysis used by tooling and the shell: `isEntry`/`isEndpoint`, `findEndpoints`, `hasPath(graph, a, b, maxDepth = 100)` and `findPath` (both BFS, ignoring conditions), `hasCycles` (DFS with a recursion stack), and `getReachablePanels`.
 
 ### Entitlement gating
 
-Navigation is also gated by monetization: before entering a panel the shell asks `PaywallService` whether the manifest's paywall rules let this reader in (or, when the host set one, its `entitlementAdapter.hasAccess(panelId)`) and raises the paywall overlay or age gate instead of navigating, and `FlowEngineService` exposes `checkPanelEntitlement` / `checkChapterEntitlement` / `checkWorkEntitlement`, which delegate to `EntitlementService` (with its 5-minute cache). See [Paywall & Entitlement](/player/paywall-entitlement).
+Navigation is also gated by monetization: before entering a panel the shell asks `PaywallService` whether the manifest's paywall rules let this reader in (or, when the host set one, its `entitlementAdapter.hasAccess(panelId)`) and raises the paywall overlay or age gate instead of navigating (from the player release after 1.2.0 also for the entry panel on the initial load, a resumed bookmark and chapter jumps), and `FlowEngineService` exposes `checkPanelEntitlement` / `checkChapterEntitlement` / `checkWorkEntitlement`, which delegate to `EntitlementService` (with its 5-minute cache). See [Paywall & Entitlement](/player/paywall-entitlement).
 
 ## Variants
 
