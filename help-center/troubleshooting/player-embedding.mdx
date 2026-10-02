@@ -21,7 +21,7 @@ Work through the symptom that matches what you see. The full integration guide i
 
 ## Labels show as keys (`toolbar.like`, `paywall.sign_in`, …)
 
-The UI translation files are missing or outdated. Copy them from the package into your build output — `node_modules/@panelwave/player/src/assets/i18n` → `assets/i18n` via the `assets` entry in `angular.json` — instead of keeping your own copy, which misses keys added in newer releases (most recently `player.locked.*`, `navigation.*` and `toolbar.author_timing*` from the release after 1.2.0, and before them `age_gate.*`, `branch_chooser.*` and `paywall.reason_*`). See [Installation](/player/installation#application-setup).
+The UI translation files are missing or outdated. Copy them from the package into your build output — `node_modules/@panelwave/player/src/assets/i18n` → `assets/i18n` via the `assets` entry in `angular.json` — instead of keeping your own copy, which misses keys added in newer releases (most recently `age_gate.*`, `branch_chooser.*` and `paywall.reason_*`). See [Installation](/player/installation#application-setup).
 
 ## The table of contents or thumbnail strip is empty
 
@@ -32,13 +32,13 @@ Both list the loaded work whether you pass `manifestUrl` or `[manifest]`. If the
 The shell reacts to input changes after initialization:
 
 - A new `manifestUrl` / `manifest` reloads the work. `initialChapterId`, `initialPanelId` and `initialVariables` are only read during a load — to jump to another position in the running work, call `navigateToPanel()` instead, or call `reload()` after changing them.
-- `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live (from the release after 1.2.0 also `pageFormat`); a new `entitlementSnapshot` re-evaluates the paywall. `showCover` is only read during a load.
+- `locale`, `viewModeOverride`, `showToolbar`, `autoplay`, `secondsPerPanel` and `reducedMotion` apply live; a new `entitlementSnapshot` re-evaluates the paywall.
 
 If nothing reacts, check that you bind a **new** value (a mutated object with the same reference is not a change for Angular), and that you are on player 1.1.0 or later — 1.0.1 and earlier read their inputs only once. See [Inputs &amp; Outputs](/player/inputs-outputs).
 
 ## Speech balloons use the wrong font
 
-Include the bundled balloon font CSS once in your application styles (`node_modules/@panelwave/player/src/assets/fonts/balloon/balloon-fonts.css`). Ames Pro is a commercial font and is **not** bundled — without a license, balloons fall back to Comic Neue. That is also why balloons set in Ames look different in your own embed than in the CMS preview or on read.panelwave.org: PanelWave's own players load Ames under PanelWave's license, which covers PanelWave's domains only, and CMS exports don't include it. To use Ames on your site, license it from blambot.com and add your own `@font-face`. See [Fonts and Ames Pro](/player/balloon-renderer#fonts-and-ames-pro).
+Include the bundled balloon font CSS once in your application styles (`node_modules/@panelwave/player/src/assets/fonts/balloon/balloon-fonts.css`). Ames Pro is a commercial font and is **not** bundled — without a license, balloons fall back to Comic Neue. See [Installation](/player/installation#application-setup).
 
 ## Audio or video won't start
 
@@ -54,9 +54,7 @@ See [Audio](/player/audio).
 ## Gated content is locked (or nothing is)
 
 - **Everything past the preview is locked:** the player treats the reader as anonymous until you tell it otherwise. Pass what they own via `[entitlementSnapshot]`, or let the player fetch it with `entitlementEndpoint` + `readerToken`. If the endpoint request fails, the reader stays anonymous on purpose.
-- **Nothing is locked:** check that the manifest has `paywall.rules`, and that you haven't set `[entitlementAdapter]` — an adapter replaces the manifest rules with its own `hasAccess()` answer.
-- **Paid panels show with an adapter set:** an `entitlementAdapter` decides navigation, not rendering. A panel it refuses is still rendered — the paywall opens over a refused entry panel, and page and canvas view show refused panels in full. Don't rely on an adapter to hide content: strip it on the server ([`"x-locked": true`](/player/paywall-entitlement#server-stripped-panels) stubs stay locked whatever the adapter says) or pass an `entitlementSnapshot`, which locks rendering too.
-- **Gated panels appear in page or canvas view (1.2.0 and earlier):** these versions checked the paywall only when the reader moved panel by panel. From the release after 1.2.0 every view shows a [locked placeholder](/player/paywall-entitlement#locked-panels-on-screen) for gated panels, and the entry panel is gated on load. A `chapter` rule gates only the chapter named in its `refId`, and an `extras` rule never gates panels — it only locks its extras block. (In 1.0.1 and earlier, chapter rules were ignored and extras rules locked the whole work.)
+- **Nothing is locked:** check that the manifest has `paywall.rules`, and that you haven't set `[entitlementAdapter]` — an adapter replaces the manifest rules with its own `hasAccess()` answer. A `chapter` rule gates only the chapter named in its `refId`, and an `extras` rule never gates panels — it only locks its extras block. (In 1.0.1 and earlier, chapter rules were ignored and extras rules locked the whole work.)
 - **The age gate keeps appearing / never appears:** a passed age gate is remembered per device (`pw-age-verified` in `localStorage`); private browsing forgets it. To skip the prompt for readers you have verified, pass `ageVerified: true` and `age` in the snapshot.
 - **`NullEntitlementAdapter` denies everything:** that only concerns the standalone `EntitlementService`, not the embedded shell.
 

@@ -40,17 +40,15 @@ graph TD
 - loads the manifest via `ManifestService` (`manifestUrl` over HTTP, or the `manifest` object),
 - arms the paywall (`PaywallService` with the manifest's rules and the host's entitlement snapshot, restoring a stored age verification), seeds `initialVariables` and entitlement context variables, and configures `TrackingService` from `manifest.tracking`,
 - restores the reader's like/bookmark for the work and resumes the bookmark when the host gives no start position,
-- owns navigation (`navigateNext`/`navigatePrevious`/`navigateToPanel`/`navigateToChapter`, page-view `navigateToNextPage`/`navigateToPreviousPage`) through `FlowEngineService` (`getNextInChapter` / `getPreviousInChapter`, so chapters without edges follow their reading order),
-- owns the `'panel' | 'page' | 'canvas'` view-mode switch and autoplay (wall-clock timer per panel — the author's `durationMs` or the reader's speed, summed over the page in page view — or media-driven advance for video panels via `VideoControllerService.passComplete$` and `VideoSequencerService.queueComplete`, with a stall watchdog),
-- picks page view's page sequence for the screen (`pageFormat`, re-picked on window resize) and shows the work's cover before the first panel (`showCover`),
-- feeds the viewport its reading-order look-ahead (`preloadTargets`) and warms the first panel or page while the cover is up,
+- owns navigation (`navigateNext`/`navigatePrevious`/`navigateToPanel`/`navigateToChapter`, page-view `navigateToNextPage`/`navigateToPreviousPage`) through `FlowEngineService`,
+- owns the `'panel' | 'page' | 'canvas'` view-mode switch and autoplay (wall-clock timer per panel, or media-driven advance for video panels via `VideoControllerService.passComplete$` and `VideoSequencerService.queueComplete`, with a stall watchdog),
 - handles keyboard shortcuts (`ArrowLeft`/`ArrowRight` navigate, `T` toggles toolbar, `O`/`+`/`-` in canvas view, `Escape` closes the topmost dialog or else hides the toolbar — with a dialog open, the other shortcuts are ignored) and swipe gestures forwarded by the viewport,
 - derives the effective reduced-motion state (host input, reader setting, live OS media query) and passes it to the viewport and canvas stage,
-- raises the paywall overlay or age gate when a navigation hits a locked panel (the entry panel on load included) or a page-view lock placeholder is activated, resumes the interrupted navigation after a passed age gate, keeps a locked panel's audio silent, and turns `PaywallService` enforcement off while a host `entitlementAdapter` decides access,
+- raises the paywall overlay or age gate when a navigation hits a locked panel, and resumes the interrupted navigation after a passed age gate,
 - computes the branch choices (outgoing edges whose conditions pass) for the Choices button, shown only when at least two are open, and traverses the chosen edge,
 - toggles all modal/overlay visibility flags.
 
-Key inputs: `manifestUrl`, `manifest`, `locale`, `initialChapterId`, `initialPanelId`, `initialVariables`, `entitlementSnapshot`, `entitlementEndpoint`, `readerToken`, `entitlementAdapter`, `viewModeOverride`, `pageFormat`, `showCover`, `reducedMotion`, `secondsPerPanel`, `autoplay`, `showToolbar` — all of them may change after init (`ngOnChanges`: a new manifest reloads via the public `reload()`, the rest apply live; `showCover` and the initial-position inputs are read on load). Key outputs: `ready`, `panelChange`, `chapterChange`, `localeChange`, `variableChange`, `navigationAttempt`, `cameraChange`, `paywallAction`, `ageVerified`, `likeChange`, `bookmarkChange`, `error`. The full integrator-facing contract is documented in [Inputs & Outputs](/player/inputs-outputs).
+Key inputs: `manifestUrl`, `manifest`, `locale`, `initialChapterId`, `initialPanelId`, `initialVariables`, `entitlementSnapshot`, `entitlementEndpoint`, `readerToken`, `entitlementAdapter`, `viewModeOverride`, `reducedMotion`, `secondsPerPanel`, `autoplay`, `showToolbar` — all of them may change after init (`ngOnChanges`: a new manifest reloads via the public `reload()`, the rest apply live). Key outputs: `ready`, `panelChange`, `chapterChange`, `localeChange`, `variableChange`, `navigationAttempt`, `cameraChange`, `paywallAction`, `ageVerified`, `likeChange`, `bookmarkChange`, `error`. The full integrator-facing contract is documented in [Inputs & Outputs](/player/inputs-outputs).
 
 ## Viewport and layers
 
@@ -62,9 +60,6 @@ Key inputs: `manifestUrl`, `manifest`, `locale`, `initialChapterId`, `initialPan
 - hover navigation arrows in the outer 15% zones and overflow indicators,
 - optional viewport culling (`enableViewportCulling`) and lazy loading (`enableLazyLoading`),
 - a `performanceMetrics` output (`renderTime`, panel counts, culled count, transform calculation time),
-- the locked placeholder (`pw-locked-panel-placeholder`) in place of any panel that is an `x-locked` stub or that `PaywallService.isPanelLocked()` reports, repainted on `PaywallService.changes$`; in page view the placeholder is a button whose activation emits `lockedPanelActivate` (the panel id) so the shell can raise that panel's gate,
-- page view's page box in the page's format aspect ratio (`pageAspectRatio`), filling the screen,
-- warming the out-edge targets (panel view) and the host's `preloadTargets` (`{ panelId, panel, widthFraction? }[]`, both views) at the image variant each will render at,
 - passing `workBalloonConfig` and `characters` down to the speech-bubble overlay for the [balloon config cascade](/player/balloon-renderer#the-configuration-cascade).
 
 ### LayerRendererComponent (`pw-layer-renderer`)
@@ -91,7 +86,7 @@ Overlays render on top of the viewport content:
 | `PaywallOverlayComponent` | `pw-paywall-overlay` | The paywall gate UI; emits `PaywallAction`s (see [Paywall & Entitlement](/player/paywall-entitlement)) |
 | `AgeGateComponent` | `pw-age-gate` | Birth-date prompt for age-gate rules (rejects impossible dates); emits an `AgeVerificationResult` |
 | `ContentWarningOverlayComponent` | `pw-content-warning-overlay` | Content warning interstitial before gated content |
-| `ThumbnailStripComponent` | `pw-thumbnail-strip` | Panel thumbnail navigation strip: the cover, then per chapter a title card and its panels in reading order, each with a small rendition of its artwork (`panelThumbnailSrc`); locked panels show a lock instead. Scrolls to the current panel (page view: highlights the current page's panels); emits `{ chapterId, panelId, cover? }` navigation targets |
+| `ThumbnailStripComponent` | `pw-thumbnail-strip` | Panel thumbnail navigation strip; scrolls to the current panel; emits navigation targets |
 
 ## Modals (`components/modals/`)
 
@@ -99,7 +94,7 @@ Modal dialogs opened from the toolbar (or by a hotspot action); each has a visib
 
 | Component | Selector | Role |
 |---|---|---|
-| `TocOverlayComponent` | `pw-toc-overlay` | Table of contents: the cover, then chapters with their pages (only those of the active `pageFormat`) or panels, with panel artwork thumbnails (none for locked panels); emits `{ chapterId, panelId?, cover? }` navigation targets |
+| `TocOverlayComponent` | `pw-toc-overlay` | Table of contents; emits `{ chapterId, panelId? }` navigation targets |
 | `SettingsModalComponent` | `pw-settings-modal` | Reader preferences (speech, audio, autoplay speed, accessibility) and public variables; edits a working copy that Save commits and Cancel/Escape discards |
 | `LanguageModalComponent` | `pw-language-modal` | Locale picker fed from `meta.locales` |
 | `CharacterRosterComponent` | `pw-character-roster` | Character gallery mapped from `meta.characters` (portrait, name, bio) |
@@ -113,7 +108,7 @@ Modal dialogs opened from the toolbar (or by a hotspot action); each has a visib
 
 ### ToolbarComponent (`pw-toolbar`)
 
-`components/toolbar/` — the bottom control bar. Inputs reflect the current state (`locale`, `availableLocales`, `viewMode`, `pageViewAvailable`, `speechEnabled`, `audioEnabled`, `sfxEnabled`, `autoplayEnabled`, `secondsPerPanel`, `autoplayTiming` (`'author' | 'manual'`), `autoplayProgress`, `thumbnailsVisible`, `hasAlternatives`, `hasBranches`, `showSocial`); plus `liked` / `bookmarked` for the highlighted state; outputs fire one event per control (toggle view/speech/audio/SFX/autoplay, open ToC/settings/characters/extras/share/comments, show branches, cycle alternatives, locale change, thumbnails, like/bookmark; `secondsPerPanelChange` and `autoplayTimingChange` for the autoplay speed and the Author button). All labels go through ngx-translate. The shell shows it on viewport click and auto-hides it after 5 seconds; while it is hidden, the shell's own floating button (the PanelWave icon, bottom right) opens it. See [Reader Interface](/player/reader-interface) for the user-facing description.
+`components/toolbar/` — the bottom control bar. Inputs reflect the current state (`locale`, `availableLocales`, `viewMode`, `pageViewAvailable`, `speechEnabled`, `audioEnabled`, `sfxEnabled`, `autoplayEnabled`, `secondsPerPanel`, `autoplayProgress`, `thumbnailsVisible`, `hasAlternatives`, `hasBranches`, `showSocial`); plus `liked` / `bookmarked` for the highlighted state; outputs fire one event per control (toggle view/speech/audio/SFX/autoplay, open ToC/settings/characters/extras/share/comments, show branches, cycle alternatives, locale change, thumbnails, like/bookmark). All labels go through ngx-translate. The shell shows it on viewport click and auto-hides it after 5 seconds. See [Reader Interface](/player/reader-interface) for the user-facing description.
 
 ## Helper components (`components/helpers/` and others)
 
@@ -121,7 +116,6 @@ Modal dialogs opened from the toolbar (or by a hotspot action); each has a visib
 |---|---|---|
 | `PwIconComponent` | `pw-icon` | Inline SVG icon set used across all player UI |
 | `TopHudComponent` | `pw-top-hud` | Top heads-up display showing work/chapter/panel titles and quick actions |
-| `LockedPanelComponent` | `pw-locked-panel-placeholder` | `components/locked-panel/` — the lock placeholder of a locked panel (`player.locked.*` texts), used by the viewport and the canvas stage. `actionable` turns it into a button (click, `Enter`, `Space`) that emits `activate` |
 | `WaveFabComponent` | `pw-wave-fab` | Circular floating action button that toggles the toolbar |
 | `ToastContainerComponent` | `pw-toast-container` | Transient toast notifications |
 | `PluginSandboxComponent` | `pw-plugin-sandbox` | Sandboxed iframe host for a plugin instance, paired with `PluginHostService` |

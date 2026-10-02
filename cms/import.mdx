@@ -18,7 +18,7 @@ A **work archive** is the `.zip` produced by the [Archive export](/cms/export#ar
     On the [My Works](/cms/works) page, click **Import Archive**.
   </Step>
   <Step title="Upload the zip">
-    Pick the archive file (up to **50 GiB**). The upload goes directly to storage; progress is shown in the dialog. Archives above 16 MiB are uploaded in parts of 8 MiB; a part that fails is retried up to five times with increasing pauses, so slow or throttled connections still get through, and progress counts the bytes sent — cancelling or closing the dialog stops the upload and discards the parts already sent.
+    Pick the archive file (up to **50 GiB**). The upload goes directly to storage; progress is shown in the dialog. Archives above 1 GiB are uploaded in parts of at least 64 MiB, each retried automatically if it fails — cancelling or closing the dialog stops the upload and discards the parts already sent.
   </Step>
   <Step title="Wait for the import">
     The archive is validated and imported in the background: first the work's structure (in a single transaction — if anything fails, nothing is created), then the media files. The work appears in your list as a **draft** as soon as the structure is in; a marker on the card clears when all assets have arrived.
@@ -30,7 +30,7 @@ A **work archive** is the `.zip` produced by the [Archive export](/cms/export#ar
 
 Everything gets **fresh ids** on import, plan limits apply exactly as for a JSON import, and archives written by format versions 1.0–1.7 are accepted. Use archives to move works **between systems and accounts** — development to production, handing a work to another team, or keeping full local backups.
 
-Panels keep their **friendly ids** (`ch1-p022`) in the copy, so exporting the imported work again yields the same ids, and [translations](/cms/localization) attached to panels, pages and chapters are re-pointed at the new copies — nothing is left orphaned. The same applies to a JSON manifest exported from PanelWave. In an archive import, the work cover, character portraits and extras images point at the imported copies of their files as well.
+Panels keep their **friendly ids** (`ch1-p022`) in the copy, so exporting the imported work again yields the same ids, and [translations](/cms/localization) attached to panels, pages and chapters are re-pointed at the new copies — nothing is left orphaned. The same applies to a JSON manifest exported from PanelWave.
 
 Bubble audio is re-attached to the same bubbles in the copy. A track whose bubble or file is missing from the archive is skipped (the import's statistics count them); archives made before 28 September 2026 carry no bubble audio, so those bubbles arrive silent — regenerate or re-upload their lines.
 
@@ -39,7 +39,7 @@ Bubble audio is re-attached to the same bubbles in the copy. A track whose bubbl
 The archive carries every [paywall rule](/cms/monetization#paywall-rules) of the work — live rules and inactive drafts. The import creates each one **disabled**, with its price, currency, tiers, age limit, and preview count intact and its locked panels pointing at the new copies of those panels. The rule's description gets a note saying when it was imported, whether it was live in the source work, and how many locked panels could not be matched (those are dropped). Review the rules in [Monetization](/cms/monetization) and enable the ones you want — nothing is sold on the target system until you do. Archives made before this change bring only the rules that were live, also disabled.
 
 <Callout kind="info">
-Not carried over (by design): products and reader entitlements, publish history, releases and review links, analytics, and community data (comments, likes). Review the paywall rules and publish anew on the target system.
+Not carried over (by design): products and reader entitlements, publish history and preview links, analytics, and community data (comments, likes). Review the paywall rules and publish anew on the target system.
 </Callout>
 
 ## Importing a JSON manifest

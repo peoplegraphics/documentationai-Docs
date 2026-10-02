@@ -15,7 +15,7 @@ graph LR
 ```
 
 <Callout kind="alert">
-Client-side gating is a **reading-experience layer, not a security boundary.** A determined reader can edit client state. Anything that must not leak — full-resolution art of paid chapters, downloads — has to be withheld by your backend (for example with signed URLs) until the reader is entitled — or left out of the manifest altogether as [server-stripped panels](#server-stripped-panels). See [Monetization](/concepts/monetization).
+Client-side gating is a **reading-experience layer, not a security boundary.** A determined reader can edit client state. Anything that must not leak — full-resolution art of paid chapters, downloads — has to be withheld by your backend (for example with signed URLs) until the reader is entitled. See [Monetization](/concepts/monetization).
 </Callout>
 
 ## The entitlement snapshot
@@ -86,9 +86,7 @@ Which panels a rule gates:
 - **Work rules** (`scope: "work"` or `"global"`) gate the whole work. The first one wins. `previewPanelCount` / `previewPanels` keeps the first *n* panels readable, counted in reading order across the **whole work** (chapters in order, panels in declaration order).
 - **Extras rules** (`scope: "extras"`) never gate panels. They lock the [extras](/schema/extras) block named in `refId`: the extras viewer shows that block with a lock and does not open it until the reader satisfies the rule.
 
-Precedence for a panel's purchase or subscription requirement: panel rule → chapter rule for its chapter → work rule → free.
-
-**Age requirements combine across rules** (from the player release after 1.2.0). Every rule that applies to a panel and names an age must be met — its panel rules, its chapter's rules and every work rule, each outside its own free preview — whichever rule decides the purchase or subscription part. A chapter preview or a panel-scoped `free` rule therefore never skips a work-wide age gate. When several age requirements are unmet, the age gate asks for the highest minimum age, so one answer clears them all. (In 1.2.0 the first matching rule decided everything, age included.)
+Precedence for a panel: panel rule → chapter rule for its chapter → work rule → free.
 
 ```json
 "paywall": {
@@ -107,7 +105,7 @@ Here the first six panels of the work are free and the rest needs a subscription
 `chapter-3` and `art-book` are not entitlement type names, so both rules are purchase gates. Without `requiredProductIds`, a purchase gate is satisfied by **any** product in `purchasedProductIds` — pass only the purchases that belong to this work in the snapshot. The key still names the product the overlay offers (see [below](#what-readers-see-at-a-gate)). To require specific products, list them in `requiredProductIds` (format 1.6+, e.g. `"requiredProductIds": ["chapter-3", "complete-edition"]`): then only those unlock the rule, any one of them is enough. The CMS exports every unlocking product this way.
 </Callout>
 
-To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`. To check a panel the way the player's renderers do (from the release after 1.2.0), use `PaywallService.isPanelLocked(panelId)` and re-check whenever `PaywallService.changes$` fires — see [Core Services](/player/services#paywallservice).
+To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`.
 
 ## What readers see at a gate
 
@@ -117,18 +115,6 @@ When the reader tries to move onto a gated panel, **navigation stops** — they 
 - the **paywall overlay** for everything else: a title for the gated scope, the reason (e.g. *"This part of the story is included with a subscription."*), the **Buy** / **Subscribe** options the rule offers, **Sign in** and **Maybe later**. All texts, including the reason, are translated (English and German ship with the package).
 
 While the paywall or the age gate is open, the story behind it does not move: arrow keys, `T` and swipes are ignored. **Escape** still works — it dismisses the paywall (like *Maybe later*) and closes the age gate, leaving the reader on the panel they were on.
-
-### Locked panels on screen
-
-From the player release after 1.2.0, a gated panel stays locked wherever it would be rendered, not only when the reader moves onto it (in 1.2.0, page and canvas view showed gated panels in full):
-
-- **Every view shows a locked placeholder** — a lock with *"This panel is part of the full edition."* (`player.locked.*` keys) — in place of each panel the reader's snapshot does not open. The other panels of a page stay readable. Placeholders update the moment a lock lifts (age confirmed, `refreshEntitlements()`, a new `entitlementSnapshot`).
-- **In page view a placeholder is a button** (click, `Enter` or `Space`; labelled *"Unlock this panel"*). It raises the gate for that panel in place: the age gate when only the age is missing, otherwise the paywall with that panel's Buy / Subscribe options. Turning onto (or switching to) a page with age-locked panels asks for the age once; confirming unlocks them in place.
-- **The entry panel is gated too.** On the initial load the reader lands on the entry panel with the age gate or the paywall open over its placeholder; confirming the age reveals it in place. A resumed bookmark or an `initialPanelId` on a gated panel behaves the same, and a chapter jump from the table of contents into a gated entry stops like any other move — the gate opens and the reader stays where they were.
-- **The thumbnail strip and the table of contents** show no artwork for locked panels (the strip marks them with a lock).
-- **Audio** of a gated panel stays silent until the lock lifts, and the [preloader](/player/performance#preloading) does not fetch a locked panel's assets ahead of the gate.
-
-While a host [`entitlementAdapter`](#custom-access-checks) decides access, the manifest rules do not lock rendering — see the warning there.
 
 ### Buy and Subscribe options
 
@@ -181,17 +167,6 @@ Called without an argument, `refreshEntitlements()` re-fetches from `entitlement
 
 An edge's `action` mutations (for example a counter the move increments) are applied only once the paywall or age gate lets the move through. A blocked attempt changes no variables; a move held by the age gate applies its mutations when the reader passes.
 
-## Server-stripped panels
-
-Client-side rules can be bypassed, so a server that publishes a paid work for anonymous readers can leave the paid content out instead: it keeps each paid panel's id and position, strips its content and marks it `"x-locked": true` — an [extension property](/schema/extensions) allowed on panels since format 1.7. From the release after 1.2.0 the player:
-
-- renders such a panel as the [locked placeholder](#locked-panels-on-screen), in every view;
-- treats it as locked whatever the rules say — no free preview, entitlement or `entitlementAdapter` opens it, because its content is not in the manifest;
-- raises the applying rule's gate while that rule locks the panel; otherwise the gate asks for a subscription (when the applying rule is a subscription rule) or a purchase — never for the age, so a confirmed age does not re-open the age gate on a stub;
-- reports `PaywallService.isFreeWork` as `false` when any panel is locked.
-
-Only the boolean `true` counts (`"true"` as a string is not a lock); the exported `isLockedPanel(panel)` applies the same test. To show a stripped panel after a purchase, hand the shell a manifest that contains it.
-
 ## Age gates
 
 Age-gate rules are answered **inside the player** — no checkout involved:
@@ -236,11 +211,7 @@ interface ShellEntitlementAdapter {
 
 - `getContext()` values are **seeded** (a privileged write that may populate `readOnly` variables, applied after `initialVariables`), so conditions can reference entitlement flags like `{"var": "premium"}` or a verified `{"var": "user.age"}` that in-story content cannot tamper with.
 - A `false` from `hasAccess()` stops navigation and raises the paywall overlay for that panel.
-- While an adapter is set, the manifest's paywall rules and the age gate are **not** consulted for navigation, and the rules do not [lock rendering](#locked-panels-on-screen) either (`x-locked` stubs stay locked).
-
-<Callout kind="alert">
-**An adapter decides navigation, not rendering.** A panel the adapter refuses is still rendered: a move onto it stops at the gate, but when the adapter refuses the entry panel (initial load, bookmark resume) the paywall opens **over the rendered content**, and page and canvas view show refused panels in full. Don't rely on an adapter to hide content — strip it on the server ([`"x-locked": true`](#server-stripped-panels) stubs stay locked whatever the adapter says) or pass an `entitlementSnapshot`, which locks rendering too.
-</Callout>
+- While an adapter is set, the manifest's paywall rules and the age gate are **not** consulted for navigation.
 
 <Callout kind="alert">
 The `EntitlementAdapter` type you can import from `@panelwave/player` is the richer interface below (`resolveEntitlement`, …), **not** this one. Declare a structurally identical interface in your app, as above. For most integrations `entitlementSnapshot` is the simpler and better choice.
@@ -332,7 +303,6 @@ Both overlays are exported and can be used on their own:
 
 - You know what the reader owns → **`[entitlementSnapshot]`** + `(paywallAction)` + `refreshEntitlements()`.
 - Your backend can answer "what does this reader own?" per work → **`entitlementEndpoint`** + `readerToken`.
-- You need a per-panel yes/no from your own service, or entitlement flags as story variables → the shell's **`[entitlementAdapter]`** (note it bypasses manifest rules and the age gate, and gates navigation only — it doesn't hide content), or `initialVariables` for the flags alone.
-- Paid content must not reach anonymous readers at all → serve a manifest with [server-stripped panels](#server-stripped-panels), combined with any of the above.
+- You need a per-panel yes/no from your own service, or entitlement flags as story variables → the shell's **`[entitlementAdapter]`** (note it bypasses manifest rules and the age gate), or `initialVariables` for the flags alone.
 - You're building screens outside the player (library, store, signed downloads) → the **full adapter** with `EntitlementService`, or the exported evaluator functions.
 

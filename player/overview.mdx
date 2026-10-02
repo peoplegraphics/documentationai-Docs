@@ -38,11 +38,11 @@ All of the following is implemented in the library source (`projects/player/src/
 
 | Area | What you get |
 |---|---|
-| Navigation | Graph traversal with conditional edges and edge priorities (`FlowEngineService`), reading order for chapters without edges, panel, page (one page sequence per output format, picked for the screen) and [canvas](/player/canvas-view) view, an optional cover before the first panel, a branch chooser for panels with several outgoing paths, keyboard and swipe input, autoplay with per-panel durations and video-aware advance |
+| Navigation | Graph traversal with conditional edges and edge priorities (`FlowEngineService`), panel, page and [canvas](/player/canvas-view) view, a branch chooser for panels with several outgoing paths, keyboard and swipe input, autoplay with per-panel durations and video-aware advance |
 | Localization | `LocalizedString` resolution with fallback chains, per-locale asset variants, runtime language switching, translated player UI via `@ngx-translate` |
 | Variables | Five scopes (`global`, `chapter`, `page`, `session`, `persistent`), typed definitions, mutations, JSON Logic context building; `persistent` scope survives reloads via `localStorage` |
 | Media | WebAudio mixer with four buses (`ambient`, `music`, `voiceover`, `sfx`), video controller with a single-active-video policy and stall watchdogs, LRU image cache, lookahead preloading |
-| Monetization | Manifest paywall rules evaluated against an entitlement snapshot you supply (or fetch from your endpoint), work, chapter, panel and extras scopes, a paywall overlay with Buy / Subscribe options derived from the rule, in-player age gate, free-preview panels, lock placeholders for gated and server-stripped (`x-locked`) panels — checkout stays in your app |
+| Monetization | Manifest paywall rules evaluated against an entitlement snapshot you supply (or fetch from your endpoint), work, chapter, panel and extras scopes, a paywall overlay with Buy / Subscribe options derived from the rule, in-player age gate, free-preview panels — checkout stays in your app |
 | Analytics | Consent-aware `TrackingService` with event whitelisting, batching, and a configurable endpoint — driven by the manifest's `tracking` section |
 | Extensibility | Plugin system: sandboxed iframe plugins with a capability model and a postMessage protocol, plus `plugin` layers inside panels |
 | Accessibility | Keyboard navigation (Escape closes the open dialog), ARIA labels and roles throughout the UI, reduced motion from the OS setting, the reader's own setting or the host input, focus management in modals; an automated axe sweep covers every dialog, overlay and view |
@@ -73,11 +73,10 @@ The public API also exports a `PlayerComponent` with selector `pw-player` — it
 - **Standalone reader sites** — any Angular application on a supported version that loads a published manifest and embeds `pw-player-shell`.
 - **The demo application** — ships in the same repository (`projects/demo`), is the reference integration, and runs live at [panelwave.github.io/player](https://panelwave.github.io/player/). See [Demo App](/player/demo-app).
 - **PanelWave CMS preview** — the CMS uses the player for its [preview environment](/cms/preview) so that what creators see is exactly what readers get. Rendering behavior lives in the player, not in a CMS fork.
-- **read.panelwave.org** — where [published works](/guides/publishing) are read. Its frontend is the reader app in the same repository (`projects/reader`), a full-window `pw-player-shell`; see [Development](/player/development#reader-app).
 
 ## Project status
 
-The library is **released**: it is on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) (current release 1.2.0), and new versions are published from the public [GitHub repository](https://github.com/panelwave/player) by its release workflow. Release 1.2.0 supports the format through 1.6; format 1.7 — chapters without graph edges, `x-` extension properties on panels and extras blocks, and [server-stripped `x-locked` panels](/player/paywall-entitlement#server-stripped-panels) — ships with the next player release. Every change runs through lint, the unit suite, a Playwright end-to-end suite (desktop and mobile) and a bundle-size budget of 180 KB minified + gzipped (about 106 KB today) — see [Development & Contributing](/player/development).
+The library is **released**: version 1.0 is on npm as [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player), and new versions are published from the public [GitHub repository](https://github.com/panelwave/player) by its release workflow. It supports the format through 1.5. Every change runs through lint, the unit suite, a Playwright end-to-end suite (desktop and mobile) and a bundle-size budget of 180 KB minified + gzipped (about 106 KB today) — see [Development & Contributing](/player/development).
 
 A few surfaces are still deliberately thin, and the pages in this section say so where it matters: the comments drawer and share modal are UI only (persistence is the host's job), and the manga-mode and high-contrast settings are stored but not yet applied.
 

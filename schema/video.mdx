@@ -48,8 +48,6 @@ For `loop-from`, the semantic constraint `startAtMs <= loopFromMs < asset.durati
 | `on-hover` | Starts on mouseover. Page view only — falls back to `on-click` in panel view and on touch devices. |
 | `on-click` | Starts on click/tap and toggles play/pause thereafter. |
 
-In page view, the PanelWave Player plays the visible `on-view` videos of a page **one after another in reading order**; each plays one full pass before the next starts. From the player release after 1.2.0, image panels between two videos pause that sequence for their display duration (`durationMs`, else the reader's autoplay seconds), and hovering or clicking a video that is not playing starts it early (see [Reader Interface](/player/reader-interface#page-view)).
-
 ### Legacy fields (schema 1.0)
 
 `autoplay` and `loop` remain valid and are not deprecated. Consumers apply this mapping at read time; the new fields always win when present:

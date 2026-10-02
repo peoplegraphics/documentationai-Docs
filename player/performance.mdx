@@ -23,7 +23,6 @@ The player is designed to keep reading fluid on slow networks and modest devices
 - **Idle scheduling**: `low`-priority items are deferred with `requestIdleCallback` (2 s timeout, `setTimeout` fallback) so they never compete with rendering.
 - **Prediction**: `preloadNext(currentIndex, panelUrls, count = 3)` queues the next panels with descending priority (next = `high`, +2 = `medium`, +3 = `low`); `predictAndPreload(currentIndex, totalPanels, direction, panelUrls)` supports `forward`, `backward`, and `auto` (forward 3 + backward 1).
 - **Per-type loading**: images go through `ImageCacheService.preload()`; audio waits for `canplaythrough`; video only fetches metadata (`video.preload = 'metadata'`) to keep preloads cheap.
-- **No gated assets** (from the release after 1.2.0): an item whose `panelId` the paywall [locks](/player/paywall-entitlement#locked-panels-on-screen) for the reader is skipped, so neighbour warming never fetches artwork ahead of the gate. Once the lock lifts, the next preload call loads it. Items without a panel id, or with one the paywall doesn't know, load as before.
 - **Observability**: `status$` emits `queued`/`loading`/`loaded`/`error` per item; `getQueueStatus()` returns counts.
 
 ## Image caching
@@ -31,7 +30,6 @@ The player is designed to keep reading fluid on slow networks and modest devices
 `ImageCacheService` is an LRU cache for decoded images:
 
 - **Decode path**: `fetch()` → `blob` → `createImageBitmap()` where supported (decode off the main thread), falling back to an `HTMLImageElement` from an object URL.
-- **Preload path** (from the release after 1.2.0): `preload(url)` — what `PreloadService` uses — warms the image for the `<img>` that will show it: it loads it through an `Image` element (the same request the `<img>` makes, so it works on storage without CORS headers), waits for `decode()`, and keeps the last 48 warmed elements referenced, so the browser's memory cache hands the next `<img src>` decoded pixels and the panel appears in the frame it mounts. In 1.2.0 preloads went through `fetch()` + `ImageBitmap`, which the `<img>` never reused and which failed on storage without CORS headers.
 - **Memory budget**: 100 MB (`MEMORY_BUDGET`), adjustable at runtime with `setMemoryBudget(bytes)`. Entry size is estimated as `width × height × 4` bytes (RGBA).
 - **LRU mechanics**: the backing `Map`'s insertion order is the recency order — a cache hit re-inserts the entry at the end; eviction pops from the front until the new entry fits. Evicted and removed `ImageBitmap`s are explicitly released with `bitmap.close()`.
 - **Deduplication**: concurrent `load()` calls for the same URL share one in-flight promise.
@@ -60,7 +58,7 @@ Variant selection is not a one-time choice at load — the viewport binds a **pe
 - **Quantized to 256 px steps**, so small zoom changes don't retrigger loads.
 - **Upgrade-only per mounted panel** — once a higher-resolution variant is shown, the panel never downgrades back to a thumbnail while mounted; tracked widths are pruned on unmount.
 - **Settle-based recomputation**: target widths recompute immediately on panel/page change, and after a **180 ms settle** on zoom or resize — never per frame.
-- **Look-ahead preloading**: in panel view, the player warms the artwork of the current panel's outgoing-edge target panels at the current target width via `PreloadService`, honoring `settings.preload` (`strategy` `none`/`panelsAhead`, `maxConcurrent`) and the network-awareness rules above. From the release after 1.2.0 it also warms what comes next in **reading order** — the next panels (panel view) or the next pages' panels (page view), continuing into the next chapter — each at the rendition it will mount with (priority `high` for the first two, then `medium`, then `low`), and, while the [cover](/player/reader-interface#cover) is shown, the first panel or page behind it.
+- **Out-edge preloading**: in panel view, the player warms the artwork of the current panel's outgoing-edge target panels at the current target width via `PreloadService`, honoring `settings.preload` (`strategy` `none`/`panelsAhead`, `maxConcurrent`) and the network-awareness rules above.
 
 Together with the CMS-generated [responsive size ladder](/cms/assets#automatic-processing) in published manifests, this means an overview or phone reader downloads small WebP rungs while a zoomed-in 4K reader gets the full-resolution encode.
 
