@@ -52,8 +52,8 @@ Every row has a right-click context menu (also available via the **⋮** button 
 | Node | Menu items |
 |---|---|
 | **Work** | New Chapter · Properties ([Work Properties](/cms/works)) · Settings (placeholder — not available yet) |
-| **Chapter** | New Page · Duplicate · Rename · Move Up · Move Down · Move to... · Delete |
-| **Page** | New Panel · Page Properties · Duplicate · Rename · Move Up · Move Down · Move to... · Delete |
+| **Chapter** | New Page · Arrange All Pages by Artwork · Fit All Balloons to Text · Duplicate · Rename · Move to... · Move Up · Move Down · Delete |
+| **Page** | New Panel · Page Properties · Arrange Panels by Artwork · Duplicate · Rename · Move to... · Move Up · Move Down · Delete |
 | **Panel** | Edit Panel · Duplicate · Rename · Move to... · Set Paywall · Content Warning · Copy as JSON · Delete Panel |
 
 Destructive actions ask for confirmation, and every structural change supports [undo/redo](/cms/editor/layout#header-bar) (`Ctrl+Z` / `Ctrl+Shift+Z`). **Rename** opens the same dialog for chapters, pages and panels (a panel's title can also be edited in the [inspector](#basic-properties)).
@@ -110,6 +110,17 @@ To edit page-level settings, right-click a page and choose **Page Properties**. 
 
 Arranging the panels themselves — moving, resizing, aligning, distributing — happens visually on the canvas in page view; see [Canvas](/cms/editor/canvas#page-view-vs-panel-view).
 
+### Arranging pages by artwork
+
+When a page's panels have their artwork, the editor can lay the page out for you so that **every panel keeps its own proportions** — the shape its first image gave it, or the [frame shape](#frame-shape) you cropped it to:
+
+- **Arrange Panels by Artwork** — right-click a page in the structure tree.
+- **Arrange All Pages by Artwork** — right-click a chapter: every page of the chapter, in one go.
+
+Both work on the **page format open in the editor** (the [format selector](/cms/editor/canvas#canvas-toolbar)); switch the format and run it again for the next one. The panels are packed in **reading order** into rows that span the page width: each row's height follows from the shapes in it, and of all the ways to break the sequence into rows the one that fills the page best wins. A stack that would be too tall is scaled down evenly, one that is too short is centred. Panels are separated by the work's **gutter width** ([Work Properties → Typography](/cms/works#typography); 10 px on an A4 page when none is set).
+
+Arranging the open page is one [undo](/cms/editor/layout#header-bar) step. Script imports lay pages out before any artwork exists — run **Arrange All Pages by Artwork** per format once the images are in.
+
 ## Panel properties in the inspector
 
 Select a panel and open the **Panel** tab in the right inspector. Changes apply to the canvas immediately and are picked up by [auto-save](/cms/editor/layout#saving-your-work).
@@ -129,6 +140,10 @@ The numeric twin of dragging on the canvas:
 - **Rotation** — from −180° to 180°.
 - **Z-Index** — stacking order for overlapping panels, plus **Bring to Front / Bring Forward / Send Backward / Send to Back** buttons.
 - **Lock Position** — prevents accidental dragging; **Lock Aspect Ratio** keeps the panel's proportions when resizing.
+
+#### Frame Shape
+
+**Frame Shape** crops the panel's visible area to a fixed ratio, centred: **Whole image** (no crop), **Strip 4:1**, **Strip 3:1**, **Panorama 21:9**, **Wide 16:9**, **Landscape 3:2**, **Landscape 4:3**, **Square 1:1**, **Portrait 3:4**, **Portrait 2:3**, **Tall 9:16** and **Tall strip 1:3**. Use it for strip panels cut from wider artwork (a 4:1 strip from a 21:9 image) or a tall strip from a portrait one, instead of dragging the crop edges by hand. With **Apply to all page formats** (on by default) the crop is set on every page that places the panel, in every format. A crop made by hand shows as *Custom crop*. [Arrange by artwork](#arranging-pages-by-artwork) treats a cropped panel by the shape of its visible area.
 
 ### Content Settings
 

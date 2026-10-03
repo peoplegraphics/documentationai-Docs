@@ -21,7 +21,7 @@ New to branching stories? Read [Graph Navigation](/concepts/graph-navigation) fi
     Click **Graph Editor** in the sidebar. The graph opens full-screen with a toolbar at the top and the canvas below.
   </Step>
   <Step title="Pick a chapter">
-    Use the **Chapter:** dropdown in the header to switch between chapters — each chapter has its own graph.
+    Use the **Chapter:** dropdown in the header to switch between chapters — each chapter has its own graph. To see the whole story at once, choose **Whole work (all chapters)** at the end of the list (see [The whole work](#the-whole-work)).
   </Step>
 </Steps>
 
@@ -31,7 +31,7 @@ A chapter without panels shows *"This chapter has no graph yet. Add panels to th
 
 ## Reading the map
 
-Each **node** on the canvas is one panel of the chapter, labeled with the panel's title. **Every** panel of the chapter is shown — including brand-new panels that have no connections yet — so you can draw the first edge of a fresh chapter right away. The **Legend** (top right) explains the color coding:
+Each **node** on the canvas is one panel of the chapter, labeled with the panel's title — wrapped onto up to three lines, with *…* only when it is longer than that. **Every** panel of the chapter is shown — including brand-new panels that have no connections yet — so you can draw the first edge of a fresh chapter right away. From **80% zoom** on, each node also shows its panel's picture (the background image's thumbnail) above a two-line title, so you can find a scene at a glance. The **Legend** (top right) explains the color coding:
 
 | Element | Appearance | Meaning |
 |---|---|---|
@@ -40,6 +40,8 @@ Each **node** on the canvas is one panel of the chapter, labeled with the panel'
 | End Node | Red node | A panel that is reached by an edge but has no outgoing edges — the flow stops here. Panels with no edges at all appear as regular panel nodes. |
 | Unconditional edge | Solid green line | Always followed |
 | Conditional edge | Dashed orange line | Only followed when its condition is true |
+
+A panel of **another chapter** that an edge leads to — a chapter transition, a jump into an endings chapter — is shown as its own node, titled *↗ Title (Chapter)*.
 
 The **entry panel** is additionally marked with a star and an orange border. It is determined by the chapter itself (the panel where the chapter starts — normally the first panel in reading order); the Graph Editor displays it but you do not pick it here.
 
@@ -61,7 +63,7 @@ graph LR
 
 | Action | How |
 |---|---|
-| Zoom | Mouse wheel, or the **+** / **−** zoom buttons (10%–300%, current level shown as a percentage) |
+| Zoom | Mouse wheel — zooms toward the mouse pointer, so what is under it stays put — or the **+** / **−** zoom buttons, which zoom around the middle of the canvas (2%–300%, current level shown as a percentage) |
 | Pan | Click and drag any empty spot on the canvas |
 | Fit everything on screen | **Fit to View** button (or the maximize icon in the header) |
 | Tidy up the layout | **Auto-Layout** button or press <kbd>L</kbd> |
@@ -83,7 +85,22 @@ Deleting an **edge** permanently removes that connection from the story. Deletin
 
 ## Creating branches (connecting panels)
 
-To draw a new edge between two panels, use **connect mode**:
+The quickest way is the selected panel's **Outgoing** list:
+
+<Steps>
+  <Step title="Select the source panel">
+    Click the panel the reader will be coming *from*. The info panel (bottom left) lists its **Outgoing** edges.
+  </Step>
+  <Step title="Connect to…">
+    Pick the target in **Connect to…** — the panels of this chapter first, then every other chapter's panels, grouped by chapter. The edge is created and saved immediately.
+  </Step>
+</Steps>
+
+Each outgoing edge in the list shows its target, a **condition** field (empty means *always*; see [Edge conditions](#edge-conditions)) and a delete button — so you can edit and remove edges without hitting a thin line on the canvas. An edge into another chapter is stored with this chapter, like any other.
+
+With the mouse, hold <kbd>Shift</kbd> and drag from a node onto the target node.
+
+With the keyboard, use **connect mode**:
 
 <Steps>
   <Step title="Select the source panel">
@@ -103,7 +120,7 @@ Connections are persisted as you make them; the **Save** button in the toolbar r
 
 ## Edge conditions
 
-Select a single edge and the **Edge** panel opens (bottom left). It shows the route (*source → target*) and one field:
+Select a single edge and the **Edge** panel opens (bottom left) — or edit the condition right in the source panel's **Outgoing** list. The panel shows the route (*source → target*) and one field:
 
 > **Condition (JSON Logic; empty = always follow)**
 
@@ -149,6 +166,8 @@ Press the **Simulate** button in the toolbar to walk through your story the way 
 - Click an option to follow it (the canvas selects that node), use **Step back** to retrace, and press <kbd>Esc</kbd> or the close button to stop.
 - When you reach a panel with no outgoing edges, the panel reports *"End of flow — no outgoing edges."*
 
+The view follows the simulation: when the current panel is off screen (or under the simulation panel), the canvas pans to it, keeping your zoom. A long path scrolls inside the simulation panel — the newest step stays in view — while **Where to next?** and **Step back** always stay visible.
+
 Prefer a text view? The **List** toggle renders the whole graph as a nested list in reading order (with *entry* and *end* badges) — every entry is clickable and it is fully screen-reader friendly.
 
 <Callout kind="info">
@@ -171,7 +190,21 @@ Findings from the local check and the deeper server-side check are shown togethe
 
 When everything is clean you'll see: *"No issues found - graph is valid!"*
 
+An edge into another chapter of the work is valid, and a panel that is entered from another chapter (the endings of a story reached from its last chapter, say) counts as reachable. An edge whose target is no panel of the work at all is an error.
+
 Work-wide checks (including unreachable flow nodes across the whole work) also run in [Validation / Preflight](/cms/validation) before publishing.
+
+## The whole work
+
+Choose **Whole work (all chapters)** in the **Chapter:** dropdown to see the entire story in one graph — every chapter's panels and edges, the links between chapters included:
+
+- **One labelled row per chapter**, top to bottom in reading order; within a row the chapter is laid out left to right like a single chapter. **Auto-Layout** restores that arrangement.
+- **Chapter ends that continue.** A panel without an outgoing edge ends its chapter, and the reader goes on with the next chapter's entry panel. Such a step is drawn as a **dashed grey link**. It is not an edge of your graph: it can't be selected, edited or deleted, and it disappears as soon as you give that panel a real edge.
+- **Editing works as in a chapter.** New edges — from the **Outgoing** list, by <kbd>Shift</kbd>+drag or in connect mode — are stored in the chapter of their source panel. Nodes show their chapter's name in place of the panel id.
+- **Validation** checks every chapter and lists the findings together; chapter ends that continue are not reported as dead ends.
+- **Simulate** walks across chapter boundaries.
+
+A story of a few hundred panels gets a wide graph: use **Fit to View**, the minimap and the wheel zoom toward the pointer to move around.
 
 ## Keyboard shortcuts
 

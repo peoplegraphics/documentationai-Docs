@@ -22,7 +22,7 @@ graph LR
 | `edges` | `Edge[]` | Yes | Directed connections between panels. May be empty since 1.7 (it was min 1 before) |
 | `nodes` | object (ID → `{ label: LocalizedString }`) | — | Optional per-node metadata (display labels, e.g. for a chapter map) |
 
-All panel references (`entry`, `from`, `to`) are keys of the chapter's `panels` map. Since format 1.7 `edges` may be empty (`"edges": []`): a chapter without edges — for example a single-panel chapter — follows its panels' reading order. The property itself stays required.
+The panel references `entry` and `from` are keys of the chapter's `panels` map. An edge's `to` is usually one too, but may name a panel of another chapter of the work — the reader then continues in that chapter (see [Moving between chapters](/concepts/graph-navigation#moving-between-chapters)). Since format 1.7 `edges` may be empty (`"edges": []`): a chapter without edges — for example a single-panel chapter — follows its panels' reading order. The property itself stays required.
 
 ## `Edge`
 

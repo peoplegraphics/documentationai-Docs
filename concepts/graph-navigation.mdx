@@ -109,6 +109,14 @@ Operations: `set`, `increment`, `toggle`, `append`, `remove`. In practice, choic
 3. Edge `action` mutations are applied, the `transition` plays, and the target panel renders.
 4. The step is pushed onto history, so back-navigation restores both position and state.
 
+### Moving between chapters
+
+- A panel **without an outgoing edge** ends its chapter; the reader continues with the next chapter's `entry`.
+- An edge's `to` (or a hotspot's `goTo`) may name a panel of **another chapter** — a chapter transition, or a jump from the last chapter into a separate endings chapter. The reader continues in that chapter: from the player release after 1.2.0 the flow engine switches to the target's chapter, so further steps follow that chapter's graph.
+- `entry` and every edge's `from` belong to the chapter that holds the graph.
+
+The CMS keeps such edges in exported and published manifests, and its [Graph Editor](/cms/editor/graph#the-whole-work) shows the whole work with the links between chapters.
+
 ## Related pages
 
 - [Graph schema reference](/schema/graph) — every property, with constraints

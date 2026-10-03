@@ -15,17 +15,21 @@ Your work's languages are set when you [create the work](/cms/works) and managed
 - **Set default** marks the source language; every other locale falls back to it.
 - **Remove locale** hides it but keeps its translations — re-add it later to restore them.
 
+The **Locales** button becomes active once the work's locales have loaded, so the dialog always starts from the work's real list and can't replace its default language by accident.
+
 Translating text also adds its language. When speech bubbles or text layers get text in a language the work doesn't list yet, the CMS adds that language to the work's locales. This happens however the text arrives: typed in the editor, imported, written back from this workshop, or set through an AI assistant. That way the published work offers it in the reader's language switch. A language is added only within your plan's limit and never removed automatically. Bare codes such as `de` count as the work's locale of that language (otherwise `de-DE`).
 
 The locale chips under the workshop header show each language's completion percentage; click one to switch the translation target. Your [profile preference](/cms/account) "Default editing language" preselects the target when you open the workshop.
 
 ## Extracting translatable text
 
-Click **Extract Strings** to scan the work and pull every translatable string into the table — speech bubble text, titles, descriptions, and other reader-facing content. Each entry gets a stable **key**, its **default text** (the source language), a category, and a "Used in" badge telling you where it appears.
+Click **Extract Strings** to scan the work and pull every translatable string into the table — speech bubble text, titles, panel descriptions, [hotspot](/cms/editor/hotspots) labels and other reader-facing content. Each entry gets a stable **key**, its **default text** (the source language), a category, and a "Used in" badge telling you where it appears.
 
-Strings are listed in **story order** — the order a reader meets them: the work title, then for each chapter its title and its pages in order, with each page's panels in reading order (title, then speech bubbles), followed by panels not placed on any page, and character bios last. Translating top to bottom therefore follows the story.
+Strings are listed in **story order** — the order a reader meets them: the work title, then for each chapter its title and its pages in order, with each page's panels in reading order (title, description, speech bubbles, hotspot labels), followed by panels not placed on any page, and character bios last. Translating top to bottom therefore follows the story.
 
 Opening the workshop runs an extraction automatically, so the list reflects the current state of the work; run **Extract Strings** again whenever you've added content while the workshop is open. Existing translations are kept and new strings are appended. On a [read-only work](/cms/plans#read-only-works) the automatic extraction is skipped — the workshop opens quietly with the strings as last extracted, and you can read them but not change them. You can also add free-form strings manually with **Add Entry** (key, default text, category).
+
+Hotspot labels are listed as **Hotspot label** (category *hotspot*); they are what screen readers announce for a choice, so translate them with the bubbles. Hotspots that still carry the editor's default name (*Rect Hotspot* and the like) are skipped.
 
 <Callout kind="info">
   **Which language is the source?** Extraction takes your work's default locale as the source language. If the work has none set, it falls back to the language hinted in Work Properties (matching `en` to `en-US` and the like), and finally to the locale most of your strings actually carry — so a stray translated title can't flip the Default Text column into another language. Works extracted before story order existed list their strings last until you run **Extract Strings** once more.
@@ -50,8 +54,10 @@ When you change the source text of a string that was already translated, its tra
 
 ### Machine translation
 
-- **Translate untranslated** machine-translates every string missing a value for the selected locale.
+- **Translate untranslated** machine-translates every string missing a value for the selected locale. Strings are sent to the provider in batches of up to 50, and when the provider asks to slow down the workshop waits and retries, so a whole book (well over a thousand strings) goes through in one run.
 - Machine-translated strings carry an **MT** badge until you confirm them with the green check (or edit them, which marks them **Modified**).
+- **Approve MT (N)** in the toolbar confirms all machine translations currently shown for the selected locale at once — N is their count; narrow the list with search or filters to approve part of them. Other languages keep their review state.
+- A machine translation reaches your work's content — the editor, the preview and the published work — **once it is approved** (or edited). Until then it lives in the workshop only, so switching the editor to the new language still shows the source text.
 - The source text is always a **human-entered** value — your default language where it exists, otherwise another locale you translated by hand, and as a last resort the default text with the provider detecting the language. A machine draft is never used as the source, and a string is never "translated" from a language into itself. When you translate *into* your default language (say, to fill an English column from German originals), the workshop picks the best other locale as the source automatically.
 - If the translation provider fails mid-run, the workshop keeps what was translated so far and shows a warning — *"Machine translation stopped after N string(s): … — try again in a moment"* — instead of filling the remaining rows with placeholders.
 

@@ -155,7 +155,7 @@ A panel contains neither layers nor speech bubbles — readers would see a blank
 
 A text layer references a typography **text style preset** (`styleRef`) that is not defined in the work's settings. Rendering does not break — consumers ignore the unknown reference — but the intended styling is silently lost.
 
-**How to fix:** define the preset under **Work Properties → Typography → Text Styles**, or point the layer at an existing preset. See [Settings](/schema/settings) for how presets live in the manifest.
+**How to fix:** text style presets come in with an imported manifest (the CMS has no editor for them yet; saving Work Properties keeps them). Re-import a manifest that defines the preset, or point the layer at an existing one. See [Settings](/schema/settings) for how presets live in the manifest.
 
 ## Animation unknown layer
 
@@ -171,7 +171,7 @@ Keyframes of a panel's [animation](/cms/editor/animations) target a layer the pa
 
 A speech bubble references a **balloon preset** (`styleRef`) that is not defined in the work's settings — same situation as an unknown text style, but for balloon styling.
 
-**How to fix:** define the preset under **Work Properties → Typography → Balloon Presets**, or fix the bubble's preset reference. See [Speech Bubbles](/cms/editor/speech-bubbles).
+**How to fix:** define the preset under **Work Properties → Typography → Balloon Presets**, or pick another one (or **— None —**) under **Style preset** in the bubble's Speech inspector, where the missing name shows as *(missing)*. See [Balloon presets](/cms/editor/speech-bubbles#balloon-presets).
 
 ## Video hover start mode
 

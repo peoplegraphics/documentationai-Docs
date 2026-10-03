@@ -5,6 +5,113 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-04" description="CMS — swap a panel's picture for its video version" tags={["feature", "bugfix"]}>
+  ## Video backgrounds
+
+  - **Alt-drop swaps the picture.** Hold <kbd>Alt</kbd> while dropping an
+    image *or a video* onto a panel: the background layer shows the new
+    asset, keeps its place at the bottom, takes its shape, and the panel is
+    refitted in every format. Before, only images could be swapped. A video
+    dropped without Alt was added as a small layer on top, and deleting the
+    old picture left the panel without a background.
+  - **Set as Background** in the layer context menu makes an image or video
+    layer the panel's background. The previous background is hidden, not
+    deleted. It also repairs a panel whose background layer was deleted.
+  - A one-time hint after a plain drop onto a panel with a background
+    explains both ways.
+  - **Panel view lays out a video panel correctly.** A panel with a video
+    background used to be shown as if it had no picture: full frame, the
+    video squeezed into a strip, bubbles and hotspots out of place.
+
+  See [The panel background](/cms/editor/layers#the-panel-background).
+</Update>
+
+<Update label="2026-10-03" description="Player — choices in page view, navigation into another chapter" tags={["feature", "bugfix"]}>
+  ## Page view follows the reader's path
+
+  In the PanelWave reader and the CMS [preview](/cms/preview); in
+  `@panelwave/player` from the release after 1.2.0.
+
+  - **Choices in page view.** Panels that only some options of a choice lead
+    to are grey placeholders until the reader picks an option; then that
+    option's path appears. Pages made up only of panels off the chosen path
+    are skipped when turning pages, in both directions and across chapters
+    ([Choices in page view](/player/reader-interface#choices-in-page-view)).
+  - **Into another chapter.** An edge or hotspot jump to a panel of another
+    chapter now switches to that chapter, so **Next** continues there. Before,
+    the player kept the old chapter and showed the new chapter's entry panel
+    again ([Moving between chapters](/concepts/graph-navigation#moving-between-chapters)).
+</Update>
+
+<Update label="2026-10-03" description="CMS — whole-work graph, working hotspots and choices, balloon presets, arrange by artwork" tags={["feature", "bugfix"]}>
+  ## Building a large branching story
+
+  **Graph Editor** ([Graph](/cms/editor/graph)):
+
+  - **Whole work (all chapters)** in the Chapter dropdown shows the entire
+    story: one row per chapter, the links between chapters, and dashed grey
+    links where a chapter end continues with the next chapter.
+  - A selected panel lists its **Outgoing** edges (condition and delete per
+    edge), and **Connect to…** adds an edge to any panel of the work, grouped
+    by chapter. Panels of other chapters appear as *↗ Title (Chapter)* nodes.
+  - Titles wrap onto up to three lines; from 80% zoom each node shows its
+    panel's picture. The mouse wheel zooms toward the pointer (2%–300%).
+  - **Simulate** keeps the current panel in view, and a long path scrolls so
+    the choices and **Step back** stay visible.
+  - Validation accepts edges into another chapter and counts panels entered
+    from another chapter as reachable.
+  - Exported and published manifests keep edges into another chapter; they
+    were dropped before.
+
+  **Hotspots** ([Hotspots](/cms/editor/hotspots)):
+
+  - Hotspots built in the editor were never saved into the work: their
+    actions were lost and the hotspot was left out of the export. They now
+    save, export and open for editing again. **Navigate** with **Set
+    Variables** is published as one jump that records the choice.
+  - **Navigate** picks its target from a list of the work's panels, grouped
+    by chapter, and stores the panel itself, so renaming a friendly ID no
+    longer breaks a jump.
+  - **Visible If** uses the JSON Logic Rule Builder.
+  - The canvas label shows the label text (it read *[object Object]*), and a
+    panel's hotspots no longer stay drawn over the page view.
+  - The action, mutation and condition dialogs are readable in dark mode.
+  - New guide: [Building a choice](/cms/editor/hotspots#building-a-choice).
+
+  **Speech bubbles** ([Speech Bubbles](/cms/editor/speech-bubbles)):
+
+  - **Balloon presets**: define named styles under Work Properties →
+    Typography → Balloon Presets and give a bubble one with **Style preset**.
+  - **Fit height to text** (one bubble) and **Fit All Balloons to Text**
+    (chapter context menu) size balloons for their longest language.
+  - The first image of a panel no longer moves its bubbles and hotspots off
+    the artwork, and resizing a caption that sits on a panel edge no longer
+    runs away.
+
+  **Pages and panels** ([Pages & Panels](/cms/editor/pages-panels)):
+
+  - **Arrange Panels by Artwork** (page) and **Arrange All Pages by Artwork**
+    (chapter) pack the panels into justified rows that keep each picture's
+    proportions.
+  - **Frame Shape** in the panel inspector crops a panel to a fixed ratio,
+    for all page formats at once.
+
+  **Script import and localization**:
+
+  - [Script Import](/cms/script-import#follow-my-script) offers **Follow my
+    script**: one panel per scene heading and a chapter at every
+    `# Section`, with no AI call.
+  - The [Localization Workshop](/cms/localization) extracts panel
+    descriptions and hotspot labels. **Approve MT (N)** confirms all shown
+    machine translations at once and writes them into the work.
+  - **Translate untranslated** works through a whole book: strings go to
+    DeepL in batches of 50 and are retried when DeepL asks to slow down
+    (before, it stopped after about 75 strings).
+  - The **Locales** button waits until the work's locales have loaded.
+    Before, adding a language too early could replace the work's default
+    language.
+</Update>
+
 <Update label="2026-10-02" description="Reader · Player — links to every page and panel, page colors, fullscreen, video pacing" tags={["feature", "bugfix"]}>
   ## Pages and panels you can link to, and pages that look like the CMS
 
