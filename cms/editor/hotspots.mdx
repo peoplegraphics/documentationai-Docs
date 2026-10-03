@@ -27,6 +27,8 @@ Hotspots come in three shapes, each with its own drawing tool:
   </Step>
 </Steps>
 
+The dashed outlines are drawn in **panel view** only. Page view shows the page layout without them.
+
 <Callout kind="info">
   The dashed overlay is an editing aid — readers never see it. In the published work the player renders the area as a clickable region with a **gentle pulsing outline** so readers can discover it (disabled for readers who prefer reduced motion), plus a highlight on hover and full keyboard access. See [the reader's view](/player/reader-interface#interactive-hotspots).
 </Callout>
@@ -45,17 +47,21 @@ The Inspector's **Shape** section always mirrors the canvas: for rectangles it s
 
 In **Basic Properties**:
 
-- **Label** — the hotspot's name, edited per language (the field shows the active locale, e.g. **Label (en-US)**; switch locales in the editor header — see [Localization](/cms/localization)).
+- **Label** — the hotspot's name, edited per language (the field shows the active locale, e.g. **Label (en-US)**; switch locales in the editor header). It is what screen readers announce for the hotspot, so for a choice it should say the choice. Labels are also translated in the [Localization Workshop](/cms/localization#extracting-translatable-text), listed as **Hotspot label**.
 - **ARIA Label** — a screen-reader description, so interactive areas stay accessible.
 - **Visible** and **Locked** — the usual editing toggles.
 
 ## Actions — what happens on click
 
-The **Actions** section lists the hotspot's actions. Click **+ Add Action** to open the Action Builder, pick an **Action Type**, fill in its settings, and save. A hotspot can carry several actions; each shows a summary with **Edit** and **Remove** buttons.
+The **Actions** section lists the hotspot's actions. Click **+ Add Action** to open the Action Builder, pick an **Action Type**, fill in its settings, and save. Each action shows a summary with **Edit** and **Remove** buttons.
+
+A hotspot does **one thing** when clicked: Navigate, Open Extras, Open Modal or Trigger Plugin Event — if you add more than one of these, the first one is used. **Set Variables** combines with **Navigate**: the variables change when the reader jumps (that is how a choice records itself). On its own, Set Variables is the hotspot's action; next to Open Extras or Open Modal it does not run.
 
 <Tabs>
   <Tab title="Navigate" icon="arrow-right">
-    **Navigate (Go To Panel/Page)** jumps the reader elsewhere in the story. Choose a **Target Type** (Panel or Page), enter the **Panel ID** or **Page Number**, and pick a **Transition Effect**: None, Fade, Slide, Zoom, or Crossfade. This is the building block for choices and branching — see [Graph](/cms/editor/graph) for how branches fit into your story flow.
+    **Navigate (Go To Panel/Page)** jumps the reader elsewhere in the story. Choose a **Target Type**: for **Panel**, pick the panel from the list, grouped by chapter — any panel of the work, including one in another chapter (an ending, say); for **Page**, enter the **Page Number**. Then pick a **Transition Effect**: None, Fade, Slide, Zoom, or Crossfade (published as Fade). This is the building block for choices and branching — see [Graph](/cms/editor/graph) for how branches fit into your story flow.
+
+    The list stores the panel itself, not its [friendly ID](/cms/editor/pages-panels#basic-properties), so renaming a friendly ID never breaks a jump. An older action that names its target by friendly ID is shown with the matching panel selected; saving it once stores the panel.
   </Tab>
   <Tab title="Set Variables" icon="variable">
     **Set Variables** changes story state. Add one or more rows, each with a variable name, an operation, and a value:
@@ -85,23 +91,50 @@ Mutations change how the hotspot itself looks or behaves in response to the read
 
 A typical use: a subtle **On Hover** scale-up so readers can discover what's clickable.
 
+<Callout kind="alert">
+  Mutations are kept with the hotspot in the CMS but are **not part of the published work** yet — the PanelWave format has no hover or click effects for hotspots. Readers get the player's own pulsing outline and hover highlight instead. Variable changes belong in a **Set Variables** action.
+</Callout>
+
 ## Transition
 
-The **Transition** section styles the moment the hotspot fires: an **Effect** (None, Fade, Slide, Zoom, Crossfade), a **Duration (ms)**, and an **Easing** function.
+The **Transition** section styles the moment the hotspot fires: an **Effect** (None, Fade, Slide, Zoom, Crossfade), a **Duration (ms)**, and an **Easing** function. It applies to a **Navigate** action (the jump's transition) when the action itself sets none; Crossfade is published as Fade.
 
 ## Conditions — showing hotspots only sometimes
 
-The **Visibility Condition** section makes a hotspot appear only when your story state allows it. You can type an expression into **Visible If** directly (for example `variable.hasKey === true`), but the friendlier way is the **Build Condition** button, which opens the Condition Builder:
+The **Visibility Condition** section makes a hotspot appear only when your story state allows it. **Visible If** takes a [JSON Logic](/concepts/graph-navigation#conditions-a-json-logic-primer) rule against the story variables — for example `{"==": [{"var": "hasKey"}, true]}`; leave it empty to always show the hotspot. A rule that is not valid JSON is flagged under the field.
 
-1. Click **+ Add Condition** and fill in the **Variable** name, its **Type** (String, Number, Boolean), an **Operator** (equals, not equals; greater/less than for numbers; contains, starts with, ends with for strings), and a **Value**.
-2. With two or more conditions, choose how to combine them: **AND (all must be true)** or **OR (any can be true)**.
-3. The **Expression Preview** shows the resulting expression as you build. Click **Apply Condition** to save it to the hotspot.
+The friendlier way is **Build Condition**, which opens the **JSON Logic Rule Builder** below the field:
 
-You don't need to know any syntax — the builder writes the expression for you. Under the hood, conditions evaluate against the variables of your work; read [Variables in the editor](/cms/editor/variables) and [Variables concepts](/concepts/variables) to understand scopes and how state persists for the reader.
+1. Click **+ Create Rule** and pick an operator — comparisons (equals, not equals, less than, greater than, less or equal, greater or equal) or the logical **AND**, **OR** and **NOT**.
+2. Fill in the operands: a **Variable** from your work's variables, a **Literal** value (text, a number, `true`/`false`), or a **Nested Rule** for combinations.
+3. The rule is written to **Visible If** as you build. Switch to **JSON** to see or paste it, and use the test area to try it with sample variable values.
+
+Conditions evaluate against the variables of your work; read [Variables in the editor](/cms/editor/variables) and [Variables concepts](/concepts/variables) to understand scopes and how state persists for the reader.
 
 <Callout kind="tip">
-  Classic pattern: hotspot A runs a **Set Variables** action (`hasKey` → true). Hotspot B, elsewhere in the story, has the visibility condition `variable.hasKey === true` — it only becomes clickable once the reader found the key.
+  Classic pattern: hotspot A runs a **Set Variables** action (`hasKey` → true). Hotspot B, elsewhere in the story, has the visibility condition `{"==": [{"var": "hasKey"}, true]}` — it only becomes clickable once the reader found the key.
 </Callout>
+
+## Building a choice
+
+A reader's choice is a set of hotspots on one panel, one per option, usually each on top of a caption that shows the option's text:
+
+<Steps>
+  <Step title="Add the captions">
+    Right-click the panel → **Add Speech Bubble** → **Narrator** for each option and type its text. A [balloon preset](/cms/editor/speech-bubbles#balloon-presets) such as *choice* gives all choices one look; **Fit height to text** sizes each box for its longest translation.
+  </Step>
+  <Step title="Add a hotspot per option">
+    Draw a rectangle hotspot over each caption (or set its **X**, **Y**, **Width** and **Height** to the caption's box). Set the **Label** to the option's text.
+  </Step>
+  <Step title="Navigate + Set Variables">
+    Give each hotspot a **Navigate** action to the panel the option leads to, and a **Set Variables** action that records the choice (`choice1` → `"A"`) and its effects (`trust` → increment 1).
+  </Step>
+  <Step title="Gate options that depend on the story">
+    An option that only some readers get carries a **Visible If** rule — on the hotspot and on its caption.
+  </Step>
+</Steps>
+
+In the player's page view, the panels of options not taken are shown as placeholders, and the outcome of a choice appears once the reader makes it — see [Choices in page view](/player/reader-interface#choices-in-page-view). For where the branches meet again and conditional routing, use the [Graph Editor](/cms/editor/graph).
 
 ## Finding panels with hotspots
 
@@ -112,7 +145,7 @@ The structure tree's filter bar has a **Show panels with hotspots** toggle, hand
 Once a published version is being read, the analytics dashboard's **[Click heatmap](/cms/analytics#click-heatmap)** shows where readers actually click on each panel — hotspot hits ranked per hotspot, plus **dead clicks** (taps that hit nothing). A hot cluster outside your hotspots is a reader telling you where the next hotspot belongs.
 
 <Callout kind="info">
-  A hotspot needs at least a shape, a label, and **one action** to appear in the published work — hotspots without an action are left out of the export (the format requires one), so a silent, do-nothing area can never ship by accident.
+  A hotspot needs at least a shape, a label, and **one action** to appear in the published work — hotspots without an action are left out of the export (the format requires one), so a silent, do-nothing area can never ship by accident. The label is shown on the canvas above the hotspot in the language you are editing.
 </Callout>
 
 ## Related pages

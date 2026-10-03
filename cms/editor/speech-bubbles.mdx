@@ -31,7 +31,7 @@ To edit text later, **double-click the bubble** on the canvas — the inline edi
 With a bubble selected:
 
 - **Drag the body** to move the balloon — its tail moves with it.
-- **Drag a resize handle** to change the balloon's maximum width/height. The balloon still auto-sizes to its text within those limits, so it never clips your dialogue.
+- **Drag a resize handle** to change the balloon's width or height — its **Max Width** / **Max Height**, which are the size the balloon is drawn at. Text that needs more room than the box is cut off; the inspector then warns *"The text doesn't fit this balloon"*, and [**Fit height to text**](#fitting-balloons-to-their-text) sizes the box for you. Resizing works symmetrically around the balloon's centre, also for a caption box that sits on the panel edge.
 - **Drag the tail tip** to point the tail at a speaker. The editor converts your drag into the tail's angle and length, and the tail base stays attached to the balloon edge automatically.
 
 Fine-grained tail settings (position angle, length, curve direction, curve amount) live in the **Balloon Style** panel described below.
@@ -65,7 +65,7 @@ The **Panel Top / Top-Left / Top-Right** types are glued to the panel's top bord
 
 ## One work, many formats
 
-Bubble geometry is stored **relative to the panel artwork** (the same normalized `shape` box the [format defines](/schema/speech-bubbles)), so a bubble keeps its position on every device format — author in DIN A4, and the balloon points at the same spot on the artwork in Square or Bigscreen layouts, in the editor and in the player.
+Bubble geometry is stored **relative to the panel artwork** (the same normalized `shape` box the [format defines](/schema/speech-bubbles)), so a bubble keeps its position on every device format — author in DIN A4, and the balloon points at the same spot on the artwork in Square or Bigscreen layouts, in the editor and in the player. That also holds when the artwork changes: giving a panel its first image, dropping an image onto a panel in page view, or replacing the background keeps every bubble and hotspot on the same spot of the artwork (bubbles written before a panel had an image used to end up above or below it).
 
 Lettering size is handled **per format**: text keeps the same comfortable reading size on each target screen — unchanged in A4-sized formats, moderately larger on big screens, smaller on phone formats — instead of growing with the artwork. Balloons re-measure around their anchored position when you open a panel in another format, so captions never end up half-empty or overflowing. The open-source player applies the exact same rule at playback time (see [Balloon renderer](/player/balloon-renderer)), so what you letter is what readers get on every device.
 
@@ -73,23 +73,49 @@ In **page view**, panels are much smaller than in panel view, so balloons get a 
 
 ## The style cascade
 
-You rarely style bubbles one by one. A bubble's effective look is resolved through three levels, each overriding the one before:
+You rarely style bubbles one by one. A bubble's effective look is resolved through four levels, each overriding the one before:
 
 ```mermaid
 graph LR
     A[Work default<br/>Work Properties] --> B[Character override<br/>Characters manager]
-    B --> C[Per-bubble override<br/>Balloon Style panel]
+    B --> C[Balloon preset<br/>Style preset]
+    C --> D[Per-bubble override<br/>Balloon Style panel]
 ```
 
 1. **Work default** — in **Work Properties**, the **Speech Balloon Style (Work Default)** section defines the base style for every balloon in the work.
 2. **Character override** — each character in the [Characters manager](/cms/characters) can carry its own balloon style. Assign a speaker to a bubble and the character's style applies on top of the work default.
-3. **Per-bubble override** — anything you change in a bubble's **Balloon Style** panel is stored for that bubble only.
+3. **Balloon preset** — a named style (*caption*, *shout*, *voice-over*, …) the bubble picks under **Style preset**; see [Balloon presets](#balloon-presets).
+4. **Per-bubble override** — anything you change in a bubble's **Balloon Style** panel is stored for that bubble only.
 
-Only the fields you explicitly change are stored at each level. That means restyling the work default (or a character) instantly updates every bubble that didn't override that field — across the whole work, in the editor and in the published player output.
+Only the fields you explicitly change are stored at each level. That means restyling the work default, a character or a preset instantly updates every bubble that didn't override that field — across the whole work, in the editor and in the published player output.
 
 <Callout kind="tip">
   If a bubble has its own overrides, a **Reset to inherited style** button appears under the Balloon Style panel. Click it to drop all per-bubble changes and fall back to the character/work style.
 </Callout>
+
+## Balloon presets
+
+A preset is a named balloon style you define once and give to any bubble — the caption look, a character's voice-over box, a screen readout, a shout. Presets are part of the format ([`settings.typography.balloonPresets`](/schema/settings#reusable-style-presets), referenced by the bubble's `styleRef`), so they travel with exports and imports.
+
+<Steps>
+  <Step title="Define presets">
+    Open **Work Properties → Typography → Balloon Presets**. Type a name (letters, digits, `-` and `_`; spaces become `-`) and click **Add preset**, then style it with the same controls as the work default. A preset stores only what differs from the work default, so changing the default later still reaches preset balloons in every field the preset leaves alone. Click a preset's name to edit it again; the bin icon deletes it. **Save Properties** stores them.
+  </Step>
+  <Step title="Give a bubble its preset">
+    Select the bubble and pick the preset under **Style preset** in the Speech inspector (**— None —** removes it). Picking a preset drops the bubble's own overrides of the fields the preset sets — a caption that was a plain rectangle takes the preset's type, colors and font right away — and keeps the rest (its size, a hand-set tail).
+  </Step>
+</Steps>
+
+A bubble that names a preset the work no longer has shows it as *(missing)* in the dropdown and uses the remaining levels of the cascade; [Validation](/cms/validation) reports it. Saving Work Properties keeps presets and text-style presets that came in with an imported manifest.
+
+## Fitting balloons to their text
+
+A balloon is drawn at its **Max Width** × **Max Height**. When the lettering grows (a larger font in a preset, say) or a translation is longer than the original, text no longer fits — and in a work with hundreds of balloons, resizing them by hand is no option:
+
+- **Fit height to text** — in the Speech inspector's **Balloon Style** section, for the selected bubble.
+- **Fit All Balloons to Text** — right-click a chapter in the structure tree: every balloon of the chapter, the open panel included.
+
+Fitting keeps each balloon's width and sets its height to what its **longest language** needs (between 30 and 600 px of the reference size), so one fit holds in every language and — because sizes scale with the lettering per [format](#one-work-many-formats) — in every format. The balloon stays centred where it was. Fit again after adding a translation or changing a font.
 
 ## The Balloon Style panel
 
@@ -97,7 +123,7 @@ Select a bubble and open the Inspector's balloon tab. Under **Balloon Style** yo
 
 - **Type** — the ten balloon types above.
 - **Roundness** — corner roundness slider (hidden for Rectangle, Thought, and Shout, which have fixed shapes).
-- **Max Width** / **Max Height** — the size limits the auto-sizing works within.
+- **Max Width** / **Max Height** — the balloon's box size (in reference pixels, scaled per format). See [Fitting balloons to their text](#fitting-balloons-to-their-text).
 - **Font** and **Font Size** — comic lettering fonts, grouped in the dropdown.
 - **Fill** and **Stroke** colors, and **Border Width**.
 - **Tail** — enable/disable, plus **Position** (0–359°, compass-style), **Length**, **Curve** (Straight / Curve Left / Curve Right), and **Curve Amount**. A Curve Amount of exactly 0 draws a straight tail even when a curve direction is set.
@@ -115,7 +141,7 @@ If the dropdown is empty, add your cast in the [Characters manager](/cms/charact
 
 ## Dialogue in multiple languages
 
-Bubble text is localized. The Inspector's text field is labeled with the locale you are editing — for example **Text (en-US)** — and the locale switcher in the editor header changes which language you are writing. Enter each language's dialogue while that locale is active, or manage translations in bulk on the [Localization](/cms/localization) screen. Balloons re-measure per language, so longer translations still fit. See [Localization concepts](/concepts/localization) for how fallback locales work.
+Bubble text is localized. The Inspector's text field is labeled with the locale you are editing — for example **Text (en-US)** — and the locale switcher in the editor header changes which language you are writing. Enter each language's dialogue while that locale is active, or manage translations in bulk on the [Localization](/cms/localization) screen. A balloon has one size for all languages: after translating, use [Fit All Balloons to Text](#fitting-balloons-to-their-text) so the longest language fits. See [Localization concepts](/concepts/localization) for how fallback locales work.
 
 How the editor handles the languages behind one bubble:
 

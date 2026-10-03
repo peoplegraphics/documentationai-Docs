@@ -29,6 +29,7 @@ Panel view shows one panel at a time and follows the chapter's [graph](/concepts
 
 - **Next** follows the outgoing edge of the current panel. When several edges match, their [JSON Logic](/concepts/variables) conditions are evaluated against the current variables and the highest-priority valid edge wins — this is how branching narratives resolve.
 - **Previous** follows an incoming edge back.
+- An edge (or a hotspot jump) into **another chapter** continues in that chapter: from the release after 1.2.0 the player switches to the target's chapter, so the next **Next** goes on from there (1.2.0 kept the old chapter and showed the new chapter's entry panel again). A panel with no outgoing edge ends its chapter, and reading continues with the next chapter.
 - A chapter **without any edges** (allowed from format 1.7) is read in its reading order: the entry panel, then the remaining panels in the order the chapter lists them. From the player release after 1.2.0, next and previous follow that order (1.2.0 stopped on the entry panel).
 - Hovering the left/right edge of the viewport reveals **navigation arrow zones** (chevron icons); panels larger than the viewport additionally show **overflow arrows** for panning.
 - From the release after 1.2.0, **double-clicking** the panel returns to page view, on the page that holds it.
@@ -51,6 +52,16 @@ From the player release after 1.2.0, page view also adapts to the screen:
 - **Paging crosses chapters:** next on a chapter's last page opens the next chapter's first page, previous on its first page the previous chapter's last page.
 - **Thumbnails and table-of-contents entries** open the page that shows the panel.
 
+### Choices in page view
+
+A page shows every panel placed on it — in a branching story that can include the outcome of an option the reader did not pick, or of a choice still ahead. From the release after 1.2.0 page view shows only the reader's path:
+
+- **Before a choice is made**, the panels that only some of its options lead to (up to where the branches meet again) are **grey placeholders** in their place on the page, so the layout keeps its shape.
+- **Picking an option** reveals its path. Panels that only the other options lead to stay grey.
+- **Turning pages skips** pages made up only of panels off the chosen path, in both directions and across chapters, so the reader lands on a page with a panel of their path. The last page on the path ends the work. A page of a choice not made yet is not skipped: it shows its placeholders until the reader chooses.
+
+A *choice* here is a panel whose hotspots jump to two or more different panels; a single "continue" hotspot is not one. Panels picked by a [condition on an edge](/concepts/graph-navigation#conditions-a-json-logic-primer) — a variant panel, an ending reached through a stat check — are not affected. Placeholders show no artwork, speech bubbles or hotspots, are skipped by screen readers and the keyboard, and take no time in autoplay. The reader's choices last for the reading session; panel view and canvas view are unaffected (they follow the graph).
+
 ### Cover
 
 From the player release after 1.2.0, a work that starts from the beginning opens on its **cover** — `meta.cover`, else the image of the work's cover extras block. Clicking the cover, **next**, a swipe or autoplay starts the story; **previous** on the first panel (or page) goes back to it. The cover is the first entry of the thumbnail strip and the table of contents. From the release after 1.2.0 a work always starts on the cover, also when reading resumes at a bookmark (the bookmarked page waits behind it); leaving the cover opens page view. It is skipped when the reader follows a link to a page or panel (see below) or the host opens a specific chapter or panel, and the host can turn it off with the `showCover` input.
@@ -71,7 +82,7 @@ The address bar follows the reader while they read (without adding a browser his
 
 Panels can carry [hotspots](/schema/hotspots) — clickable regions the creator drew in the CMS. In panel and page view they render as invisible click targets with a **gentle pulsing outline** so readers can discover them (the pulse is disabled under reduced motion); hovering or focusing a hotspot shows its outline. Activating one runs its action:
 
-- **Navigate** (`goTo`) — jumps to the target panel, applying any variable changes and playing the configured transition. This is how in-panel story choices work.
+- **Navigate** (`goTo`) — jumps to the target panel, applying any variable changes and playing the configured transition. This is how in-panel story choices work. The target may be in another chapter (from the release after 1.2.0 the player then continues in that chapter); in page view the jump also reveals the chosen path ([Choices in page view](#choices-in-page-view)).
 - **Set variables** — changes story state in place (conditional hotspots, edges, and variants react immediately).
 - **Open extras** — opens the extras viewer at a specific bonus item.
 - **Open modal** — shows a small dialog with localized title and text.

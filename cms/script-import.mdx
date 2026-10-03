@@ -38,7 +38,7 @@ The import treats your script as untouchable source material:
     On the [My Works](/cms/works) page, click **Import Script** (next to **Import**). The wizard opens at the upload step.
   </Step>
   <Step title="Upload your script">
-    Drop a `.fountain` (or `.txt`) file onto the drop zone, pick the **script language** (all imported text is stored under this locale), and click **Suggest structure**.
+    Drop a `.fountain` (or `.txt`) file onto the drop zone, pick the **script language** (all imported text is stored under this locale), choose how the **Structure** is built (see [Follow my script](#follow-my-script)), and click **Suggest structure** (or **Import structure**).
   </Step>
   <Step title="Watch the analysis">
     The script is parsed and summarized — scenes, dialogue lines, and the detected cast with line counts appear while the AI works through the scenes. Long scripts are processed in chunks with live progress.
@@ -58,6 +58,16 @@ The import treats your script as untouchable source material:
 </Steps>
 
 Imports are **resumable** — leave the wizard at any point and continue later from the *Open imports* list on the upload step.
+
+## Follow my script
+
+Some scripts are already broken down for comics: every scene heading is one panel, and `# Sections` mark the chapters. For those, pick **Follow my script** in the upload step instead of the AI suggestion:
+
+- **One panel per scene heading** — nothing is split or merged, however many lines a scene has.
+- **A new chapter at every `# Section`**, titled after the section (`# SHIFT 1: INTAKE` → *Shift 1: Intake*). There is no chapter size limit.
+- **An ID at the end of a heading leads the panel title**: `INT. ER WAITING ROOM - NIGHT (P017)` becomes *P017 · Teo sits very still…*, so your panel numbering survives into the editor.
+- Every dialogue line and `!SUPER:` caption becomes a balloon in script order; `[[notes]]` are kept in the panel description.
+- No AI call is made for the structure, so the wizard's second step reads **Structure** instead of *AI structure*. The review, format, and layout steps work as usual.
 
 ## The structure review in detail
 

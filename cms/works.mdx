@@ -90,8 +90,11 @@ Localized **Name** and **Description** (the fields offer the work's own language
 Work-wide visual defaults:
 
 - **Default Font** and **Default Font Size**, plus the **Default Page Background Color**.
-- **Speech Balloon Style (Work Default)** — the balloon configurator with live preview. This is the base style for *every* speech bubble in the work; [characters](/cms/characters) and individual bubbles can override it (styles cascade: work default → character override → per-bubble override).
-- **Panel Border Style** (color, thickness, solid/dashed/none) and the **Gutter Width** between panels.
+- **Speech Balloon Style (Work Default)** — the balloon configurator with live preview. This is the base style for *every* speech bubble in the work; [characters](/cms/characters), presets and individual bubbles can override it (styles cascade: work default → character override → balloon preset → per-bubble override).
+- **Balloon Presets** — named balloon styles (*caption*, *voice-over*, *shout*, …) that a bubble picks in the Speech inspector. Add one by name, style it with the same configurator, delete it with the bin icon. See [Balloon presets](/cms/editor/speech-bubbles#balloon-presets).
+- **Panel Border Style** (color, thickness, solid/dashed/none) and the **Gutter Width** between panels. The gutter is also the spacing [Arrange by Artwork](/cms/editor/pages-panels#arranging-pages-by-artwork) leaves between panels.
+
+Saving Work Properties keeps every typography setting this tab doesn't show, such as the text-style presets of an imported manifest.
 
 ### Localization
 The **Default Locale**, the set of **Supported Locales**, and the **Reading Direction**. These are the same locales managed in the [Localization Workshop](/cms/localization) — a change in either place shows up in the other.

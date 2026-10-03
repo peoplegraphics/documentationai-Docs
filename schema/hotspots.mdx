@@ -58,7 +58,7 @@ A `oneOf` union (`$defs/HotspotAction`) discriminated by `type`. Exactly these f
 | Property | Type | Required | Description |
 |---|---|---|---|
 | `type` | `"goTo"` | Yes | Action discriminator. |
-| `to` | `Identifier` | Yes | Target panel ID. |
+| `to` | `Identifier` | Yes | Target panel ID — any panel of the work, including one in another chapter; the reader then continues in that chapter ([Moving between chapters](/concepts/graph-navigation#moving-between-chapters)). |
 | `mutations` | `Mutation[]` | No | Variable mutations applied when the hotspot fires (e.g. record the choice). |
 | `transition` | `Transition` | No | Visual transition for this navigation — see [Animations & Transitions](/schema/animations). |
 

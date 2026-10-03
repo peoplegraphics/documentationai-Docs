@@ -37,6 +37,17 @@ Speech bubbles and hotspots are *not* layers — they sit on top of the layer st
 
 Two layer types also have dedicated canvas tools in the tool palette: **Image** (shortcut `I`) and **Text** (shortcut `T`) — select the tool and click the canvas to place a layer directly. The full shortcut list is on [Shortcuts](/cms/editor/shortcuts).
 
+## The panel background
+
+The image or video layer at the bottom of the stack (z-index 0) is the panel's **background** — its picture. It gives the panel its shape: the panel is fitted to it, and speech bubbles and hotspots are placed relative to it, in every [format](/cms/editor/canvas). A video works as a background just like an image.
+
+Dropping an asset onto a panel that already has a background adds it as a **new layer on top**. To **swap the picture** instead — for example to replace a still with its animated video version:
+
+- **Hold <kbd>Alt</kbd> while dropping** an image or video onto the panel. The background layer shows the new asset, keeps its place at the bottom, takes the new asset's shape, and the panel is refitted to it in every format. A video also sets the panel's duration.
+- Or **right-click a layer → Set as Background** (image and video layers). The layer moves to the bottom and becomes the background. The previous background is **hidden, not deleted** — it stays in the layer list, so you can switch back. This also repairs a panel whose background layer was deleted.
+
+The first time you drop onto a panel with a background, a hint reminds you of both ways.
+
 ## The layer list
 
 The **Layers** section of the Inspector's panel tab lists everything in the current panel, top-most first:
