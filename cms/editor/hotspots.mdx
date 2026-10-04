@@ -49,6 +49,7 @@ In **Basic Properties**:
 
 - **Label** — the hotspot's name, edited per language (the field shows the active locale, e.g. **Label (en-US)**; switch locales in the editor header). It is what screen readers announce for the hotspot, so for a choice it should say the choice. Labels are also translated in the [Localization Workshop](/cms/localization#extracting-translatable-text), listed as **Hotspot label**.
 - **ARIA Label** — a screen-reader description, so interactive areas stay accessible.
+- **Shown as** — how readers see the hotspot: **Auto** (a button with its label when the panel's hotspots offer a choice, otherwise an invisible area), **Button with its label**, or **Invisible area** — use that when the artwork paints the button itself. Written to the manifest as [`display`](/schema/hotspots#hotspot).
 - **Visible** and **Locked** — the usual editing toggles.
 
 ## Actions — what happens on click
@@ -124,7 +125,7 @@ A reader's choice is a set of hotspots on one panel, one per option, usually eac
     Right-click the panel → **Add Speech Bubble** → **Narrator** for each option and type its text. A [balloon preset](/cms/editor/speech-bubbles#balloon-presets) such as *choice* gives all choices one look; **Fit height to text** sizes each box for its longest translation.
   </Step>
   <Step title="Add a hotspot per option">
-    Draw a rectangle hotspot over each caption (or set its **X**, **Y**, **Width** and **Height** to the caption's box). Set the **Label** to the option's text.
+    Draw a rectangle hotspot over each caption (or set its **X**, **Y**, **Width** and **Height** to the caption's box). Set the **Label** to the option's text and **Shown as** to **Invisible area**, since the caption already shows it. (Without captions, leave **Auto**: readers then see each label as a button.)
   </Step>
   <Step title="Navigate + Set Variables">
     Give each hotspot a **Navigate** action to the panel the option leads to, and a **Set Variables** action that records the choice (`choice1` → `"A"`) and its effects (`trust` → increment 1).

@@ -35,6 +35,7 @@ The panel references `entry` and `from` are keys of the chapter's `panels` map. 
 | `transition` | [`Transition`](/schema/manifest-structure#transition) | — | Animation when traversing this edge; overrides the format preset's `defaultTransition` |
 | `cameraMove` | [`CameraMove`](/schema/canvas#edgecameramove--trail-dynamics) | — | Camera travel when this edge is taken in [canvas view](/schema/canvas) (1.4+); inherits the format preset's `defaultCameraMove`. Coexists with `transition` (which still applies in panel view) |
 | `action` | `Mutation[]` | — | Variable mutations executed when the edge is taken |
+| `label` | [`LocalizedString`](/schema/manifest-structure#localizedstring) | — | Reader-facing choice text of this path (1.7+). Players show it on the branch chooser's buttons when several paths leave a panel; without it they fall back to the target panel's title, then to a numbered "Option N" |
 | `mutations` | `object[]` | — | **Editor metadata** — free-form edge descriptors written by the CMS (e.g. hotspot/edge-type markers). Not variable mutations |
 
 <Callout kind="alert">

@@ -5,6 +5,67 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-04" description="Format 1.7.0 additions · @panelwave/types 1.2.0 and @panelwave/cli 1.2.0" tags={["feature"]}>
+  ## Choice labels, hotspot buttons, lettering color — and the 1.7.0 tooling
+
+  Four optional fields were folded into **format 1.7.0** before its tooling
+  release. Existing manifests stay valid unchanged:
+
+  - **`Edge.label`** — the choice text of a path, shown on the branch
+    chooser's buttons ([Graph](/schema/graph#edge)).
+  - **`Hotspot.display`** — `auto` | `button` | `area`: show the
+    hotspot's label as a button or keep an invisible click area. `auto`
+    (default) shows buttons for a choice ([Hotspots](/schema/hotspots#hotspot)).
+  - **`BalloonConfig.textColor`** — the lettering color, e.g. amber
+    on-screen text on a dark fill ([Speech Bubbles](/schema/speech-bubbles#balloonconfig)).
+  - **Variable ids may use underscores**, such as `trust_jonas`
+    ([Variables](/schema/variables)).
+
+  Released on npm: **`@panelwave/types` 1.2.0** (types the 1.7.0 fields)
+  and **`@panelwave/cli` 1.2.0** (bundles the 1.7.0 schema; `upgrade`
+  targets 1.7.0). Update with `npm install -g @panelwave/cli@latest`. The
+  current versions of all packages are listed under
+  [Versioning → Current releases](/schema/versioning#current-releases).
+
+  - **CMS:** exports the new fields — **Shown as** on hotspots
+    ([Hotspots](/cms/editor/hotspots#naming-and-accessibility)), the **Text**
+    color in the Balloon Style panel, choice labels from the graph editor —
+    and accepts variable ids with underscores.
+  - **Player:** `@panelwave/player` 1.2.0 already reads `Edge.label`;
+    `display` and `textColor` follow in the release after 1.2.0 and are
+    live in the CMS preview and on read.panelwave.org.
+</Update>
+
+<Update label="2026-10-04" description="Reader, player and MCP — readable branching stories on every screen" tags={["feature", "bugfix"]}>
+  ## Findings from building a branching work entirely through MCP
+
+  In the PanelWave reader and the CMS preview; in `@panelwave/player` from
+  the release after 1.2.0:
+
+  - **Choices are visible.** The hotspots of a choice show their labels as
+    buttons, also on video panels. At a decision, **Next** opens the choice
+    dialog instead of picking a path ([Branch choices](/player/reader-interface#branch-choices)).
+  - **Lettering scales with the page** and never renders below 9 px; balloons
+    stay inside their panel. On phones, page view uses the full width.
+  - **The reader starts in the reader's language**: the browser language when
+    the work has it, a language picked earlier on that device, or `?lang=`
+    in the link ([What readers see](/guides/publishing#what-readers-see)).
+
+  [MCP server](/cms/integrations/mcp-overview):
+
+  - **Pages per format.** A work created from an outline gets one panel per
+    page on phones and several on larger formats (4 on tablet, desktop and
+    landscape print, 6 on portrait print, 8 on big screens), with a new page
+    at each choice. **`pw_pages_compose`** re-lays out one format of a
+    chapter after a dry run and your confirmation, and warns about balloons
+    that would overlap.
+  - **`pw_assets_reprocess`** queues thumbnails, image sizes and video
+    renditions again for assets that stayed *processing*.
+  - Balloons created through MCP are sized to their text in the work's font;
+    choices keep their labels and variable changes.
+  All tools: [Tool reference](/cms/integrations/tool-reference).
+</Update>
+
 <Update label="2026-10-04" description="CMS — swap a panel's picture for its video version" tags={["feature", "bugfix"]}>
   ## Video backgrounds
 

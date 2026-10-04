@@ -98,7 +98,7 @@ Each AJV error has an `instancePath` (where in the manifest), a `keyword` (which
   </Expandable>
   <Expandable title="must match pattern ...">
     - **IDs** (`Identifier`): must match `^[a-zA-Z0-9][a-zA-Z0-9._:-]*$` — no spaces, must start alphanumeric, 1–200 chars.
-    - **Variable IDs**: stricter dot-namespaced pattern `^[a-zA-Z0-9]+(?:\.[a-zA-Z0-9_-]+)*$` — see [Variables](/schema/variables).
+    - **Variable IDs**: stricter dot-namespaced pattern `^[a-zA-Z0-9][a-zA-Z0-9_]*(?:\.[a-zA-Z0-9_-]+)*$` (underscores since 1.7.0) — see [Variables](/schema/variables).
     - **Locales** (`LocaleCode`): BCP-47-like, e.g. `en-US`, `de-DE`.
     - **Colors** (`ColorHex`): `#RRGGBB` or `#RGB`.
     - **MIME types on variants**: image variants must have an `image/*` MIME, audio `audio/*`, and so on — see [Assets](/schema/assets).

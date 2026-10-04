@@ -48,7 +48,8 @@ From the release after 1.2.0:
 From the player release after 1.2.0, page view also adapts to the screen:
 
 - **One page sequence per screen.** A work authored for several [output formats](/schema/chapters-and-pages) carries one page sequence per format. The player shows the one that suits the screen — `mobile-portrait` on a phone, `tablet-portrait` on a portrait tablet, a wide format on a desktop, `bigscreen-landscape` on a 4K display — and picks again when the window is resized or the device rotated, re-opening the page that shows the current panel. The host can force a format with the [`pageFormat`](/player/inputs-outputs#reading-behavior) input.
-- **The page fills the screen** in its format's aspect ratio (1.2.0 used a fixed 16:9 box of at most 1400 px for every format).
+- **The page fills the screen** in its format's aspect ratio (1.2.0 used a fixed 16:9 box of at most 1400 px for every format). On a phone (narrower than 768 px) the page is fitted to the panels it shows, so they use the full width without dark margins.
+- **Lettering scales with the page**, as in the editor, so balloons keep their place on the artwork on every screen. Text never renders below 9 px: a balloon that would get smaller re-wraps to fit its panel instead.
 - **Paging crosses chapters:** next on a chapter's last page opens the next chapter's first page, previous on its first page the previous chapter's last page.
 - **Thumbnails and table-of-contents entries** open the page that shows the panel.
 
@@ -80,7 +81,7 @@ The address bar follows the reader while they read (without adding a browser his
 
 ### Interactive hotspots
 
-Panels can carry [hotspots](/schema/hotspots) — clickable regions the creator drew in the CMS. In panel and page view they render as invisible click targets with a **gentle pulsing outline** so readers can discover them (the pulse is disabled under reduced motion); hovering or focusing a hotspot shows its outline. Activating one runs its action:
+Panels can carry [hotspots](/schema/hotspots) — clickable regions the creator drew in the CMS. In panel and page view they render as invisible click targets with a **gentle pulsing outline** so readers can discover them (the pulse is disabled under reduced motion); hovering or focusing a hotspot shows its outline. From the release after 1.2.0, a hotspot can show its **label as a button** instead — set by the hotspot's [`display`](/schema/hotspots#hotspot) (`button`; `area` keeps the invisible target). With the default `auto`, the hotspots of a **choice** (their `goTo` actions lead to two or more panels) are buttons, so readers see the options even when the artwork does not paint them. Activating a hotspot runs its action:
 
 - **Navigate** (`goTo`) — jumps to the target panel, applying any variable changes and playing the configured transition. This is how in-panel story choices work. The target may be in another chapter (from the release after 1.2.0 the player then continues in that chapter); in page view the jump also reveals the chosen path ([Choices in page view](#choices-in-page-view)).
 - **Set variables** — changes story state in place (conditional hotspots, edges, and variants react immediately).
@@ -96,7 +97,7 @@ In [canvas view](/player/canvas-view) the hotspots of the **current** panel are 
 
 When **at least two paths** lead on from the current panel — outgoing edges whose conditions pass right now — the toolbar shows a **Choices** button. A panel with several edges of which only one is open shows no button. The button opens the branch chooser, which lists exactly those open paths — labelled with the edge's `label`, else the target panel's title, else a translated "Option 1", "Option 2", … Picking one follows that edge exactly as a normal navigation would: its transition (or camera move in canvas view) plays and its `action` mutations are applied. The choice is tracked as `branch_choice`.
 
-**Next** still resolves the graph on its own (highest-priority valid edge), so the chooser is an *additional* way to pick a path, not a required step.
+**Next** still resolves the graph on its own (highest-priority valid edge), so the chooser is an *additional* way to pick a path, not a required step. From the release after 1.2.0 one case differs: when at least two open paths carry an authored [`label`](/schema/graph#edge) — a decision the author wants the reader to make — **Next** opens the chooser instead of picking a path, and in page view, turning past a page with a decision the reader has not made yet does the same.
 
 ### Input methods
 

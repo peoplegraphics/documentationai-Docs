@@ -54,7 +54,7 @@ Variables are defined per work in the **Variables** designer: open a work's Back
 
 <Steps>
   <Step title="Create a variable">
-    Click **New Variable**. Enter the **Id** (letters and digits, optionally in dot-separated segments such as `inventory.hasKey`), pick the **Type** and **Scope**, and optionally a **Default value**, **Visibility**, the **Read-only** flag, and a **Description**. For an `enum`, list the **Allowed values** one per line; the default must be one of them.
+    Click **New Variable**. Enter the **Id** (letters, digits and underscores such as `trust_jonas`, optionally in dot-separated segments such as `inventory.hasKey`), pick the **Type** and **Scope**, and optionally a **Default value**, **Visibility**, the **Read-only** flag, and a **Description**. For an `enum`, list the **Allowed values** one per line; the default must be one of them.
   </Step>
   <Step title="Save">
     Click **Save Variable**. The dialog validates the definition first (a malformed id, a duplicate id, a default that doesn't match the type) and points at the problem; the CMS re-checks the same rules on the server, so what you save is always valid against [the schema](/schema/variables).

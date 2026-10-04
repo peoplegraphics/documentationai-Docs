@@ -17,6 +17,7 @@ Defined as `$defs/Hotspot`. Lives in `chapters[].panels.<panelId>.hotspots[]` (a
 | `action` | `HotspotAction` | Yes | What happens on activation — one of five action types. |
 | `ariaLabel` | `LocalizedString` | No | Screen-reader label, if it should differ from `label`. |
 | `visibleIf` | `JsonLogic` | No | Condition controlling hotspot availability, evaluated against [variables](/schema/variables). |
+| `display` | `"auto"` \| `"button"` \| `"area"` | No | How readers see the hotspot (1.7+, default `auto`). `area`: an invisible click area over the artwork — the label is only its accessible name. `button`: the label is shown as a button. `auto`: a button when the panel's `goTo` hotspots lead to two or more panels (a choice), otherwise an area. Use `area` when the artwork or a caption already shows the option. |
 
 ## `Shape`
 
