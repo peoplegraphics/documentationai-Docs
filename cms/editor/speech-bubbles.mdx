@@ -145,7 +145,7 @@ Bubble text is localized. The Inspector's text field is labeled with the locale 
 
 How the editor handles the languages behind one bubble:
 
-- Every bubble keeps its **full set of translations**. The canvas, the inline editor, and the Inspector show and edit the text for the editing locale; switching the header locale redraws every bubble in that language at once (this is not an undoable edit and does not mark the work unsaved).
+- Every bubble keeps its **full set of translations**. The canvas, the inline editor, and the Inspector show and edit the text for the editing locale; switching the header locale redraws every bubble in that language at once, in page view as well as panel view (this is not an undoable edit and does not mark the work unsaved).
 - If a bubble has no text in the editing locale, the editor shows the work's **default language** (or the first available translation), so a half-translated page never renders empty balloons.
 - Edits are written back **only to the locale you are editing**; the other languages are untouched. Typing into a bubble never creates an empty translation, and clearing a field only clears that language.
 - Bubbles created before per-locale editing existed carry a plain string; the editor treats it as the work's default language.

@@ -80,7 +80,7 @@ Imports preserve the content of the manifest:
 - **Settings** — typography and style presets, output presets, the video UI defaults and the **preload** setting (`settings.preload`; a value outside the CMS's ranges is dropped rather than failing the import — see the [Perf tab](/cms/editor/layout#the-performance-tab))
 - The **localization** block (format 1.5): translations and glossary
 
-References between them — panels, assets, characters, hotspot targets, canvas placements — are remapped to the new ids. Re-importing a CMS export gives an equal copy (hotspot-derived graph edges are no longer duplicated).
+Hotspot labels and accessibility labels are kept, so the choices of an imported work still show their texts; edges keep their labels and their variable changes (`Edge.action`). References between them — panels, assets, characters, hotspot targets, canvas placements — are remapped to the new ids. Re-importing a CMS export gives an equal copy (hotspot-derived graph edges are no longer duplicated).
 
 Not imported from a JSON manifest: **paywall rules** (only the [work archive](#paywall-rules-arrive-disabled) carries them, as disabled drafts), **tracking** settings and the top-level **`ui`** block. Set those up again in the CMS.
 

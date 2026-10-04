@@ -113,6 +113,8 @@ function pickInitialLocale(manifest: PanelWaveManifest): LocaleCode {
 }
 ```
 
+To remember a language the reader picks, store the value of the [`localeChange`](/player/inputs-outputs) output and pass it as `locale` on the next visit. `localeChange` fires only when the language changes, never with the start locale, so storing it does not overwrite your choice with the player's default. The PanelWave reader uses this order: `?lang=` in the link, the language picked earlier on the device, the browser languages, then the work's default.
+
 ## Related pages
 
 - [Localization concepts](/concepts/localization) — the format-level model shared by schema, player, and CMS.

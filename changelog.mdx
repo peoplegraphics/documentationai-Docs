@@ -5,6 +5,44 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-04" description="CMS and player fixes — stacking, variables on paths, languages" tags={["bugfix"]}>
+  ## Fixes from the same day
+
+  **CMS editor and publishing:**
+
+  - **Send to Back sticks.** Arranging panels used to write a negative
+    z-index, which the export dropped, so after a reload every panel was
+    back at the same level. The arrange commands now renumber the page's
+    panels to a gapless stack within the format's 0–9999 range, as one undo
+    step and one save ([Pages & Panels](/cms/editor/pages-panels)).
+  - **Variable changes on a path reach the reader.** Variable changes
+    stored on a graph edge — on choices created through MCP or imported
+    from a manifest — are now exported as the edge's `action`, the field
+    the player applies ([Graph](/cms/editor/graph#transitions-and-edge-effects)).
+  - **Imports keep hotspot labels.** Choices of an imported manifest or
+    work archive keep their labels and accessibility labels, and edges keep
+    their variable changes ([Import](/cms/import#what-gets-imported)).
+  - **Page view follows the header language.** Switching the language in
+    the editor header now also redraws the balloons in page view, and
+    balloons of a panel selected in page view no longer disappear after
+    you open another panel.
+  - **MCP:** outlines can branch, rejoin and end with `next`, choice labels
+    keep every language, and the work's cover no longer counts as an
+    unused asset.
+
+  **Player and reader** (CMS preview and read.panelwave.org; in
+  `@panelwave/player` from the release after 1.2.0):
+
+  - **`localeChange` reports changes only.** It no longer fires with the
+    player's internal `en-US` default on load, which made hosts store
+    English as the reader's choice ([Inputs & Outputs](/player/inputs-outputs)).
+  - **The reader's language wins over the server default:** `?lang=`, then
+    the language picked earlier, then the browser languages, then the work's
+    default ([What readers see](/guides/publishing#what-readers-see)).
+  - At the 9 px lettering floor, a balloon wider than its panel re-wraps to
+    the panel width instead of shrinking its text again.
+</Update>
+
 <Update label="2026-10-04" description="Format 1.7.0 additions · @panelwave/types 1.2.0 and @panelwave/cli 1.2.0" tags={["feature"]}>
   ## Choice labels, hotspot buttons, lettering color — and the 1.7.0 tooling
 

@@ -157,6 +157,8 @@ A typical branch has one conditional edge per choice plus one unconditional edge
 
 The PanelWave format also lets an edge carry a **transition** (how the switch to the next panel is animated) and variable mutations. In the CMS you configure panel-to-panel transitions on the **Navigate (Go To Panel/Page)** action of a hotspot — with a **Transition Effect** of None, Fade, Slide, Zoom, or Crossfade — rather than in the Graph Editor. See [Hotspots](/cms/editor/hotspots).
 
+Variable changes stored on an edge — for example on choices created through the [MCP server](/cms/integrations/mcp-overview) or imported from a manifest — are exported as the edge's [`action`](/schema/graph#edge), so the reader applies them when it follows that path. Before, they were kept only as editor data and never changed a variable in the reader.
+
 ## Simulating the flow
 
 Press the **Simulate** button in the toolbar to walk through your story the way a reader would:

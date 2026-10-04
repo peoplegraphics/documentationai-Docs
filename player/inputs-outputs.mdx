@@ -153,7 +153,7 @@ See [Paywall & Entitlement](/player/paywall-entitlement) for how these fit toget
 </ResponseField>
 
 <ResponseField name="localeChange" field-type="EventEmitter<LocaleCode>">
-  Fires when the content locale changes (e.g. the reader picked a language in the language modal).
+  Fires when the content locale changes (e.g. the reader picked a language in the language modal). It reports changes only: it does not fire with the start locale when the player loads, so a host can store the emitted value as the reader's choice without overwriting the `locale` it passed in.
 </ResponseField>
 
 <ResponseField name="variableChange" field-type="EventEmitter<{ key: string; value: unknown }>">
