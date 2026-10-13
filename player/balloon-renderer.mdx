@@ -100,13 +100,13 @@ The merged config is converted for the renderer with `balloonConfigToRenderOptio
 
 Balloons are lettered with the font family their config names (`fontFamily`); the default is `'Ames Italic', sans-serif`. The open-licensed lettering fonts (SIL OFL 1.1 — Comic Neue, Bangers and others) ship with the package; include their CSS once as described in [Installation](/player/installation#application-setup).
 
-**Ames Pro** (Blambot) is a commercial font, so it is handled differently depending on who runs the player:
+**Ames Pro** (Purastik Graphics) is a commercial font, so it is handled differently depending on who runs the player:
 
 | Where the work is read | Ames Pro |
 |---|---|
 | PanelWave's own players — the CMS [preview](/cms/preview) and [read.panelwave.org](/guides/publishing) | Loaded under PanelWave's license, which covers PanelWave's domains only |
 | `@panelwave/player` from npm, and works exported from the CMS | **Not included** |
-| Your own host | Only with your own license from [blambot.com](https://blambot.com) |
+| Your own host | Only with your own web-font license from [Fontspring](https://www.fontspring.com/fonts/purastik-graphics/ames-pro) |
 
 To use Ames in a work you host yourself, license it and add your own `@font-face` declarations for the families `'Ames Italic'`, `'Ames Bold Italic'` and `'Ames Regular'`. Without them, balloons fall back to **Comic Neue** (the engine's default font stack is `'Ames Italic', 'Comic Neue', sans-serif`).
 
