@@ -1,6 +1,6 @@
 ---
 title: Export
-description: Turn a PanelWave work into a PDF, PowerPoint deck, video, or a portable work archive — export options, presets, batch export, job progress, and downloads.
+description: Turn a PanelWave work into a PDF, PowerPoint deck, video, a portable work archive, or a self-hostable package with the player — the export wizard, options, presets, job progress, and downloads.
 ---
 
 Exports produce **offline versions** of your work for print, pitching, and social media. They are separate from [publishing](/cms/publishing): publishing puts the interactive work online for readers, while an export renders it into a conventional file you can download and share anywhere.
@@ -20,33 +20,48 @@ Exports produce **offline versions** of your work for print, pitching, and socia
   <Card title="Work Archive" icon="archive" href="#archive-export">
     Self-contained `.zip` of the whole work — for transfer and backup.
   </Card>
+  <Card title="Package with player" icon="monitor-play" href="#package-with-player">
+    The work plus the PanelWave Player — read it offline or host it on your own website.
+  </Card>
 </Columns>
 
 Exports run as **background jobs**: you queue them, keep working, and download the file when the job completes.
 
-## Queueing exports from the works list
+## The export wizard
 
-The quickest way to export several works at once is from **My Works**:
+Every export starts in the **export wizard**, a dialog that walks you through **Works → Format → Options → Confirm**. Open it from wherever you are:
+
+| Where | How | The wizard starts with |
+|---|---|---|
+| **My Works** | **Export…** in the header | Choosing works (ticked works are preselected) |
+| A work card | **More actions** (⋮) → **Export…** | Choosing the format for that work |
+| **My Works**, several works ticked | **Export…** in the bulk action bar | Choosing the format for the ticked works |
+| The editor | **Export** next to **Publish** (save your changes first), or **Export Work…** in the command palette (<kbd>Ctrl</kbd>+<kbd>K</kbd>) | Choosing the format for the open work |
+| Backstage (Characters, Graph, Preview, …) | The download icon in the header | Choosing the format for the work |
+| **Exports** screen | **New export**, or a **Quick start** preset | Choosing works (a preset also sets the format and options) |
 
 <Steps>
-  <Step title="Select works">
-    Tick the checkbox on one or more work cards (or use **Select all**).
+  <Step title="Works">
+    Search and tick one or more works (**Select all** ticks every work in the list). Each work becomes its own export job.
   </Step>
-  <Step title="Pick a format">
-    In the bulk action bar, choose **PDF**, **PPT**, **Video**, or **Archive (.zip)** from the format dropdown.
+  <Step title="Format">
+    Pick **PDF**, **PowerPoint**, **Video**, **Archive (.zip)**, or **Package with player (.zip)**. Presets below the cards jump straight to their options.
   </Step>
-  <Step title="Click Export">
-    Each selected work is queued as its own export job — you'll see a confirmation like "Queued 3 exports (pdf)".
+  <Step title="Options">
+    Set the format's options (below). An **estimated size** warns before very large exports. **"Save these options as…"** stores the settings as your own preset.
+  </Step>
+  <Step title="Confirm">
+    Check the summary — it also shows how many of your 5 concurrent and 50 daily exports are in use — and click **Start export**. The wizard lists which works were queued; **Go to Exports** takes you to the job list.
   </Step>
 </Steps>
 
+You can go **Back** to any earlier step, or click a finished step in the step list.
+
 ## The Exports screen
 
-The full **Exports** screen ("Export your works to PDF, PowerPoint, Video, or an Archive (.zip)") adds per-format options, presets, and job management. Open it from the **user menu** (your avatar in the top-right corner) → **Exports**; it lists the jobs you queued from the works list, too. The **← Works** link left of the title takes you back to your works list (the Import pages have the same link).
+The **Exports** screen lists your export jobs. Open it from the **user menu** (your avatar in the top-right corner) → **Exports**, or with **Go to Exports** at the end of the wizard. **New export** opens the wizard; the **Quick start** row holds the presets. The **← Works** link left of the title takes you back to your works list.
 
-### Creating an export
-
-Under **Create New Export**, pick a work from the **Select Work** dropdown, which lists all your works by title (or enable **"Batch export (queue one job per selected work)"** and tick several works), then choose a format. A dialog opens with format-specific options:
+### Format options
 
 #### PDF options
 
@@ -72,17 +87,22 @@ Under **Create New Export**, pick a work from the **Select Work** dropdown, whic
 | **Frame Rate** | 24 fps (Cinematic) / 30 fps (Standard) / 60 fps (Smooth, ~2× size) | The video is rendered at the chosen rate (before 27 September 2026 every video came out at 30 fps) |
 | **Include panel audio (voice-over, sound effects, music)** | on/off, plus **Voice-over** / **Sound effects** / **Music & ambience** | Mixes the work's panel audio into the video — see [Soundtrack](#soundtrack). The three role toggles appear when the option is on; all are on by default |
 
-Before you start, the dialog shows an **estimated size** ("~ a few MB" up to "~ several hundred MB+") and warns when a combination — such as 4K at 60 fps — will be very large and slow. Click **Start Export** to queue the job.
+#### Package with player options
+
+See [Package with player](#package-with-player) below.
+
+The options step shows an **estimated size** ("~ a few MB" up to "~ several hundred MB+") and warns when a combination — such as 4K at 60 fps — will be very large and slow.
 
 ### Presets
 
-Recurring setups can be saved as one-click **presets**. Three are built in:
+Recurring setups can be saved as one-click **presets**. Four are built in:
 
 - **Email-friendly PDF** — low quality, no metadata, links enabled
 - **16:9 deck + notes** — widescreen PowerPoint with speaker notes
 - **1080p social clip** — 1080p / 30 fps video with audio
+- **Self-hosted site** — package with player, cover and toolbar on
 
-Type a name into **"Save these options as…"** inside any export dialog to add your own; custom presets can be deleted with their **×** button.
+Type a name into **"Save these options as…"** on the wizard's options step to add your own; custom presets can be deleted with their **×** button (in the wizard or the **Quick start** row).
 
 ## Archive export
 
@@ -96,20 +116,34 @@ The **Archive (.zip)** format is different from the presentation formats above: 
 
 The archive's `manifest.json` uses the short **friendly panel ids** (`ch1-p022`) instead of the CMS's internal database ids, and every asset reference points at its file inside the zip (`assets/<asset-id>/w1280.webp`). An unzipped archive is therefore a complete, playable bundle: put the folder on any static web server and load `manifest.json` in the [PanelWave Player](/player/quickstart-embed) by URL.
 
-Archives are queued from the works-list bulk export or from the **Archive (.zip)** card on the Exports screen — without an options dialog, for one work or in batch mode — and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
+Archives are created in the export wizard with the **Archive (.zip)** card — there are no options, the options step only summarises what the zip contains — and appear as normal jobs with a download link. Import one on any PanelWave system — another account, another server, or the same one to duplicate a work — via [Import Archive](/cms/import#importing-a-work-archive).
 
 <Callout kind="info">
   Deliberately **not** included: products and reader entitlements, publish history, releases and review links, analytics, and community data (comments, likes). Review the paywall rules, then republish on the target system.
 </Callout>
 
+## Package with player
+
+**Package with player (.zip)** makes a self-contained website of one work: the work, its media, and the [PanelWave Player](/player/overview) in an `index.html`. Unzip it and open `index.html` to read the work on your computer, or upload the folder to your own web space by FTP or SFTP. Step by step: [Self-Host Your Graphic Novel](/guides/self-hosting).
+
+| Option | Default | Notes |
+|---|---|---|
+| **Start language** | Work default | Readers can still switch languages |
+| **Open on the cover** | on | |
+| **Show the reader toolbar** | on | |
+| **Include original files** | off | Adds your original uploads next to the web versions; much larger zip |
+| **Page title** / **Description** | the work's title and description | Per work; used by browser tabs, search engines and link previews |
+
+A self-hosted package is always fully readable — **paywall rules and analytics are not included**. The **Fonts** panel on the options step lists the work's fonts: the open-licensed balloon fonts travel with the player, while **Ames Pro** (Purastik Graphics) is licensed for PanelWave's own websites only and is left out; the panel explains how to license and add it, or **Change balloon font…** opens **Work properties → Typography**.
+
 ## Tracking jobs and downloading
 
-The **Export Jobs** list shows every job with filters for **status** (Queued, Processing, Completed, Failed) and **type** (PDF, PowerPoint, Video, Archive). While one or more jobs are running, a floating **Active Exports** panel stays in the corner of the screen and updates progress live.
+The **Export Jobs** list shows every job with filters for **status** (Queued, Processing, Completed, Failed) and **type** (PDF, PowerPoint, Video, Archive, Player package). While one or more jobs are running, a floating **Active Exports** panel stays in the corner of the screen and updates progress live.
 
 Each job card shows the work title, format, when it was created, a status badge, and — while processing — a progress bar with the current step. Depending on status you can:
 
-- **Download** — completed jobs show the file size and a green **Download** button. The file is named after the work and the export time, for example `TARMAC-Pilot_2026-09-30_18-45.zip` (letters, digits and hyphens only; the time is Central European time). Jobs created before 2026-09-30 keep the name `export.<ext>`.
-- **Retry** — failed jobs show the error message. If the export service is unavailable when you start an export, the job fails right away with that reason — it no longer waits in **Queued** or counts against your limit of 5 running exports. A bulk export from the works list then shows one summary message; **Retry** re-queues after a short cancellable countdown, and **"Retry with options…"** reopens the export dialog prefilled with that job's settings so you can adjust before retrying.
+- **Download** — completed jobs show the file size and a green **Download** button. When the export has something to tell you — fonts you need to license, links that need an internet connection, files that were missing — the card shows **"N notes about this export"**; click it to read them. The file is named after the work and the export time, for example `TARMAC-Pilot_2026-09-30_18-45.zip` (letters, digits and hyphens only; the time is Central European time). Jobs created before 2026-09-30 keep the name `export.<ext>`.
+- **Retry** — failed jobs show the error message. If the export service is unavailable when you start an export, the job fails right away with that reason — it no longer waits in **Queued** or counts against your limit of 5 running exports. The wizard's result step lists such failures per work; **Retry** re-queues after a short cancellable countdown, and **"Retry with options…"** reopens the export wizard on its options step, prefilled with that job's settings, so you can adjust before retrying.
 - **Cancel** — stop a queued or processing job.
 - **Details** — expand the card for the job ID, timestamps, and processing time.
 

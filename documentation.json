@@ -569,6 +569,11 @@
                 "icon": "upload"
               },
               {
+                "title": "Self-Host Your Graphic Novel",
+                "path": "guides/self-hosting",
+                "icon": "server"
+              },
+              {
                 "title": "Monetization",
                 "path": "cms/monetization",
                 "icon": "credit-card"

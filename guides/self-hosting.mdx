@@ -1,0 +1,114 @@
+---
+title: Self-Host Your Graphic Novel
+description: Export a work as a package with the PanelWave Player, open it from your computer, and put it on your own website by FTP or SFTP — what the package contains, what is different from PanelWave, and how to add licensed fonts.
+---
+
+The **Package with player (.zip)** export turns one work into a small website: the work, its images, video and audio, and the open-source [PanelWave Player](/player/overview) in an `index.html`. Unzip it and double-click `index.html` to read the work on your computer — no installation, no internet connection. Upload the same folder to any web space and it works there too.
+
+## Create the package
+
+<Steps>
+  <Step title="Open the export wizard">
+    In **My Works**, open a work's **More actions** menu (⋮) and choose **Export…** — or click **Export** in the editor header next to **Publish**. See [Export](/cms/export#the-export-wizard) for all the ways in.
+  </Step>
+  <Step title="Choose Package with player (.zip)">
+    Pick the **Package with player (.zip)** card and click **Next**.
+  </Step>
+  <Step title="Set the options">
+    | Option | Default | What it does |
+    |---|---|---|
+    | **Start language** | Work default | The language the page opens in (readers can still switch) |
+    | **Open on the cover** | on | Show the work's cover first |
+    | **Show the reader toolbar** | on | Off gives a reading-only page without the toolbar |
+    | **Include original files** | off | Adds your original uploads next to the web versions the player uses; makes the zip much larger |
+    | **Page title** | the work's title | The title of the web page (browser tab, search results) |
+    | **Description** | the work's description | Shown by search engines and link previews |
+
+    The **Fonts** panel below the options tells you whether every font of the work is included — see [Fonts that need a license](#fonts-that-need-a-license).
+  </Step>
+  <Step title="Confirm and download">
+    Click **Next**, check the summary, and click **Start export**. The package appears on the **Exports** page; click **Download** when the job is done.
+  </Step>
+</Steps>
+
+## Open it on your computer
+
+Unzip the download and double-click **index.html**. The work opens in your browser with the full player: page and panel view, languages, speech bubbles, audio and video.
+
+Keep the folder together: `index.html` needs `panelwave.js` and the `player`, `assets` and `fonts` folders next to it. If the page stays empty with a message about `panelwave.js`, that file was moved or deleted.
+
+## Put it on your own website
+
+<Steps>
+  <Step title="Upload the folder">
+    Upload the **whole unzipped folder** unchanged — with an FTP or SFTP program (such as FileZilla) or your host's file manager. Any sub-directory works, for example `/my-comic/`.
+  </Step>
+  <Step title="Open its address">
+    Open the folder's address in a browser, for example `https://example.com/my-comic/`. That's it: no PHP, no database, no Node.js.
+  </Step>
+</Steps>
+
+Any static web space works. Video needs a host that supports HTTP range requests and serves `video/mp4` — every mainstream host does. On an old Apache setup you may need these lines in a file named `.htaccess` inside the folder:
+
+```text
+AddType application/json .json
+AddType image/webp .webp
+```
+
+## What is different from PanelWave
+
+<Callout kind="info">
+  A self-hosted package is a plain copy of your work. It has no server behind it, so:
+</Callout>
+
+- **Everything is readable.** [Paywall rules](/cms/monetization#paywall-rules) are not part of the package — a static copy could not check purchases anyway.
+- **No analytics.** The package sends nothing to PanelWave or anyone else.
+- **Web versions of the media.** Images are the optimized versions the player uses, video is the H.264 rendition. Tick **Include original files** if you also want your uploads in the folder.
+- **Links stay links.** Media you added by URL from another site (not uploaded to PanelWave) and hotspot links still need an internet connection. The package's `README.txt` lists them.
+
+## Fonts that need a license
+
+The player includes the open-licensed balloon fonts (Comic Neue, Bangers, Caveat, Anton and 10 more). **Ames Pro** — PanelWave's default balloon font — is a commercial font by **Purastik Graphics**. PanelWave's license covers PanelWave's own websites only, so it is **not** part of the package. Without it, balloons are shown in Comic Neue.
+
+The **Fonts** panel in the export wizard tells you which fonts your work uses and which are missing. To use Ames Pro on your own site:
+
+<Steps>
+  <Step title="Buy a web-font license">
+    Buy Ames Pro from Purastik Graphics on [Fontspring](https://www.fontspring.com/fonts/purastik-graphics/ames-pro) with a license that covers web use on your domain. A desktop license alone does not cover embedding the font in a website.
+  </Step>
+  <Step title="Add the files">
+    Copy the web-font files (`.woff2` and `.woff`) into the package's `fonts` folder. Open `fonts/custom-fonts.css`: it already contains the rules with the expected file names; remove the two comment lines around each rule.
+  </Step>
+  <Step title="Upload">
+    Upload the folder again. Balloons now use Ames Pro.
+  </Step>
+</Steps>
+
+Prefer not to license it? Choose one of the included fonts as the balloon font before exporting — **Change balloon font…** in the Fonts panel opens **Work properties → Typography** — and export again.
+
+## What is in the package
+
+| File or folder | Contents |
+|---|---|
+| `index.html` | The page that shows the work |
+| `panelwave.js` | The work for the player (works when opened from disk) |
+| `panelwave.json` | The same work as plain JSON in the open [PanelWave format](/schema/overview) — readable by other tools |
+| `panelwave.config.json` | Start language, cover and toolbar settings |
+| `player/` | The PanelWave Player (MIT license, see `player/LICENSE`) |
+| `assets/` | Images, video and audio of the work |
+| `fonts/` | `custom-fonts.css` and `README-fonts.txt` for fonts you add yourself |
+| `README.txt` | Short instructions, what was left out, links that need the internet |
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Export" icon="upload" href="/cms/export">
+    All export formats and the export wizard.
+  </Card>
+  <Card title="Publishing and Sharing" icon="share-2" href="/guides/publishing">
+    Publish on PanelWave with paywall and analytics.
+  </Card>
+  <Card title="Embed the Player" icon="code" href="/player/quickstart-embed">
+    Build your own site around the player.
+  </Card>
+</Columns>
