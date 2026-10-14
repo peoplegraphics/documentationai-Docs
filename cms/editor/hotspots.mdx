@@ -125,7 +125,7 @@ A reader's choice is a set of hotspots on one panel, one per option, usually eac
     Right-click the panel → **Add Speech Bubble** → **Narrator** for each option and type its text. A [balloon preset](/cms/editor/speech-bubbles#balloon-presets) such as *choice* gives all choices one look; **Fit height to text** sizes each box for its longest translation.
   </Step>
   <Step title="Add a hotspot per option">
-    Draw a rectangle hotspot over each caption (or set its **X**, **Y**, **Width** and **Height** to the caption's box). Set the **Label** to the option's text and **Shown as** to **Invisible area**, since the caption already shows it. (Without captions, leave **Auto**: readers then see each label as a button.)
+    Draw a rectangle hotspot over each caption (or set its **X**, **Y**, **Width** and **Height** to the caption's box). Set the **Label** to the option's text and **Shown as** to **Invisible area**, since the caption already shows it. (Without captions, leave **Auto**: readers then see each label as a button. With **Auto**, the player also recognizes a label that is exactly the text of one of the panel's captions and keeps that hotspot invisible, so the option is never shown twice.)
   </Step>
   <Step title="Navigate + Set Variables">
     Give each hotspot a **Navigate** action to the panel the option leads to, and a **Set Variables** action that records the choice (`choice1` → `"A"`) and its effects (`trust` → increment 1).

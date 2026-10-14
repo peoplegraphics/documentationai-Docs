@@ -285,7 +285,12 @@
               {
                 "title": "Demo App",
                 "path": "player/demo-app",
-                "icon": "monitor-play",
+                "icon": "monitor-play"
+              },
+              {
+                "title": "Standalone Package",
+                "path": "player/standalone-package",
+                "icon": "folder-down",
                 "badge": "New"
               }
             ]

@@ -5,6 +5,57 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-14" description="Player 1.4.0 · CMS — panels fill the screen, balloons sit where you lettered them, live export progress" tags={["bugfix", "feature"]}>
+  ## Reading
+
+  - **Panel view fills the screen.** A panel is shown in its artwork's own
+    aspect ratio, as large as the screen allows, instead of a fixed
+    1280 × 720 box — on a 4K screen you see the full-size artwork. On a
+    phone, a panel's focus region fills the screen.
+    [Panel view](/player/reader-interface#panel-view).
+  - **Page view shows the whole artwork on large screens.** A panel's crop
+    (its visible area) now applies on phones only, where panels run edge to
+    edge; tablets and desktops show the whole panel, as the editor's page
+    view does. [Page view](/player/reader-interface#page-view).
+  - **Balloons sit where you lettered them.** The player centred the whole
+    balloon graphic — tail included — on the stored box, so a balloon with a
+    downward tail appeared half a tail length too high. The balloon body is
+    now placed exactly as in the editor. Balloons also re-measure their text
+    once their font has loaded, so line breaks in a self-hosted package match
+    the editor.
+  - **No double choice labels.** A choice whose label is already lettered in
+    one of the panel's captions stays an invisible click area instead of
+    drawing the label a second time as a button.
+    [Interactive hotspots](/player/reader-interface#interactive-hotspots).
+  - The **thumbnail strip** no longer jumps back to the current panel while
+    you scroll it.
+  - **Standalone player, documented.** The self-hostable player page behind
+    *Package with player* has its own developer page — package layout,
+    config keys, `?page=` / `?lang=` and the new print mode
+    (`print`, `pageFormat`, `viewMode`, `reducedMotion`) that the lettered
+    PDF export uses. [Standalone Package](/player/standalone-package).
+
+  ## Editor and exports
+
+  - **Balloons grow inside their oval.** Whether a text fits is now tested
+    against the oval itself, not its bounding box, so long lines no longer
+    poke out at the top and bottom of a grown round balloon; a grown oval gets
+    half a line height of extra room.
+    [Balloons grow with their text](/cms/editor/speech-bubbles#balloons-grow-with-their-text).
+  - The Speech inspector's **growth note** is readable in dark mode, and the
+    balloon preview in the Balloon Style panel letters at the current
+    format's size and shows the grown body.
+  - The **editing language** dropdown in the editor header always shows the
+    language you are actually editing (works that listed German before English
+    showed "German" while the editor was in English).
+  - **Live export progress.** Export cards on the Exports page now move while
+    the job runs — with the current step — instead of sitting at 10 % until
+    you reloaded the page. PowerPoint and video exports report their progress
+    too. [Tracking jobs and downloading](/cms/export#tracking-jobs-and-downloading).
+  - The export wizard's PDF step explains what the lettered A4 PDF contains;
+    the **Enable hyperlinks** checkbox, which never had an effect, is gone.
+</Update>
+
 <Update label="2026-10-14" description="Format 1.8.0 · Player 1.4.0 · CMS — speech balloons grow with their text in every language" tags={["format", "feature"]}>
   ## Balloons grow with their text
 
@@ -37,6 +88,46 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     the frame that PDF and PowerPoint exports show, at the video's full
     resolution — for example the moment after the door has opened, not the
     first frame. [Choosing the print still](/cms/assets#choosing-the-print-still-videos).
+</Update>
+
+<Update label="2026-10-13" description="CMS · Player — export wizard, Package with player and self-hosting" tags={["feature"]}>
+  ## Put your work on your own website
+
+  - **Export wizard.** Every export starts in one wizard — works, format,
+    options, confirm — with visible entry points: **Export…** in **My Works**
+    and in a work's ⋮ menu, **Export** next to **Publish** in the editor
+    header, the download icon in backstage views, and **New export** or a
+    **Quick start** preset on the Exports page. It replaces the old bulk
+    format dropdown and the inline export form.
+    [The export wizard](/cms/export#the-export-wizard).
+  - **Package with player (.zip).** A new export format: your work, its media
+    and the open-source PanelWave Player in an `index.html`. Unzip it and
+    double-click to read offline, or upload the folder to any web space by FTP
+    or SFTP — no server code needed. Packages are always fully readable (no
+    paywall, no analytics). [Self-Host Your Graphic Novel](/guides/self-hosting).
+  - **Notes on finished exports.** A completed job card shows
+    *"N notes about this export"* when there is something to know — fonts you
+    need to license for your own site, links that still need the internet,
+    missing files.
+  - **Player:** the self-hostable standalone app (`projects/standalone`,
+    `npm run build:standalone`) that the package is built from — it opens from
+    `file://` and from any static host sub-directory.
+    [Standalone Package](/player/standalone-package).
+  - **Ames Pro** — PanelWave's default balloon font — is by **Purastik
+    Graphics** (sold through Fontspring), not Blambot; the docs, the export
+    wizard and the player's font notes say so now.
+</Update>
+
+<Update label="2026-10-07" description="CMS — export downloads work again, descriptive browser tab titles" tags={["bugfix"]}>
+  ## Fixes
+
+  - **Export downloads.** The **Download** button of a finished export opened
+    an *Access denied* page, for every export type. Downloads now use a
+    temporary signed link, and exports made before the fix download again
+    without being re-run. [Tracking jobs and downloading](/cms/export#tracking-jobs-and-downloading).
+  - **Browser tab titles.** Tabs of the PanelWave CMS are named after the area
+    you are in — for example *Exports — PanelWave* — instead of always reading
+    "PanelWave CMS & Editor". Titles never contain a work or team name.
 </Update>
 
 <Update label="2026-10-05" description="Platform · PanelWave is public — panelwave.org, docs.panelwave.org and the beta are live" tags={["feature"]}>

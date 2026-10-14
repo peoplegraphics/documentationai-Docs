@@ -1,0 +1,131 @@
+---
+title: Standalone Package
+description: The player as a finished web page for one work — a folder that opens from disk or any static host. Package layout, boot rules, config keys, URL parameters, print mode and building it yourself.
+---
+
+The player repository ships a second app next to the [demo](/player/demo-app): `projects/standalone`, the player as a finished web page for **one** work. A folder with this page and a work opens
+
+- **from disk** — double-click `index.html` (a `file://` URL), and
+- **from any static web space** — upload the folder by FTP or SFTP, into any sub-directory, and open its URL.
+
+No server code, no build step and no PanelWave account are needed to read it. The PanelWave CMS export **Package with player (.zip)** produces such a folder (see [Self-Host Your Graphic Novel](/guides/self-hosting)); you can also assemble one by hand from any valid manifest.
+
+## Package layout
+
+```text
+my-comic/
+├── index.html              from the standalone build
+├── player/                 from the standalone build (main.js, polyfills.js, styles.css, media/, LICENSE, VERSION.json)
+├── panelwave.js            the work: window.PANELWAVE_MANIFEST = {…}; window.PANELWAVE_CONFIG = {…};
+├── panelwave.json          the same manifest as plain JSON (optional; used over http when panelwave.js is absent)
+├── panelwave.config.json   the same config as plain JSON (optional)
+├── assets/…                images, video, audio — referenced by RELATIVE paths in the manifest
+└── fonts/custom-fonts.css  optional: @font-face rules for fonts you licensed yourself
+```
+
+The manifest must reference media by **relative** paths (`assets/img-a/w1280.webp`) and must not set `assets.base`; the player then resolves every path against the page. Absolute URLs (`https://…`) keep working but need a connection.
+
+## How the page finds the work
+
+<Steps>
+  <Step title="panelwave.js">
+    `window.PANELWAVE_MANIFEST` (and `window.PANELWAVE_CONFIG`), set by the classic script `panelwave.js`, wins. This is the only source that works from `file://`, where browsers block `fetch()` and module scripts.
+  </Step>
+  <Step title="panelwave.json over http">
+    Without it, on `http(s)`, the page fetches `./panelwave.json` and `./panelwave.config.json`. A missing config means defaults.
+  </Step>
+  <Step title="Explanation">
+    Without it on `file://`, the page explains that `panelwave.js` is missing.
+  </Step>
+</Steps>
+
+A minimal `panelwave.js`:
+
+```javascript
+window.PANELWAVE_MANIFEST = { "panelwave": { "version": "1.8.0" }, "meta": { /* … */ }, "chapters": [ /* … */ ] };
+window.PANELWAVE_CONFIG = { "locale": "en-US", "showCover": true, "showToolbar": true };
+```
+
+## Config
+
+All keys of `PANELWAVE_CONFIG` / `panelwave.config.json` are optional.
+
+| Key | Default | Meaning |
+|---|---|---|
+| `locale` | `meta.default_locale` | Start language; used only when it is one of `meta.locales` |
+| `showCover` | `true` | Open on the work's cover |
+| `showToolbar` | `true` | Show the reader toolbar |
+| `pageFormat` | chosen by screen size | Page format to show, e.g. `a4-portrait` (used when the work has pages in it) — the shell's [`pageFormat`](/player/inputs-outputs#reading-behavior) input |
+| `viewMode` | page view when the work has pages | Start in `page` or `panel` view |
+| `reducedMotion` | `false` (or the OS setting) | Hold animations at their end state, no autoplay |
+| `print` | `false` | Static print render — see [Print mode](#print-mode) |
+
+## URL parameters
+
+| Parameter | Effect |
+|---|---|
+| `?locale=de-DE` or `?lang=de` | Start language. First match wins: URL, then the config's `locale`, then `meta.default_locale`. The language alone matches (`?lang=de` → `de-DE`). |
+| `?page=<page id>` | Opens that page (a manifest page id such as `pg-A3`) in page view, without the cover |
+
+The page title is whatever `index.html` says; if it still carries the placeholder `PanelWave`, the browser tab is named after `meta.title`.
+
+## Print mode
+
+`"print": true` renders a static page for printing or PDF generation. It implies **no cover, no toolbar, page view and reduced motion**, and adds the class `pw-print` to `<html>` so a print stylesheet can hook into it. Combine it with `pageFormat` and `?page=` to render one page of one format:
+
+```json
+{ "print": true, "pageFormat": "a4-portrait", "locale": "en-US" }
+```
+
+```text
+index.html?page=pg-A3
+```
+
+<Callout kind="info">
+  The CMS [lettered PDF export](/cms/export#pdf) works exactly this way: it opens every DIN A4 portrait page through the standalone player in print mode in a headless Chromium and prints it, so the PDF shows the same balloons, tails and lettering as the reader.
+</Callout>
+
+## What a package does not do
+
+- **No paywall, no analytics.** Everything in the package is readable; there is no server to check entitlements or receive events. The CMS export removes `paywall` and `tracking` from the manifest.
+- **No commercial fonts.** The 14 open-licensed balloon font families (SIL OFL) are included. Ames Pro (Purastik Graphics) is not: it falls back to Comic Neue unless you license it and add `@font-face` rules in `fonts/custom-fonts.css` — see [Fonts that need a license](/guides/self-hosting#fonts-that-need-a-license).
+
+Balloon fonts load lazily, the first time a balloon uses them. The player requests every face its balloons need and re-renders the balloons once a face arrives, so line breaks are measured with the real font, not a fallback.
+
+## Building it yourself
+
+From the [player repository](https://github.com/panelwave/player):
+
+```bash
+npm run build:standalone              # builds the library, then the app -> dist/standalone-package/
+npm run build:standalone -- --skip-lib
+npm run test:standalone-build         # unit tests of the build script's rules
+```
+
+Copy `dist/standalone-package/` (`index.html` + `player/`) into a folder and add your work as shown in [Package layout](#package-layout).
+
+<Expandable title="Why the build rewrites the script tags">
+  The Angular build emits `<script type="module">` although the bundles contain no `import`/`export`. Browsers refuse module scripts from `file://`, so `scripts/build-standalone.mjs`:
+
+  - rewrites the tags to classic `defer` scripts under `player/`,
+  - wraps `main.js` and `polyfills.js` in a strict-mode IIFE — as classic scripts their top-level `var`s would otherwise become `window` properties and collide with built-ins such as `window.name`,
+  - **fails the build** if a bundle ever needs real module semantics (top-level `import`/`export`, `import.meta`, dynamic `import()`) or emits lazy chunks.
+
+  UI translations are bundled into `main.js`, so the page makes no request besides the work and its media.
+</Expandable>
+
+End-to-end tests (`e2e/standalone-package.spec.ts`) build packages into a temporary folder and open them from `file://` and from a static server sub-directory in Chromium, Firefox and WebKit.
+
+## Related pages
+
+<Columns cols={3}>
+  <Card title="Self-Host Your Graphic Novel" icon="server" href="/guides/self-hosting">
+    The creator's guide: export the package from the CMS and upload it.
+  </Card>
+  <Card title="Quickstart: Embed" icon="code" href="/player/quickstart-embed">
+    Build your own Angular site around the player.
+  </Card>
+  <Card title="Demo App" icon="monitor-play" href="/player/demo-app">
+    Try any manifest in the reference integration.
+  </Card>
+</Columns>

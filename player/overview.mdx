@@ -71,6 +71,7 @@ The public API also exports a `PlayerComponent` with selector `pw-player` — it
 ## Where it's used
 
 - **Standalone reader sites** — any Angular application on a supported version that loads a published manifest and embeds `pw-player-shell`.
+- **Self-hosted single works** — the ready-made [standalone package](/player/standalone-package): one work next to an `index.html` that opens from disk or any static web space, no Angular project needed.
 - **The demo application** — ships in the same repository (`projects/demo`), is the reference integration, and runs live at [panelwave.github.io/player](https://panelwave.github.io/player/). See [Demo App](/player/demo-app).
 - **PanelWave CMS preview** — the CMS uses the player for its [preview environment](/cms/preview) so that what creators see is exactly what readers get. Rendering behavior lives in the player, not in a CMS fork.
 - **read.panelwave.org** — where [published works](/guides/publishing) are read. Its frontend is the reader app in the same repository (`projects/reader`), a full-window `pw-player-shell`; see [Development](/player/development#reader-app).

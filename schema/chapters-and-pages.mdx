@@ -66,6 +66,10 @@ Each entry in `placements` positions one panel using normalized page coordinates
 
 The `vx`/`vy`/`vw`/`vh` quartet lets a page show only a crop of a panel (e.g. a page spread showing the top half, while panel view shows everything).
 
+<Callout kind="info">
+  `@panelwave/player` 1.4.0+ applies the visible area on compact screens only (narrower than 768 px), where the page's panels run edge to edge. On larger screens page view draws each panel's whole artwork in its placement, as the PanelWave CMS editor's page view does.
+</Callout>
+
 ## Example
 
 Adapted from the bundled minimal sample — one page with three side-by-side panels:
