@@ -5,7 +5,21 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
-<Update label="2026-10-14" description="Player 1.4.0 · CMS — panels fill the screen, balloons sit where you lettered them, live export progress" tags={["bugfix", "feature"]}>
+<Update label="2026-10-14" description="SDK · @panelwave/types and @panelwave/cli 1.4.0, @panelwave/player 1.5.0 on npm — format 1.8.0" tags={["feature"]}>
+  ## Format 1.8.0 on npm
+
+  - **`@panelwave/types` 1.4.0** types `BalloonConfig.textFit`; **`@panelwave/cli`
+    1.4.0** bundles the 1.8.0 schema, validates `textFit` and upgrades manifests
+    to 1.8.0. Update with `npm install -g @panelwave/cli@latest` — CLI 1.2.0
+    rejects `textFit` as an unknown property.
+  - **`@panelwave/player` 1.5.0** grows balloons with their text and ships the
+    viewport, balloon-placement and hotspot fixes listed below.
+  - Version numbers 1.3.0 (types, cli) and 1.4.0 (player) were skipped.
+    [Versioning → Current releases](/schema/versioning#current-releases).
+  - The PanelWave CMS now exports format 1.8.0 and imports 1.0–1.8.
+</Update>
+
+<Update label="2026-10-14" description="Player 1.5.0 · CMS — panels fill the screen, balloons sit where you lettered them, live export progress" tags={["bugfix", "feature"]}>
   ## Reading
 
   - **Panel view fills the screen.** A panel is shown in its artwork's own
@@ -56,7 +70,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     the **Enable hyperlinks** checkbox, which never had an effect, is gone.
 </Update>
 
-<Update label="2026-10-14" description="Format 1.8.0 · Player 1.4.0 · CMS — speech balloons grow with their text in every language" tags={["format", "feature"]}>
+<Update label="2026-10-14" description="Format 1.8.0 · Player 1.5.0 · CMS — speech balloons grow with their text in every language" tags={["format", "feature"]}>
   ## Balloons grow with their text
 
   - **Longer translations fit.** A balloon's size is now its *authored* size:
@@ -70,8 +84,8 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     authored size (the floor), and the new `textFit` (`grow` | `fixed`) opts a
     work, character, preset or bubble out of growth. Additive — 1.7 manifests
     stay valid. [Balloon renderer](/player/balloon-renderer).
-  - **Player 1.4.0** ships the growth in `ComicBalloon.render()` and the
-    tail-anchored placement; `@panelwave/types` and `@panelwave/cli` 1.3.0 carry
+  - **Player 1.5.0** ships the growth in `ComicBalloon.render()` and the
+    tail-anchored placement; `@panelwave/types` and `@panelwave/cli` 1.4.0 carry
     the new field.
 </Update>
 
