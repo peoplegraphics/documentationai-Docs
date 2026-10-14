@@ -5,6 +5,25 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-14" description="Format 1.8.0 · Player 1.4.0 · CMS — speech balloons grow with their text in every language" tags={["format", "feature"]}>
+  ## Balloons grow with their text
+
+  - **Longer translations fit.** A balloon's size is now its *authored* size:
+    when a language needs more room, the balloon grows on its own — first
+    proportionally (the oval keeps its shape), then in height — and its tail
+    stays on the speaker. The editor re-fits every balloon when you switch the
+    editing language and tells you how much a balloon has grown; readers'
+    players and the lettered exports apply the same rule.
+    [Balloons grow with their text](/cms/editor/speech-bubbles#balloons-grow-with-their-text).
+  - **Format 1.8.0:** `BalloonConfig.maxWidth`/`maxHeight` are defined as the
+    authored size (the floor), and the new `textFit` (`grow` | `fixed`) opts a
+    work, character, preset or bubble out of growth. Additive — 1.7 manifests
+    stay valid. [Balloon renderer](/player/balloon-renderer).
+  - **Player 1.4.0** ships the growth in `ComicBalloon.render()` and the
+    tail-anchored placement; `@panelwave/types` and `@panelwave/cli` 1.3.0 carry
+    the new field.
+</Update>
+
 <Update label="2026-10-14" description="CMS — lettered A4 PDF export and print stills for video panels" tags={["feature"]}>
   ## The PDF is your page view
 

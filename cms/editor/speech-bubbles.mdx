@@ -31,7 +31,7 @@ To edit text later, **double-click the bubble** on the canvas — the inline edi
 With a bubble selected:
 
 - **Drag the body** to move the balloon — its tail moves with it.
-- **Drag a resize handle** to change the balloon's width or height — its **Max Width** / **Max Height**, which are the size the balloon is drawn at. Text that needs more room than the box is cut off; the inspector then warns *"The text doesn't fit this balloon"*, and [**Fit height to text**](#fitting-balloons-to-their-text) sizes the box for you. Resizing works symmetrically around the balloon's centre, also for a caption box that sits on the panel edge.
+- **Drag a resize handle** to change the balloon's authored **Width** / **Height** — the size it has when its text fits. A language whose text needs more room [grows the balloon](#balloons-grow-with-their-text) on its own; when you grab a handle of a grown balloon, the grown size becomes the authored size first, so the drag starts from what you see. Resizing works symmetrically around the balloon's centre, also for a caption box that sits on the panel edge.
 - **Drag the tail tip** to point the tail at a speaker. The editor converts your drag into the tail's angle and length, and the tail base stays attached to the balloon edge automatically.
 
 Fine-grained tail settings (position angle, length, curve direction, curve amount) live in the **Balloon Style** panel described below.
@@ -108,9 +108,17 @@ A preset is a named balloon style you define once and give to any bubble — the
 
 A bubble that names a preset the work no longer has shows it as *(missing)* in the dropdown and uses the remaining levels of the cascade; [Validation](/cms/validation) reports it. Saving Work Properties keeps presets and text-style presets that came in with an imported manifest.
 
+## Balloons grow with their text
+
+You size a balloon once, in the language you write in. That size — **Width** × **Height** in the Balloon Style panel — is its *authored* size and the smallest it will ever be drawn. When a language needs more room (a German line is easily a third longer than its English original), the balloon **grows by itself**: first proportionally, so the oval keeps the shape you gave it, then in height, until the text fits. The tail stays on the speaker — the body moves away from it — and a caption box stays on its panel edge. Switching the editing language re-fits every balloon on the canvas; nothing is saved, the stored size is still the one you authored, in every language.
+
+In the Speech inspector a grown balloon says so: *Grown for de-DE: 146 × 98 px (authored 120 × 80, ×1.22)*, and while it is selected the canvas shows the authored box as a dotted outline inside the grown body.
+
+Growth is the default (**Text fit: Grows with text**). Set **Text fit** to **Fixed size** — on the work defaults, a character, a preset or a single bubble — for a balloon that must keep its exact size, for instance one painted into the artwork; the inspector then warns when its text spills. Readers' players and exports apply the same rule as the editor (format field `textFit`, schema 1.8).
+
 ## Fitting balloons to their text
 
-A balloon is drawn at its **Max Width** × **Max Height**. When the lettering grows (a larger font in a preset, say) or a translation is longer than the original, text no longer fits — and in a work with hundreds of balloons, resizing them by hand is no option:
+Growth happens at render time. When you would rather **bake** the size a longer language needs into the authored size — so the handles, the dotted outline and the print layout match it — fit the balloons:
 
 - **Fit height to text** — in the Speech inspector's **Balloon Style** section, for the selected bubble.
 - **Fit All Balloons to Text** — right-click a chapter in the structure tree: every balloon of the chapter, the open panel included.
@@ -123,7 +131,8 @@ Select a bubble and open the Inspector's balloon tab. Under **Balloon Style** yo
 
 - **Type** — the ten balloon types above.
 - **Roundness** — corner roundness slider (hidden for Rectangle, Thought, and Shout, which have fixed shapes).
-- **Max Width** / **Max Height** — the balloon's box size (in reference pixels, scaled per format). See [Fitting balloons to their text](#fitting-balloons-to-their-text).
+- **Width** / **Height** — the balloon's authored size (in reference pixels, scaled per format); the body [grows](#balloons-grow-with-their-text) when a language needs more room.
+- **Text fit** — **Grows with text** (default) or **Fixed size**. See [Balloons grow with their text](#balloons-grow-with-their-text).
 - **Font** and **Font Size** — comic lettering fonts, grouped in the dropdown.
 - **Fill**, **Stroke** and **Text** colors, and **Border Width**. **Text** sets the lettering color (black by default), e.g. amber letters on a dark on-screen display.
 - **Tail** — enable/disable, plus **Position** (0–359°, compass-style), **Length**, **Curve** (Straight / Curve Left / Curve Right), and **Curve Amount**. A Curve Amount of exactly 0 draws a straight tail even when a curve direction is set.

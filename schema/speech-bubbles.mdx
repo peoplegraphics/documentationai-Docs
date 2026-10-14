@@ -86,8 +86,9 @@ Complete balloon styling configuration, used at the work level as defaults (`$de
 |---|---|---|---|
 | `balloonType` | enum | `"normal"` | Visual type of the balloon shape — see the 10 types below. |
 | `cornerRadius` | number (0–1) | `0.5` | Shape roundness (0 = rectangle, 1 = ellipse). |
-| `maxWidth` | number (40–800) | `120` | Maximum balloon width in pixels (balloon auto-sizes to text). |
-| `maxHeight` | number (30–600) | `80` | Maximum balloon height in pixels. |
+| `maxWidth` | number (40–800) | `120` | Authored balloon width in reference pixels — the size when the text fits, and the floor. With `textFit: "grow"` the body grows beyond it when the active language's text needs more room. |
+| `maxHeight` | number (30–600) | `80` | Authored balloon height in reference pixels (the floor; see `maxWidth`). |
+| `textFit` | `"grow"` \| `"fixed"` | `"grow"` | What happens when the text needs more room than the authored size: `grow` enlarges the body (proportionally first, then in height) and keeps the tail tip on the speaker; `fixed` keeps the authored size and lets the text spill. Since 1.8.0. |
 | `fontFamily` | string | `"'Ames Italic', sans-serif"` | CSS font-family for balloon text. |
 | `fontSize` | number (4–200) | `12` | Font size in pixels. |
 | `strokeWidth` | number (0–20) | `2` | Balloon border stroke width in pixels. |
