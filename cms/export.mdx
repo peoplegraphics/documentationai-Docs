@@ -9,7 +9,7 @@ Exports produce **offline versions** of your work for print, pitching, and socia
 
 <Columns cols={2}>
   <Card title="PDF Export" icon="file-text" href="#pdf-options">
-    High-quality PDF document — for print, review copies, and email.
+    Your DIN A4 pages as in page view, with lettered balloons — for print, review copies, and email.
   </Card>
   <Card title="PowerPoint" icon="presentation" href="#powerpoint-options">
     Editable presentation slides — for pitches and readings.
@@ -67,9 +67,8 @@ The **Exports** screen lists your export jobs. Open it from the **user menu** (y
 
 | Option | Choices | Notes |
 |---|---|---|
-| **Quality** | Low (Smaller file) / Medium (Balanced) / High (Best quality) | A visual comparison shows the sharpness/size trade-off; High is best for print |
-| **Include metadata** | on/off | Embed work information in the PDF |
-| **Enable hyperlinks** | on/off | Keep links clickable in the document |
+| **Image quality** | Low (screen, ~96 dpi) / Medium (~190 dpi) / High (print, 300 dpi) | Resolution of the artwork in the PDF. Lettering and balloon outlines stay sharp at every level. High is for professional print and gives the largest file |
+| **Title and author** | on/off | Puts the work's title, creators and description into the PDF's document properties |
 
 #### PowerPoint options
 
@@ -97,7 +96,7 @@ The options step shows an **estimated size** ("~ a few MB" up to "~ several hund
 
 Recurring setups can be saved as one-click **presets**. Four are built in:
 
-- **Email-friendly PDF** — low quality, no metadata, links enabled
+- **Email-friendly PDF** — low image quality (~96 dpi), no document properties
 - **16:9 deck + notes** — widescreen PowerPoint with speaker notes
 - **1080p social clip** — 1080p / 30 fps video with audio
 - **Self-hosted site** — package with player, cover and toolbar on
@@ -159,11 +158,23 @@ You can run up to **5 exports at the same time** and **50 per day**; a job beyon
 
 Exports render the work's current state at the time the job runs; hidden layers are skipped. Content that is hidden from readers stays hidden in exports too — for example, [extras](/cms/extras) marked **Draft (hidden from readers)** are excluded, exactly as they are from the published manifest.
 
-### PDF and PowerPoint
+### PDF
 
-Every panel gets its own PDF page or slide, drawn from its visible layers bottom to top:
+The PDF is your work's **DIN A4 portrait page view**, lettered: one PDF page (210 × 297 mm) for every page you laid out in the A4 portrait format, in reading order. Each page is rendered by the same player your readers use, so it matches page view exactly:
+
+- **Layout** — panels where you placed them on the page, with their size, rotation and crop.
+- **Page colour** — the page's **Background colour** from its page properties, else the work's default page colour (white unless you changed it).
+- **Speech balloons** — real balloons with their shape, tail and lettering font (including Ames Pro), styled like in the editor, in the work's default language.
+- **Video panels** — the [print still](/cms/assets#choosing-the-print-still-videos) you chose for the video, or its poster frame if you did not choose one. A video that has neither yet (still processing) is left out, and the job lists it under **Warnings**.
+
+Pages in other formats (phone, tablet, landscape, …) are not part of the PDF. A work without any A4 portrait page cannot be exported to PDF: the CMS tells you to lay out A4 portrait pages first.
+
+### PowerPoint
+
+Every panel gets its own slide, drawn from its visible layers bottom to top:
 
 - **Artwork** — every visible image layer, whether it was uploaded, placed from the library, or created by [Page Import](/cms/page-import). In PowerPoint the images are embedded in the deck, so it opens offline.
+- **Video layers** — as one still image: the [print still](/cms/assets#choosing-the-print-still-videos) you chose for that video, or its poster frame if you did not choose one. A video that has neither yet (still processing) is left out, and the job lists it under **Warnings**.
 - **Text layers** — in the work's default language.
 - **Speech bubbles** — as simple text boxes at the bubble's position, in the default language and prefixed with the speaking [character's](/cms/characters) name (*"Mara: Run!"*). Balloon shapes and tails are not drawn.
 

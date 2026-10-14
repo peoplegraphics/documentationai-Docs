@@ -137,6 +137,18 @@ A replacement must be of the same kind as the original (an image replaces an ima
 
 Dimensions and duration are shown **live**: if an older asset is missing them, the panel briefly shows *Measuring…* while they are read from the media and stored — the values then stay with the asset for good.
 
+### Choosing the print still (videos)
+
+A PDF or PowerPoint [export](/cms/export) can only show one frame of a video. By default that is the poster frame from the start of the clip, which is often not the moment that tells the story: in a clip where someone opens a door and steps into a room, you want the frame of them standing in the room, not the closed door.
+
+For a video, the details panel has a **Print still** section:
+
+1. Play or scrub the preview to the moment you want.
+2. Fine-tune with the **previous frame** / **next frame** buttons, or type a time (`0:04.120`) into the time field and press Enter.
+3. Click **Use this frame**. The frame is extracted at the video's full resolution, which takes a few seconds, and then shows as the current print still.
+
+The print still is stored with the video for good and is used by every later PDF and PowerPoint export. **Reset to automatic** removes it, and exports use the poster frame again. Deleting the video also deletes its print still. Replacing the video file removes it too (the CMS asks first), because the chosen moment belongs to the old footage. The print still does not change what readers see before playback; that stays the [poster frame](/cms/editor/video-panels#poster-images).
+
 For images, a zoom button opens a **lightbox** with zoom controls (`+`, `-`, `0` to reset), arrow-key navigation between images, and an optional slideshow (Space to start/pause).
 
 ## Alt text and accessibility

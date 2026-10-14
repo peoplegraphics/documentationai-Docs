@@ -5,6 +5,21 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-14" description="CMS — lettered A4 PDF export and print stills for video panels" tags={["feature"]}>
+  ## The PDF is your page view
+
+  - **Lettered A4 PDF.** The PDF export now prints your DIN A4 portrait pages
+    exactly as page view shows them: panels where you placed them, the page's
+    background colour, and real speech balloons with their tails and lettering
+    font (including Ames Pro). Before, it printed one panel per page with plain
+    text boxes. Image quality now says what it means (~96, ~190 or 300 dpi).
+    [PDF](/cms/export#pdf).
+  - **Print stills for video panels.** In a video's details panel you can pick
+    the frame that PDF and PowerPoint exports show, at the video's full
+    resolution — for example the moment after the door has opened, not the
+    first frame. [Choosing the print still](/cms/assets#choosing-the-print-still-videos).
+</Update>
+
 <Update label="2026-10-05" description="Platform · PanelWave is public — panelwave.org, docs.panelwave.org and the beta are live" tags={["feature"]}>
   ## PanelWave is live
 
@@ -1203,7 +1218,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     used to have no images, lost text layers and printed garbled bubbles. Each
     panel now carries its visible art, text in the default language, and bubbles
     labelled with the speaking character, and PowerPoint embeds the images.
-    [PDF and PowerPoint](/cms/export#pdf-and-powerpoint).
+    [What gets exported](/cms/export#what-gets-exported).
   - **Video panels in the video export.** Panels with a video layer play their
     clip, looped or cut to the panel's display duration; other panels show their
     artwork as a still. Everything is letterboxed to the chosen resolution.
