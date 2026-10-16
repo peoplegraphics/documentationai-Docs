@@ -1,12 +1,12 @@
 ---
 title: Audio
-description: Add music, ambience, voiceover, and sound effects to panels or across whole chapters, control volume, fades, and looping, and preview the mix in the timeline.
+description: Add music and ambience that last for the whole work, a chapter, or a page, put sound effects on single panels, and preview the mix in the timeline.
 ---
 
-Sound turns a graphic novel into an experience: ambient rain behind a scene, a musical theme that carries across a chapter, a door slam exactly when a panel appears. PanelWave gives you two kinds of audio:
+Sound turns a graphic novel into an experience: rain behind a scene, a theme that carries the whole story, an explosion exactly when the panel shows it. PanelWave gives you two kinds of audio:
 
-- **Panel audio tracks** — sounds that belong to a single panel and start relative to it (a sound effect, a line of dialogue).
-- **Sequence audio tracks** — sounds that span **multiple panels** of a chapter (background music, ambience) and are positioned on the chapter's overall timeline.
+- **Sound effects on panels**: sounds that belong to a single panel and start when the reader reaches it (an explosion, a door knock, a line of dialogue).
+- **Timeline audio tracks**: music and ambience that run across panels. A track lasts for the **whole work**, a **chapter**, a **page**, or a custom stretch of time.
 
 Both are built from audio **assets** you upload once and reuse anywhere.
 
@@ -20,77 +20,100 @@ When you upload, the file's **duration is detected automatically** and stored wi
   Use the **Audio** filter in the Assets tab to see only your sound files. Asset cards show the duration and file size, which helps when picking between takes.
 </Callout>
 
-## Panel audio tracks
+## Sound effects on panels
 
-Panel audio tracks live in the Inspector when a panel is selected.
+A panel's sound effects start when the reader reaches the panel, optionally after a delay, and stop when the reader moves on. There are three quick ways to add one:
 
-<Steps>
-  <Step title="Select a panel">
-    Click the panel on the canvas or in the structure tree.
-  </Step>
-  <Step title="Add a track">
-    In the Inspector's **Audio Tracks** section, click **+ Add Audio Track**. The Track Editor dialog opens; `Esc` closes it and keeps the panel selected.
-  </Step>
-  <Step title="Pick the sound">
-    Give the track a **Name**, then click **Select Audio Asset** to open the asset browser and choose a file. (If the list is empty, upload audio in the Assets tab first.)
-  </Step>
-  <Step title="Set timing and playback">
-    Adjust the timing and playback options described below, then click **Create Track**.
-  </Step>
-</Steps>
+- **Drag and drop**: drag an audio file from the Assets tab onto a panel on the canvas, or onto the timeline. On the timeline it lands on the panel under the pointer, starting at the point where you dropped it.
+- **Timeline**: select a panel and click **+ Sound Effect** in the timeline header (or the **+** next to *Panel SFX*). The sound starts at the playhead if the playhead is inside that panel.
+- **Inspector**: select a panel and click **+ Add Sound Effect** in the **Audio Tracks** section.
 
-### Track Editor options
+All panel sounds appear in the timeline's **Panel SFX** lane, at the panel's start plus their delay:
+
+- **Click** a sound to open it in the editor dialog.
+- **Drag** it left or right to change when it starts within its panel. With the keyboard, focus it and press ← / → to move it by 100 ms.
+- A sound longer than what is left of its panel shows a dashed right edge. The reader leaves the panel before it ends, so the editor cuts it there, just like the reader does.
+- Overlapping sounds stack in extra rows.
+
+### Sound effect options
 
 | Field | What it does |
 |---|---|
-| Start Time (ms) | When the track begins, relative to the panel |
-| Duration Override (ms) | Optional custom length — leave empty to use the asset's own duration |
-| Loop Track | Repeats the track when it reaches the end |
+| Role | SFX (default), Ambient, Music, Voiceover, or UI. The reader's **SFX** switch mutes SFX and UI sounds |
+| Starts after (ms) | Delay after the reader reaches the panel |
+| Duration Override (ms) | Optional length for the editor preview — leave empty to use the file's length |
+| Loop Track | Repeats the sound while the reader stays on the panel |
 | Volume | 0–100% playback volume |
-| Fade In (ms) / Fade Out (ms) | Smooth ramps at the start and end (0 = no fade) |
-| Playback Rate | Speed from 0.5× to 2.0× |
-| Muted | Disables the track's audio output without deleting it |
+| Muted | Keeps the sound in the editor but leaves it out of exports and the published work |
 
-A **Track Summary** at the bottom of the dialog recaps type, asset, start time, and volume before you save. Existing tracks are listed in the Inspector with their start time; use the pencil to edit or the trash button to remove one.
+The Inspector's **Audio Tracks** list shows each sound's role and delay, with quick mute, edit, and remove buttons.
 
-<Callout kind="info">
-  The same Track Editor also handles **video tracks** (the Audio/Video toggle at the top). Video overlays are covered in [Video Panels](/cms/editor/video-panels).
+## Timeline audio tracks
+
+Timeline tracks are for music and ambience that keep playing while the reader (or the autoplay playhead) moves from panel to panel.
+
+### Creating a track
+
+<Steps>
+  <Step title="Pick the place">
+    Select a panel (or a page or chapter). "This chapter" and "This page" refer to the selection, or to the panel under the playhead when nothing is selected.
+  </Step>
+  <Step title="Open the dialog">
+    Click **+ Audio Track** in the timeline header.
+  </Step>
+  <Step title="Choose the sound">
+    Click **Select Audio Asset** and pick a file. You can listen to it right in the dialog. The file name becomes the track name; change it if you like.
+  </Step>
+  <Step title="Set role and length">
+    Choose the **Role** (Music, Ambient, Voiceover, SFX) and the **Length**, then click **Create Track**.
+  </Step>
+</Steps>
+
+### Length
+
+| Length | The track plays… |
+|---|---|
+| Whole work | From the first panel to the last panel of the work, across all chapters |
+| This chapter | From the first to the last panel of the current chapter |
+| This page | Over the panels of the current page |
+| Custom | From a start time (relative to the chapter's start) for a set duration — or the file's own length |
+
+The dialog previews where the range starts, how long it lasts, and how many panels it covers. Work, chapter, and page tracks **follow their range**: when you change panel durations or reading order, the track grows or shrinks with them.
+
+<Callout kind="tip">
+  If the file is shorter than the range, the dialog suggests **Loop Track** so the music or ambience doesn't stop halfway. A new track turns it on automatically. Once you change Loop yourself, the dialog stops suggesting it.
 </Callout>
 
-## Sequence audio tracks
+The other options — volume, fade in/out, playback rate (0.5×–2.0×), muted — work as you'd expect. Tracks are created for the device format you're editing.
 
-Sequence audio tracks belong to a **chapter**, not a single panel. They sit on the timeline's absolute time axis and keep playing while the reader (or the autoplay playhead) moves through panels — ideal for background music and ambience.
+### In the timeline
 
-Each track has a **role** that classifies it and color-codes it in the timeline:
+Each track has its own lane, color-coded by role, with a **Work**, **Chapter**, or **Page** badge when it follows a range:
 
 | Role | Typical use |
 |---|---|
 | Ambient | Environmental atmosphere — rain, wind, room tone |
 | Music | Background music and themes |
 | Voiceover | Narration and dialogue |
-| SFX | Sound effects |
+| SFX | Sound effects that span several panels |
 
-### Creating and editing sequence tracks
+- **Click a clip** (or press Enter on it) to edit the track.
+- Each lane's label has a **mute** and a **delete** button.
+- Clips show extra indicators when the volume differs from 100%, when looping is on, and shaded ramps for fades.
 
-- In the **Timeline panel** header, click **+ Audio Track**. The Track Editor opens in sequence mode: name the track, pick the asset, and set its start time, duration, volume, fades, and looping — the same options as panel tracks.
-- Sequence tracks appear as colored clips in the timeline, spanning however many panels their duration covers. **Click a clip** to reopen it in the editor.
-- Each track's label row has a **mute** button and a **delete** button; clips show extra indicators when the volume differs from 100%, when looping is on, and shaded ramps for fade-in and fade-out.
+With many lanes, the timeline scrolls vertically. Drag the timeline's **top edge** (or focus it and press ↑ / ↓) to make it taller.
 
 ### Seeing them per panel
 
-Select any panel and check the Inspector's **Sequence Audio Tracks** section: it lists exactly the tracks that overlap that panel's time range, with their start time and duration, plus quick mute, edit, and delete buttons. This answers "what will the reader hear on this panel?" without hunting through the timeline.
-
-<Callout kind="tip">
-  Timing is millisecond-precise and derives from panel display durations. If you change panel durations later (see [Animations & Timeline](/cms/editor/animations)), re-check where your sequence tracks fall.
-</Callout>
+Select any panel and check the Inspector's **Sequence Audio Tracks** section: it lists exactly the timeline tracks that play during that panel, with their start and duration, plus quick mute, edit, and delete buttons.
 
 ## Previewing audio in the editor
 
 Press **Play** in the [Timeline panel](/cms/editor/animations) to hear your mix:
 
-- All tracks that overlap the playhead play **simultaneously and in sync** — volumes, fades, playback rate, and looping are applied exactly as configured.
-- Muted tracks stay silent.
-- **Seeking** (clicking the ruler or dragging the playhead) restarts audio at the correct offset, so you can audition any moment directly.
+- Music, ambience, and panel sound effects play **together and in sync**. Every sound starts exactly when it is due, even one that begins long after you pressed Play. Each sound stops at its end.
+- Volumes, fades, playback rate, and looping are applied as configured. Muted tracks and sounds stay silent.
+- **Seeking** (clicking the ruler or dragging the playhead) and looping restart the mix at the right position.
 - The canvas follows the playhead from panel to panel, so picture and sound stay together.
 
 <Callout kind="info">
@@ -98,6 +121,10 @@ Press **Play** in the [Timeline panel](/cms/editor/animations) to hear your mix:
 </Callout>
 
 For the full reader-side behavior of audio (mixing rules, autoplay policies in the published player), see [Player audio](/player/audio).
+
+<Callout kind="info">
+  In the published player, timeline tracks follow the reader: music starts at the right point when the reader reaches its panels, keeps playing while they read on, and fades out when they leave its range; **Whole work** tracks carry on across chapters. This needs the player release after 1.5.0 — the editor preview already uses it.
+</Callout>
 
 ## Localized audio
 

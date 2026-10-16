@@ -34,7 +34,7 @@ Lifecycle rules:
 - **Locked panels stay silent** (from the player release after 1.2.0): while the current panel is [locked](/player/paywall-entitlement#locked-panels-on-screen) for the reader — by a paywall rule or as an `x-locked` stub — its tracks don't play, so an age-gated or paid entry panel no longer plays its music behind the age gate or paywall. The audio starts once the lock lifts (age confirmed, purchase completed). The same holds while the work's [cover](/player/reader-interface#cover) is shown.
 - Missing or non-audio assets are skipped with a single console warning per asset.
 
-Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`) are **not** started by the shell — they need a playback clock the panel-based shell does not run; see [Sequence tracks](#sequence-tracks) for driving them from a host.
+Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`, the CMS timeline's music and ambience) are played by the shell too (from the player release after 1.5.0) — see [Sequence tracks](#sequence-tracks).
 
 ### Toggles and preferences
 
@@ -136,7 +136,17 @@ The signal chain is `element → track gain → role gain → master gain → ou
 
 ## Sequence tracks
 
-Chapters can define **sequence audio tracks** (`chapter.sequenceAudioTracks`) — tracks positioned on a timeline that spans multiple panels, each with `assetId`, `role`, `startTime`, `duration`, and optional `volume` (0–2), `loop`, `fadeIn`/`fadeOut`, `muted`, and a panel range (`startPanelId`/`endPanelId`). The engine can start every track that should be audible at a given timeline position, seeking each to the correct offset:
+Chapters can define **sequence audio tracks** (`chapter.sequenceAudioTracks`) — music, ambience, or voiceover beds positioned on a timeline that spans multiple panels, each with `assetId`, `role`, `startTime`, `duration`, and optional `volume` (0–2), `loop`, `fadeIn`/`fadeOut`, `playbackRate`, `muted`, a panel range (`startPanelId`/`endPanelId`), and `span` (`custom`, `page`, `chapter`, `work`; format 1.8.0).
+
+From the player release after 1.5.0, the shell's `SequenceAudioService` plays them as the reader moves through the panels:
+
+- **Placement** follows the CMS timeline: the work is one line of panels — chapters in order, the active page format's pages, reading order — each lasting its `durationMs` (else `settings.ui.secondsPerPanel`, else 5 s). A track's `startTime` is relative to its chapter's start; `page` / `chapter` tracks cover their `startPanelId`..`endPanelId` range.
+- **Entering a panel** starts every track that covers it, at the matching offset — jumping into the middle of a scene picks the music up where it would be. A track that starts or ends inside a panel is delayed or stopped there.
+- **Continuity:** a track keeps playing while the reader stays inside its range, so music doesn't restart on every panel. Leaving the range fades it out (its `fadeOut`, else 250 ms).
+- **Across chapters:** a `span: "work"` track continues into the following chapters until its `endPanelId` (else the last panel); every other track ends with its chapter.
+- Format filters (`format`), muted tracks, roles → channels, the reader's Audio/SFX/Speech toggles, locked panels, the cover, and the autoplay-policy retry behave as for panel audio.
+
+The placement helpers (`buildWorkTimeline`, `resolveTrackRanges`, `cuesForPanel`) are exported for hosts. A host that runs its own clock can still start every track audible at a timeline position, seeking each to the correct offset:
 
 ```typescript
 // Start all chapter tracks that overlap the 12.5 s mark

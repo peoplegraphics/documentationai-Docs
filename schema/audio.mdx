@@ -40,7 +40,7 @@ Defined as `$defs/AudioTrack`, used in `panels.<panelId>.audio[]` and in [extras
 
 ## `SequenceAudioTrack`
 
-Defined as `$defs/SequenceAudioTrack`: "Audio track that spans multiple panels within a chapter". Placed in `chapters[].sequenceAudioTracks[]`, these describe a timeline relative to the chapter/sequence start — the natural home of background music that should not restart on every panel.
+Defined as `$defs/SequenceAudioTrack`: an audio track that spans multiple panels, starting in its chapter. Placed in `chapters[].sequenceAudioTracks[]`, these describe a timeline relative to the chapter start — the natural home of background music that should not restart on every panel. A track with `span: "work"` keeps playing into later chapters.
 
 | Property | Type | Required | Default | Description |
 |---|---|---|---|---|
@@ -59,7 +59,8 @@ Defined as `$defs/SequenceAudioTrack`: "Audio track that spans multiple panels w
 | `playbackRate` | number (0.25–4) | No | `1` | Playback speed multiplier. |
 | `muted` | boolean | No | `false` | Whether the track is muted. |
 | `startPanelId` | `Identifier` | No | — | Optional explicit panel range start. |
-| `endPanelId` | `Identifier` | No | — | Optional explicit panel range end. |
+| `endPanelId` | `Identifier` | No | — | Optional explicit panel range end. For `span: "work"` it may name a panel of a later chapter. |
+| `span` | enum | No | `custom` | How long the track lasts, as authored: `custom` (`startTime` + `duration`), `page` or `chapter` (that panel range — `startTime` / `duration` hold it resolved), `work` (keeps playing across chapter boundaries until `endPanelId`, else the last panel). Added in 1.8.0 (additive). |
 
 ```json
 {
