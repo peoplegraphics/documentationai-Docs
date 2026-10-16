@@ -263,7 +263,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     unused asset.
 
   **Player and reader** (CMS preview and read.panelwave.org; in
-  `@panelwave/player` from the release after 1.2.0):
+  `@panelwave/player` from 1.3.0):
 
   - **`localeChange` reports changes only.** It no longer fires with the
     player's internal `en-US` default on load, which made hosts store
@@ -302,7 +302,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     color in the Balloon Style panel, choice labels from the graph editor —
     and accepts variable ids with underscores.
   - **Player:** `@panelwave/player` 1.2.0 already reads `Edge.label`;
-    `display` and `textColor` follow in the release after 1.2.0 and are
+    `display` and `textColor` follow in 1.3.0 and are
     live in the CMS preview and on read.panelwave.org.
 </Update>
 
@@ -310,7 +310,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
   ## Findings from building a branching work entirely through MCP
 
   In the PanelWave reader and the CMS preview; in `@panelwave/player` from
-  the release after 1.2.0:
+  1.3.0:
 
   - **Choices are visible.** The hotspots of a choice show their labels as
     buttons, also on video panels. At a decision, **Next** opens the choice
@@ -376,7 +376,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
   ## Page view follows the reader's path
 
   In the PanelWave reader and the CMS [preview](/cms/preview); in
-  `@panelwave/player` from the release after 1.2.0.
+  `@panelwave/player` from 1.3.0.
 
   - **Choices in page view.** Panels that only some options of a choice lead
     to are grey placeholders until the reader picks an option; then that
@@ -860,7 +860,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     rollback reports success again.
 </Update>
 
-<Update label="2026-09-30" description="Format 1.6.0 additions · Player (unreleased) · CMS — layer keyframe animations, several alt covers, ensemble character sheets" tags={["feature"]}>
+<Update label="2026-09-30" description="Format 1.6.0 additions · Player 1.3.0 · CMS — layer keyframe animations, several alt covers, ensemble character sheets" tags={["feature"]}>
   ## Panels animate their layers, works can carry several alternate covers, and a character sheet can show a whole cast
 
   **Format (merged into 1.6.0 — the version number does not change, existing
@@ -878,8 +878,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     `characterIds`; `characterId` stays for single sheets and as the first
     entry. [Extras](/schema/extras#extracharactersheet).
 
-  **Player** (merged, **not yet released** — ships with the `@panelwave/player`
-  release after 1.2.0; 1.2.0 itself does not contain it):
+  **Player** (released in `@panelwave/player` 1.3.0; 1.2.0 does not contain it):
 
   - Plays layer keyframes in panel view, page view and canvas view: start when
     the panel comes into view, hold / interpolate / loop as the format defines,

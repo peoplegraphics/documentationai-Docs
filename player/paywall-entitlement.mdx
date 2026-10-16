@@ -88,7 +88,7 @@ Which panels a rule gates:
 
 Precedence for a panel's purchase or subscription requirement: panel rule → chapter rule for its chapter → work rule → free.
 
-**Age requirements combine across rules** (from the player release after 1.2.0). Every rule that applies to a panel and names an age must be met — its panel rules, its chapter's rules and every work rule, each outside its own free preview — whichever rule decides the purchase or subscription part. A chapter preview or a panel-scoped `free` rule therefore never skips a work-wide age gate. When several age requirements are unmet, the age gate asks for the highest minimum age, so one answer clears them all. (In 1.2.0 the first matching rule decided everything, age included.)
+**Age requirements combine across rules** (from player 1.3.0). Every rule that applies to a panel and names an age must be met — its panel rules, its chapter's rules and every work rule, each outside its own free preview — whichever rule decides the purchase or subscription part. A chapter preview or a panel-scoped `free` rule therefore never skips a work-wide age gate. When several age requirements are unmet, the age gate asks for the highest minimum age, so one answer clears them all. (In 1.2.0 the first matching rule decided everything, age included.)
 
 ```json
 "paywall": {
@@ -107,7 +107,7 @@ Here the first six panels of the work are free and the rest needs a subscription
 `chapter-3` and `art-book` are not entitlement type names, so both rules are purchase gates. Without `requiredProductIds`, a purchase gate is satisfied by **any** product in `purchasedProductIds` — pass only the purchases that belong to this work in the snapshot. The key still names the product the overlay offers (see [below](#what-readers-see-at-a-gate)). To require specific products, list them in `requiredProductIds` (format 1.6+, e.g. `"requiredProductIds": ["chapter-3", "complete-edition"]`): then only those unlock the rule, any one of them is enough. The CMS exports every unlocking product this way.
 </Callout>
 
-To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`. To check a panel the way the player's renderers do (from the release after 1.2.0), use `PaywallService.isPanelLocked(panelId)` and re-check whenever `PaywallService.changes$` fires — see [Core Services](/player/services#paywallservice).
+To check an extras block yourself, use `PaywallService.isExtraLocked(extraId)` or the pure `isExtraLocked(rules, snapshot, extraId)`. To check a panel the way the player's renderers do (from player 1.3.0), use `PaywallService.isPanelLocked(panelId)` and re-check whenever `PaywallService.changes$` fires — see [Core Services](/player/services#paywallservice).
 
 ## What readers see at a gate
 
@@ -120,7 +120,7 @@ While the paywall or the age gate is open, the story behind it does not move: ar
 
 ### Locked panels on screen
 
-From the player release after 1.2.0, a gated panel stays locked wherever it would be rendered, not only when the reader moves onto it (in 1.2.0, page and canvas view showed gated panels in full):
+From player 1.3.0, a gated panel stays locked wherever it would be rendered, not only when the reader moves onto it (in 1.2.0, page and canvas view showed gated panels in full):
 
 - **Every view shows a locked placeholder** — a lock with *"This panel is part of the full edition."* (`player.locked.*` keys) — in place of each panel the reader's snapshot does not open. The other panels of a page stay readable. Placeholders update the moment a lock lifts (age confirmed, `refreshEntitlements()`, a new `entitlementSnapshot`).
 - **In page view a placeholder is a button** (click, `Enter` or `Space`; labelled *"Unlock this panel"*). It raises the gate for that panel in place: the age gate when only the age is missing, otherwise the paywall with that panel's Buy / Subscribe options. Turning onto (or switching to) a page with age-locked panels asks for the age once; confirming unlocks them in place.
@@ -183,7 +183,7 @@ An edge's `action` mutations (for example a counter the move increments) are app
 
 ## Server-stripped panels
 
-Client-side rules can be bypassed, so a server that publishes a paid work for anonymous readers can leave the paid content out instead: it keeps each paid panel's id and position, strips its content and marks it `"x-locked": true` — an [extension property](/schema/extensions) allowed on panels since format 1.7. From the release after 1.2.0 the player:
+Client-side rules can be bypassed, so a server that publishes a paid work for anonymous readers can leave the paid content out instead: it keeps each paid panel's id and position, strips its content and marks it `"x-locked": true` — an [extension property](/schema/extensions) allowed on panels since format 1.7. From player 1.3.0 the player:
 
 - renders such a panel as the [locked placeholder](#locked-panels-on-screen), in every view;
 - treats it as locked whatever the rules say — no free preview, entitlement or `entitlementAdapter` opens it, because its content is not in the manifest;

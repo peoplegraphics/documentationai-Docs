@@ -24,10 +24,10 @@ These are all the `@Input()`s the shell accepts (verified in `PlayerShellCompone
 | `initialVariables` | `Record<string, unknown>` | — | Seed story variables once at start; may set `readOnly` variables (e.g. a verified `user.age`). |
 | `showToolbar` | `boolean` | `false` | Show the toolbar. Readers can always toggle it (`T`, floating button, viewport click). |
 | `viewModeOverride` | `'auto' \| 'panel' \| 'canvas'` | `'auto'` | Force panel or [canvas](/player/canvas-view) view. |
-| `pageFormat` | `'auto' \| OutputFormat` | `'auto'` | From the release after 1.2.0. Which page sequence page view shows: `'auto'` picks the authored output format that suits the screen (phone → `mobile-portrait`, 4K → `bigscreen-landscape`, …) and re-picks on resize; a format id forces that sequence when the work has pages for it. |
-| `showCover` | `boolean` | `true` | From the release after 1.2.0. Open on the work's cover (`meta.cover`, else `extras.cover`) when reading starts at the beginning; the cover also heads the thumbnail strip and the table of contents. |
+| `pageFormat` | `'auto' \| OutputFormat` | `'auto'` | From player 1.3.0. Which page sequence page view shows: `'auto'` picks the authored output format that suits the screen (phone → `mobile-portrait`, 4K → `bigscreen-landscape`, …) and re-picks on resize; a format id forces that sequence when the work has pages for it. |
+| `showCover` | `boolean` | `true` | From player 1.3.0. Open on the work's cover (`meta.cover`, else `extras.cover`) when reading starts at the beginning; the cover also heads the thumbnail strip and the table of contents. |
 | `reducedMotion` | `boolean` | `false` | Force reduced motion. The OS `prefers-reduced-motion` setting and the reader's Settings switch also turn it on. |
-| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs` (and for the cover). Reader-adjustable in the toolbar (0.5–120 s); from the release after 1.2.0 a speed the reader picks applies to every panel until they switch back to the author's timing. From the same release, autoplay in panel and canvas view waits for a non-looping panel animation to finish. |
+| `secondsPerPanel` | `number` | `5` | Autoplay dwell time per panel when the panel has no own `durationMs` (and for the cover). Reader-adjustable in the toolbar (0.5–120 s); from player 1.3.0 a speed the reader picks applies to every panel until they switch back to the author's timing. From the same release, autoplay in panel and canvas view waits for a non-looping panel animation to finish. |
 | `autoplay` | `boolean` | `false` | Start in autoplay once the work is ready; the reader's toolbar toggle takes over afterwards. |
 | `entitlementSnapshot` | `EntitlementSnapshot` | anonymous | What the reader owns; evaluated against the manifest's `paywall.rules`. See [Paywall & Entitlement](/player/paywall-entitlement). |
 | `entitlementEndpoint` / `readerToken` | `string` | — | Let the player fetch the snapshot itself (`{workId}` is substituted; token sent as a Bearer header). |
@@ -102,7 +102,7 @@ Branding (`primaryColor`, `accentColor`, `logo`) and control visibility (`showLa
 
 Individual panels can carry behavior that overrides globals:
 
-- `durationMs` — autoplay dwell time for that panel (takes precedence over `secondsPerPanel` until the reader picks a speed in the toolbar; in page view, from the release after 1.2.0, a page stays for the sum of its panels' times).
+- `durationMs` — autoplay dwell time for that panel (takes precedence over `secondsPerPanel` until the reader picks a speed in the toolbar; in page view, from player 1.3.0, a page stays for the sum of its panels' times).
 - `"x-locked": true` (format 1.7) — a [server-stripped panel](/player/paywall-entitlement#server-stripped-panels): rendered as a locked placeholder whatever the paywall rules say.
 - Video layers can override `playMode`, `startMode`, `muted` per layer (cascade: layer → `settings.ui` defaults → built-in defaults).
 - `formatViews` — which view modes a panel allows per output format.
