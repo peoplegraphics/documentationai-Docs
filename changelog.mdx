@@ -30,6 +30,41 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     the right time, every timeline track that starts after the playhead is
     heard in the preview, and the timeline scrolls when it has more lanes than
     room (drag its top edge to make it taller).
+    [Timeline panel](/cms/editor/animations#the-timeline-panel).
+  - **Video export:** a **Whole work** music track plays to the end of the
+    video instead of stopping with the first chapter; muted panel sounds stay
+    out of the soundtrack. [Export → Soundtrack](/cms/export#soundtrack).
+  - **Video Tracks removed.** The panel Inspector's *Video Tracks* section never
+    reached the published work and is gone; video on a panel is a video layer.
+    [Video Panels](/cms/editor/video-panels#video-tracks-removed).
+
+  ## Lettering
+
+  - **Balloons stay on the speaker in page view.** `@panelwave/player` 1.6.0
+    keeps a balloon's tail tip where you lettered it when page view enlarges
+    small text — only the body grows, the tail keeps its length. Before,
+    balloons drifted toward the faces and tails stretched up to the heads, in
+    page view and in the lettered PDF. [Page view](/player/reader-interface#page-view).
+  - **Line breaks are kept in the editor.** A line break you type in a balloon
+    now shows on the canvas too; the editor used to show fewer lines than the
+    player and the lettered PDF draw. [Speech Bubbles](/cms/editor/speech-bubbles).
+
+  ## Import
+
+  - **Work archives in format 1.8 import again.** Re-importing a work archive
+    exported by the CMS failed with "newer than this system supports"; archives
+    in formats 1.0–1.8 are accepted. [Import](/cms/import).
+</Update>
+
+<Update label="2026-10-15" description="CMS — the PanelWave newsletter in your account" tags={["feature"]}>
+  ## Newsletter
+
+  - **Subscribe at registration or in your profile.** The *Create your
+    account* form has an optional, unticked **Send me the PanelWave
+    newsletter** box, and **Profile → Preferences** a newsletter toggle to
+    subscribe or unsubscribe later. A confirmation email comes first; the
+    *product news & updates* notification is a separate setting.
+    [Account](/cms/account#creating-an-account).
 </Update>
 
 <Update label="2026-10-14" description="SDK · @panelwave/types and @panelwave/cli 1.4.0, @panelwave/player 1.5.0 on npm — format 1.8.0" tags={["feature"]}>

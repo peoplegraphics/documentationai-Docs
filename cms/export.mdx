@@ -193,9 +193,9 @@ With **Include panel audio (voice-over, sound effects, music)** on, the video ca
 
 | Audio | Starts | Stops |
 |---|---|---|
-| A panel's [audio track](/cms/editor/audio#panel-audio-tracks) or audio layer | When its panel starts, plus the track's **Start Time** | When the file ends or the panel ends, whichever comes first. It plays again on every panel that uses it |
+| A panel's [sound effect](/cms/editor/audio#sound-effects-on-panels) or audio layer | When its panel starts, plus its **Starts after** delay | When the file ends or the panel ends, whichever comes first. It plays again on every panel that uses it; muted sounds are left out |
 | The same, set to **Loop** | When its panel starts, plus its Start Time | Keeps looping across consecutive panels that use the same file, and stops at the end of the last of them |
-| A chapter's [sequence audio track](/cms/editor/audio#sequence-audio-tracks) | At the chapter's start plus the track's start time on the timeline | After its duration (without one, the file's length), and never later than the chapter's end. Volume, fades, speed and loop are applied; muted tracks are left out |
+| A [timeline audio track](/cms/editor/audio#timeline-audio-tracks) | At the chapter's start plus the track's start time on the timeline | After its duration (without one, the file's length), and never later than the chapter's end — a **Whole work** track keeps playing to the end of the video. Volume, fades, speed and loop are applied; muted tracks are left out |
 
 The role toggles narrow the mix:
 

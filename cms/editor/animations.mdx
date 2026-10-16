@@ -116,17 +116,21 @@ The Timeline at the bottom of the editor is your preview and pacing tool. It sho
   The single-arrow buttons step **one frame** at a time, so at the end of the timeline they barely move. Use the **Jump to Start / End** buttons (or `Home` / `End`) to snap all the way back to the first panel or forward to the last — the canvas jumps to that panel too, even when paused.
 </Callout>
 
-During playback the canvas automatically switches to the panel under the playhead, and any [audio tracks](/cms/editor/audio) and [video panels](/cms/editor/video-panels) play in sync — so what you see and hear is close to what readers get in autoplay. Panel images are preloaded so switching panels doesn't flash a placeholder.
+During playback the canvas automatically switches to the panel under the playhead, and the music, ambience and sound effects of the [audio tracks](/cms/editor/audio) and any [video panels](/cms/editor/video-panels) play in sync — every sound starts exactly when it is due, even long after you pressed Play, and stops at its end — so what you see and hear is close to what readers get in autoplay. Panel images are preloaded so switching panels doesn't flash a placeholder.
 
 ### Tracks
 
 - **Panel track** — one bar per panel, in reading order. Click a bar to select that panel (the structure tree and Inspector follow along). Drag the handle at a bar's right edge to change the panel's display duration directly.
 - **Layer tracks** — rows for timeline keyframe markers, each with visibility and lock toggles. They are a pacing aid in the timeline; the panel's saved animation is edited in the Inspector and watched in the preview.
-- **Audio tracks** — panel audio and chapter-wide sequence audio, with mute buttons and volume/fade indicators. See [Audio](/cms/editor/audio).
+- **Panel SFX** — every panel's sound effects at the panel's start plus their delay. Click a sound to edit it, drag it (or use ← / → on it) to move it within its panel; a sound longer than its panel shows a dashed edge where the reader moves on. Overlapping sounds stack in extra rows.
+- **Audio tracks** — one lane per music, ambience or voiceover track, with a mute and a delete button. A **Work**, **Chapter** or **Page** badge marks a track that follows that range. See [Audio](/cms/editor/audio).
 - **Markers** — comments and bookmarks you can place as notes along the timeline.
+
+The header's **+ Audio Track** button adds music or ambience, **+ Sound Effect** adds a sound to the selected panel at the playhead. You can also drop an audio file from the Assets tab anywhere on the timeline: it becomes a sound effect of the panel under the pointer, starting where you dropped it.
 
 ### Navigation and editing aids
 
+- **Resize the timeline**: drag its top edge (or focus the edge and press ↑ / ↓) to make room for more lanes — from 240 px up to 60% of the window. When the lanes need more room than that, the track list scrolls, with names and lanes moving together.
 - **Zoom** from 10% to 500% with the slider or the zoom buttons; the ruler adapts its tick spacing.
 - **Snap to Grid** (magnet button) with grid sizes of 0.1 s, 0.5 s, 1 s, or 5 s.
 - The **focus button** hides other panels' clips so you can concentrate on the selected panel.

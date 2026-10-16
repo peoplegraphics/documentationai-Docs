@@ -12,6 +12,7 @@ All services live in `projects/player/src/lib/services/` and are `@Injectable({ 
 | `ManifestService` | Loading, validating, and indexing the manifest |
 | `PlayerStateService` | Current panel, locale and reader preferences (reactive, preferences persisted) |
 | `PanelAudioService` | Starts/stops the current panel's manifest audio through the engine |
+| `SequenceAudioService` | Plays the chapters' timeline (sequence) audio as the reader moves through the panels (1.6.0) |
 | `VariableStoreService` | Scoped variables, mutations, persistence |
 | `FlowEngineService` | Graph traversal and edge condition evaluation |
 | `HotspotActionService` | Executes hotspot actions (mutations, plugin events) and returns UI effects |
@@ -67,6 +68,17 @@ A second, extended implementation exists at `src/lib/state/player-state.service.
 - Tracks refused by the browser's autoplay policy are retried, and the `AudioContext` resumed, on the first gesture reported by `UserGestureService`.
 
 See [Audio](/player/audio#what-the-shell-plays-automatically).
+
+## SequenceAudioService
+
+`services/sequence-audio.service.ts` (from 1.6.0) — plays `chapters[].sequenceAudioTracks` (music, ambience, voiceover beds) while the reader moves through the panels. The shell calls it next to `PanelAudioService`.
+
+- `syncPanel(panelId, pageFormat)` — on every panel change and page-format change. Every track covering the panel starts at the matching offset (scaled by `playbackRate`); a track starting or ending inside the panel is delayed / stopped there; a track keeps playing while the reader stays inside its range and fades out on leaving it (its `fadeOut`, else 250 ms, `SEQUENCE_AUDIO_LEAVE_FADE_MS`); `span: "work"` tracks continue across chapters. `panelId` `undefined` silences everything — the shell passes it under the cover and on locked panels.
+- `stopAll()` — teardown; `getDesiredTrackIds()` — engine ids (`seq:<trackId>`) of the tracks the current panel wants.
+- Placement: the pure helpers in `utils/sequence-audio-timeline.ts`, exported from the package — `buildWorkTimeline(manifest, format, defaultPanelMs?)` (the panel line: chapters → the format's pages → reading order, `durationMs` else `settings.ui.secondsPerPanel` else 5 s), `resolveTrackRanges(manifest, timeline, format)` (each unmuted, format-matching track's start/end on that line), `cuesForPanel(ranges, entry)` (delay, offset and in-panel stop per covering track).
+- Autoplay refusals are retried on the first user gesture, at the track's offset.
+
+See [Audio → Sequence tracks](/player/audio#sequence-tracks).
 
 ## VariableStoreService
 
@@ -133,7 +145,7 @@ The returned sources are unresolved; pass them through `AssetUrlService.resolve(
 `services/audio-engine.service.ts` — Web Audio playback with a master `GainNode` and one gain bus per role: `ambient`, `music`, `voiceover`, `sfx`.
 
 - `initialize()` / `resumeContext()` — creates the `AudioContext` and probes the browser autoplay policy; call `resumeContext()` on user interaction.
-- `play(track: AudioTrack)` / `stop(id, fadeOutMs?)` / `pause(id)` / `resume(id)` / `stopAll(fadeOutMs?)` — tracks are `HTMLAudioElement`s routed through `createMediaElementSource` into a per-track `GainNode` (`volume` 0–2, fades as linear ramps on that node) and from there into their role bus; one-shot tracks release themselves on `ended`.
+- `play(track: AudioTrack, offsetSeconds = 0)` / `stop(id, fadeOutMs?)` / `pause(id)` / `resume(id)` / `stopAll(fadeOutMs?)` — tracks are `HTMLAudioElement`s routed through `createMediaElementSource` into a per-track `GainNode` (`volume` 0–2, fades as linear ramps on that node) and from there into their role bus; one-shot tracks release themselves on `ended`. `AudioTrack` carries `id`, `url`, `role`, `loop`, `volume`, `fadeIn`, `fadeOut` and (from 1.6.0) `playbackRate` (0.25–4); `offsetSeconds` starts the file part-way in. From 1.6.0 a fade-in ramps while the track plays — before, the start waited for the whole fade.
 - `setMasterVolume(v)` / `setRoleVolume(role, v)` and getters; `setMasterMuted(bool)` / `isMasterMuted()` / `masterMuted$` and `setRoleMuted(role, bool)` / `isRoleMuted(role)` — mutes are independent of volumes (what the toolbar toggles drive); `setTrackVolume(id, v)`, `isActive(id)`.
 - `playSequenceTracks(tracks, currentTimeMs, assetBaseUrl)` / `stopSequenceTracks(ids?)` — plays chapter timeline audio (`SequenceAudioTrack`) from the correct offset.
 - `isAutoplayAllowed()`, `getPlaybackState(id)`, `getActiveTracks()`, `destroy()`.

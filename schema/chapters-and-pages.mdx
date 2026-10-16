@@ -16,7 +16,7 @@ Panels always live in the chapter's `panels` map; pages only *place* them. A cha
 | `graph` | [`Graph`](/schema/graph) | Yes | Entry panel and directed edges defining reading flow |
 | `title` | `LocalizedString` | — | Chapter title |
 | `pages` | `Page[]` (unique) | — | Page layouts for page-view formats |
-| `sequenceAudioTracks` | `SequenceAudioTrack[]` (unique) | — | Audio tracks spanning multiple panels within the chapter — see [Audio](/schema/audio) |
+| `sequenceAudioTracks` | `SequenceAudioTrack[]` (unique) | — | Timeline audio (music, ambience) that starts in this chapter and spans several panels; a `span: "work"` track continues into later chapters — see [Audio](/schema/audio) |
 
 ## `Page`
 
