@@ -34,7 +34,7 @@ Lifecycle rules:
 - **Locked panels stay silent** (from the player release after 1.2.0): while the current panel is [locked](/player/paywall-entitlement#locked-panels-on-screen) for the reader — by a paywall rule or as an `x-locked` stub — its tracks don't play, so an age-gated or paid entry panel no longer plays its music behind the age gate or paywall. The audio starts once the lock lifts (age confirmed, purchase completed). The same holds while the work's [cover](/player/reader-interface#cover) is shown.
 - Missing or non-audio assets are skipped with a single console warning per asset.
 
-Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`, the CMS timeline's music and ambience) are played by the shell too (from the player release after 1.5.0) — see [Sequence tracks](#sequence-tracks).
+Chapter-level **sequence tracks** (`chapter.sequenceAudioTracks`, the CMS timeline's music and ambience) are played by the shell too (from player 1.6.0) — see [Sequence tracks](#sequence-tracks).
 
 ### Toggles and preferences
 
@@ -138,7 +138,7 @@ The signal chain is `element → track gain → role gain → master gain → ou
 
 Chapters can define **sequence audio tracks** (`chapter.sequenceAudioTracks`) — music, ambience, or voiceover beds positioned on a timeline that spans multiple panels, each with `assetId`, `role`, `startTime`, `duration`, and optional `volume` (0–2), `loop`, `fadeIn`/`fadeOut`, `playbackRate`, `muted`, a panel range (`startPanelId`/`endPanelId`), and `span` (`custom`, `page`, `chapter`, `work`; format 1.8.0).
 
-From the player release after 1.5.0, the shell's `SequenceAudioService` plays them as the reader moves through the panels:
+From player 1.6.0, the shell's `SequenceAudioService` plays them as the reader moves through the panels:
 
 - **Placement** follows the CMS timeline: the work is one line of panels — chapters in order, the active page format's pages, reading order — each lasting its `durationMs` (else `settings.ui.secondsPerPanel`, else 5 s). A track's `startTime` is relative to its chapter's start; `page` / `chapter` tracks cover their `startPanelId`..`endPanelId` range.
 - **Entering a panel** starts every track that covers it, at the matching offset — jumping into the middle of a scene picks the music up where it would be. A track that starts or ends inside a panel is delayed or stopped there.

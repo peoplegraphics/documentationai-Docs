@@ -60,7 +60,7 @@ Defined as `$defs/SequenceAudioTrack`: an audio track that spans multiple panels
 | `muted` | boolean | No | `false` | Whether the track is muted. |
 | `startPanelId` | `Identifier` | No | — | Optional explicit panel range start. |
 | `endPanelId` | `Identifier` | No | — | Optional explicit panel range end. For `span: "work"` it may name a panel of a later chapter. |
-| `span` | enum | No | `custom` | How long the track lasts, as authored: `custom` (`startTime` + `duration`), `page` or `chapter` (that panel range — `startTime` / `duration` hold it resolved), `work` (keeps playing across chapter boundaries until `endPanelId`, else the last panel). Added in 1.8.0 (additive). |
+| `span` | enum | No | `custom` | How long the track lasts, as authored: `custom` (`startTime` + `duration`), `page` or `chapter` (that panel range — `startTime` / `duration` hold it resolved), `work` (keeps playing across chapter boundaries until `endPanelId`, else the last panel). Added in 1.8.0 (additive): `@panelwave/types` 1.5.0, `@panelwave/cli` 1.4.1, `@panelwave/player` 1.6.0. |
 
 ```json
 {

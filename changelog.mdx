@@ -5,6 +5,33 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-16" description="Player 1.6.0 · types 1.5.0 · CLI 1.4.1 · CMS — music and ambience for the whole work, a chapter or a page; sound effects on panels" tags={["feature", "bugfix"]}>
+  ## Audio
+
+  - **Timeline tracks with a length.** In the CMS timeline, a music or
+    ambience track lasts for the **whole work**, **this chapter**, **this
+    page**, or a custom time — and follows the panels when their durations
+    change. [Audio](/cms/editor/audio#length).
+  - **Sound effects on panels, visible in the timeline.** Drop an audio file
+    on a panel (canvas or timeline) or use **+ Sound Effect**; the timeline's
+    **Panel SFX** lane shows every panel's sounds — click to edit, drag to
+    move. [Sound effects on panels](/cms/editor/audio#sound-effects-on-panels).
+  - **The reader plays timeline audio.** `@panelwave/player` **1.6.0** starts
+    music and ambience when the reader reaches their panels, keeps them
+    playing while they read on, and fades them out when they leave; whole-work
+    tracks carry on across chapters. Fade-ins no longer delay a track's start.
+    [Player audio](/player/audio#sequence-tracks).
+  - **Format 1.8.0, additive:** `SequenceAudioTrack.span` (`custom`, `page`,
+    `chapter`, `work`) — typed in **`@panelwave/types` 1.5.0**, validated by
+    **`@panelwave/cli` 1.4.1** (CLI 1.4.0 rejects it; update with
+    `npm install -g @panelwave/cli@latest`). [Audio in the format](/schema/audio).
+  - **Fixes in the CMS editor:** panel sounds now reach the published work
+    (they were lost after a reload), timeline tracks of later chapters play at
+    the right time, every timeline track that starts after the playhead is
+    heard in the preview, and the timeline scrolls when it has more lanes than
+    room (drag its top edge to make it taller).
+</Update>
+
 <Update label="2026-10-14" description="SDK · @panelwave/types and @panelwave/cli 1.4.0, @panelwave/player 1.5.0 on npm — format 1.8.0" tags={["feature"]}>
   ## Format 1.8.0 on npm
 
