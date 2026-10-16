@@ -414,6 +414,12 @@
                 "icon": "user"
               },
               {
+                "title": "Install as an App",
+                "path": "cms/install-app",
+                "icon": "monitor-down",
+                "badge": "New"
+              },
+              {
                 "title": "Plans & Limits",
                 "path": "cms/plans",
                 "icon": "wallet"
