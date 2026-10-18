@@ -43,6 +43,7 @@ The enum contains exactly these event names:
 | `sfx_toggle` | The SFX toggle changes. |
 | `speech_toggle` | The speech toggle changes. |
 | `paywall_view` | A paywall prompt is shown. |
+| `paywallAction` | The reader acts on a paywall prompt — `purchase`, `subscribe`, `login` or `dismiss` (format 1.9+). |
 | `like` | The reader likes the work. |
 | `bookmark` | The reader bookmarks a position. |
 | `share` | The reader shares content. |
@@ -54,7 +55,11 @@ The enum contains exactly these event names:
 | `videoLoop` | A video layer loops (format 1.1+). |
 
 <Callout kind="info">
-Naming note: the four video events added in format 1.1 are camelCase (matching the events the player emits), while the older entries are snake_case. This inconsistency is inherited from 1.0 and kept for compatibility.
+Naming note: the four video events added in format 1.1 and `paywallAction` (format 1.9) are camelCase (matching the events the player emits), while the older entries are snake_case. This inconsistency is inherited from 1.0 and kept for compatibility.
+</Callout>
+
+<Callout kind="tip">
+List both `paywall_view` and `paywallAction` to measure paywall conversion: `paywall_view` counts how often a prompt is shown, `paywallAction` what readers do with it. A whitelist without `paywallAction` keeps the event filtered out in the player, as before 1.9.
 </Callout>
 
 ## Example

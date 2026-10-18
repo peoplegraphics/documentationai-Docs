@@ -5,6 +5,24 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-18" description="Format 1.9.0 — paywall clicks become a tracking event" tags={["format"]}>
+  ## Format 1.9.0
+
+  Additive; existing manifests remain valid unchanged.
+
+  - **`paywallAction`** joins the [`tracking.eventWhitelist`](/schema/tracking#eventwhitelist-values)
+    enum: the reader acts on a paywall prompt — `purchase`, `subscribe`,
+    `login` or `dismiss`. Together with `paywall_view` it measures paywall
+    conversion, which the CMS shows on the Paywall page and in
+    [Analytics](/cms/analytics). A whitelist without it keeps the event
+    filtered out, as before.
+  - **CMS:** exports and publishes 1.9.0 and imports formats 1.0–1.9.
+    [Import](/cms/import).
+  - **SDK:** the `@panelwave/cli` and `@panelwave/types` releases that bundle
+    and type 1.9.0 follow; until then the CLI rejects `paywallAction` as an
+    unknown enum value. [Versioning](/schema/versioning#what-changed-in-190).
+</Update>
+
 <Update label="2026-10-18" description="CMS — the Studio redesign: a Dashboard, notifications, and every Backstage tool rebuilt for 4K screens" tags={["feature"]}>
   ## CMS
 
