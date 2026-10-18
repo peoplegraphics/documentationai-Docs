@@ -17,11 +17,15 @@ In Chrome or Edge you can also [install the CMS as an app](/cms/install-app). It
 
 ## The main areas of the app
 
-After signing in you land on **My Works** — everything else is reached from there.
+After signing in you land on the **Dashboard**. A slim **rail** on the left leads to the five app-level screens — **Dashboard**, **Works**, **Exports**, **Team** and **Profile** — and the top bar carries the breadcrumb, the help icon, the notification bell and the user menu. On wide screens the rail shows labels; on narrower ones icons with tooltips (pin it open if you prefer labels).
 
-### My Works
+### Dashboard
 
-The home screen at `/works`. Browse, search, and filter all your works, create new ones with the **Create New Work** wizard, import existing manifests, manage statuses, and open the Trash. See [Works](/cms/works).
+Your studio home: the work you touched last with a direct jump back into the editor, creator KPIs, your latest works, readers, your inbox, a next-steps checklist, tutorial videos and the PanelWave blog. See [Dashboard](/cms/dashboard).
+
+### Works
+
+The library of every work of your team: a cover grid, a cover wall or a sortable table, with an inspector that shows everything about the selected work and lets you edit its properties in place. Create new works with the wizard, import existing material, manage statuses, and open the Trash. See [Works](/cms/works).
 
 ### The Editor
 
@@ -36,26 +40,21 @@ The editor header shows the save status (auto-save is enabled), undo/redo, a loc
 
 ### Backstage
 
-Every work also has a **Backstage** area — a set of management tools that sit outside the panel-by-panel editor. The Backstage sidebar ("Backstage Tools") links to:
+Every work also has a **Backstage** area — a set of management tools that sit outside the panel-by-panel editor. Its **work rail** on the left groups them by what they are for; small badges on the rail tell you where attention is needed (validation errors, the least complete language, comments awaiting review, bubbles without voice audio, the size of the cast):
 
-| Tool | What it's for |
+| Group | Tools |
 |---|---|
-| **Editor** | Back to the visual editor |
-| **Characters** | Your cast, portraits, and per-character balloon styles — [Characters](/cms/characters) |
-| **Extras** | Bonus content such as covers, bonus art, interviews — [Extras](/cms/extras) |
-| **Graph Editor** | The branching navigation graph between panels — [Graph](/cms/editor/graph) |
-| **Variables** | The story's declared state (types, scopes, defaults) — [Variables & Conditions](/cms/editor/variables) |
-| **Preview** | The embedded player — [Preview](/cms/preview) |
-| **Paywall** | Monetization rules — [Monetization](/cms/monetization) |
-| **Entitlement** | Simulate what a reader with/without purchases sees |
-| **Localization** | The translation workshop — [Localization](/cms/localization) |
-| **Audio** | Per-locale voice audio and text-to-speech |
-| **Validation** | Preflight checks before publishing — [Validation](/cms/validation) |
-| **Analytics** | Reader metrics — [Analytics](/cms/analytics) |
+| **Create** | **Editor** (back to the visual editor) · **Graph Editor** — the branching navigation between panels ([Graph](/cms/editor/graph)) · **Canvas Layout** — the infinite-canvas board of a chapter ([Canvas Layout Board](/cms/editor/canvas-layout)) |
+| **Cast & Content** | **Characters** — the cast board with portraits, balloon styles and voices ([Characters](/cms/characters)) · **Extras** — bonus content such as covers, bonus art, interviews ([Extras](/cms/extras)) · **Variables** — the story's declared state ([Variables & Conditions](/cms/editor/variables)) |
+| **Language & Sound** | **Localization** — the translation grid ([Localization](/cms/localization)) · **Audio** — voice takes and text-to-speech per language ([Audio localization](/cms/localization#audio-localization-and-text-to-speech)) |
+| **Ship** | **Preview** — the device lab with the embedded player ([Preview](/cms/preview)) · **Validation** — preflight before publishing ([Validation](/cms/validation)) · **Paywall** — rules and products ([Monetization](/cms/monetization)) · **Entitlement** — who sees what, persona by persona ([Simulating reader access](/cms/monetization#simulating-reader-access)) |
+| **Audience** | **Comments** — your team's review threads ([Team comments](/cms/community#team-comments-in-the-cms)) · **Analytics** — how the work is read ([Analytics](/cms/analytics)) |
+
+All Backstage tools share one layout — a list on the left, the stage in the middle, an inspector on the right — and the same keys: <kbd>]</kbd> toggles the inspector, <kbd>[</kbd> the list, <kbd>?</kbd> opens the page's **Guide rail**, a short card with what the tool does, why it matters, three next steps, a link to this documentation and a tutorial video. Editing happens in the inspector while the stage stays visible; dialogs are left for creating things and for confirmations.
 
 ### Account, Team, and Profile
 
-The user menu (top right, on every screen) leads to **Profile**, **Exports** (your export jobs — see [Export](/cms/export)), and **Team**, plus theme and font toggles, keyboard shortcuts, a **Documentation** link to this site, and logout. See [Account & Team](/cms/account).
+The user menu (top right, on every screen) leads to **Profile**, **Exports** (your export jobs — see [Export](/cms/export)), and **Team**, plus the theme (light, dark, high contrast), font, interface density and interface scale toggles, keyboard shortcuts in the editor, a **Documentation** link to this site, and logout. See [Account & Team](/cms/account).
 
 ### AI assistants
 
@@ -84,7 +83,7 @@ graph LR
     H --> I[Publish]
 ```
 
-1. **Create a work** with the 3-step wizard — title, URL slug, languages, age rating, and tags. Optionally start from a template. See [Works](/cms/works).
+1. **Create a work** with the wizard — title, URL slug, languages, page formats, age rating, and tags. Optionally start from a template. See [Works](/cms/works).
 2. **Upload your artwork** (and audio, video, fonts) into the Assets library. Files are processed automatically into optimized variants. See [Assets](/cms/assets).
 3. **Build the structure**: add chapters, pages, and panels in the Tree tab, then compose each panel from layers on the canvas. See [Pages & Panels](/cms/editor/pages-panels) and [Layers](/cms/editor/layers).
 4. **Add dialogue and interactivity**: speech bubbles (with [character](/cms/characters) styling), [hotspots](/cms/editor/hotspots), [animations](/cms/editor/animations), and [audio](/cms/editor/audio).

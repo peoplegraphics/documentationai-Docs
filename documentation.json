@@ -409,9 +409,21 @@
                 "icon": "home"
               },
               {
+                "title": "Dashboard",
+                "path": "cms/dashboard",
+                "icon": "layout-dashboard",
+                "badge": "New"
+              },
+              {
                 "title": "Account & Team",
                 "path": "cms/account",
                 "icon": "user"
+              },
+              {
+                "title": "Notifications",
+                "path": "cms/notifications",
+                "icon": "bell",
+                "badge": "New"
               },
               {
                 "title": "Install as an App",
