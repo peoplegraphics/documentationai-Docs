@@ -50,9 +50,9 @@ The format and the open-source packages that read and write it, as of 2026-10-18
 | Release | Current version | Format | Notes |
 |---------|-----------------|--------|-------|
 | Format / schema ([panelwave/schema](https://github.com/panelwave/schema)) | **1.9.0** | — | `1.0/panelwave.schema.json`, CC BY 4.0 |
-| [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) | **1.4.1** | bundles 1.8.0 | Validates offline and upgrades to 1.8.0, including the additive `SequenceAudioTrack.span` (CLI 1.4.0 rejects it). The release that bundles 1.9.0 follows; until then the CLI rejects `paywallAction` in `tracking.eventWhitelist`. CLI 1.2.0 bundled 1.7.0, CLI 1.1.0 1.6.0, CLI 1.0.0 1.5.0 (there is no CLI 1.3.0). See [CLI](/schema/cli) |
-| [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) | **1.5.0** | 1.8.0 | TypeScript interfaces for the manifest, including `BalloonConfig.textFit` and `SequenceAudioTrack.span` (1.8.0). `paywallAction` (1.9.0) is typed in the next release. Types 1.2.0 cover 1.7.0; there is no types 1.3.0 |
-| [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) | **1.6.0** | up to 1.9 | Reads 1.9.0 manifests (the only 1.9 addition is a tracking event name; the player emits `paywallAction` from its next release). Plays timeline music and ambience (`sequenceAudioTracks`, incl. `span`); balloons grow with their text (`textFit`, since 1.5.0). Player 1.3.0 reads up to 1.7; there is no player 1.4.0. See [Player](/player/overview) |
+| [`@panelwave/cli`](https://www.npmjs.com/package/@panelwave/cli) | **1.5.0** | bundles 1.9.0 | Validates offline and upgrades to 1.9.0, including `paywallAction` in `tracking.eventWhitelist` (CLI 1.4.x rejects it). CLI 1.4.1 bundled 1.8.0 with `SequenceAudioTrack.span`, CLI 1.2.0 1.7.0, CLI 1.1.0 1.6.0, CLI 1.0.0 1.5.0 (there is no CLI 1.3.0). See [CLI](/schema/cli) |
+| [`@panelwave/types`](https://www.npmjs.com/package/@panelwave/types) | **1.6.0** | 1.9.0 | TypeScript interfaces for the manifest, including `paywallAction` in `TrackingEvent` (1.9.0), `BalloonConfig.textFit` and `SequenceAudioTrack.span` (1.8.0). Types 1.5.0 cover 1.8.0, types 1.2.0 1.7.0; there is no types 1.3.0 |
+| [`@panelwave/player`](https://www.npmjs.com/package/@panelwave/player) | **1.7.0** | up to 1.9 | Emits the 1.9 `paywallAction` event and the analytics events `transition`, `decision` (replaces `branch_choice`), `paywall_view`, `lang_change` and `share`; the demo app's embed mode speaks [bridge protocol v1](/player/demo-app#embed-mode). Plays timeline music and ambience (`sequenceAudioTracks`, incl. `span`, since 1.6.0); balloons grow with their text (`textFit`, since 1.5.0). Player 1.3.0 reads up to 1.7; there is no player 1.4.0. See [Player](/player/overview) |
 | [`@panelwave/mcp`](https://www.npmjs.com/package/@panelwave/mcp) | **0.1.0** | — | Local bridge to the PanelWave MCP server for desktop AI assistants. See [Local bridge](/cms/integrations/local-bridge) |
 
 All packages are MIT-licensed and published from [github.com/panelwave](https://github.com/panelwave) with npm provenance. The CMS exports and publishes 1.9.0 and imports formats 1.0–1.9.
@@ -71,7 +71,7 @@ Additive; existing manifests remain valid unchanged. Paywall clicks become measu
 
 - **`tracking.eventWhitelist`** gains **`paywallAction`** — emitted when the reader acts on a paywall prompt (`purchase`, `subscribe`, `login` or `dismiss`, with the blocking rule, its scope and the chosen product). It is the click-side counterpart of `paywall_view` (the prompt being shown), so a whitelist that lists both lets analytics measure paywall conversion; a whitelist without it keeps filtering the event out in the player, as before. The name is camelCase like the video events because it matches the event the player emits. [Tracking](/schema/tracking#eventwhitelist-values).
 
-The CMS exports 1.9.0 and imports formats 1.0–1.9. The `@panelwave/cli` and `@panelwave/types` releases that bundle and type 1.9.0 follow; until then a CLI with the 1.8.0 schema rejects `paywallAction` as an unknown enum value — update with `npm install -g @panelwave/cli@latest` once the release is out.
+`@panelwave/cli` **1.5.0** and `@panelwave/types` **1.6.0** (released 2026-10-18) bundle and type 1.9.0; `@panelwave/player` **1.7.0** emits `paywallAction`. The CMS exports 1.9.0 and imports formats 1.0–1.9. A validator with an older schema copy (CLI 1.4.x or earlier) rejects `paywallAction` as an unknown enum value — update with `npm install -g @panelwave/cli@latest`.
 
 ### What changed in 1.8.0
 
@@ -194,7 +194,7 @@ The upgrade currently performs these normalizations:
 - Adds a missing `graph.edges` array
 
 <Callout kind="info">
-The CLI's upgrade target is always the version declared by the schema bundled in that CLI release — `1.8.0` in CLI 1.4.0 (`1.7.0` in CLI 1.2.0, `1.6.0` in CLI 1.1.0, `1.5.0` in CLI 1.0.0); the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships (the release targeting 1.9.0 follows). Since 1.1–1.9 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
+The CLI's upgrade target is always the version declared by the schema bundled in that CLI release — `1.9.0` in CLI 1.5.0 (`1.8.0` in CLI 1.4.x, `1.7.0` in CLI 1.2.0, `1.6.0` in CLI 1.1.0, `1.5.0` in CLI 1.0.0); the SDK build fails if the two diverge (see [CLI → Bundled schema](/schema/cli#bundled-schema)). Update with `npm install -g @panelwave/cli@latest` when a new format version ships. Since 1.1–1.9 are purely additive or relaxing, older manifests need no migration to be read by current consumers — upgrading normalizes the header and legacy fields. Run `--dry-run` first and review the reported steps before overwriting files.
 </Callout>
 
 After upgrading, always re-validate:

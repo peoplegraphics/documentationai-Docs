@@ -5,6 +5,30 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-18" description="SDK · @panelwave/types 1.6.0 and @panelwave/cli 1.5.0, @panelwave/player 1.7.0 on npm — format 1.9.0" tags={["feature"]}>
+  ## Format 1.9.0 on npm
+
+  - **`@panelwave/types` 1.6.0** types `paywallAction`; **`@panelwave/cli`
+    1.5.0** bundles the 1.9.0 schema, validates `paywallAction` in
+    `tracking.eventWhitelist` and upgrades manifests to 1.9.0. Update with
+    `npm install -g @panelwave/cli@latest` — CLI 1.4.x rejects
+    `paywallAction` as an unknown enum value.
+  - **`@panelwave/player` 1.7.0** sends richer reading analytics:
+    `transition` for every move, `decision` for every path taken (it
+    replaces `branch_choice`, also for `goTo` hotspots), `paywall_view` and
+    `paywallAction` for the paywall, `lang_change`, and `share` from the
+    share dialog; every event names its panel.
+    [Tracking](/player/tracking#reading-session-and-hotspot-events).
+  - **Embed bridge protocol v1.** The demo app's embed mode is now two-way:
+    a host fixes its origin, changes locale, variables, entitlements and
+    options without restarting the story, jumps to any panel, and receives
+    every player event plus state snapshots. Hosts that send only `config`
+    keep working. [Embed mode](/player/demo-app#embed-mode).
+  - **`@panelwave/player` 1.6.1** (2026-10-16) fixed audio served from
+    another origin, such as a CDN, staying silent.
+    [Versioning → Current releases](/schema/versioning#current-releases).
+</Update>
+
 <Update label="2026-10-18" description="Format 1.9.0 — paywall clicks become a tracking event" tags={["format"]}>
   ## Format 1.9.0
 
@@ -18,9 +42,9 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     filtered out, as before.
   - **CMS:** exports and publishes 1.9.0 and imports formats 1.0–1.9.
     [Import](/cms/import).
-  - **SDK:** the `@panelwave/cli` and `@panelwave/types` releases that bundle
-    and type 1.9.0 follow; until then the CLI rejects `paywallAction` as an
-    unknown enum value. [Versioning](/schema/versioning#what-changed-in-190).
+  - **SDK:** `@panelwave/cli` 1.5.0 and `@panelwave/types` 1.6.0 bundle and
+    type 1.9.0; `@panelwave/player` 1.7.0 emits `paywallAction`.
+    [Versioning](/schema/versioning#what-changed-in-190).
 </Update>
 
 <Update label="2026-10-18" description="CMS — the Studio redesign: a Dashboard, notifications, and every Backstage tool rebuilt for 4K screens" tags={["feature"]}>

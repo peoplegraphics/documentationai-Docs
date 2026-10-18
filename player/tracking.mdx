@@ -131,11 +131,16 @@ Beyond video events, the shell instruments the reading session automatically —
 |---|---|---|
 | `session_start` | Once, when tracking is configured | `deviceType`, `locale`, `totalPanels` (reading-order count) |
 | `panel_view` | Each panel the reader lands on (deduplicated) | `panelId`, `chapterId`, `panelOrder` |
+| `transition` | Every move from one panel to another (from 1.7.0) | `fromPanelId`, `toPanelId`, `panelId` (= the target), `chapterId` |
 | `work_complete` | Once, when the reader reaches an end panel of the last chapter (in a chapter without edges: its last panel in reading order) | `panelId`, `chapterId` |
 | `hotspot_click` | Every click/tap on panel content (panel, page and canvas view) | see below |
-| `branch_choice` | The reader picked a path in the branch chooser | `chapterId`, `from`, `to`, `index` (position in the edge list) |
-| `like` | Like toggled | `workId`, `liked` |
+| `decision` | The reader picked a path — in the branch chooser or with a `goTo` hotspot (from 1.7.0; replaces `branch_choice`) | `panelId` (= the panel chosen from), `chapterId`, `fromPanelId`, `toPanelId`, `choiceId`, `choiceLabel`, `source` (`branch` or `hotspot`), `index` (position in the edge list, branch chooser only) |
+| `paywall_view` | A paywall prompt is shown (from 1.7.0) | `panelId`, `chapterId`, `ruleId`, `scope`, `refId`, `lockReason`, `requireEntitlement` |
+| `paywallAction` | The reader acts on a paywall prompt (from 1.7.0; whitelistable from format 1.9) | as `paywall_view`, plus `action` (`purchase`, `subscribe`, `login` or `dismiss`) and `productId` when one was chosen |
+| `lang_change` | The reader switches language (from 1.7.0) | `from`, `to`, `panelId`, `chapterId` |
+| `like` | Like toggled | `workId`, `liked`, `panelId`, `chapterId` (panel fields from 1.7.0) |
 | `bookmark` | Bookmark set or cleared | `workId`, `chapterId`, `panelId`, `bookmarked` |
+| `share` | The reader copies or posts a link from the share dialog — not on opening it (from 1.7.0) | `workId`, `channel` (`copy`, `twitter`, `facebook`, …), `panelId`, `chapterId`, `url` |
 | `speech_toggle` / `audio_toggle` / `sfx_toggle` | A sound toggle changed (toolbar or Settings) | `enabled` |
 | `session_end` | On page hide / destroy, followed by a synchronous flush (`sendBeacon`) | — |
 

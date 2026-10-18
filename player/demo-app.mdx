@@ -59,6 +59,7 @@ Everything the header does can be preset in the URL, which makes demo links easy
 | `?entitlements=<tokens>` | Read as a reader who owns something, e.g. `?entitlements=premium,purchased:ch-3,age-verified` — passed as the shell's [`entitlementSnapshot`](/player/paywall-entitlement#the-entitlement-snapshot), see [Simulated entitlements](#simulated-entitlements) |
 | `?deny=<panelId>[,<panelId>…]` | Install an entitlement adapter that refuses these panels, to try the paywall path without a backend (an adapter gates navigation only — refused panels still render, see [Custom access checks](/player/paywall-entitlement#custom-access-checks)) |
 | `?embed=1` | Embed mode (see below) |
+| `?origin=<url-encoded origin>` | Embed mode only (from 1.7.0): the host page's origin, the only origin the demo posts to and accepts messages from |
 
 Example: `https://panelwave.github.io/player/?device=phone&devtools=1&vars={"user.age":16}`
 
@@ -77,7 +78,17 @@ Without the parameter the shell keeps its anonymous reader: paid and age-gated p
 
 ## Embed mode
 
-With `?embed=1`, or automatically when the demo runs inside an iframe, the header is hidden and the demo waits for its host to send the work via `postMessage`:
+With `?embed=1`, or automatically when the demo runs inside an iframe, the header is hidden and the demo waits for its host to send the work via `postMessage`. From player 1.7.0 the bridge is two-way (**protocol v1**): the host drives the player live and hears what the reader does. This is how the PanelWave CMS runs its [preview](/cms/preview) — the preview is the real player, not a copy of it.
+
+Load the iframe with your page's origin, so the demo knows where it may post:
+
+```html
+<iframe src="https://panelwave.github.io/player/?embed=1&origin=https%3A%2F%2Fyour-site.example"></iframe>
+```
+
+The demo posts **only** to that origin and ignores messages from any other. Without `origin` it falls back to its own origin, which suits a same-origin host; a host on another origin must pass it, or nothing comes back.
+
+Send the work with a `config` message:
 
 ```typescript
 iframe.contentWindow.postMessage({
@@ -86,12 +97,28 @@ iframe.contentWindow.postMessage({
     manifest,                 // PanelWaveManifest object
     locale: 'de-DE',          // optional
     autoplay: false,          // optional
+    muted: false,             // optional
     viewMode: 'canvas',       // optional: 'auto' | 'panel' | 'canvas'
+    pageFormat: 'auto',       // optional: a page format id or 'auto'
     variables: { 'user.age': 21 },  // optional initial variables
     entitlements: ['premium', 'purchased:ch-3', 'age-verified'],  // optional, see Simulated entitlements
+    initialPanelId: 'p-12',   // optional, read when the player (re)starts
   },
-}, '*');
+}, playerOrigin);
 ```
 
-Each `config` message re-creates the player with the new work. This is how the PanelWave CMS runs its [preview](/cms/preview) — the preview is the real player, not a copy of it.
+The player is created on the first `config` and re-created only when the manifest changes or the message sets `restart: true`. Any other `config` — a new locale, variables, entitlements or options — is applied **live**, so the reader keeps their place.
+
+**From the host** you can also send `navigate` (`{ type: 'navigate', panelId }`), `setVariable` (`{ type: 'setVariable', key, value }`), `setLocale`, `setEntitlements`, `setOptions` (autoplay, muted, view mode, page format, seconds per panel, reduced motion, cover), `getState` and `restart`.
+
+**From the player** you receive:
+
+| Message | When |
+|---|---|
+| `{ type: 'pw:hello', protocol: 1 }` | On load — the bridge speaks v1 |
+| `{ type: 'pw:ready' }` | The work is loaded and positioned |
+| `{ type: 'pw:event', name, data }` | Every shell output: `panelChange`, `chapterChange`, `locationChange`, `variableChange`, `localeChange`, `navigationAttempt`, `paywallAction`, `ageVerified`, `likeChange`, `bookmarkChange`, `error`, … |
+| `{ type: 'pw:state', data }` | In reply to `getState`, and shortly after every change: current chapter, page and panel, view mode, locale, live variables, the last 50 panels visited, the panels reachable next, the paywall gate, preload status, errors and load time |
+
+Hosts written for older players that send only `config` keep working; they now also receive the `pw:*` messages and may ignore them. The full message reference, including which options apply live and which need a restart, is in [`docs/EMBED_PROTOCOL.md`](https://github.com/panelwave/player/blob/master/docs/EMBED_PROTOCOL.md) in the player repository.
 
