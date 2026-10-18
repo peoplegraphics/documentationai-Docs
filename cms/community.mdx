@@ -6,27 +6,35 @@ description: PanelWave's community features — team comments live in the CMS to
 PanelWave is building a community layer around published works: comments, reactions, likes, watchlists, and social sharing. The first piece is now live — **team comments inside the CMS**. The reader-facing side is still on its way; this page is honest about which is which.
 
 <Callout kind="success">
-  **New:** comments are now usable in the CMS — as a work-level discussion in backstage and as a drawer inside the editor. They are **team-internal**: only members of the work's team can read or write them, and team owners, admins, and editors moderate them themselves. Reader-facing comments, likes, watchlists, and sharing are not surfaced anywhere yet.
+  **New:** comments are now usable in the CMS — every thread of a work on the Backstage **Comments** page, and as a drawer inside the editor, with pins on the artwork. They are **team-internal**: only members of the work's team can read or write them, and team owners, admins, and editors moderate them themselves. Reader-facing comments, likes, watchlists, and sharing are not surfaced anywhere yet.
 </Callout>
 
 ## Team comments in the CMS
 
-Comments are the discussion channel for the people making the work — art notes, lettering feedback, review remarks — attached to the thing they are about.
+Comments are the discussion channel for the people making the work — art notes, lettering feedback, review remarks — attached to the thing they are about: the whole work, a chapter, a page, a panel, or a **spot on the artwork**.
 
 ### Where to find them
 
-- **Backstage → Comments** — a work-level thread for discussion that isn't about one specific spot. It sits in the backstage sidebar next to Validation, and in the editor's **Work areas** menu.
+- **Backstage → Comments** (group **Audience**) — **every thread of the work** in one place. The threads list on the left groups them by location in story order — *Work-level*, then chapter › page › panel, each with a small panel thumbnail, its open count and the last activity. Filter by **Open / Resolved / All**, the **review queue** (moderators), chapter, author and date, sort, and search the comment text (<kbd>/</kbd>). The stage shows the threads of the selected location — or all of them, location by location — and the inspector on the right shows the panel with its comment pins. The rail item carries a badge while comments await review.
 - **The editor's comments drawer** — a speech-bubble button in the editor header opens a side drawer that targets **the most specific thing you have open**: the selected panel, otherwise the current page, otherwise the whole work. A scope line at the top of the drawer always tells you what you are commenting on. Switch selection while the drawer is open and it follows.
 
   The button carries a **count badge** for that same target — the number of comments on the selected panel, page, or work (capped at "99+"). The badge turns **amber** when comments are waiting for review, and hovering the button spells it out: *"Comments on the selected panel: 4 (1 awaiting review)"*. The count refreshes when you change the selection and whenever the drawer opens or closes.
 
 ### What you can do in a thread
 
-- Write comments up to 5,000 characters and post replies one level deep.
-- Sort by **Newest**, **Popular**, or **Oldest**; comments load in pages of 20 with a **Load More Comments** button.
-- React with six emoji: 👍 like, ❤️ love, 😂 laugh, 😮 surprised, 😢 sad, 😠 angry.
+- Write comments up to 5,000 characters; replies are shown **inline** under the comment, one level deep, folded after the third.
+- The composer at the bottom posts to the selected location; **Pick a panel** opens a thumbnail grid to comment on a specific panel from the Comments page.
+- React with six emoji: 👍 like, ❤️ love, 😂 laugh, 😮 surprised, 😢 sad, 😠 angry — counts are shown per emoji, and choosing the same one again takes your reaction back. The reaction menu works with the keyboard too.
+- **Resolve** a thread once it is dealt with (and **Reopen** it if not); resolved threads disappear from the default *Open* view.
+- **Pin** a comment to keep it on top; pinned comments display with a **Pinned** badge.
 - **Edit** and **Delete** your own comments (edited comments are labeled).
-- Pinned comments display with a **Pinned** badge.
+- Sort by **Newest**, **Popular**, or **Oldest**; long lists load more as you scroll.
+
+### Pinning a comment to the artwork
+
+A comment on a panel can point at the exact spot it is about. In the editor's drawer, choose **Pin to canvas** and click on the panel — the comment gets a numbered **pin**; **Move pin** relocates it and **Remove pin** takes it off. Without a mouse, the **Nudge** control and the arrow keys move the pin (1 % per step, 5 % with <kbd>Shift</kbd>); <kbd>Esc</kbd> cancels placing.
+
+Open pins are drawn on the canvas as numbered markers (the **Pins** option in the canvas view menu hides them) — click a marker and the drawer opens at that thread. The Comments page shows the same numbers on the panel thumbnail in its inspector; click a pin there to select the thread, or **Open in editor** to land on the panel with the drawer open at it. Pins stay where you put them when the page format changes, and they never appear in the preview, the published work or an export.
 
 ### Who can see what
 
@@ -41,15 +49,9 @@ Because every author is already a member of the work's team, comments are **appr
 
 ### Moderating as a team
 
-Team members with the **owner**, **admin**, or **editor** role see three tabs above the thread (in backstage and in the editor drawer):
+Team members with the **owner**, **admin**, or **editor** role get the **Review queue** — comments held by the content guard or flagged by a moderator — as a filter in the threads list (with a count while anything is waiting) and as a section of the Comments page's inspector, plus a **Rejected** filter for comments a moderator rejected, kept so they can be restored.
 
-| Tab | Shows |
-|---|---|
-| **Discussion** | Approved comments — what everyone on the team sees. This is the only tab with the comment form, reactions, and replies. |
-| **Review queue** | Comments held by the content guard or flagged by a moderator. The tab carries a count badge while anything is waiting. |
-| **Rejected** | Comments a moderator rejected, kept so they can be restored. |
-
-Each comment in these views shows a **status badge** (`pending`, `flagged`, `rejected`) and the moderation actions that make sense for it:
+Each such comment shows a **status badge** (`pending`, `flagged`, `rejected`) and the moderation actions that make sense for it, each with an optional note saying *why* (shown later in the thread's moderation history):
 
 - **Approve** — publishes a pending or flagged comment to the discussion.
 - **Flag** — hides an approved comment from the discussion and sends it to the review queue for a second look.

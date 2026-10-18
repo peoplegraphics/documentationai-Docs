@@ -1,19 +1,19 @@
 ---
 title: Works
-description: Manage your projects on the My Works page — create works with the wizard, filter and sort, change statuses, use the Trash, and edit work-level defaults.
+description: Your library of works — a cover grid, a cover wall or a table, an inspector with everything about the selected work and its properties, team scoping, the create wizard, statuses and the Trash.
 ---
 
-**My Works** (`/works`) is the CMS home screen. Every interactive graphic novel you author is a **work** — a self-contained project with its own chapters, assets, characters, translations, and settings.
+**Works** (`/works`) is your library: every work of your team, ready to find, compare and manage. Every interactive graphic novel you author is a **work** — a self-contained project with its own chapters, assets, characters, translations, and settings. (After signing in you land on the [Dashboard](/cms/dashboard); **Works** is one click away in the left rail.)
 
 ## Creating a work
 
-Click **Create New Work** to open the four-step wizard:
+Open **+ New** and choose **New work** to start the four-step wizard. On a wide screen it slides in as a sheet on the right, over the library; on a smaller one it is a dialog.
 
 <Steps>
   <Step title="Basic Info">
     Enter the **Work Title** and the **URL Slug** (lowercase letters, numbers, and hyphens; auto-generated from the title). The wizard checks slug availability live — you'll see **Available** or **Already taken**.
 
-    Optionally pick a starter template (**Webcomic**, **Branching Novel**, **All-Ages Story**, **Graphic Novel**) to pre-fill languages, age rating, tags, and page formats — you can still adjust everything in the next steps.
+    Optionally pick a starter template (**Webcomic**, **Branching Novel**, **All-Ages Story**, **Graphic Novel** — each shown as an illustrated tile) to pre-fill languages, age rating, tags, and page formats — you can still adjust everything in the next steps. You can also add a short **description** and upload a **cover** right here (both can be changed later in the work's properties), and members of several teams pick the **Team** the work belongs to.
   </Step>
   <Step title="Languages">
     Choose the **Default Language** and tick any **Additional Languages**. The list is grouped by region and searchable; **Select all** and **Clear** help with large selections. You can add or remove languages later in the [Localization Workshop](/cms/localization).
@@ -32,23 +32,37 @@ Click **Create New Work** to open the four-step wizard:
 If you close the wizard halfway, your input is kept as a draft — next time you'll see a **Resume where you left off?** banner with **Resume** and **Discard**.
 </Callout>
 
-You can also start from existing material instead of a blank work: **Import** a PanelWave JSON file, **Import Archive** to restore a complete work archive with all its media (see [Import](/cms/import)), **Import Script** to turn a Fountain screenplay into a work with AI-suggested panels and speech bubbles (see [Script Import](/cms/script-import)), or **Import Pages** to have AI split finished page images into panels (see [Page Import](/cms/page-import)).
+The same **+ New** menu starts from existing material instead of a blank work: **Import JSON** loads a PanelWave manifest, **Import archive** restores a complete work archive with all its media (see [Import](/cms/import)), **Import script** turns a Fountain screenplay into a work with AI-suggested panels and speech bubbles (see [Script Import](/cms/script-import)), and **Import pages** has AI split finished page images into panels (see [Page Import](/cms/page-import)).
+
+## Three views of your library
+
+The toolbar's view toggle switches between three views of the same works:
+
+- **Grid** (default) — cards with the whole cover at its real aspect ratio in a fixed-height box (portrait covers are never cropped), the status chip, a **Live** chip with a **Read** link for published works, a progress ring (panels with artwork vs. total), chapter/panel/character counts, language flags, readers in the last 30 days, and when and by whom the work was last edited. The number of columns follows your screen — six on a 4K monitor, three on a laptop.
+- **Wall** — pure art: covers at their real aspect ratio in justified rows, title and one status line underneath, controls only on hover.
+- **Table** — one row per work: Cover · Title · Team · Status · Published · Progress · Chapters · Panels · Languages · Formats · Updated · Last edited by · Readers (30 d) · Actions. Sort by any column, pick the columns you want with **Columns** (remembered for you), scroll for more — in compact density thirty-plus works fit on one screen.
+
+Your choice is remembered. On a small screen the library falls back to a compact list.
 
 ## Browsing and filtering
 
-The list supports:
+- **Search** by title, slug, or work ID (<kbd>/</kbd> focuses it).
+- **Team** — members of several teams see a team select: one team, or **All teams**. The choice is shared with the [Dashboard](/cms/dashboard) and remembered across devices.
+- **Status** (All, Draft, Review, Published, Archived), **Language**, **Format** and **Tag** filters — the last three offer what the works on the page actually use.
+- **Sort by** Updated (default), Created, Title, Progress or Published, ascending or descending.
+- Two tabs: **Works** (active) and **Trash**.
 
-- **Search** by title, slug, or work ID.
-- **Status** filter: All, Draft, Review, Published, Archived.
-- **Sort by** Last Updated (default), Date Created, or Title, with an ascending/descending toggle.
-- **Grid or list view** toggle.
-- Two view tabs: **Works** (active) and **Trash**.
+Single-click a work to see it in the inspector; double-click (or <kbd>Enter</kbd>, <kbd>o</kbd>, <kbd>e</kbd>) opens it in the editor; middle-click opens it in a new tab. The arrow keys move through cards or rows, <kbd>]</kbd> toggles the inspector, <kbd>?</kbd> the Guide rail.
 
-Each work card shows the whole cover at its own aspect ratio (portrait covers make taller cards; the list view keeps a small cropped thumbnail), a color-coded status badge, creators, chapter/panel/character/language counts, an artwork-progress bar (panels with artwork vs. total), last-updated time, and who last edited it. Click a card (or the pencil button) to open the work in the editor; middle-click opens it in a new tab.
+## The inspector
+
+The right column (a drawer on narrower screens) shows everything about the selected work on its **Overview** tab: the cover with its status, the title in every language, the slug with a copy button, series and issue, age rating, creators with their roles, the progress ring with chapters, pages, panels with artwork, assets, characters, paywall rules and likes, the **publishing state** with the production and review links (copy with one click, open the public page), a readers sparkline for the last 30 days, the description, publisher, release date, tags and content warnings, languages (with the default marked), page formats (with the default marked), reading direction, team, created/updated/last edit — and a **section grid** that jumps to any Backstage tool of the work: Editor, Graph Editor, Canvas Layout, Characters, Extras, Variables, Localization, Audio, Preview, Validation, Paywall, Entitlement, Comments, Analytics. **Open editor**, **Export…**, the status select and **Move to Trash** are here too.
+
+The **Properties** tab edits the work's settings in place — see [Work Properties](#metadata) below.
 
 ## Work statuses
 
-A work is always in one of four statuses, changeable directly from the dropdown on each card:
+A work is always in one of four statuses, changeable from the status select in the inspector or with a bulk action:
 
 | Status | Meaning |
 |---|---|
@@ -59,13 +73,13 @@ A work is always in one of four statuses, changeable directly from the dropdown 
 
 ## The card menu
 
-The **⋮ More actions** button on a card opens a menu with quick jumps into the work — **Editor**, **Open in new tab**, **Characters**, **Extras**, **Graph Editor**, **Preview**, **Validation**, **Analytics** — plus **Export…** (opens the [export wizard](/cms/export#the-export-wizard) for that work), **Properties** (see below) and **Move to Trash**.
+The **⋮ More actions** button on a card (or table row) opens a menu with **Editor**, **Open in new tab**, every Backstage section of the work, **Export…** (opens the [export wizard](/cms/export#the-export-wizard) for that work), **Open public page** and **Copy reader link** for published works, **Properties** (see below) and **Move to Trash**.
 
-The **Export…** button in the page header opens the export wizard too; ticked works are preselected.
+The **Export…** button in the toolbar opens the export wizard too; ticked works are preselected.
 
 ## Bulk actions
 
-Tick the checkbox on one or more cards (or **Select all**) to reveal the bulk action bar:
+Tick the checkbox on one or more cards or rows (or **Select all**) to reveal the bulk action bar:
 
 - **Move to Trash** — trash all selected works.
 - **Set status** — change the status of all selected works at once.
@@ -75,7 +89,7 @@ In the Trash view, the bulk bar offers **Restore** and **Delete permanently** in
 
 ## Trash, restoring, and deleting
 
-**Move to Trash** never deletes anything immediately. Switch to the **Trash** tab to **Restore** works or delete them for good. Permanent deletion opens a confirmation dialog — **Delete Work Permanently?** — because it removes all chapters, panels, assets, and data and **cannot be undone**. The work's files (artwork, audio, video and their generated variants) are removed from storage in a nightly cleanup **7 days** after the deletion; files another work still uses — for example a portrait shared through the [team character library](/cms/characters#team-character-library) — are kept.
+**Move to Trash** never deletes anything immediately. Switch to the **Trash** tab to **Restore** works or delete them for good; every trashed work shows when it was trashed and how many days are left before it is deleted automatically (30 days). Permanent deletion opens a confirmation dialog — **Delete Work Permanently?** — because it removes all chapters, panels, assets, and data and **cannot be undone**. The work's files (artwork, audio, video and their generated variants) are removed from storage in a nightly cleanup **7 days** after the deletion; files another work still uses — for example a portrait shared through the [team character library](/cms/characters#team-character-library) — are kept.
 
 <Callout kind="alert">
 There is currently no duplicate-work action on the works list. To copy a work, [export](/cms/export) it as JSON and [import](/cms/import) it under a new slug.
@@ -83,10 +97,10 @@ There is currently no duplicate-work action on the works list. To copy a work, [
 
 ## Work Properties — work-level settings and defaults
 
-Open **Properties** from the card menu, from the work node's context menu in the editor's [structure tree](/cms/editor/pages-panels#context-menus), or press <kbd>Ctrl</kbd>+<kbd>,</kbd> inside the editor. The **Work Properties** dialog has six tabs:
+In the library, select a work and open the inspector's **Properties** tab: the **Metadata**, **Localization** and **Output** settings are edited right there, with an explicit **Save**. The remaining tabs — **Typography**, **Audio/Visual**, **Video Defaults** and **Publishing** — still open the **Work Properties** dialog (**Open full properties**, or the tab's own button). Inside the editor the dialog opens from the work node's context menu in the [structure tree](/cms/editor/pages-panels#context-menus) or with <kbd>Ctrl</kbd>+<kbd>,</kbd>. The sections:
 
 ### Metadata
-Localized **Name** and **Description** (the fields offer the work's own languages; the **Name** is the work's title, so renaming it here changes the published title and the title in the Localization Workshop), **Series Name** and **Issue / Episode Number**, a **Cover Image** picker (choose from the work's uploaded image assets; the preview shows the whole cover, uncropped), **Creators**, and publishing fields: **Publisher**, **Release Date**, **Age Rating**, **Tags / Genres**, **Copyright**, and **License**.
+Localized **Name** and **Description** (the fields offer the work's own languages; the **Name** is the work's title, so renaming it here changes the published title and the title in the Localization grid), **Series Name** and **Issue / Episode Number**, a **Cover Image** picker (choose from the work's uploaded image assets; the preview shows the whole cover, uncropped), **Creators**, and publishing fields: **Publisher**, **Release Date**, **Age Rating**, **Tags / Genres**, **Copyright**, and **License**.
 
 ### Typography
 Work-wide visual defaults:
@@ -123,4 +137,4 @@ Works created before supported formats existed have no stored selection — they
 ### Video Defaults
 Defaults applied to new video layers (view mode, start mode, **Muted by default**) unless overridden per layer — see [Video Panels](/cms/editor/video-panels).
 
-Click **Save Properties** to apply. Values outside their allowed range (for example a font size outside 8–72, a gutter above 50, or a transition longer than 5 seconds) are rejected with a list of what to correct. On a [read-only work](/cms/plans#read-only-works) the dialog can be opened but not saved.
+Click **Save** (in the inspector) or **Save Properties** (in the dialog) to apply. Values outside their allowed range (for example a font size outside 8–72, a gutter above 50, or a transition longer than 5 seconds) are rejected with a list of what to correct. On a [read-only work](/cms/plans#read-only-works) the properties can be opened but not saved.

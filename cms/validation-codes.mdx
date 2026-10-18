@@ -42,6 +42,14 @@ Every issue that [Preflight Validation](/cms/validation) reports carries a stabl
 | [`VARIANT_UNKNOWN_OVERRIDE_KEY`](#variant-unknown-override-key) | Warning | Logic |
 | [`VARIANT_EMPTY_OVERRIDES`](#variant-empty-overrides) | Warning | Logic |
 | [`UNREACHABLE_PANELS`](#unreachable-panels) | Warning | Logic |
+| [`UNKNOWN_VARIABLE_IN_CONDITION`](#unknown-variable-in-condition) | Warning | Logic |
+| [`UNUSED_VARIABLE`](#unused-variable) | Info | Logic |
+| [`MISSING_TRANSLATION`](#missing-translation) | Warning | Localization |
+| [`DEAD_END_PANEL`](#dead-end-panel) | Warning | Flow |
+| [`NO_CHOICE_LABEL`](#no-choice-label) | Warning | Flow |
+| [`MISSING_AUDIO`](#missing-audio) | Info | Audio |
+
+The **Rules** section of the preflight board's health rail lists the same catalogue inside the CMS, with the count of each code in the current report.
 
 ---
 
@@ -233,7 +241,7 @@ Panels behind an active [paywall rule](/cms/monetization) are visible when reade
 
 **Code:** `PAYWALL_TARGET_MISSING` · **Severity:** Error (active rule) / Warning (inactive rule) · **Category:** Integrity
 
-A **Chapter** or **Extras Item** [paywall rule](/cms/monetization#creating-a-rule) has no target, targets a chapter or extras item that no longer exists, or targets an extras item that is still a draft. The message names the rule, for example *Paywall rule "Chapter 3 premium" targets a chapter that no longer exists — it is left out of the published manifest, so that content would be free*. An active rule like this blocks publishing, because the content it was meant to protect would ship without a paywall; an inactive one only warns.
+A **Chapter** or **Extras Item** [paywall rule](/cms/monetization#creating-and-editing-a-rule) has no target, targets a chapter or extras item that no longer exists, or targets an extras item that is still a draft. The message names the rule, for example *Paywall rule "Chapter 3 premium" targets a chapter that no longer exists — it is left out of the published manifest, so that content would be free*. An active rule like this blocks publishing, because the content it was meant to protect would ship without a paywall; an inactive one only warns.
 
 **How to fix:** open **Paywall**, edit the rule and pick the chapter or extras item it gates (publish the extras item first if it is a draft), or delete the rule.
 
@@ -293,9 +301,57 @@ Some panels of a chapter cannot be reached from its entry panel by following the
 
 **How to fix:** open the [Graph Editor](/cms/editor/graph) and connect the panels where they belong in the story — from the last reachable panel to the first unreachable one, or by inserting them into the chain. Delete panels that are leftovers.
 
+## Unknown variable in condition
+
+**Code:** `UNKNOWN_VARIABLE_IN_CONDITION` · **Severity:** Warning · **Category:** Logic
+
+A graph edge condition, a hotspot action, a visibility condition on a layer, bubble or hotspot, or a panel's audio condition uses a variable that is not declared in the [Variables](/cms/editor/variables) page. The condition can never resolve as intended — typically a typo (`hasKey` vs `haskey`), or a variable you renamed or deleted. One finding per variable, listing every place it is used. (Panel variants report the same situation as [`VARIANT_UNKNOWN_VARIABLE`](#variant-unknown-variable).)
+
+**How to fix:** declare the variable on the Variables page, or correct the name in the condition — the finding's tool buttons open each place that uses it.
+
+## Unused variable
+
+**Code:** `UNUSED_VARIABLE` · **Severity:** Info · **Category:** Logic
+
+A declared variable that nothing in the work reads or writes — no edge condition, hotspot action, visibility condition, panel audio condition or variant mentions it. Harmless for readers, but usually a leftover or a plan you never wired up; the Variables page's **Used** column shows the same *unused* flag.
+
+**How to fix:** use it in a condition or a **Set Variables** action, or delete the definition on the [Variables](/cms/editor/variables) page.
+
+## Missing translation
+
+**Code:** `MISSING_TRANSLATION` · **Severity:** Warning · **Category:** Localization
+
+One of the work's languages has fewer translations than there are extracted strings. One finding per language, with how many strings are translated, how many are missing, how many are machine drafts still awaiting approval, and the completion percentage. Readers who pick that language see the default language's text wherever a translation is missing. The check is silent until strings have been extracted for the first time.
+
+**How to fix:** open the [Localization](/cms/localization) grid with the language's column visible and filter by **Missing**; **Translate missing** fills the gaps by machine, then approve or edit the drafts. If the language is not meant to ship yet, make it inactive under **Manage locales**.
+
+## Dead-end panel
+
+**Code:** `DEAD_END_PANEL` · **Severity:** Warning · **Category:** Flow
+
+In a chapter that uses the [graph](/cms/editor/graph), a reachable panel has no way out — no outgoing edge and no hotspot that jumps somewhere — although it is neither the chapter's last panel in reading order nor marked as an ending. Readers who arrive there are stuck. Chapters read purely page by page, without a graph, are not checked.
+
+**How to fix:** connect the panel onward in the Graph Editor (or add a hotspot with a go-to action), or mark it as an ending if the story is meant to stop there.
+
+## No choice label
+
+**Code:** `NO_CHOICE_LABEL` · **Severity:** Warning · **Category:** Flow
+
+The reader leaves a panel by **choice** — it has two or more unconditional ways out (edges or go-to hotspots) — but at least one of the targets has no label: neither the edge nor a hotspot leading there is named. Readers (and screen readers) cannot tell the options apart. Conditional edges are decided by the story state, not the reader, so they do not count as choices.
+
+**How to fix:** label the edge in the [Graph Editor](/cms/editor/graph), or give the [hotspot](/cms/editor/hotspots) a name that says where it leads. The finding lists the unlabeled targets.
+
+## Missing audio
+
+**Code:** `MISSING_AUDIO` · **Severity:** Info · **Category:** Audio
+
+In a language that has voice audio, some speech bubbles with text have no take. The check only runs for works that use [voice audio](/cms/localization#audio-localization-and-text-to-speech) at all, and reports per language how many bubbles are missing out of how many, with the panels concerned.
+
+**How to fix:** open the Audio page on that language and use **Generate all missing**, or upload or generate takes for the listed bubbles. Bubbles that are intentionally silent can be ignored for this work on the preflight board.
+
 ---
 
-## Codes reserved for upcoming checks
+## Codes not emitted
 
-Some categories shown in the validation UI (localization completeness, per-bubble audio, duplicate IDs) do not emit issues yet — their checks are planned but depend on data models still being built. Their codes will be documented here when they ship.
+The **duplicate ids** check listed in older releases never produced findings and still does not; ids are kept unique by the editor itself.
 

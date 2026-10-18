@@ -1,33 +1,31 @@
 ---
 title: Localization
-description: Translate your work in the Localization Workshop — extract strings, edit translations, catch stale text, and add per-language voice audio and TTS.
+description: Translate your work in the Localization grid — every language as a column, the panel in view, balloon-fit warnings, machine translation with review — and give it a voice per language with cast voices, takes and batch text-to-speech.
 ---
 
 PanelWave works are multilingual by design: every piece of reader-facing text is stored per locale (like `en-US` or `de-DE`), and readers fall back to your default language where a translation is missing. See [Localization concepts](/concepts/localization) for how this works in the format.
 
-The CMS gives you two Backstage tools for it: the **Localization Workshop** (text) and **Audio Localization** (spoken audio and TTS).
+The CMS gives you two Backstage tools for it, both in the **Language & Sound** group: **Localization** (text) and **Audio** (spoken audio and text-to-speech).
 
 ## Locales and fallbacks
 
-Your work's languages are set when you [create the work](/cms/works) and managed afterwards via the **Locales** button in the workshop:
+Your work's languages are set when you [create the work](/cms/works) and managed afterwards with **Manage locales** on the Localization page (the form opens in the inspector):
 
 - **Add a locale** by code (e.g. `fr-FR`) — a searchable catalogue helps you pick. Adding more languages than your [plan](/cms/plans) allows is refused with a message naming the limit.
 - **Set default** marks the source language; every other locale falls back to it.
-- **Remove locale** hides it but keeps its translations — re-add it later to restore them.
+- **Active** — an inactive locale keeps its translations but leaves the grid, the exports and the reader's language switch; activate it again to bring everything back. **Remove locale** likewise keeps the translations — re-add it later to restore them.
 
-The **Locales** button becomes active once the work's locales have loaded, so the dialog always starts from the work's real list and can't replace its default language by accident.
+Translating text also adds its language. When speech bubbles or text layers get text in a language the work doesn't list yet, the CMS adds that language to the work's locales. This happens however the text arrives: typed in the editor, imported, written back from the grid, or set through an AI assistant. That way the published work offers it in the reader's language switch. A language is added only within your plan's limit and never removed automatically. Bare codes such as `de` count as the work's locale of that language (otherwise `de-DE`).
 
-Translating text also adds its language. When speech bubbles or text layers get text in a language the work doesn't list yet, the CMS adds that language to the work's locales. This happens however the text arrives: typed in the editor, imported, written back from this workshop, or set through an AI assistant. That way the published work offers it in the reader's language switch. A language is added only within your plan's limit and never removed automatically. Bare codes such as `de` count as the work's locale of that language (otherwise `de-DE`).
-
-The locale chips under the workshop header show each language's completion percentage; click one to switch the translation target. Your [profile preference](/cms/account) "Default editing language" preselects the target when you open the workshop.
+The **locale strip** under the title shows the source language (★) and, for every target language, its live completion percentage, a progress bar, how many strings are missing and how many machine translations await review. Clicking a chip hides or shows that language's column; clicking an inactive language activates it. Your [profile preference](/cms/account) "Default editing language" picks the language you start in.
 
 ## Extracting translatable text
 
-Click **Extract Strings** to scan the work and pull every translatable string into the table — speech bubble text, titles, panel descriptions, [hotspot](/cms/editor/hotspots) labels and other reader-facing content. Each entry gets a stable **key**, its **default text** (the source language), a category, and a "Used in" badge telling you where it appears.
+Click **Extract** to scan the work and pull every translatable string into the grid — speech bubble text, titles, panel descriptions, [hotspot](/cms/editor/hotspots) labels, variant overrides, character bios and other reader-facing content. Each entry gets a stable **key**, its **source text** (the default language), a category, and its place in the story.
 
-Strings are listed in **story order** — the order a reader meets them: the work title, then for each chapter its title and its pages in order, with each page's panels in reading order (title, description, speech bubbles, hotspot labels), followed by panels not placed on any page, and character bios last. Translating top to bottom therefore follows the story.
+Strings are grouped in **story order** — the order a reader meets them: the work title, then for each chapter its title and its pages in order, with each page's panels in reading order (title, description, speech bubbles, hotspot labels), followed by panels not placed on any page, and character bios last. Translating top to bottom therefore follows the story.
 
-Opening the workshop runs an extraction automatically, so the list reflects the current state of the work; run **Extract Strings** again whenever you've added content while the workshop is open. Existing translations are kept and new strings are appended. On a [read-only work](/cms/plans#read-only-works) the automatic extraction is skipped — the workshop opens quietly with the strings as last extracted, and you can read them but not change them. You can also add free-form strings manually with **Add Entry** (key, default text, category).
+Opening the page runs an extraction automatically, so the grid reflects the current state of the work; run **Extract** again whenever you've added content while the page is open. Existing translations are kept and new strings are appended. On a [read-only work](/cms/plans#read-only-works) the automatic extraction is skipped — the page opens quietly with the strings as last extracted, and you can read them but not change them. You can also add free-form strings manually with **Add entry** (key, default text, category).
 
 Hotspot labels are listed as **Hotspot label** (category *hotspot*); they are what screen readers announce for a choice, so translate them with the bubbles. Hotspots that still carry the editor's default name (*Rect Hotspot* and the like) are skipped.
 
@@ -35,18 +33,46 @@ Hotspot labels are listed as **Hotspot label** (category *hotspot*); they are wh
   **Which language is the source?** Extraction takes your work's default locale as the source language. If the work has none set, it falls back to the language hinted in Work Properties (matching `en` to `en-US` and the like), and finally to the locale most of your strings actually carry — so a stray translated title can't flip the Default Text column into another language. Works extracted before story order existed list their strings last until you run **Extract Strings** once more.
 </Callout>
 
-## The translation editor
+## The translation grid
 
-The table has four columns: **Key**, **Default Text**, **Translation** (for the selected locale), and **Actions**. Click a translation cell to edit it inline; press Escape to stop editing. Untranslated rows are tinted red, and the stat cards at the top track **Total Strings**, **Translated**, **Missing**, and **Completion**.
+The grid shows the **source** text in a sticky left column and **every active target language as its own column** — on a 4K screen the source, three languages and the context inspector fit side by side. Use the **Columns** menu or the locale strip to hide languages you are not working on; the choice is remembered per work.
 
-Click the **Key**, **Default Text**, or **Translation** header to sort by that column; a second click flips the direction, and an arrow marks the active sort. Sorting by translation sinks untranslated rows to the bottom, so a completed batch floats up and the gaps collect at the end. The **Story order** button that appears in the header row returns to the default order. While a search or filter is active, a line above the table reads *"Showing N of M strings"*.
+Rows are grouped by **chapter › page › panel**: each group header carries a small panel thumbnail, the titles and the string count, and collapses individually or all at once. A speech bubble's row shows its **speaker** (portrait and name) and bubble type, so you always know who is talking. Sorting by a text column flattens the groups; the **Story order** button returns to them.
 
-Handy details:
+Each cell shows its state at a glance:
 
-- Missing translations show what the reader actually gets: *"No translation — falls back to `en-US` '…'"*.
-- **Autosave** (toggle in the toolbar) saves edits automatically; otherwise use **Save**.
-- Filters: search by key or text, filter by category, **Show Only Missing**, **Needs review**, and **Glossary issues**.
-- Per-row actions: **Translation Memory**, **Copy from default**, **Machine-translate this string**, **Edit**, **Delete**.
+| Cell | Means |
+|---|---|
+| red tint, *Falls back to `en-US` "…"* | no translation yet — what the reader actually gets |
+| amber tint, **MT** badge, ✓ | a machine translation awaiting your approval |
+| **Modified** | edited, autosave on its way |
+| **Stale** | the source text changed after this was translated — review it |
+| small ✓ | approved or human-entered |
+
+Every filled cell shows its character count and, for speech bubbles, whether the text still **fits its balloon** (see below). Hovering a cell reveals quick actions: translation memory, copy from source, machine-translate this string.
+
+### Editing and keyboard
+
+Click a cell (or press <kbd>Enter</kbd>, <kbd>Space</kbd> or <kbd>F2</kbd>) to edit it in place; the box grows with the text. <kbd>Tab</kbd> commits and moves to the next language of the same row (wrapping to the next row), <kbd>Shift</kbd>+<kbd>Tab</kbd> goes back, <kbd>Enter</kbd> commits and moves down the same column, <kbd>Shift</kbd>+<kbd>Enter</kbd> inserts a line break, <kbd>Esc</kbd> cancels. Outside editing the arrow keys move between cells. **Autosave** (toggle in the toolbar) saves a moment after you leave a cell; with it off, **Save** writes every modified value at once. <kbd>]</kbd> toggles the inspector, <kbd>?</kbd> opens the Guide rail.
+
+### Filters
+
+Search (key, text, speaker, any visible translation), **Category**, **Chapter**, **Character**, **Missing** (empty in any visible column), **Needs review** (stale or awaiting MT approval), **Glossary issues**. A line above the grid reads *"Showing N of M strings"* while a filter is active, and the bulk actions below respect it.
+
+### Does it still fit the balloon?
+
+Speech bubbles are re-lettered per language, so the question is not "is the translation longer" but "does it still fit". The grid asks the real balloon engine, with the bubble's actual style (work default → preset → character → the bubble's own override):
+
+- **fits** — within the balloon as you lettered it;
+- **grows +n %** — the balloon grows to take the text; a ⚠ warns above 25 %, where it will likely spill over its panel;
+- **does not fit** — a fixed-size balloon the text spills out of (red ⚠);
+- **n % of source** with a `?` — a length-only estimate when the balloon could not be measured (above 130 % warns).
+
+Hover the verdict for the details, or select the cell: the inspector shows the balloon drawn with that language's text.
+
+### The context inspector
+
+Selecting a cell shows what you are translating: the **panel thumbnail with the selected bubble outlined**, chapter › page › panel, the speaker, the bubble type and size; the **balloon previews** — the source and every visible language, drawn with the real engine, so the artist sees how the grown balloons compare; **Translation memory** (**Look up** finds exact and fuzzy matches from previously saved translations, applied with one click — everything you translate feeds the memory); **glossary** hits of the source text and whether the translation honours them; and the **history** — who last edited the string, and which machine-translation provider filled a language when. **Open in editor** opens the editor on that bubble in the selected language.
 
 ### Stale translation detection
 
@@ -54,20 +80,16 @@ When you change the source text of a string that was already translated, its tra
 
 ### Machine translation
 
-- **Translate untranslated** machine-translates every string missing a value for the selected locale. Strings are sent to the provider in batches of up to 50, and when the provider asks to slow down the workshop waits and retries, so a whole book (well over a thousand strings) goes through in one run.
-- Machine-translated strings carry an **MT** badge until you confirm them with the green check (or edit them, which marks them **Modified**).
-- **Approve MT (N)** in the toolbar confirms all machine translations currently shown for the selected locale at once — N is their count; narrow the list with search or filters to approve part of them. Other languages keep their review state.
-- A machine translation reaches your work's content — the editor, the preview and the published work — **once it is approved** (or edited). Until then it lives in the workshop only, so switching the editor to the new language still shows the source text.
-- The source text is always a **human-entered** value — your default language where it exists, otherwise another locale you translated by hand, and as a last resort the default text with the provider detecting the language. A machine draft is never used as the source, and a string is never "translated" from a language into itself. When you translate *into* your default language (say, to fill an English column from German originals), the workshop picks the best other locale as the source automatically.
-- If the translation provider fails mid-run, the workshop keeps what was translated so far and shows a warning — *"Machine translation stopped after N string(s): … — try again in a moment"* — instead of filling the remaining rows with placeholders.
-
-### Translation memory
-
-The brain icon fetches **Translation Memory Suggestions**: exact and fuzzy matches from previously saved translations, with match scores, quality/verified indicators, and a **Use This Translation** button. Everything you translate feeds the memory automatically.
+- **Translate missing ▾** machine-translates the strings that still miss a value — for one language or for every visible language — among the strings currently shown, so filter first to translate one chapter or one character. Strings are sent to the provider in batches of up to 50, and when the provider asks to slow down the page waits and retries, so a whole book (well over a thousand strings) goes through in one run.
+- Machine-translated strings carry an **MT** badge until you confirm them with the ✓ in the cell (or edit them, which marks them **Modified**).
+- **Approve MT (N) ▾** in the toolbar — and the ✓ in each language's column header — confirms all machine translations currently shown for that language at once; narrow the list with search or filters to approve part of them. Other languages keep their review state.
+- A machine translation reaches your work's content — the editor, the preview and the published work — **once it is approved** (or edited). Until then it lives in the grid only, so switching the editor to the new language still shows the source text.
+- The source text is always a **human-entered** value — your default language where it exists, otherwise another locale you translated by hand, and as a last resort the default text with the provider detecting the language. A machine draft is never used as the source, and a string is never "translated" from a language into itself. When you translate *into* your default language (say, to fill an English column from German originals), the page picks the best other locale as the source automatically.
+- If the translation provider fails mid-run, the page keeps what was translated so far and shows a warning — *"Machine translation stopped after N string(s): … — try again in a moment"* — instead of filling the remaining rows with placeholders.
 
 ### Glossary
 
-**Glossary** manages preferred translations for key terms (e.g. *Hero → Held*), optionally case-sensitive, with notes for translators. Rows whose translation ignores a glossary term get a warning badge, and the **Glossary issues** filter collects them.
+**Glossary** manages preferred translations for key terms (e.g. *Hero → Held*), optionally case-sensitive, with notes for translators. Rows whose translation ignores a glossary term get a warning badge, the **Glossary issues** filter collects them, and the inspector shows the hits for the selected string.
 
 ## Working with external translators
 
@@ -79,7 +101,7 @@ Use the **Export** menu to hand strings to translators and **Import** to bring t
 | **XLIFF 1.2 (CAT tools)** | the standard translator exchange format |
 | **JSON** | a simple key → value map |
 
-**Import** accepts JSON, CSV, and XLIFF files.
+**Import** accepts JSON, CSV, and XLIFF files and targets the language the file declares (otherwise the column you last worked in); imported values count as human work. **Export ▾** exports per visible language.
 
 ## Localized assets
 
@@ -87,17 +109,32 @@ Some content is easier to localize as an asset than as text — a hand-lettered 
 
 ## Audio Localization and text-to-speech
 
-The **Audio** entry in the Backstage sidebar opens **Audio Localization**: voice audio for each speech bubble, per locale. Stat cards show **Total Bubbles**, **With Audio**, **Missing Audio**, and **Completion** for the selected locale.
+The **Audio** entry in the Backstage rail is the recording studio for your dialogue: a spoken **take** for every speech bubble, per language — uploaded from a voice actor or generated by text-to-speech. (Music, ambience and sound effects live in the editor's [timeline](/cms/editor/audio).) The page has three zones: the **cast voices** and the job queue on the left, the **bubble sheet** in the middle, the **take inspector** on the right.
 
-For each bubble you can:
+### Cast voices
 
-- **Upload** an audio file (MP3, WAV, OGG, M4A) — e.g. from a voice actor.
-- **Generate TTS** — pick a voice from the catalogue (with gender, age, style, and a preview sample where available) and click **Generate Audio**. If a [character](/cms/characters) has an assigned voice, that's the natural choice for their lines.
+One row per [character](/cms/characters) — plus **Narrator / no speaker** for bubbles without one — with the character's voice for the **selected language**: ▶ plays a sample, **Assign** / **Change** opens the voice picker (search, filter by language and gender, ▶ preview, provider). Cast voices are the voices batch generation uses, and the same voices you see on the character's page. Below the cast, the **job queue** shows generation jobs in progress (with Cancel), finished ones (▶) and failed ones (↻ Retry); the rail badge counts what is pending or failed.
 
-Generated jobs run in the background — the **Job Queue** panel tracks **Processing** (with progress and Cancel), **Completed** (with playback), and **Failed** (with Retry) jobs.
+### The bubble sheet
 
-Existing tracks can be played, deleted, or trimmed: the **Waveform & trim** view lets you set a playback window **non-destructively** — the file is unchanged, only the played region is trimmed.
+Pick the language at the top; coverage chips count the bubbles that are **voiced**, **missing**, **stale** or **untranslated**. The sheet lists every speech bubble grouped by **chapter › page › panel** with panel thumbnails: the speaker, the text in the selected language (hover for the source text), the status, the **active take** with a mini waveform, ▶, approve, the number of takes, and **TTS**, **Upload**, **Regenerate** and **Delete**.
+
+- A bubble is **missing** while it has no active take; **stale** when its text changed after the take was made — re-record or regenerate it. Bubbles with **no text** in this language cannot be generated; the row links to the translation grid.
+- Filters: search, chapter, speaker, uploaded vs generated, **missing only**, **stale only**. <kbd>/</kbd> focuses the search, <kbd>↑</kbd>/<kbd>↓</kbd> walk the rows, <kbd>Enter</kbd> opens the inspector, <kbd>Delete</kbd> removes the active take.
+- **Select several** rows for the bulk actions: **Regenerate with voice…**, **Mark newest active**, **Delete takes**.
+
+### Generate all missing
+
+**Generate all missing** records every bubble that has text but no take in this language, in one background batch, using the cast voices — pick a default voice for speakers without one. The dialog first shows the **estimate**: how many characters of text will be spoken, your team's monthly **text-to-speech allowance**, how much is used, and how much would remain after the batch. The allowance depends on your [plan](/cms/plans) (a Work Pass adds to it); a batch that would exceed it is refused with a **View plans** link.
+
+### Takes and the inspector
+
+A bubble can have several **takes** per language — two generated versions, a studio recording — but only the **active** one is used; the first take of a bubble is active automatically, and you switch with the **Active** toggle in the inspector's takes list (each take shows its provider or *uploaded*, voice, date, duration and size). The inspector also shows the bubble's panel thumbnail, speaker, source and spoken text, and the **full waveform**: a playhead that follows playback, click to seek, zoom, and **trim handles** (drag or arrow keys) that set the played region **non-destructively** — the file is unchanged, only the played window is. **Regenerate with…** and **Generate speech** open the voice picker; **Upload** takes an audio file (MP3, WAV, OGG, M4A), as does **dropping a recording** onto the inspector.
+
+<Callout kind="info">
+The published work carries the active take of every language. Today's PanelWave Player plays the **default language's** take in every language; switching the voice with the reader's language is on its way to the player. A bubble's own audio (set in the editor's Speech inspector) remains the fallback where a language has no take.
+</Callout>
 
 <Callout kind="tip">
-Run [Preflight validation](/cms/validation) before publishing — it reports missing translations and bubbles without audio so nothing slips through.
+Run [Preflight validation](/cms/validation) before publishing — it reports languages with missing translations and bubbles without voice audio so nothing slips through.
 </Callout>

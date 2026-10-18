@@ -5,6 +5,89 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-18" description="CMS — the Studio redesign: a Dashboard, notifications, and every Backstage tool rebuilt for 4K screens" tags={["feature"]}>
+  ## CMS
+
+  - **Dashboard.** Signing in now lands on your studio home: continue where
+    you left off (straight back to the panel you last saved), creator KPIs,
+    your latest works, readers per day, your inbox, a next-steps checklist
+    with milestones, tutorial videos and the blog. A team switcher scopes it
+    all. [Dashboard](/cms/dashboard).
+  - **Notifications.** A bell on every screen and a Notifications page tell
+    you about comments and mentions, finished or failed exports, publishes,
+    team changes, plan limits and finished speech batches.
+    [Notifications](/cms/notifications).
+  - **One layout for every tool.** The Works library and all Backstage tools
+    now share the editor's rhythm — list, stage, inspector — with editing in
+    the inspector instead of dialogs, a Guide rail on every page
+    (<kbd>?</kbd>), the same keys everywhere (<kbd>]</kbd> inspector,
+    <kbd>[</kbd> list, <kbd>/</kbd> search), a grouped work rail with status
+    badges, and **Interface density** and **Interface scale** preferences
+    under Profile → Appearance. [Working on a 4K screen](/cms/4k-screens).
+  - **Works library.** Cover grid, cover wall or sortable table; team
+    scoping; language, format and tag filters; an inspector with everything
+    about a work, its reader links and a section grid; Metadata, Localization
+    and Output properties edited in place; the create wizard as a side sheet
+    with a cover and description on step 1. [Works](/cms/works).
+  - **Characters.** A cast board grouped by role — drag between groups to
+    change a role — with an autosaving inspector, balloon previews drawn by
+    the real engine with the work's cascade, **balloon presets** as a
+    character's base, voices per language, and "used in" panel thumbnails.
+    [Characters](/cms/characters).
+  - **Extras.** The bonus shelf: a bucket rail, a wall at real aspect ratio,
+    drop-to-upload, multi-select with bulk actions, an autosaving inspector
+    with language tabs, PDF and text previews, tiers from your products, and
+    a reader view. [Extras](/cms/extras).
+  - **Variables.** Grouped by namespace, a **Used** column that flags unused
+    variables, autosave in the inspector, and **Try it** to open the Preview
+    with a value. [Variables & Conditions](/cms/editor/variables).
+  - **Preview as a device lab.** Several devices side by side with mirrored
+    navigation, fit-to-screen, rotation, big screen and A4 print frames,
+    working copy / staging / production sources, live entitlements and start
+    values, a live-state inspector (position, variables editable without a
+    restart, history, events) and shareable scenario links. Fullscreen works
+    again. [Preview](/cms/preview).
+  - **Paywall.** The content map shows panel thumbnails tinted free / preview
+    / gated for a chosen reader; rules are applied to panels by selection,
+    lasso or drag and **saved**; the rule inspector shows the diff and a
+    reader-outcome table; the real paywall overlay previews under the map;
+    **Products** are a tab of the same page with sold counts and Stripe
+    state; paywall conversion is counted. [Monetization](/cms/monetization).
+  - **Entitlement lab.** Personas built from your real products, a chapters
+    × personas outcome matrix with CSV export, and the real player at the
+    first locked panel. [Simulating reader access](/cms/monetization#simulating-reader-access).
+  - **Localization grid.** Every language as a column, rows grouped by panel
+    with thumbnails and speakers, **balloon-fit warnings** from the real
+    balloon engine, a context inspector with balloon previews per language,
+    machine translation over the filtered set, and active/inactive languages.
+    [Localization](/cms/localization).
+  - **Audio studio.** Cast voices per language, a bubble sheet with active
+    takes, stale detection, **Generate all missing** with a team text-to-speech
+    allowance, and a full waveform with trim handles.
+    [Audio localization](/cms/localization#audio-localization-and-text-to-speech).
+  - **Comments.** Every thread of a work grouped by location, replies and
+    reactions that work, resolve and pin, a review queue with notes, and
+    **pins on the artwork** that survive page-format changes.
+    [Team comments](/cms/community#team-comments-in-the-cms).
+  - **Preflight board.** Results are kept and runs start on their own when
+    the work changed; a health rail with trend and rules catalogue, a sortable
+    findings table with panel thumbnails, an inspector that shows the finding
+    on the artwork and opens the right tool, bulk fixes with one undo, and
+    **ignores** per finding or rule. Six new checks: [`MISSING_TRANSLATION`](/cms/validation-codes#missing-translation),
+    [`DEAD_END_PANEL`](/cms/validation-codes#dead-end-panel),
+    [`NO_CHOICE_LABEL`](/cms/validation-codes#no-choice-label),
+    [`MISSING_AUDIO`](/cms/validation-codes#missing-audio),
+    [`UNUSED_VARIABLE`](/cms/validation-codes#unused-variable) and
+    [`UNKNOWN_VARIABLE_IN_CONDITION`](/cms/validation-codes#unknown-variable-in-condition).
+    [Validation](/cms/validation).
+  - **Analytics board.** Six KPIs incl. paywall conversion, reads per day by
+    device, **reading paths** that show your branches, the **story heat
+    strip**, a click heatmap at full width with dead clicks, audience and
+    social tiles, a panel/day inspector, segments on every zone, comparison
+    everywhere, four CSV exports, and retention by plan.
+    [Analytics](/cms/analytics).
+</Update>
+
 <Update label="2026-10-16" description="Docs — install the CMS as a desktop app" tags={["feature"]}>
   ## CMS
 
@@ -1191,7 +1274,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     Level, Chapter, Panel Level and Extras Item; Chapter and Extras Item rules
     need a picked target. A chapter rule's free preview counts panels within that
     chapter; an extras rule locks only its item. Old *Global* rules behave as Work
-    Level rules. [Creating a rule](/cms/monetization#creating-a-rule).
+    Level rules. [Creating a rule](/cms/monetization#creating-and-editing-a-rule).
   - **Unlocking products and an optional age on any rule.** Purchase rules list
     the products that unlock them (none checked: any purchase), and every rule can
     add a minimum age that readers must pass in addition to paying.
@@ -1506,7 +1589,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     header to sort, again to flip; untranslated rows sink to the bottom
     when sorting by translation, and a **Story order** button restores
     the default. A *"Showing N of M strings"* line appears while a
-    filter is active. [The translation editor](/cms/localization#the-translation-editor).
+    filter is active. [The translation editor](/cms/localization#the-translation-grid).
   - **Machine translation uses the real source language.** *Translate
     untranslated* into a locale the workshop believed was the default
     sent identical source and target languages to the provider, which
@@ -1629,7 +1712,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     Ids may be dot-namespaced (`inventory.hasKey`), `enum` variables
     list their allowed values, and changing a type resets a stale
     default. Details:
-    [The Variables designer](/cms/editor/variables#the-variables-designer).
+    [The Variables designer](/cms/editor/variables#the-variables-page).
   - **Validation on both sides.** The dialog catches a malformed or
     duplicate id and a default that doesn't match its type, and the
     server re-checks the same rules — what you save always validates
@@ -1902,7 +1985,7 @@ Release notes for the PanelWave **format** and this **documentation site**. For 
     nightly aggregation. See [Click heatmap](/cms/analytics#click-heatmap).
   - **Reading funnel & panel engagement documented** — the dashboard's
     per-panel drop-off funnel and views/dwell/bounce table now have
-    [reference docs](/cms/analytics#reading-funnel).
+    [reference docs](/cms/analytics#reading-paths).
   - **Editor fix** — hotspots are reloaded when you reopen a panel (they
     previously disappeared from the canvas after a reload while still being
     saved), and hotspot geometry is stored in the format's normalized

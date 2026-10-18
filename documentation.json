@@ -432,6 +432,12 @@
                 "badge": "New"
               },
               {
+                "title": "Working on a 4K Screen",
+                "path": "cms/4k-screens",
+                "icon": "monitor",
+                "badge": "New"
+              },
+              {
                 "title": "Plans & Limits",
                 "path": "cms/plans",
                 "icon": "wallet"

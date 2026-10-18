@@ -1,0 +1,91 @@
+---
+title: Working on a 4K screen
+description: Get the most out of the PanelWave CMS on a large monitor — the recommended scaling, the interface scale and density preferences, the List · Stage · Inspector layout every tool shares, its keyboard shortcuts, and the grouped work rail.
+---
+
+The PanelWave CMS is built for a big screen. The editor always was; since the **Studio** redesign every other screen — the Dashboard, the Works library and all Backstage tools — uses a 4K monitor the same way: the work fills the screen, and what you edit stays in view while you edit it. Everything still works on a laptop; it just shows less at once.
+
+## Monitor and scaling
+
+We recommend a monitor of **27″ or larger at 3840 × 2160**. The operating system's display scaling decides how much of that the CMS can use:
+
+| OS scaling | Space the CMS sees | What you get |
+|---|---|---|
+| **150 %** (recommended) | 2560 × 1440 | The layouts are designed for this: three zones side by side, six covers per row, three devices in the Preview, the source and three languages in the Localization grid |
+| 200 % | 1920 × 1080 | Still the full Studio layout with a persistent inspector, with fewer columns and two devices in the Preview |
+| 100 % | 3840 × 2160 | Even more at once, but text and controls become small — raise the **Interface scale** to 125 % (below) |
+
+On Windows the setting is **Settings → System → Display → Scale**; on macOS **System Settings → Displays → Resolution**. Browser zoom works too, but the in-app preference is cleaner: it scales the interface and leaves the editor canvas alone.
+
+## Interface scale and density
+
+Under **Profile → Preferences → Appearance** three settings shape the interface. They are saved to your account and follow you across devices; the user menu (top right) has quick toggles for the last two.
+
+- **Theme** — System, Light, Dark or High Contrast.
+- **Interface density** — **Comfortable** (default) or **Compact**. Compact shortens rows and cards: the tables of the Works library, the Localization grid, the Variables page and the preflight board show a third more rows on the same screen.
+- **Interface scale** — **100 %**, **110 %** or **125 %**. Scales text, controls and spacing of the whole interface. On a 4K monitor at 100 % OS scaling choose 125 %. The editor canvas is never scaled: artwork, balloons and page layouts keep their exact size.
+
+## One layout for every tool: List · Stage · Inspector
+
+Every Backstage tool and the Works library share the editor's rhythm:
+
+- the **list** on the left — a filterable list of what the page manages (paywall rules, personas, the extras buckets, cast voices, comment threads, the validation health rail), or the page's toolbar where the stage *is* the list;
+- the **stage** in the middle — the wall of covers, the cast board, the content map, the device frames, the findings table, the analytics board; grids add columns as the screen grows;
+- the **inspector** on the right — details of the selected item, its edit form, and the **Guide rail**.
+
+On screens wider than 1920 px the inspector is a **persistent column** — drag its edge to resize it; the width is remembered per page. Below that it becomes a **drawer** that slides in when you select something and closes with <kbd>Esc</kbd>; on narrower screens the list folds into a toolbar above the stage. Editing happens **in the inspector**, not in dialogs, so the stage stays visible while you type — and most forms save as you go. Dialogs are left for creating things and for confirmations.
+
+The **Guide rail** at the top of every inspector tells you in a few lines what the page does, why it matters and what to do first, links to the matching page of this documentation and plays the page's tutorial video. Collapse it, dismiss it, and bring it back any time with <kbd>?</kbd>.
+
+## Keyboard
+
+The same keys work on every Studio page:
+
+| Key | Action |
+|---|---|
+| <kbd>]</kbd> | Toggle the inspector |
+| <kbd>[</kbd> | Toggle the list |
+| <kbd>?</kbd> | Open the Guide rail |
+| <kbd>/</kbd> | Focus the search box |
+| <kbd>↑</kbd> <kbd>↓</kbd> | Move through cards or rows |
+| <kbd>Enter</kbd> | Open the focused item in the inspector |
+| <kbd>e</kbd> | Edit it · <kbd>Del</kbd> delete it · <kbd>n</kbd> create a new one |
+| <kbd>Esc</kbd> | Close the drawer, clear a selection |
+
+The editor has its own set — see [Keyboard Shortcuts](/cms/editor/shortcuts).
+
+## The rails
+
+The **app rail** on the far left leads to **Dashboard**, **Works**, **Exports**, **Team** and **Profile**; the logo returns to the Dashboard. Inside a work, the **work rail** groups the Backstage tools:
+
+| Group | Tools |
+|---|---|
+| **Create** | Editor · Graph Editor · Canvas Layout |
+| **Cast & Content** | Characters · Extras · Variables |
+| **Language & Sound** | Localization · Audio |
+| **Ship** | Preview · Validation · Paywall · Entitlement |
+| **Audience** | Comments · Analytics |
+
+On wide screens the rails show labels; below that, icons with tooltips — pin a rail open if you prefer labels. Small **badges** on the work rail tell you where attention is needed: the number of validation errors, the completion of your least complete language, comments awaiting review, bubbles without voice audio, and the size of the cast. The breadcrumb in the top bar always reads *Works / work title / tool*.
+
+## Where the big screen pays off most
+
+- **[Preview](/cms/preview)** — phone, tablet and desktop side by side, navigating together, with the live state next to them.
+- **[Localization](/cms/localization)** — the source and three target languages as columns, the panel and its balloons in the inspector.
+- **[Works](/cms/works)** — a six-column cover grid, or a table with thirty works on one screen.
+- **[Validation](/cms/validation)** — health, every finding and the affected panel, all in view.
+- **[Analytics](/cms/analytics)** — the whole board: reads, paths, the story heat strip, the heatmap and the audience at once.
+- **[Entitlement](/cms/monetization#simulating-reader-access)** — all personas and all chapters in one matrix.
+- **The [editor](/cms/editor/layout)** — tree, canvas, inspector and timeline, as before.
+
+<Columns cols={3}>
+  <Card title="Dashboard" icon="layout-dashboard" href="/cms/dashboard">
+    Your studio home, designed for the big screen.
+  </Card>
+  <Card title="Account & Team" icon="user" href="/cms/account">
+    Where the appearance preferences live.
+  </Card>
+  <Card title="Install as an App" icon="monitor-down" href="/cms/install-app">
+    Give the CMS a window of its own.
+  </Card>
+</Columns>

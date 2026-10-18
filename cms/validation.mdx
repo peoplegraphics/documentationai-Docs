@@ -1,23 +1,32 @@
 ---
 title: Validation & Preflight
-description: Check your work before publishing with Preflight Validation — what is checked, how errors and warnings are presented, auto-fixes, and how to resolve issues.
+description: Check your work before publishing on the preflight board — the health rail, the findings table, the finding inspector with the affected panel in view, auto-fixes with undo, ignores, and automatic runs.
 ---
 
-Before a work goes live, **Preflight Validation** checks it for problems — missing translations, broken navigation, oversized files, accessibility gaps. Errors block publishing; warnings and info items are advisory.
+Before a work goes live, **Preflight Validation** checks it for problems — missing translations, broken navigation, dead ends, oversized files, accessibility gaps. Errors block publishing; warnings and info items are advisory.
 
 You reach it in two ways:
 
 - The **Preflight** button in the editor header (it shows a badge with the current issue count).
-- **Validation** in the Backstage sidebar, which opens the full **Preflight Validation** page.
+- **Validation** in the **Ship** group of the Backstage rail, which opens the full preflight board. The rail item carries the error count as a badge.
 
 Publishing runs the same checks: the [publish wizard's](/cms/publishing) first step is **Preflight**.
 
-## Running a validation
+## Runs happen on their own
 
-Click **Run Validation**. When it finishes you get a summary:
+Opening the page shows the **last report** immediately — results are kept per work, so a revisit is never empty — and starts a new run when there is no report yet or the work has changed since the last one. **Run** re-checks on demand; hovering a category in the health rail (or a group header in the table) reveals a button that re-runs **just that category**.
 
-- A verdict card — **Ready to Publish** (green) or **Cannot Publish** (red) with the total issue count. If you've run validation before, a diff shows how many issues are **new** and how many were **resolved** since the last run.
-- Counts per severity: **Errors**, **Warnings**, **Info**.
+## The board
+
+Three zones: the **Health** rail on the left, the **Findings** table in the middle, the **Finding** inspector on the right (a column on wide screens, a drawer on narrower ones; <kbd>]</kbd> toggles it, <kbd>[</kbd> the rail, <kbd>?</kbd> the Guide rail).
+
+### Health
+
+- The verdict — **Ready**, **Not ready** or **Not validated** — with its one-line reason (*"2 errors block publishing."*, *"No errors. 3 warnings worth a look."*, *"Every check passed."*), the time of the run, and how many findings are **new** and **resolved** since the previous run.
+- One row per category with counts per severity; **—** means the category has no findings. Click a row to filter the table by it (click again to clear).
+- A **trend** sparkline of the totals of your last runs, once you have run validation twice.
+- **Ignored** — rules and findings you chose to ignore (see below), each with **Un-ignore**.
+- **Rules** — the catalogue of everything preflight checks: every code with its severity, category, a short description, a **Fix** badge where an auto-fix exists, the count in the current report and a **Learn more** link into the [Validation Code Reference](/cms/validation-codes).
 
 | Severity | Meaning |
 |---|---|
@@ -25,37 +34,44 @@ Click **Run Validation**. When it finishes you get a summary:
 | **Warning** | Should be fixed — quality or accessibility concern |
 | **Info** | Nice to have — suggestions |
 
-## What is checked
-
-Issues are grouped into nine categories:
+### What is checked
 
 | Category | Typical checks |
 |---|---|
-| **Accessibility** | Image layers without alt text, audio without captions |
-| **Content** | Empty panels (no layers or content) |
-| **Localization** | Strings missing translations for supported locales |
-| **Flow** | Reserved for further flow checks; panels unreachable from the chapter's entry point in the [graph](/cms/editor/graph) are reported under **Logic** as [`UNREACHABLE_PANELS`](/cms/validation-codes#unreachable-panels) |
-| **Logic** | [Panel variants](/cms/editor/pages-panels#variants) without a condition, duplicate variant ids, conditions reading unknown variables, empty or unknown overrides (`VARIANT_*` codes) |
-| **Performance** | Oversized assets that will slow readers down |
-| **Audio** | Speech bubbles without voice audio |
-| **Integrity** | Broken references (edges or layers pointing at missing panels/assets), pages still listing deleted panels, canvas placements for missing panels |
-| **Metadata** | Missing work title, description, or cover |
+| **Accessibility** | Image layers without alt text |
+| **Content** | Empty panels, bubbles without text, video loop settings, unknown style presets |
+| **Localization** | Languages with missing translations ([`MISSING_TRANSLATION`](/cms/validation-codes#missing-translation)) |
+| **Flow** | Panels the reader cannot leave ([`DEAD_END_PANEL`](/cms/validation-codes#dead-end-panel)), choices without a label ([`NO_CHOICE_LABEL`](/cms/validation-codes#no-choice-label)) |
+| **Logic** | Panels unreachable in the [graph](/cms/editor/graph), [panel variants](/cms/editor/pages-panels#variants) without a condition, conditions reading unknown variables, declared variables nothing uses |
+| **Performance** | Oversized assets, canvases that are too large or too low-resolution |
+| **Audio** | Speech bubbles without voice audio in a voiced language ([`MISSING_AUDIO`](/cms/validation-codes#missing-audio)) |
+| **Integrity** | Broken references (edges or layers pointing at missing panels/assets), pages still listing deleted panels, canvas placements for missing panels, paywall rules without a target |
+| **Metadata** | Missing work title, description or cover |
 
-An issue whose category the preflight does not know is listed under an extra **Other** group, so the list always matches the counts in the summary. **Other** appears (also in the Category filter) only while it has issues; its re-run button re-runs the full validation.
+An issue whose category the preflight does not know is listed under an extra **Other** group, so the list always matches the counts in the summary.
 
-## Working through issues
+### Findings
 
-Issues are listed grouped by category. Each row shows a severity badge, the human-readable message, and the issue code (e.g. `MISSING_ALT_TEXT`). Click a row to open the details:
+Every finding is a row: **severity** (with a *new* badge when it appeared in this run), the **finding** (a short title plus its code, e.g. `MISSING_ALT_TEXT`), **where** it sits — chapter › page › panel with a small panel thumbnail, or the layer, asset, language, variable, rule or work — the full **message**, a **Fix** button where an auto-fix exists, and a button that opens the right tool.
 
-- **Path** — where in the work the problem sits (with a copy button), plus panel/bubble IDs and locale where relevant.
-- **Suggestion** — the recommended fix.
-- **Used in** — for asset issues (missing alt text, oversized asset), one link per chapter/page/panel that displays the asset; each opens that panel in the editor. Assets not placed on any panel say so — manage those in the editor's Assets tab.
-- **Open in editor** — jumps straight to the offending panel so you can fix it.
-- **Learn more** — opens the matching section of the [Validation Code Reference](/cms/validation-codes), which documents every issue code with its severity and recommended fix.
+- **Sort** by any column; **group by** category (default), chapter, severity or nothing. Groups collapse.
+- **Filter** with the search box (message, code, title, location, path — <kbd>/</kbd> focuses it), the severity toggles, the **Category** and **Chapter** dropdowns and **Fixable only**. Frequently used combinations can be saved as **presets** and re-applied with one click.
+- **Keyboard:** <kbd>↑</kbd>/<kbd>↓</kbd> move, <kbd>Enter</kbd> opens the inspector, <kbd>f</kbd> applies the fix, <kbd>o</kbd> opens the tool, <kbd>Space</kbd> selects the row.
+- Long reports scroll smoothly however many findings there are; the message is shortened to two lines in that case and shown in full in the inspector.
 
-To narrow a long list use the **Search** box (message, code, or path), the **Category** dropdown, and the **Errors / Warnings / Info** severity toggles. Frequently used filter combinations can be saved as **presets** (**Save current as preset**) and re-applied with one click.
+### The finding
 
-Each category header also has a re-run button so you can re-check just that category after fixing things.
+Select a row and the inspector shows the finding **as a picture** wherever it can: the panel thumbnail with the affected speech bubble or layer outlined, or the asset's preview. Below it: the full message, the **suggestion**, the location in plain words (chapter, page, panel, layer, bubble, asset, language, variable, file size), the technical path with a copy button, the **related panels** as thumbnails (click to open one in the editor), and a button for **every tool that can fix it** — the editor on the panel, bubble or layer; the Graph Editor on the broken edge; the Canvas Layout board; the paywall rule; the right Work Properties tab; Extras, Variables, Localization or Audio on the item in question.
+
+Then **Fix** (where available), **Undo**, **Learn more** (the matching section of the [Validation Code Reference](/cms/validation-codes)), and a history line telling you whether the finding is new since the previous run.
+
+## Ignoring a finding
+
+Not every warning applies to every work — a deliberate dead end, a panel that is meant to have no caption. **Ignore for this work** hides that one finding; **Ignore rule** hides every finding of that code in this work. Ignored items are not counted in the verdict, stay listed under **Ignored** in the health rail and come back with **Un-ignore**. Ignores are stored with the work, so they apply for every member of the team.
+
+<Callout kind="alert">
+Ignoring never changes the published work — a dead end you ignore is still a dead end for readers. Use it for findings you have looked at and decided are intended.
+</Callout>
 
 ## Auto-fixes
 
@@ -70,19 +86,19 @@ Issues that can be fixed automatically show a **Fix** button:
 
 You can also:
 
-- Tick multiple fixable issues (or select a whole category) and click **Apply fixes to selected**.
-- **Undo** the most recent applied fixes — removed content is restored from a snapshot taken just before the fix, so undoing a page clean-up puts back exactly that page.
+- Tick several fixable rows (or a whole group with the checkbox in its header) and click **Fix selected**. The fixes are applied one after another and the work is re-validated once.
+- **Undo** the most recent fixes — a whole batch at once. Removed content is restored from a snapshot taken just before the fix, so undoing a page clean-up puts back exactly that page.
 
 ### Optimizing oversized images
 
-Images over the 5 MB publish limit get their own fix: an **Optimize** button on each oversized-image error, plus **Optimize all (n)** on the group. Optimizing runs in the background — the CMS re-encodes the image as WebP, stepping down quality (and, if needed, resolution) until it fits the budget — and the issue list polls until the queued jobs finish and the errors clear on their own.
+Images over the 5 MB publish limit get their own fix: an **Optimize** button on each oversized-image error, plus **Optimize all (n)** on the group. Optimizing runs in the background — the CMS re-encodes the image as WebP, stepping down quality (and, if needed, resolution) until it fits the budget — and the board polls until the queued jobs finish and the errors clear on their own.
 
 - Your **original stays untouched** in the library at full quality; the fix adds an `optimized` variant, and the published work ships that variant instead.
 - The size check judges the **effective shipped size**, so an already-optimized image doesn't get flagged again.
 - **Undo** removes the optimized variant and restores the previous state.
 
 <Callout kind="alert">
-Auto-fixes are convenient but not always what you want — a "broken link" fix removes the reference rather than restoring the missing target. Review the suggestion before fixing, and prefer **Open in editor** when the real fix is authoring work.
+Auto-fixes are convenient but not always what you want — a "broken link" fix removes the reference rather than restoring the missing target. Review the suggestion before fixing, and prefer the tool buttons when the real fix is authoring work.
 </Callout>
 
 ## Fixing common issues
@@ -91,15 +107,16 @@ The [Validation Code Reference](/cms/validation-codes) covers every code individ
 
 | Issue | How to fix |
 |---|---|
-| Missing alt text | **Open in editor**, select the layer, add alt text in the **A11y** inspector tab (or via the asset's **Edit Metadata** in the [Assets library](/cms/assets)) |
-| Missing translations | Open the [Localization Workshop](/cms/localization), filter by **Show Only Missing** |
-| Unreachable panel | Open the [Graph Editor](/cms/editor/graph) and connect the panel — or delete it if it's leftover |
-| Oversized asset | Images: click **Optimize** on the issue (see [above](#optimizing-oversized-images)). Audio/video, or when you want manual control: re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
-| Missing title/description/cover | Fill them in under [Work Properties](/cms/works) → Metadata |
+| Missing alt text | Open the layer in the editor and add alt text in the **A11y** inspector tab (or via the asset's **Edit Metadata** in the [Assets library](/cms/assets)) |
+| Missing translations | Open the [Localization](/cms/localization) grid on that language, filter by **Missing** |
+| Unreachable panel, dead end | Open the [Graph Editor](/cms/editor/graph) and connect the panel — or delete it if it's leftover |
+| Choice without a label | Label the edge in the Graph Editor, or give the hotspot a name in the [Hotspots](/cms/editor/hotspots) inspector |
+| Oversized asset | Images: click **Optimize** on the finding (see [above](#optimizing-oversized-images)). Audio/video, or when you want manual control: re-export the source smaller and use **Replace File** in the [Assets library](/cms/assets) |
+| Missing title/description/cover | Fill them in under [Work Properties](/cms/works#metadata) → Metadata |
 | Empty panel | Add content, or delete the panel in the Tree |
-| Page lists panels that no longer exist | Click **Fix** on the `DANGLING_PAGE_REF` issue |
+| Page lists panels that no longer exist | Click **Fix** on the `DANGLING_PAGE_REF` finding |
+| Unused or unknown variable | Open [Variables](/cms/editor/variables): declare the missing one, or remove the one nothing uses |
 
 ## Exporting a report
 
-**Export JSON** and **Export CSV** download the full issue list — useful for tracking fixes in a spreadsheet or handing a QA report to teammates.
-
+**JSON** and **CSV** in the table's toolbar download the full report — the CSV has one row per finding with its severity, category, code, title, message, chapter, page, panel, layer, asset, language, variable, path, suggestion and whether an auto-fix exists — useful for tracking fixes in a spreadsheet or handing a QA report to teammates.
