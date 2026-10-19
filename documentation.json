@@ -420,6 +420,12 @@
                 "icon": "user"
               },
               {
+                "title": "Groups & Access",
+                "path": "cms/groups-access",
+                "icon": "shield",
+                "badge": "New"
+              },
+              {
                 "title": "Notifications",
                 "path": "cms/notifications",
                 "icon": "bell",

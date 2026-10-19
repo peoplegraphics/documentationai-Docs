@@ -1,0 +1,103 @@
+---
+title: Groups & Access
+description: Decide per work and per series who on your team can open and change it — with member groups, work groups, restricted works, guests and per-work roles.
+---
+
+By default everyone in a team works on every work of that team, with their team role. When a studio grows, that stops fitting: a letterer should only touch the series they letter, an unannounced title should stay out of sight, and a translation agency needs French and nothing else. Groups and per-work access cover exactly that.
+
+<Callout kind="info">
+  **Work groups** come with the **Creator** plan. **Groups, restricted works, guests and per-work roles** come with **Studio** and **Publisher**. See [Plans & Limits](/cms/plans).
+</Callout>
+
+## The building blocks
+
+| | What it is | Example |
+|---|---|---|
+| **Group** | A named set of team members | *Art department*, *FR agency* |
+| **Work group** | A named set of works. A work is in one work group or none | *Series A*, *Client X* |
+| **Access mode** | Who can open a work or a work group | *Only invited people* |
+| **Grant** | Gives a group or a member a role on a work or a work group | *Art department → Editor on Series A* |
+
+Owners and admins always see and can change every work. Everyone else gets the union of their team role (unless the work is restricted) and their grants. Grants only add access; they never take it away.
+
+### Access modes
+
+| Mode | Members without a grant | Guests |
+|---|---|---|
+| **Everyone in the team** (default) | Their team role | Only what is granted |
+| **Team can view, only invited people edit** | View only | Only what is granted |
+| **Only invited people** | No access, the work is hidden | Only what is granted |
+
+A work uses its work group's mode unless you set one on the work itself.
+
+### Roles on a work
+
+| Role | Can do |
+|---|---|
+| **Publisher** | Everything an editor can, plus publish to staging and production, unpublish, roll back and create review links. Can't delete works or change access. Only available as a grant. |
+| **Editor** | Edit content, publish to development |
+| **Reviewer** | Read, resolve and reopen comment threads, move a work between *Draft* and *Review* |
+| **Localizer** | Translations, locales, glossary, audio localization and voice generation |
+| **Monetizer** | Paywall rules, and the team's products and coupons |
+| **Moderator** | Moderate comments |
+| **Analyst** | Read (analytics are open to every member) |
+| **Viewer** | Read only |
+
+### Guests
+
+**Guest** is a team role for freelancers and agencies: a guest sees *nothing* of the team except the works granted to them, and no team-wide pages such as the plan, payouts or the team character library. Guests use a seat like any member. For people who only need to read and comment, a [review link](/guides/publishing) is free.
+
+## Setting it up
+
+<Steps>
+  <Step title="Create groups">
+    Open **Team** → **Groups**, click **New group**, give it a name and a color, and pick its members. A member can be in several groups.
+  </Step>
+  <Step title="Create work groups">
+    In **Team** → **Work groups**, create one per series, client or anthology. Reorder them with the arrows; the order is the one My Works shows.
+  </Step>
+  <Step title="Restrict and grant">
+    Click **Access…** on a work group. Choose who can open it, then add groups or members with a role — for example *Series A crew → Publisher*. Click **Save**.
+  </Step>
+  <Step title="Sort your works">
+    In **My Works**, select works and choose **Move to work group…**, or pick the work group when you create a work. A work inherits its work group's access.
+  </Step>
+</Steps>
+
+### Inviting a freelancer as a guest
+
+In **Team** → **Members**, click **Invite Member**, choose the role **Guest**, and pick the groups they should join. When they accept, they see exactly the works those groups were granted, nothing else.
+
+## One work's access
+
+Open a work's **Properties** → **Access**:
+
+- **Work group** — move the work into a work group or take it out.
+- **Who can open this work** — *Same as work group*, or one of the three modes for this work only.
+- **Invited people & groups** — grants on this work. Grants from the work group are listed below with *via work group …*.
+- **Who has access** — every team member with their role and why, for example *Editor · via group Art* or *No access · only invited people*.
+
+Only owners and admins can change access. Everyone else sees which mode applies and their own role.
+
+## What members notice
+
+- **My Works** shows only works they can open. A lock marks restricted works, and a role badge shows when someone can't edit, for example *Viewer* or *Localizer*.
+- On wide screens, a **work group** rail on the left filters My Works; on narrow screens it is a select in the toolbar.
+- Opening a work without edit rights shows the editor read-only, with a banner saying which access they have. A localizer still edits translations, a monetizer the paywall.
+- Notifications, comment mentions and analytics per work only reach and list people who can open the work.
+
+## The access log
+
+**Team** → **Access log** lists every change, newest first: groups created or edited, members added or removed, work groups and their access mode, grants, works moved between work groups, and members made guests. Owners and admins see it.
+
+## When you change plans
+
+If a team moves to a plan without these features, **nothing becomes visible that wasn't before**: restricted works stay restricted and guests stay guests. You can't add new grants, groups or guests, but you can still clean up — remove grants and groups, open a work group to *Everyone in the team*, or turn a guest into a regular member.
+
+## Related
+
+<Columns cols={3}>
+  <Card title="Account & Team" icon="users" href="/cms/account">Members, roles and invitations.</Card>
+  <Card title="Plans & Limits" icon="layers" href="/cms/plans">Which plan includes what.</Card>
+  <Card title="Publishing" icon="send" href="/cms/publishing">Who can publish where.</Card>
+</Columns>
