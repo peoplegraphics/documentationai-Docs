@@ -5,6 +5,104 @@ description: Release notes for the PanelWave format and this documentation site 
 
 Release notes for the PanelWave **format** and this **documentation site**. For the format's design and compatibility rules, see [Versioning](/schema/versioning).
 
+<Update label="2026-10-19" description="CMS — groups, work groups and per-work access; specialist roles get real rights" tags={["feature"]}>
+  ## Groups & Access
+
+  - **Decide per work who can open and change it.** Member **groups**
+    (*Art department*, *FR agency*), **work groups** for a series or a client,
+    three **access modes** — everyone in the team, team can view and only
+    invited people edit, only invited people — and **grants** that give a
+    group or a member a role on a work or a work group. Work groups come with
+    **Creator**; groups, restricted works, guests and per-work roles with
+    **Studio** and **Publisher**. [Groups & Access](/cms/groups-access).
+  - **New roles.** **Guest** is a team role for freelancers and agencies who
+    see only the works granted to them. **Publisher** — only as a grant — can
+    publish to staging and production, unpublish, roll back and create review
+    links without being an admin. Invite a guest straight into groups.
+  - **Specialist roles do their job.** A **localizer** edits translations,
+    locales, the glossary and audio localization — also in a work that is
+    otherwise read-only for them; a **monetizer** edits paywall rules and the
+    team's products and coupons; a **moderator** moderates comments; a
+    **reviewer** resolves threads and moves a work between *Draft* and
+    *Review*. [Roles](/cms/account#roles).
+  - **What members see.** My Works lists only works they can open, with a lock
+    on restricted works, a role badge, and a work-group rail; Work Properties
+    has an **Access** tab that explains every member's access; **Team** gets
+    *Groups*, *Work groups* and an *Access log*.
+  - **AI assistants know your access.** Three new read-only MCP tools —
+    `pw_teams_list_groups`, `pw_teams_list_work_groups` and
+    `pw_works_get_access` — and `pw_works_list` shows each work's work group,
+    your role and its access mode. `pw_meta_explain_permissions` now explains
+    a role limit as a role limit instead of blaming the plan.
+    [MCP tool reference](/cms/integrations/tool-reference).
+</Update>
+
+<Update label="2026-10-19" description="CMS — tighter team checks" tags={["security"]}>
+  ## Team boundaries
+
+  - **Creating and importing works** needs the owner or admin role in the team
+    the work lands in; the create wizard only offers those teams, and imports
+    without a chosen team go to your selected team (if you manage it) or the
+    first team you manage. [Import](/cms/import).
+  - **Products and coupons belong to a team**: its members see them, owners,
+    admins and monetizers change them, and other teams never see them.
+    [Monetization](/cms/monetization#products-price-points-and-coupons).
+  - **Deleting a comment** checks that you belong to the work; adding a member
+    directly respects the plan's seats, and only an owner can add an owner or
+    admin.
+  - **API:** `GET /manifest?workId=` now checks your access to the work, like
+    `GET /works/{workId}/manifest`. The old bubble-scoped `/audio-localization`
+    endpoint is retired and answers `410 Gone`; the CMS already uses the
+    work-scoped routes.
+</Update>
+
+<Update label="2026-10-19" description="Player (next release) · CMS — layers where you placed them, a calmer canvas, and Studio fixes" tags={["bugfix", "feature"]}>
+  ## Player
+
+  These fixes are on the player's main branch and already run inside the CMS
+  (preview, reader app and PDF export); they ship on npm with the release
+  after **1.7.0**.
+
+  - **Layers sit where you placed them.** Layers above the background are
+    placed by their `x`/`y`/`width`/`height` in the panel's 1024-unit
+    reference space, and text scales with the panel. They used to be drawn
+    full-panel and shifted. Published manifests now keep each layer's size —
+    republish works with overlays. [Layers → Placement](/schema/layers#placement).
+  - **Canvas view pans only while the button is held.** Hovering no longer
+    drags the camera, the cursor is an arrow until you drag, and a **mouse
+    click on the current panel reads on**. [Canvas view → Input model](/player/canvas-view#input-model).
+
+  ## CMS
+
+  - **Dashboard:** six KPI tiles in two rows with a new **Published** tile and
+    per-work rows while there is no history yet, a larger *Continue* cover,
+    and clean covers with captions in *Latest works*. [Dashboard](/cms/dashboard#creator-kpis).
+  - **Validation:** a **missing alt text** finding opens the asset's metadata
+    drawer right on the Validation page; saving drops the finding at once.
+    [Fixing common issues](/cms/validation#fixing-common-issues).
+  - **Characters:** characters without a role (from imports or AI assistants)
+    appear under **Other** on the cast board; the list shows larger portraits
+    with reference thumbnails; the team library loads right away, shows when
+    an entry was updated and whether the work has it, and **Update team copy**
+    replaces the shared copy. [Characters](/cms/characters#team-character-library).
+  - **Canvas layout:** panels show their artwork again and keep its shape when
+    resized (<kbd>Shift</kbd> resizes freely); **Fit to artwork** fixes boxes
+    with the wrong shape. [Canvas layout](/cms/editor/canvas-layout#the-board).
+  - **Comments:** the inspector shows the panel's artwork (video panels play
+    inline), thread cards get **Open in editor**, and links to a panel open
+    the editor on that panel. [Team comments](/cms/community#where-to-find-them).
+  - **Localization grid:** each string's type sits in its own sticky **Type**
+    column, so the source lines up with the translations.
+    [Localization](/cms/localization).
+  - **Graph editor:** closing it leaves a card to reopen it or go back to the
+    work instead of a blank page. [Graph editor](/cms/editor/graph).
+  - **Analytics:** panel engagement, the funnel, reading paths and the click
+    heatmap are recorded again for works whose reader reported friendly panel
+    ids, and the click heatmap no longer reloads in a loop.
+    [Analytics](/cms/analytics).
+  - **Studio pages** keep their side padding and have a single scrollbar.
+</Update>
+
 <Update label="2026-10-18" description="SDK · @panelwave/types 1.6.0 and @panelwave/cli 1.5.0, @panelwave/player 1.7.0 on npm — format 1.9.0" tags={["feature"]}>
   ## Format 1.9.0 on npm
 

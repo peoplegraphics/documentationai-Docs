@@ -51,6 +51,14 @@ The camera is a persistent position + zoom over the plane, managed by
 With `freeRoam: "between-moves"` (the default) panning is available while the
 camera is idle; `"always"` also allows grabbing the camera mid-glide.
 
+With a mouse, the camera pans **only while a button is held**: the cursor is an
+arrow, turns into a grabbing hand while you drag, and the press ends when you
+release the button (or the browser cancels the pointer), so plain hovering
+never moves the camera. A **click on the current panel reads on** — it
+advances like the right edge zone. A touch tap on the current panel shows the
+toolbar instead. Dragging an image out of the stage and selecting text on it
+are blocked.
+
 Only the **current** panel's [hotspots](/schema/hotspots) are interactive: a
 press that starts on one of them is left to the hotspot instead of becoming a
 pan or a panel tap, and its action and `hotspot_click` tracking run exactly as

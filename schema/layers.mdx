@@ -32,7 +32,7 @@ There is no blend-mode property in the current schema — compositing is plain a
 
 ### Editor fields
 
-`LayerCommon` also admits fields written by the CMS editor: `x`, `y`, `width`, `height`, `scaleX`, `scaleY`, `rotation` (editor transform), `locked`, `visible` (editor state), and `content`, `fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `verticalAlign` (editor text styling). They are valid on any layer kind but are authoring metadata; runtime rendering is driven by `transform`, `z`, `opacity`, and the kind-specific fields.
+`LayerCommon` also admits fields written by the CMS editor: `x`, `y`, `width`, `height`, `scaleX`, `scaleY`, `rotation` (editor transform), `locked`, `visible` (editor state), and `content`, `fontFamily`, `fontSize`, `fontWeight`, `color`, `align`, `verticalAlign` (editor text styling). They are valid on any layer kind. Most of them are authoring metadata, but `x`, `y`, `width` and `height` also **place** a layer in the reference player — see [Placement](#placement). Everything else at runtime is driven by `transform`, `z`, `opacity`, and the kind-specific fields.
 
 ## Layer kinds
 
@@ -103,6 +103,28 @@ When many layers share the same look (e.g. every caption of an album), define it
 - **Stacking:** layers render in ascending `z`. Speech bubbles and hotspots render above the layer stack.
 - **Coordinates:** geometry fields that are `NormalizedRect`/`NormalizedNumber` (`clipRect`, `visibleRect`, `dragReveal`) are fractions of the panel box — resolution-independent. `transform.x`/`y` offset the layer; `transform.scale`/`rotation` apply around the layer.
 - **Parallax:** `parallaxDepth` shifts layers at different rates during viewport motion for a depth effect (e.g. background `0`, midground `0.3`, foreground `0.6`).
+
+### Placement
+
+A layer's `x`, `y`, `width` and `height` are in the panel's **reference space**: **1024 units tall** and `1024 × aspect` wide, where `aspect` is the width / height of the panel's artwork (its background image, else the first image or video with known dimensions, else 16:9). This is the space the CMS editor authors layers in, and it does not depend on the size the panel is shown at.
+
+| Layer | Placed |
+|---|---|
+| **Background** — the first `image` layer at `z` 0 (a missing `z` counts as 0) | Always over the **whole panel**; its `x`/`y`/`width`/`height` are ignored and the CMS leaves them out |
+| **Every other layer** | At its rect, in percent of the panel box: `left = x / referenceWidth`, `top = y / 1024`, and so on. A missing `width` or `height` means the full reference extent |
+
+A text layer's `fontSize` is in the same units, so captions keep their size relative to the panel on every screen.
+
+```json
+{ "id": "sign", "kind": "image", "assetId": "sign", "z": 2,
+  "x": 640, "y": 96, "width": 512, "height": 256 }
+```
+
+In a 16:9 panel (reference space 1820 × 1024) this layer starts at about 35 % from the left and 9.4 % from the top, and is about 28 % wide and 25 % tall.
+
+<Callout kind="info">
+The reference player places layers this way since the version after **1.7.0** (inside the CMS — preview, reader app and PDF export — since 2026-10-19). Earlier versions drew every layer full-panel and used `x`/`y` as raw pixel offsets, so overlays appeared in the wrong place. Manifests the CMS publishes since 2026-10-19 keep `width` and `height` on every layer but the background; republish a work to pick this up.
+</Callout>
 
 ## `AssetRef`
 

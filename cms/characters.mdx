@@ -11,11 +11,11 @@ Open **Characters** from a work's Backstage rail (group **Cast & Content**), fro
 
 The page is laid out like every Backstage tool: an optional list on the left (the **team library**), the **board** in the middle, and the **inspector** on the right — a column on wide screens, a drawer on narrower ones (<kbd>]</kbd> toggles it, <kbd>[</kbd> the team library, <kbd>?</kbd> the Guide rail).
 
-The board groups your characters by role — **Protagonists → Antagonists → Supporting → Minor → Other** — as portrait tiles that grow with the screen. A tile shows the portrait (or initials on role-coloured paper), the name in the selected language, a role chip, small **coverage dots** for languages that still lack a localized name or bio, how many **bubbles** the character speaks in, a live **balloon sample** in the character's effective style, and a ▶ button that plays the assigned voice. Inactive characters are greyed out and marked *inactive*.
+The board groups your characters by role — **Protagonists → Antagonists → Supporting → Minor → Other** — as portrait tiles that grow with the screen. Characters without a role, for example from a script import or an AI assistant, are filed under **Other**. A tile shows the portrait (or initials on role-coloured paper), the name in the selected language, a role chip, small **coverage dots** for languages that still lack a localized name or bio, how many **bubbles** the character speaks in, a live **balloon sample** in the character's effective style, and a ▶ button that plays the assigned voice. Inactive characters are greyed out and marked *inactive*.
 
 - **Language pills** in the title row switch which localized name and bio the board shows (the work's default language is preselected).
 - **Search** by name or bio (<kbd>/</kbd> focuses it), **Board | List | Roster** switch the view.
-- **List** is a sortable table for big casts: Portrait · Name · Role · Age · Gender · Voice · Balloon type · Used in · Languages ✓/✗ · Active · Updated.
+- **List** is a sortable table for big casts: Portrait · Name · Role · Age · Gender · Voice · Balloon type · Used in · Languages ✓/✗ · Active · Updated. Each row shows a large portrait and, under the name, the character's reference images as a strip of thumbnails (up to five, then *+N*).
 - **Roster** is the board without controls and with large portraits — a printable cast sheet (**Print**).
 
 ### Reordering and changing roles by drag
@@ -44,7 +44,7 @@ The inspector's sections, top to bottom:
 
 ### Speech balloon style and presets
 
-The **Speech balloon** section shows the character's balloons exactly as the player will draw them — rendered with the real balloon engine and the work's cascade, scaled to fit, with a localized sample line in a short and a long variant so you can see how the balloon grows with longer text. A chip line states where the style comes from: *Inherits work default*, *Based on preset X*, or *Overrides: type, fill, tail*.
+The **Speech balloon** section shows the character's balloons exactly as the player will draw them — rendered with the real balloon engine and the work's cascade, scaled up to 1.5× so the sample text is readable while the balloon keeps its real proportions, with a localized sample line in a short and a long variant so you can see how the balloon grows with longer text. A chip line states where the style comes from: *Inherits work default*, *Based on preset X*, or *Overrides: type, fill, tail*.
 
 <Callout kind="info">
 **How balloon styles cascade:** work default → balloon preset → character override → per-bubble override. A character override only changes balloons *assigned to that character*, and an individual bubble can still override everything. See [Speech Bubbles](/cms/editor/speech-bubbles).
@@ -59,9 +59,10 @@ Characters connect to dialogue in the editor: select a speech bubble on the canv
 
 ## Team character library
 
-Team works get a shared **Team library**, shown in the list on the left (<kbd>[</kbd>):
+Team works get a shared **Team library**, shown in the list on the left (<kbd>[</kbd>). It loads as soon as the page opens; each entry shows when it was last updated and an **In this work** marker if the work already has that character.
 
-- **Share to team** (in the inspector) publishes a copy of the character for teammates. Re-sharing a character with the same name updates the team's copy.
+- **Share to team** (in the inspector) publishes a **copy** of the character for teammates. After sharing, the library opens with the new entry highlighted. Later edits to your character don't change the copy by themselves: once a copy exists the button reads **Update team copy**, and re-sharing a character with the same name updates the team's copy.
+- The inspector also shows the character's library status — who shared it and when — with **Show in library**.
 - To bring a shared character into the current work, **drag it onto a role section** of the board — it is imported with that role — or click **Import** on the library entry.
 
 ## Import & export

@@ -18,8 +18,15 @@ the workspace navigation (**Canvas Layout**).
 ## The board
 
 - **Panels** render with their real artwork, positioned at their world
-  coordinates. Drag to move, drag the corner handle to resize (16-unit snap),
-  shift-click for multi-select.
+  coordinates and letterboxed inside their box the way the player draws them.
+  Drag to move, drag the corner handle to resize (16-unit snap),
+  shift-click for multi-select. Resizing keeps the artwork's shape; hold
+  **Shift** while resizing to change the shape freely.
+- **Fit to artwork** in the toolbar resets the selected panels' boxes (or all
+  of them, with nothing selected) to their artwork's aspect ratio — handy for
+  boxes that were saved with the wrong shape. The button counts the boxes that
+  don't match and is disabled when all do; it can be undone like any board
+  operation.
 - **Rotate**: a selected panel shows a round knob above its top edge (it
   travels with the rotation). Drag it to rotate the panel around its origin;
   hold **Shift** to snap to 15° steps. The inspector's **Rotation (°)** field
